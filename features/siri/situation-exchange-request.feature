@@ -5,29 +5,29 @@ Feature: Support SIRI Situation Exchange by request
   @siri-valid @ARA-1342
   Scenario: Handle a SIRI SituationExchange request
     Given a Situation exists with the following attributes:
-      | Codes                                                                               | "external" : "test"                           |
-      | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                     |
-      | Version                                                                             | 1                                             |
-      | Keywords                                                                            | ["Commercial", "Test"]                        |
-      | ReportType                                                                          | general                                       |
-      | ParticipantRef                                                                      | "535"                                         |
-      | VersionedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
-      | Progress                                                                            | published                                     |
-      | ValidityPeriods[0]#StartTime                                                        | 2017-01-01T01:30:06+02:00                     |
-      | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                     |
-      | PublicationWindows[0]#StartTime                                                     | 2017-09-01T01:00:00+02:00                     |
-      | PublicationWindows[0]#EndTime                                                       | 2017-09-25T01:00:00+02:00                     |
-      | AlertCause                                                                          | maintenanceWork                               |
-      | Severity                                                                            | normal                                        |
-      | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible |
-      | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId      | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                  |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]    | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]    | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
+      | Codes                                                                              | "external" : "test"                           |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
+      | Version                                                                            | 1                                             |
+      | Keywords                                                                           | ["Commercial", "Test"]                        |
+      | ReportType                                                                         | general                                       |
+      | ParticipantRef                                                                     | "535"                                         |
+      | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
+      | Progress                                                                           | published                                     |
+      | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
+      | PublicationWindows[0]#StartTime                                                    | 2017-09-01T01:00:00+02:00                     |
+      | PublicationWindows[0]#EndTime                                                      | 2017-09-25T01:00:00+02:00                     |
+      | AlertCause                                                                         | maintenanceWork                               |
+      | Severity                                                                           | normal                                        |
+      | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId     | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId    | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                  |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]   | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]   | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
     When the Situation "external":"test" is edited with a Consequence with the following attributes:
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
@@ -62,7 +62,7 @@ Feature: Support SIRI Situation Exchange by request
       """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <ws:GetSituationExchange xmlns:siri="http://www.siri.org.uk/siri" xmlns:ws="http://wsdl.siri.org.uk">
+    <sw:GetSituationExchange xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
@@ -72,13 +72,13 @@ Feature: Support SIRI Situation Exchange by request
         <siri:MessageIdentifier>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:MessageIdentifier>
       </Request>
       <RequestExtension />
-    </ws:GetSituationExchange>
+    </sw:GetSituationExchange>
   </soap:Body>
   </soap:Envelope>
       """
     Then I should receive this SIRI response
       """
-      <?xml version='1.0' encoding='UTF-8'?> 
+      <?xml version='1.0' encoding='UTF-8'?>
       <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
@@ -221,7 +221,7 @@ Feature: Support SIRI Situation Exchange by request
       """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
-    <ws:GetSituationExchange xmlns:siri="http://www.siri.org.uk/siri" xmlns:ws="http://wsdl.siri.org.uk">
+    <sw:GetSituationExchange xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
@@ -231,13 +231,13 @@ Feature: Support SIRI Situation Exchange by request
         <siri:MessageIdentifier>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:MessageIdentifier>
       </Request>
       <RequestExtension />
-    </ws:GetSituationExchange>
+    </sw:GetSituationExchange>
   </soap:Body>
   </soap:Envelope>
       """
     Then I should receive this SIRI response
       """
-      <?xml version='1.0' encoding='UTF-8'?> 
+      <?xml version='1.0' encoding='UTF-8'?>
       <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
@@ -273,7 +273,7 @@ Feature: Support SIRI Situation Exchange by request
   Scenario: Handle a SX response (ServiceDelivery)
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
-      <?xml version='1.0' encoding='UTF-8'?> 
+      <?xml version='1.0' encoding='UTF-8'?>
       <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
@@ -522,7 +522,7 @@ Feature: Support SIRI Situation Exchange by request
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
@@ -532,3 +532,77 @@ Feature: Support SIRI Situation Exchange by request
       | Direction | sent                     |
       | Type      | SituationExchangeRequest |
       | Lines     | nil                      |
+
+  @ARA-1461 @siri-valid
+  Scenario: Manage a Request with a Line filter
+    Given a SIRI server on "http://localhost:8090"
+And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
+      | remote_url                | http://localhost:8090 |
+      | remote_credential         | test                  |
+      | remote_code_space         | internal              |
+      | collect.filter_situations | true                  |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name              | Test               |
+      | Codes             | "internal": "1234" |
+      | CollectSituations | true               |
+      And 10 seconds have passed
+      And the SIRI server has received a GetGeneralMessage request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:GetSituationExchange xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <ServiceRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:01:10.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>test</siri:RequestorRef>
+        <siri:MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:MessageIdentifier>
+      </ServiceRequestInfo>
+      <Request version="2.0:FR-IDF-2.4">
+        <siri:RequestTimestamp>2017-01-01T12:01:10.000Z</siri:RequestTimestamp>
+        <siri:MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:MessageIdentifier>
+        <siri:LineRef>1234</siri:LineRef>
+      </Request>
+      <RequestExtension />
+    </sw:GetSituationExchange>
+  </S:Body>
+  </S:Envelope>
+      """
+
+  @ARA-1461 @siri-valid
+  Scenario: Manage a Request with a StopArea filter
+    Given a SIRI server on "http://localhost:8090"
+      And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
+      | remote_url                | http://localhost:8090 |
+      | remote_credential         | test                  |
+      | remote_code_space         | internal              |
+      | collect.filter_situations | true                  |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+        | Name              | Test              |
+        | Codes             | "internal":"1234" |
+        | CollectSituations | true              |
+      And 10 seconds have passed
+      And the SIRI server has received a GetGeneralMessage request
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:GetSituationExchange xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <ServiceRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:01:10.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>test</siri:RequestorRef>
+        <siri:MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:MessageIdentifier>
+      </ServiceRequestInfo>
+      <Request version="2.0:FR-IDF-2.4">
+        <siri:RequestTimestamp>2017-01-01T12:01:10.000Z</siri:RequestTimestamp>
+        <siri:MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:MessageIdentifier>
+        <siri:StopPointRef>1234</siri:StopPointRef>
+      </Request>
+      <RequestExtension />
+    </sw:GetSituationExchange>
+  </S:Body>
+  </S:Envelope>
+      """

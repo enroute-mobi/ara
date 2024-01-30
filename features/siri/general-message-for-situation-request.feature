@@ -6,7 +6,7 @@ Feature: Support SIRI GeneralMessage for Situation
   @ARA-1362
   Scenario: 3797 - Do not ignore Situations associated to other keywords than Commercial/Perturbation/Information
     Given a Situation exists with the following attributes:
-      | Codes                  | "internal" : "1"                                  |
+      | Codes                      | "internal" : "1"                                  |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                         |
       | Version                    | 1                                                 |
       | Keywords                   | ["Others"]                                        |
@@ -16,9 +16,9 @@ Feature: Support SIRI GeneralMessage for Situation
       | Affects[Line]              | 6ba7b814-9dad-11d1-2-00c04fd430c8                 |
     And a Line exists with the following attributes:
       | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Name  | Ligne 3 Metro                   |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
-      | local_credential     | TestPartner |
+      | local_credential  | TestPartner |
       | remote_code_space | internal    |
     When I send this SIRI request
       """
@@ -86,30 +86,30 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3008 - Handle a SIRI GetGeneralMessage request
     Given a Situation exists with the following attributes:
-      | Codes                                                                           | "external" : "test"                                                        |
-      | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                                                  |
-      | Version                                                                             | 1                                                                          |
-      | Keywords                                                                            | ["Commercial"]                                                             |
-      | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                                                  |
-      | Summary[DefaultValue]                                                               | Carte abonnement                                                           |
-      | Description[DefaultValue]                                                           | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
-      | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId      | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId     | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef          | Route:66:LOC                                                               |
+      | Codes                                                                              | "external" : "test"                                                        |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                                                  |
+      | Version                                                                            | 1                                                                          |
+      | Keywords                                                                           | ["Commercial"]                                                             |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                                                  |
+      | Summary[DefaultValue]                                                              | Carte abonnement                                                           |
+      | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId     | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId    | 6ba7b814-9dad-11d1-3-00c04fd430c8                                          |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                                               |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Name  | Ligne 3 Metro                   |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Name  | Test                                     |
       | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
-      | Name      | Test last stop                           |
+      | Name  | Test last stop                           |
       | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
-      | local_credential     | NINOXE:default |
+      | local_credential  | NINOXE:default |
       | remote_code_space | external       |
     When I send this SIRI request
       """
@@ -259,8 +259,8 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ineo                  |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ineo                  |
       | remote_code_space | internal              |
     And a Line exists with the following attributes:
       | Name              | Test              |
@@ -271,25 +271,25 @@ Feature: Support SIRI GeneralMessage for Situation
       | Codes             | "internal":"5678" |
       | CollectSituations | true              |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
+      | Name  | Test                                     |
       | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
     And a StopArea exists with the following attributes:
-      | Name      | Test1                         |
+      | Name  | Test1                         |
       | Codes | "internal": "destinationRef1" |
     And a StopArea exists with the following attributes:
-      | Name      | Test2                         |
+      | Name  | Test2                         |
       | Codes | "internal": "destinationRef2" |
     And a StopArea exists with the following attributes:
-      | Name      | firstStop                                |
+      | Name  | firstStop                                |
       | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a StopArea exists with the following attributes:
-      | Name      | lastStop                                 |
+      | Name  | lastStop                                 |
       | Codes | "internal": "NINOXE:StopPoint:SP:26:LOC" |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | Codes                                                                          | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
+      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt                                                                         | 2017-03-29T03:30:06+02:00                                                  |
       | Version                                                                            | 1                                                                          |
       | Keywords                                                                           | ["Commercial"]                                                             |
@@ -316,12 +316,12 @@ Feature: Support SIRI GeneralMessage for Situation
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
       | Affects[Line]                | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
     And an audit event should exist with these attributes:
-      | Protocol  | siri                                                                                                                        |
-      | Direction | sent                                                                                                                        |
-      | Status    | OK                                                                                                                          |
-      | Type      | GeneralMessageRequest                                                                                                       |
+      | Protocol  | siri                                                                                                                             |
+      | Direction | sent                                                                                                                             |
+      | Status    | OK                                                                                                                               |
+      | Type      | GeneralMessageRequest                                                                                                            |
       | StopAreas | ["destinationRef1", "destinationRef2", "NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC", "NINOXE:StopPoint:SP:26:LOC"] |
-      | Lines     | ["1234", "5678"]                                                                                                            |
+      | Lines     | ["1234", "5678"]                                                                                                                 |
 
   Scenario: 3864 - Modification of a Situation after a GetGeneralMessageResponse
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
@@ -373,7 +373,7 @@ Feature: Support SIRI GeneralMessage for Situation
       </S:Envelope>
       """
     And a Situation exists with the following attributes:
-      | Codes                  | "external" : "NINOXE:GeneralMessage:27_1"                                  |
+      | Codes                      | "external" : "NINOXE:GeneralMessage:27_1"                                  |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
       | Version                    | 1                                                                          |
       | Channel                    | Commercial                                                                 |
@@ -381,18 +381,18 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                                                  |
       | Summary[DefaultValue]      | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ineo                  |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ineo                  |
       | remote_code_space | external              |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | Codes         | "external":"1234" |
+      | Codes             | "external":"1234" |
       | CollectSituations | true              |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | Codes                    | "external" : "NINOXE:GeneralMessage:27_1"                                         |
+      | Codes                        | "external" : "NINOXE:GeneralMessage:27_1"                                         |
       | RecordedAt                   | 2017-01-01T03:35:00+02:00                                                         |
       | Version                      | 2                                                                                 |
       | Keywords                     | ["Commercial"]                                                                    |
@@ -404,7 +404,7 @@ Feature: Support SIRI GeneralMessage for Situation
 
   Scenario: 3882 - GeneralMessageResponse empty with an expired Situation
     Given a Situation exists with the following attributes:
-      | Codes                  | "external" : "test"                                                        |
+      | Codes                      | "external" : "test"                                                        |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
       | Version                    | 1                                                                          |
       | Channel                    | Perturbation                                                               |
@@ -413,11 +413,11 @@ Feature: Support SIRI GeneralMessage for Situation
       | ValidityPeriods[0]#EndTime | 2017-01-01T01:01:00+02:00                                                  |
       | Description[DefaultValue]  | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
-      | local_credential     | NINOXE:default |
+      | local_credential  | NINOXE:default |
       | remote_code_space | external       |
     And a Line exists with the following attributes:
       | Name              | Test              |
-      | Codes         | "external":"1234" |
+      | Codes             | "external":"1234" |
       | CollectSituations | true              |
     And a minute has passed
     And a minute has passed
@@ -476,9 +476,9 @@ Feature: Support SIRI GeneralMessage for Situation
     """
     """
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
     And 30 seconds have passed
     And 30 seconds have passed
@@ -492,11 +492,11 @@ Feature: Support SIRI GeneralMessage for Situation
     <ServiceRequestInfo>
       <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>test</siri:RequestorRef>
-      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:MessageIdentifier>
     </ServiceRequestInfo>
     <Request version='2.0:FR-IDF-2.4'>
       <siri:RequestTimestamp>2017-01-01T12:01:00.000Z</siri:RequestTimestamp>
-      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:MessageIdentifier>
+      <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:MessageIdentifier>
       <siri:Extensions>
         <sws:IDFGeneralMessageRequestFilter>
         </sws:IDFGeneralMessageRequestFilter>
@@ -516,13 +516,13 @@ Feature: Support SIRI GeneralMessage for Situation
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_code_space            | internal              |
+        | remote_code_space               | internal              |
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | 1234                  |
       And 30 seconds have passed
       And a Line exists with the following attributes:
         | Name              | Test              |
-        | Codes         | "internal":"1234" |
+        | Codes             | "internal":"1234" |
         | CollectSituations | true              |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request
@@ -542,7 +542,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <siri:MessageIdentifier>RATPDev:Message::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:MessageIdentifier>
       <siri:Extensions>
         <sws:IDFGeneralMessageRequestFilter>
-          <siri:LineRef>1234</siri:LineRef> 
+          <siri:LineRef>1234</siri:LineRef>
         </sws:IDFGeneralMessageRequestFilter>
       </siri:Extensions>
     </Request>
@@ -560,12 +560,12 @@ Feature: Support SIRI GeneralMessage for Situation
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_code_space            | internal              |
+        | remote_code_space               | internal              |
         | collect.filter_general_messages | true                  |
       And 30 seconds have passed
       And a StopArea exists with the following attributes:
         | Name              | Test              |
-        | Codes         | "internal":"1234" |
+        | Codes             | "internal":"1234" |
         | CollectSituations | true              |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request
