@@ -7,6 +7,14 @@ import (
 type XMLEstimatedJourneyVersionFrame struct {
 	XMLStructure
 
+	recordedAt time.Time
+
+	estimatedVehicleJourneys []*XMLEstimatedVehicleJourney
+}
+
+type XMLEstimatedVehicleJourney struct {
+	XMLStructure
+
 	lineRef                string
 	directionRef           string
 	operatorRef            string
@@ -14,87 +22,103 @@ type XMLEstimatedJourneyVersionFrame struct {
 	originRef              string
 	destinationRef         string
 
-	recordedAt time.Time
-
 	estimatedCalls []*XMLCall
 	recordedCalls  []*XMLCall
 }
 
 func NewXMLEstimatedJourneyVersionFrame(node XMLNode) *XMLEstimatedJourneyVersionFrame {
-	estimatedJourney := &XMLEstimatedJourneyVersionFrame{}
-	estimatedJourney.node = node
-	return estimatedJourney
+	ejvf := &XMLEstimatedJourneyVersionFrame{}
+	ejvf.node = node
+	return ejvf
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) EstimatedCalls() []*XMLCall {
-	if estimatedJourney.estimatedCalls == nil {
+func NewXMLEstimatedVehicleJourney(node XMLNode) *XMLEstimatedVehicleJourney {
+	evj := &XMLEstimatedVehicleJourney{}
+	evj.node = node
+	return evj
+}
+
+func (ejvf *XMLEstimatedJourneyVersionFrame) RecordedAt() time.Time {
+	if ejvf.recordedAt.IsZero() {
+		ejvf.recordedAt = ejvf.findTimeChildContent("RecordedAtTime")
+	}
+	return ejvf.recordedAt
+}
+
+func (ejvf *XMLEstimatedJourneyVersionFrame) EstimatedVehicleJourneys() []*XMLEstimatedVehicleJourney {
+	if ejvf.estimatedVehicleJourneys == nil {
+		estimatedVehicleJourneys := []*XMLEstimatedVehicleJourney{}
+		nodes := ejvf.findNodes("EstimatedVehicleJourney")
+		for _, node := range nodes {
+			estimatedVehicleJourneys = append(estimatedVehicleJourneys, NewXMLEstimatedVehicleJourney(node))
+		}
+		ejvf.estimatedVehicleJourneys = estimatedVehicleJourneys
+	}
+	return ejvf.estimatedVehicleJourneys
+}
+
+func (evj *XMLEstimatedVehicleJourney) EstimatedCalls() []*XMLCall {
+	if evj.estimatedCalls == nil {
 		estimatedCalls := []*XMLCall{}
-		nodes := estimatedJourney.findNodes("EstimatedCall")
+		nodes := evj.findNodes("EstimatedCall")
 		for _, node := range nodes {
 			estimatedCalls = append(estimatedCalls, NewXMLCall(node))
 		}
-		estimatedJourney.estimatedCalls = estimatedCalls
+		evj.estimatedCalls = estimatedCalls
 	}
-	return estimatedJourney.estimatedCalls
+	return evj.estimatedCalls
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) RecordedCalls() []*XMLCall {
-	if estimatedJourney.recordedCalls == nil {
+func (evj *XMLEstimatedVehicleJourney) RecordedCalls() []*XMLCall {
+	if evj.recordedCalls == nil {
 		recordedCalls := []*XMLCall{}
-		nodes := estimatedJourney.findNodes("RecordedCall")
+		nodes := evj.findNodes("RecordedCall")
 		for _, node := range nodes {
 			recordedCalls = append(recordedCalls, NewXMLCall(node))
 		}
-		estimatedJourney.recordedCalls = recordedCalls
+		evj.recordedCalls = recordedCalls
 	}
-	return estimatedJourney.recordedCalls
+	return evj.recordedCalls
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) LineRef() string {
-	if estimatedJourney.lineRef == "" {
-		estimatedJourney.lineRef = estimatedJourney.findStringChildContent("LineRef")
+func (evj *XMLEstimatedVehicleJourney) LineRef() string {
+	if evj.lineRef == "" {
+		evj.lineRef = evj.findStringChildContent("LineRef")
 	}
-	return estimatedJourney.lineRef
+	return evj.lineRef
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) DirectionRef() string {
-	if estimatedJourney.directionRef == "" {
-		estimatedJourney.directionRef = estimatedJourney.findStringChildContent("DirectionRef")
+func (evj *XMLEstimatedVehicleJourney) DirectionRef() string {
+	if evj.directionRef == "" {
+		evj.directionRef = evj.findStringChildContent("DirectionRef")
 	}
-	return estimatedJourney.directionRef
+	return evj.directionRef
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) OperatorRef() string {
-	if estimatedJourney.operatorRef == "" {
-		estimatedJourney.operatorRef = estimatedJourney.findStringChildContent("OperatorRef")
+func (evj *XMLEstimatedVehicleJourney) OperatorRef() string {
+	if evj.operatorRef == "" {
+		evj.operatorRef = evj.findStringChildContent("OperatorRef")
 	}
-	return estimatedJourney.operatorRef
+	return evj.operatorRef
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) DatedVehicleJourneyRef() string {
-	if estimatedJourney.datedVehicleJourneyRef == "" {
-		estimatedJourney.datedVehicleJourneyRef = estimatedJourney.findStringChildContent("DatedVehicleJourneyRef")
+func (evj *XMLEstimatedVehicleJourney) DatedVehicleJourneyRef() string {
+	if evj.datedVehicleJourneyRef == "" {
+		evj.datedVehicleJourneyRef = evj.findStringChildContent("DatedVehicleJourneyRef")
 	}
-	return estimatedJourney.datedVehicleJourneyRef
+	return evj.datedVehicleJourneyRef
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) OriginRef() string {
-	if estimatedJourney.originRef == "" {
-		estimatedJourney.originRef = estimatedJourney.findStringChildContent("OriginRef")
+func (evj *XMLEstimatedVehicleJourney) OriginRef() string {
+	if evj.originRef == "" {
+		evj.originRef = evj.findStringChildContent("OriginRef")
 	}
-	return estimatedJourney.originRef
+	return evj.originRef
 }
 
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) DestinationRef() string {
-	if estimatedJourney.destinationRef == "" {
-		estimatedJourney.destinationRef = estimatedJourney.findStringChildContent("DestinationRef")
+func (evj *XMLEstimatedVehicleJourney) DestinationRef() string {
+	if evj.destinationRef == "" {
+		evj.destinationRef = evj.findStringChildContent("DestinationRef")
 	}
-	return estimatedJourney.destinationRef
-}
-
-func (estimatedJourney *XMLEstimatedJourneyVersionFrame) RecordedAt() time.Time {
-	if estimatedJourney.recordedAt.IsZero() {
-		estimatedJourney.recordedAt = estimatedJourney.findTimeChildContent("RecordedAtTime")
-	}
-	return estimatedJourney.recordedAt
+	return evj.destinationRef
 }

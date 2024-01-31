@@ -18,7 +18,7 @@ type EstimatedTimetableUpdateEventBuilder struct {
 
 	partner            *Partner
 	referenceGenerator *idgen.IdentifierGenerator
-	remoteCodeSpace string
+	remoteCodeSpace    string
 	origin             string
 
 	updateEvents *CollectUpdateEvents
@@ -28,59 +28,61 @@ func NewEstimatedTimetableUpdateEventBuilder(partner *Partner) EstimatedTimetabl
 	return EstimatedTimetableUpdateEventBuilder{
 		partner:            partner,
 		referenceGenerator: partner.ReferenceIdentifierGenerator(),
-		remoteCodeSpace: partner.RemoteCodeSpace(),
+		remoteCodeSpace:    partner.RemoteCodeSpace(),
 		origin:             string(partner.Slug()),
 		updateEvents:       NewCollectUpdateEvents(),
 	}
 }
 
 func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimatedJourneyVersionFrame *sxml.XMLEstimatedJourneyVersionFrame) {
-	// Lines
-	lineCode := model.NewCode(builder.remoteCodeSpace, estimatedJourneyVersionFrame.LineRef())
+	for _, estimatedVehicleJourney := range estimatedJourneyVersionFrame.EstimatedVehicleJourneys() {
+		// Lines
+		lineCode := model.NewCode(builder.remoteCodeSpace, estimatedVehicleJourney.LineRef())
 
-	_, ok := builder.updateEvents.Lines[estimatedJourneyVersionFrame.LineRef()]
-	if !ok {
-		// CollectedAlways is false by default
-		lineEvent := &model.LineUpdateEvent{
-			Origin:   builder.origin,
-			Code: lineCode,
-			// Name:     estimatedJourneyVersionFrame.PublishedLineName(),
+		_, ok := builder.updateEvents.Lines[estimatedVehicleJourney.LineRef()]
+		if !ok {
+			// CollectedAlways is false by default
+			lineEvent := &model.LineUpdateEvent{
+				Origin: builder.origin,
+				Code:   lineCode,
+				// Name:     estimatedVehicleJourney.PublishedLineName(),
+			}
+
+			builder.updateEvents.Lines[estimatedVehicleJourney.LineRef()] = lineEvent
+			builder.updateEvents.LineRefs[estimatedVehicleJourney.LineRef()] = struct{}{}
 		}
 
-		builder.updateEvents.Lines[estimatedJourneyVersionFrame.LineRef()] = lineEvent
-		builder.updateEvents.LineRefs[estimatedJourneyVersionFrame.LineRef()] = struct{}{}
-	}
+		// VehicleJourneys
+		vjCode := model.NewCode(builder.remoteCodeSpace, estimatedVehicleJourney.DatedVehicleJourneyRef())
 
-	// VehicleJourneys
-	vjCode := model.NewCode(builder.remoteCodeSpace, estimatedJourneyVersionFrame.DatedVehicleJourneyRef())
+		_, ok = builder.updateEvents.VehicleJourneys[estimatedVehicleJourney.DatedVehicleJourneyRef()]
+		if !ok {
+			vjEvent := &model.VehicleJourneyUpdateEvent{
+				Origin:    builder.origin,
+				Code:      vjCode,
+				LineCode:  lineCode,
+				OriginRef: estimatedVehicleJourney.OriginRef(),
+				// OriginName:      estimatedVehicleJourney.OriginName(),
+				DirectionType:  builder.directionRef(estimatedVehicleJourney.DirectionRef()),
+				DestinationRef: estimatedVehicleJourney.DestinationRef(),
+				// DestinationName: estimatedVehicleJourney.DestinationName(),
+				Monitored: true,
+				// Occupancy: model.NormalizedOccupancyName(estimatedVehicleJourney.Occupancy()),
 
-	_, ok = builder.updateEvents.VehicleJourneys[estimatedJourneyVersionFrame.DatedVehicleJourneyRef()]
-	if !ok {
-		vjEvent := &model.VehicleJourneyUpdateEvent{
-			Origin:       builder.origin,
-			Code:     vjCode,
-			LineCode: lineCode,
-			OriginRef:    estimatedJourneyVersionFrame.OriginRef(),
-			// OriginName:      estimatedJourneyVersionFrame.OriginName(),
-			DirectionType:  builder.directionRef(estimatedJourneyVersionFrame.DirectionRef()),
-			DestinationRef: estimatedJourneyVersionFrame.DestinationRef(),
-			// DestinationName: estimatedJourneyVersionFrame.DestinationName(),
-			Monitored: true,
-			// Occupancy: model.NormalizedOccupancyName(estimatedJourneyVersionFrame.Occupancy()),
+				CodeSpace: builder.remoteCodeSpace,
+				// SiriXML:      &estimatedVehicleJourney.XMLMonitoredVehicleJourney,
+			}
 
-			CodeSpace: builder.remoteCodeSpace,
-			// SiriXML:      &estimatedJourneyVersionFrame.XMLMonitoredVehicleJourney,
+			builder.updateEvents.VehicleJourneys[estimatedVehicleJourney.DatedVehicleJourneyRef()] = vjEvent
+			builder.updateEvents.VehicleJourneyRefs[estimatedVehicleJourney.DatedVehicleJourneyRef()] = struct{}{}
 		}
 
-		builder.updateEvents.VehicleJourneys[estimatedJourneyVersionFrame.DatedVehicleJourneyRef()] = vjEvent
-		builder.updateEvents.VehicleJourneyRefs[estimatedJourneyVersionFrame.DatedVehicleJourneyRef()] = struct{}{}
-	}
-
-	for _, call := range estimatedJourneyVersionFrame.EstimatedCalls() {
-		builder.handleCall(vjCode, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
-	}
-	for _, call := range estimatedJourneyVersionFrame.RecordedCalls() {
-		builder.handleCall(vjCode, estimatedJourneyVersionFrame.RecordedAt(), estimatedJourneyVersionFrame.DatedVehicleJourneyRef(), call)
+		for _, call := range estimatedVehicleJourney.EstimatedCalls() {
+			builder.handleCall(vjCode, estimatedJourneyVersionFrame.RecordedAt(), estimatedVehicleJourney.DatedVehicleJourneyRef(), call)
+		}
+		for _, call := range estimatedVehicleJourney.RecordedCalls() {
+			builder.handleCall(vjCode, estimatedJourneyVersionFrame.RecordedAt(), estimatedVehicleJourney.DatedVehicleJourneyRef(), call)
+		}
 	}
 }
 
@@ -92,9 +94,9 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjCode model.Cod
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
-			Origin:   builder.origin,
-			Code: stopAreaCode,
-			Name:     call.StopPointName(),
+			Origin: builder.origin,
+			Code:   stopAreaCode,
+			Name:   call.StopPointName(),
 		}
 
 		builder.updateEvents.StopAreas[call.StopPointRef()] = event
@@ -108,7 +110,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjCode model.Cod
 	_, ok = builder.updateEvents.StopVisits[call.StopPointRef()][stopVisitId]
 	if !ok {
 		svEvent := &model.StopVisitUpdateEvent{
-			Origin:                 builder.origin,
+			Origin:             builder.origin,
 			Code:               stopVisitCode,
 			StopAreaCode:       stopAreaCode,
 			VehicleJourneyCode: vjCode,
