@@ -9,12 +9,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
@@ -27,12 +27,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
@@ -44,13 +44,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url                       | http://localhost:8090 |
       | remote_credential                | test                  |
-      | remote_code_space             | internal              |
+      | remote_code_space                | internal              |
       | collect.include_lines            | RLA_Bus:Line::05:LOC  |
       | local_credential                 | ara                   |
       | collect.subscriptions.persistent | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 30 seconds have passed
@@ -61,15 +61,15 @@ Feature: Support SIRI VehicleMonitoring by subscription
   Scenario: VehicleMonitoring subscription collect and partner CheckStatus is unavailable should send VehicleMonitoringSubscriptionRequest to partner whith setting collect.persistent
    Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
-      | remote_url                       | http://localhost:8090 |
-      | remote_credential                | test                  |
-      | remote_code_space             | internal              |
-      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
-      | local_credential                 | ara                   |
-      | collect.persistent               | true                  |
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_code_space     | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+      | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 10 seconds have passed
@@ -83,31 +83,31 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url            | http://localhost:8090 |
       | remote_credential     | Ara                   |
       | local_credential      | Subscriber            |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
       | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Name  | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                                |
-      | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:201123:LOC" |
+      | Codes            | "internal": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
       | Occupancy        | seatsAvailable                        |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:999:LOC" |
+      | Codes            | "internal": "Test:Vehicle:999:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Occupancy        | manySeatsAvailable                 |
     And a Subscription exist with the following attributes:
-      | Kind              | VehicleMonitoringBroadcast       |
-      | SubscriberRef     | Subscriber                       |
-      | ExternalId        | subscription-1                   |
+      | Kind              | VehicleMonitoringBroadcast          |
+      | SubscriberRef     | Subscriber                          |
+      | ExternalId        | subscription-1                      |
       | ReferenceArray[0] | Line, "internal": "Test:Line:3:LOC" |
     When the Vehicle "internal:Test:Vehicle:201123:LOC" is edited with the following attributes:
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -209,7 +209,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | remote_url                        | http://localhost:8090 |
        | remote_credential                 | test                  |
        | local_credential                  | NINOXE:default        |
-       | remote_code_space              | internal              |
+       | remote_code_space                 | internal              |
        | broadcast.subscription_persistent | true                  |
     And a minute has passed
     When I send this SIRI request
@@ -323,9 +323,9 @@ Feature: Support SIRI VehicleMonitoring by subscription
   @ARA-1236 @siri-valid
   Scenario: Handle a SIRI VehicleMonitoring request for subscription to all lines
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
+       | remote_url        | http://localhost:8090 |
+       | remote_credential | test                  |
+       | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a minute has passed
     When I send this SIRI request
@@ -371,16 +371,16 @@ Feature: Support SIRI VehicleMonitoring by subscription
   Scenario: Handle a SIRI VehicleMonitoring request for subscription for all existing lines in a referential only with same remote_code_space
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
+       | remote_url        | http://localhost:8090 |
+       | remote_credential | test                  |
+       | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "another": "NINOXE:Line:3:LOC"  |
-      | Name      | Ligne 3 Metro                   |
+      | Codes | "another": "NINOXE:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                  |
     And a Line exists with the following attributes:
       | Codes | "internal": "NINOXE:Line:A:BUS" |
-      | Name      | Ligne A Bus                     |
+      | Name  | Ligne A Bus                     |
     And a minute has passed
     When I send this SIRI request
       """
@@ -420,16 +420,16 @@ Feature: Support SIRI VehicleMonitoring by subscription
   Scenario: Handle a SIRI VehicleMonitoring request for subscription to a line not existing in a referential
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
+       | remote_url        | http://localhost:8090 |
+       | remote_credential | test                  |
+       | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "another": "NINOXE:Line:3:LOC"  |
-      | Name      | Ligne 3 Metro                   |
+      | Codes | "another": "NINOXE:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                  |
     And a Line exists with the following attributes:
       | Codes | "internal": "NINOXE:Line:A:BUS" |
-      | Name      | Ligne A Bus                     |
+      | Name  | Ligne A Bus                     |
     And a minute has passed
     When I send this SIRI request
       """
@@ -463,7 +463,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       """
     Then I should receive this SIRI response
       """
-     <?xml version='1.0' encoding='UTF-8'?> 
+     <?xml version='1.0' encoding='UTF-8'?>
      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
        <S:Body>
          <sw:SubscribeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
@@ -493,24 +493,24 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </S:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type                    | VehicleMonitoringSubscriptionRequest |
-      | Direction               | received                             |
-      | Protocol                | siri                                 |
-      | Partner                 | test                                 |
-      | Status                  | Error                                |
-      | Lines                   | ["testLine"]                         |
+      | Type      | VehicleMonitoringSubscriptionRequest |
+      | Direction | received                             |
+      | Protocol  | siri                                 |
+      | Partner   | test                                 |
+      | Status    | Error                                |
+      | Lines     | ["testLine"]                         |
 
    @ARA-1236 @siri-valid
   Scenario: Handle a SIRI VehicleMonitoring request for subscription to a single line
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
+       | remote_url        | http://localhost:8090 |
+       | remote_credential | test                  |
+       | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
       | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Name  | Ligne 3 Metro                   |
     And a minute has passed
     When I send this SIRI request
       """
@@ -544,7 +544,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       """
     Then I should receive this SIRI response
       """
-     <?xml version='1.0' encoding='UTF-8'?> 
+     <?xml version='1.0' encoding='UTF-8'?>
      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
        <S:Body>
          <sw:SubscribeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
@@ -570,13 +570,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </S:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type                      | VehicleMonitoringSubscriptionRequest |
-      | Direction                 | received                             |
-      | Protocol                  | siri                                 |
-      | Partner                   | test                                 |
-      | Status                    | OK                                   |
-      | Lines                     | ["NINOXE:Line:3:LOC"]                |
-      | SubscriptionIdentifiers   | ["subscription-1"]                   |
+      | Type                    | VehicleMonitoringSubscriptionRequest |
+      | Direction               | received                             |
+      | Protocol                | siri                                 |
+      | Partner                 | test                                 |
+      | Status                  | OK                                   |
+      | Lines                   | ["NINOXE:Line:3:LOC"]                |
+      | SubscriptionIdentifiers | ["subscription-1"]                   |
 
   Scenario: Create Vehicle Monitoring subscription by Line
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
@@ -618,19 +618,19 @@ Feature: Support SIRI VehicleMonitoring by subscription
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-vehicle-monitoring-subscription-collector] and the following settings:
-      | remote_url                         | http://localhost:8090          |
-      | remote_credential                  | test                           |
-      | local_credential                   | NINOXE:default                 |
-      | remote_code_space               | internal                       |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Name      | Test                   |
+      | Name  | Test                   |
       | Codes | "internal": "testLine" |
     When a minute has passed
     And a minute has passed
     And a minute has passed
     Then one Subscription exists with the following attributes:
       | Kind                      | VehicleMonitoringCollect |
-      | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z     |
+      | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z   |
 
   Scenario: Update a Vehicle after a VehicleMonitoringDelivery in a subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
@@ -675,11 +675,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_code_space               | internal                       |
+      | remote_code_space                  | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                   |
+      | Name  | Test                   |
       | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
@@ -764,11 +764,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
       """
       And I see ara vehicles
       Then one Vehicle has the following attributes:
-        | Codes | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
-        | Bearing   |                                    171.0 |
-        | Latitude  |                        48.99927561424598 |
-        | Longitude |                       1.6770970859674874 |
+        | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
+        | Bearing   | 171.0                                    |
+        | Latitude  | 48.99927561424598                        |
+        | Longitude | 1.6770970859674874                       |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                   |
         | Protocol        | siri                                      |
@@ -824,12 +824,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_code_space               | internal                       |
+      | remote_code_space                  | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
       | siri.direction_type                | Aller, Retour                  |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                   |
+      | Name  | Test                   |
       | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
@@ -910,13 +910,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
       | siri.envelope         | raw                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    And 20 seconds have passed
@@ -944,14 +944,14 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </Siri>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-vehicle-monitoring-subscription-collector] and the following settings:
-      | remote_url                         | http://localhost:8090          |
-      | remote_credential                  | test                           |
-      | local_credential                   | NINOXE:default                 |
-      | remote_code_space               | internal                       |
-      | siri.envelope                      | raw                            |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
+      | siri.envelope     | raw                   |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                   |
+      | Name  | Test                   |
       | Codes | "internal": "testLine" |
     And a Subscription exist with the following attributes:
       | Kind                      | VehicleMonitoringCollect |
@@ -1023,11 +1023,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </Siri>
       """
       Then one Vehicle has the following attributes:
-        | Codes | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
-        | Bearing   |                                    171.0 |
-        | Latitude  |                        48.99927561424598 |
-        | Longitude |                       1.6770970859674874 |
+        | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
+        | Bearing   | 171.0                                    |
+        | Latitude  | 48.99927561424598                        |
+        | Longitude | 1.6770970859674874                       |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                   |
         | Protocol        | siri                                      |
@@ -1038,3 +1038,188 @@ Feature: Support SIRI VehicleMonitoring by subscription
         | VehicleJourneys | ["RDMANTOIS:VehicleJourney::6628652:LOC"] |
         | StopAreas       | ["50000016"]                              |
         | Lines           | ["testLine"]                              |
+
+  @ARA-1363 @siri-valid
+  Scenario: Send a VehicleMonitoring notification when a vehicle changes using the generator setting reference_vehicle_journey_identifier
+    Given a SIRI server on "http://localhost:8090"
+    # Setting a Partner without default generators
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+      | remote_url                                      | http://localhost:8090            |
+      | remote_credential                               | Ara                              |
+      | local_credential                                | Subscriber                       |
+      | remote_code_space                               | internal                         |
+      | sort_payload_for_test                           | true                             |
+      | generators.reference_vehicle_journey_identifier | ch:1:ServiceJourney:87_TAC:%{id} |
+    And a Line exists with the following attributes:
+      | Codes | "internal": "Test:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                 |
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                                                        |
+      | Codes                    | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
+      | Monitored                | true                                                              |
+      | Attribute[DirectionName] | Direction Name                                                    |
+    And a Vehicle exists with the following attributes:
+      | Codes            | "internal": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+    And a Subscription exist with the following attributes:
+      | Kind              | VehicleMonitoringBroadcast          |
+      | SubscriberRef     | Subscriber                          |
+      | ExternalId        | subscription-1                      |
+      | ReferenceArray[0] | Line, "internal": "Test:Line:3:LOC" |
+    When the Vehicle "internal:Test:Vehicle:201123:LOC" is edited with the following attributes:
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 234                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifyVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>Subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:201123:LOC</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>2017-01-01</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>ch:1:ServiceJourney:87_TAC:6ba7b814</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Direction Name</siri:DirectionName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>234</siri:Bearing>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+              </siri:VehicleMonitoringDelivery>
+            </Notification>
+            <SiriExtension />
+          </sw:NotifyVehicleMonitoring>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                    | NotifyVehicleMonitoring                 |
+      | Direction               | sent                                    |
+      | Protocol                | siri                                    |
+      | Partner                 | test                                    |
+      | Status                  | OK                                      |
+      | SubscriptionIdentifiers | ["subscription-1"]                      |
+      | Lines                   | ["Test:Line:3:LOC"]                     |
+      | Vehicles                | ["Test:Vehicle:201123:LOC"]             |
+      | VehicleJourneys         | ["ch:1:ServiceJourney:87_TAC:6ba7b814"] |
+
+  @ARA-1363 @siri-valid
+  Scenario: Send a VehicleMonitoring notification when a vehicle changes using the default generator should send DatedVehicleJourneyRef according to default setting
+    Given a SIRI server on "http://localhost:8090"
+    # Setting a "SIRI Partner" with default generators
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | Ara                   |
+      | local_credential      | Subscriber            |
+      | remote_code_space     | internal              |
+      | sort_payload_for_test | true                  |
+    And a Line exists with the following attributes:
+      | Codes | "internal": "Test:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                 |
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                                                        |
+      | Codes                    | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
+      | Monitored                | true                                                              |
+      | Attribute[DirectionName] | Direction Name                                                    |
+    And a Vehicle exists with the following attributes:
+      | Codes            | "internal": "Test:Vehicle:201123:LOC" |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+    And a Subscription exist with the following attributes:
+      | Kind              | VehicleMonitoringBroadcast          |
+      | SubscriberRef     | Subscriber                          |
+      | ExternalId        | subscription-1                      |
+      | ReferenceArray[0] | Line, "internal": "Test:Line:3:LOC" |
+    When the Vehicle "internal:Test:Vehicle:201123:LOC" is edited with the following attributes:
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 234                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifyVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>Subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:201123:LOC</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::6ba7b814:LOC</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Direction Name</siri:DirectionName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>234</siri:Bearing>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+              </siri:VehicleMonitoringDelivery>
+            </Notification>
+            <SiriExtension />
+          </sw:NotifyVehicleMonitoring>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                    | NotifyVehicleMonitoring                  |
+      | Direction               | sent                                     |
+      | Protocol                | siri                                     |
+      | Partner                 | test                                     |
+      | Status                  | OK                                       |
+      | SubscriptionIdentifiers | ["subscription-1"]                       |
+      | Lines                   | ["Test:Line:3:LOC"]                      |
+      | Vehicles                | ["Test:Vehicle:201123:LOC"]              |
+      | VehicleJourneys         | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |

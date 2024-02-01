@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -17,8 +16,7 @@ import (
 type SIRIVehicleMonitoringSubscriptionBroadcaster struct {
 	connector
 
-	dataFrameGenerator           *idgen.IdentifierGenerator
-	vjRemoteCodeSpaces        []string
+	vjRemoteCodeSpaces           []string
 	vehicleMonitoringBroadcaster VehicleMonitoringBroadcaster
 	toBroadcast                  map[SubscriptionId][]model.VehicleId
 
@@ -44,7 +42,6 @@ func newSIRIVehicleMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIVehi
 	connector := &SIRIVehicleMonitoringSubscriptionBroadcaster{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
-	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.VehicleId)
@@ -151,7 +148,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkLines(vm *sx
 			lineCode := model.NewCode(connector.remoteCodeSpace, lineValue)
 			ref := model.Reference{
 				Code: &lineCode,
-				Type:     "Line",
+				Type: "Line",
 			}
 			r := NewResource(ref)
 			r.Subscribed(connector.Clock().Now())
@@ -173,7 +170,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkLines(vm *sx
 
 		ref := model.Reference{
 			Code: &lineCode,
-			Type:     "Line",
+			Type: "Line",
 		}
 
 		r := NewResource(ref)

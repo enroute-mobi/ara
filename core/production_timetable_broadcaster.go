@@ -189,8 +189,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 					if !ok {
 						continue
 					}
-					referenceGenerator := ptt.connector.Partner().ReferenceIdentifierGenerator()
-					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
+					datedVehicleJourneyRef = ptt.connector.Partner().NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 				}
 
 				datedVehicleJourney = &siri.SIRIDatedVehicleJourney{
@@ -307,7 +306,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) stopPointRef(st
 
 func (connector *SIRIProductionTimetableSubscriptionBroadcaster) dataFrameRef() string {
 	modelDate := connector.partner.Model().Date()
-	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+	return connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
 }
 
 func (connector *SIRIProductionTimetableSubscriptionBroadcaster) operatorRef(stopVisit *model.StopVisit) string {

@@ -13,22 +13,20 @@ type BroadcastGeneralMessageBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	partner            *Partner
-	referenceGenerator *idgen.IdentifierGenerator
-	remoteCodeSpace    string
-	lineRef            map[string]struct{}
-	stopPointRef       map[string]struct{}
+	partner         *Partner
+	remoteCodeSpace string
+	lineRef         map[string]struct{}
+	stopPointRef    map[string]struct{}
 
 	InfoChannelRef []string
 }
 
 func NewBroadcastGeneralMessageBuilder(partner *Partner, connector string) *BroadcastGeneralMessageBuilder {
 	return &BroadcastGeneralMessageBuilder{
-		partner:            partner,
-		referenceGenerator: partner.ReferenceIdentifierGenerator(),
-		remoteCodeSpace:    partner.RemoteCodeSpace(connector),
-		lineRef:            make(map[string]struct{}),
-		stopPointRef:       make(map[string]struct{}),
+		partner:         partner,
+		remoteCodeSpace: partner.RemoteCodeSpace(connector),
+		lineRef:         make(map[string]struct{}),
+		stopPointRef:    make(map[string]struct{}),
 	}
 }
 
@@ -82,11 +80,11 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 		if !present {
 			return nil
 		}
-		infoMessageIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
+		infoMessageIdentifier = builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
 	}
 
 	siriGeneralMessage := &siri.SIRIGeneralMessage{
-		ItemIdentifier:        builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: builder.NewUUID()}),
+		ItemIdentifier:        builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: builder.NewUUID()}),
 		InfoMessageIdentifier: infoMessageIdentifier,
 		InfoChannelRef:        channel,
 		InfoMessageVersion:    situation.Version,

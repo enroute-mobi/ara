@@ -509,7 +509,7 @@ func Test_MessageIdentifierGenerator_Empty(t *testing.T) {
 	assert := assert.New(t)
 
 	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
-	assert.Equal("%{uuid}", partnerSettings.MessageIdentifierGenerator().FormatString())
+	assert.Equal("%{uuid}", partnerSettings.IdentifierGenerator.FormatString("Message"))
 }
 
 func Test_MessageIdentifierGenerator(t *testing.T) {
@@ -519,14 +519,14 @@ func Test_MessageIdentifierGenerator(t *testing.T) {
 		"generators.message_identifier": "message:%{uuid}:LOC",
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("message:%{uuid}:LOC", partnerSettings.MessageIdentifierGenerator().FormatString())
+	assert.Equal("message:%{uuid}:LOC", partnerSettings.IdentifierGenerator.FormatString("Message"))
 }
 
 func Test_ResponseMessageIdentifierGenerator_Empty(t *testing.T) {
 	assert := assert.New(t)
 
 	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
-	assert.Equal("%{uuid}", partnerSettings.ResponseMessageIdentifierGenerator().FormatString())
+	assert.Equal("%{uuid}", partnerSettings.IdentifierGenerator.FormatString("ResponseMessage"))
 }
 
 func Test_ResponseMessageIdentifierGenerator(t *testing.T) {
@@ -536,14 +536,14 @@ func Test_ResponseMessageIdentifierGenerator(t *testing.T) {
 		"generators.response_message_identifier": "response:message:%{uuid}:LOC",
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("response:message:%{uuid}:LOC", partnerSettings.ResponseMessageIdentifierGenerator().FormatString())
+	assert.Equal("response:message:%{uuid}:LOC", partnerSettings.IdentifierGenerator.FormatString("ResponseMessage"))
 }
 
 func Test_DataFrameIdentifierGenerator_Empty(t *testing.T) {
 	assert := assert.New(t)
 
 	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
-	assert.Equal("%{id}", partnerSettings.DataFrameIdentifierGenerator().FormatString())
+	assert.Equal("%{id}", partnerSettings.IdentifierGenerator.FormatString("DataFrame"))
 }
 
 func Test_DataFrameIdentifierGenerator(t *testing.T) {
@@ -553,14 +553,14 @@ func Test_DataFrameIdentifierGenerator(t *testing.T) {
 		"generators.data_frame_identifier": "dataframe:response:%{id}:LOC",
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("dataframe:response:%{id}:LOC", partnerSettings.DataFrameIdentifierGenerator().FormatString())
+	assert.Equal("dataframe:response:%{id}:LOC", partnerSettings.IdentifierGenerator.FormatString("DataFrame"))
 }
 
 func Test_ReferenceIdentifierGenerator_Empty(t *testing.T) {
 	assert := assert.New(t)
 
 	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
-	assert.Equal("%{type}:%{id}", partnerSettings.ReferenceIdentifierGenerator().FormatString())
+	assert.Equal("%{type}:%{id}", partnerSettings.IdentifierGenerator.FormatString("Reference"))
 }
 
 func Test_ReferenceIdentifierGenerator(t *testing.T) {
@@ -570,14 +570,14 @@ func Test_ReferenceIdentifierGenerator(t *testing.T) {
 		"generators.reference_identifier": "reference:%{type}:value:%{id}",
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("reference:%{type}:value:%{id}", partnerSettings.ReferenceIdentifierGenerator().FormatString())
+	assert.Equal("reference:%{type}:value:%{id}", partnerSettings.IdentifierGenerator.FormatString("Reference"))
 }
 
 func Test_ReferenceStopAreaIdentIdentifierGenerator_Empty(t *testing.T) {
 	assert := assert.New(t)
 
 	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
-	assert.Equal("%{id}", partnerSettings.ReferenceStopAreaIdentifierGenerator().FormatString())
+	assert.Equal("%{id}", partnerSettings.IdentifierGenerator.FormatString("StopArea"))
 }
 
 func Test_ReferenceStopAreaIdentifierGenerator(t *testing.T) {
@@ -587,14 +587,14 @@ func Test_ReferenceStopAreaIdentifierGenerator(t *testing.T) {
 		"generators.reference_stop_area_identifier": "stoparea:%{id}",
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("stoparea:%{id}", partnerSettings.ReferenceStopAreaIdentifierGenerator().FormatString())
+	assert.Equal("stoparea:%{id}", partnerSettings.IdentifierGenerator.FormatString("StopArea"))
 }
 
 func Test_SubscriptionIdentifierGenerator_Empty(t *testing.T) {
 	assert := assert.New(t)
 
 	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
-	assert.Equal("%{id}", partnerSettings.SubscriptionIdentifierGenerator().FormatString())
+	assert.Equal("%{id}", partnerSettings.IdentifierGenerator.FormatString("Subscription"))
 }
 
 func Test_SubscriptionIdentifierGenerator(t *testing.T) {
@@ -604,7 +604,7 @@ func Test_SubscriptionIdentifierGenerator(t *testing.T) {
 		"generators.subscription_identifier": "subscription:%{id}",
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-	assert.Equal("subscription:%{id}", partnerSettings.SubscriptionIdentifierGenerator().FormatString())
+	assert.Equal("subscription:%{id}", partnerSettings.IdentifierGenerator.FormatString("Subscription"))
 }
 
 func Test_CollectSettings_Empty(t *testing.T) {

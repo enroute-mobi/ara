@@ -867,25 +867,25 @@ func Test_Partner_DefaultIdentifierGenerator(t *testing.T) {
 	}
 	partner.PartnerSettings = s.NewEmptyPartnerSettings(partner.UUIDGenerator)
 
-	g := partner.MessageIdentifierGenerator()
-	if expected := "%{uuid}"; g.FormatString() != expected {
-		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs := partner.IdentifierGenerator.FormatString("Message")
+	if expected := "%{uuid}"; fs != expected {
+		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.ResponseMessageIdentifierGenerator()
-	if expected := "%{uuid}"; g.FormatString() != expected {
-		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("ResponseMessage")
+	if expected := "%{uuid}"; fs != expected {
+		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.DataFrameIdentifierGenerator()
-	if expected := "%{id}"; g.FormatString() != expected {
-		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("DataFrame")
+	if expected := "%{id}"; fs != expected {
+		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.ReferenceIdentifierGenerator()
-	if expected := "%{type}:%{id}"; g.FormatString() != expected {
-		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("Reference")
+	if expected := "%{type}:%{id}"; fs != expected {
+		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.ReferenceStopAreaIdentifierGenerator()
-	if expected := "%{id}"; g.FormatString() != expected {
-		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("StopArea")
+	if expected := "%{id}"; fs != expected {
+		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
 }
 
@@ -903,25 +903,25 @@ func Test_Partner_IdentifierGenerator(t *testing.T) {
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
-	g := partner.MessageIdentifierGenerator()
-	if expected := "mid"; g.FormatString() != expected {
-		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs := partner.IdentifierGenerator.FormatString("Message")
+	if expected := "mid"; fs != expected {
+		t.Errorf("partner message_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.ResponseMessageIdentifierGenerator()
-	if expected := "rmid"; g.FormatString() != expected {
-		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("ResponseMessage")
+	if expected := "rmid"; fs != expected {
+		t.Errorf("partner response_message_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.DataFrameIdentifierGenerator()
-	if expected := "dfid"; g.FormatString() != expected {
-		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("DataFrame")
+	if expected := "dfid"; fs != expected {
+		t.Errorf("partner data_frame_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.ReferenceIdentifierGenerator()
-	if expected := "rid"; g.FormatString() != expected {
-		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("Reference")
+	if expected := "rid"; fs != expected {
+		t.Errorf("partner reference_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
-	g = partner.ReferenceStopAreaIdentifierGenerator()
-	if expected := "rsaid"; g.FormatString() != expected {
-		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, g.FormatString())
+	fs = partner.IdentifierGenerator.FormatString("StopArea")
+	if expected := "rsaid"; fs != expected {
+		t.Errorf("partner reference_stop_area_identifier IdentifierGenerator should be %v, got: %v ", expected, fs)
 	}
 }
 

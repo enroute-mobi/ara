@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -17,9 +16,8 @@ import (
 type SIRIProductionTimetableSubscriptionBroadcaster struct {
 	connector
 
-	dataFrameGenerator             *idgen.IdentifierGenerator
 	noDataFrameRefRewritingFrom    []string
-	vjRemoteCodeSpaces          []string
+	vjRemoteCodeSpaces             []string
 	productionTimetableBroadcaster SIRIProductionTimetableBroadcaster
 	toBroadcast                    map[SubscriptionId][]model.StopVisitId
 
@@ -46,7 +44,6 @@ func newSIRIProductionTimetableSubscriptionBroadcaster(partner *Partner) *SIRIPr
 	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 	connector.noDataFrameRefRewritingFrom = partner.NoDataFrameRefRewritingFrom()
-	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.StopVisitId)
@@ -152,7 +149,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 			lineCode := model.NewCode(connector.remoteCodeSpace, lineValue)
 			ref := model.Reference{
 				Code: &lineCode,
-				Type:     "Line",
+				Type: "Line",
 			}
 			r := NewResource(ref)
 			r.Subscribed(connector.Clock().Now())
@@ -174,7 +171,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) checkLines(ptt 
 
 		ref := model.Reference{
 			Code: &lineCode,
-			Type:     "Line",
+			Type: "Line",
 		}
 
 		r := NewResource(ref)
