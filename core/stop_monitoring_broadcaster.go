@@ -21,6 +21,9 @@ type SMBroadcaster struct {
 	clock.ClockConsumer
 
 	connector *SIRIStopMonitoringSubscriptionBroadcaster
+
+	notification       *siri.SIRINotifyStopMonitoring
+	multipleDeliveries bool
 }
 
 type StopMonitoringBroadcaster struct {
@@ -42,6 +45,7 @@ func NewFakeStopMonitoringBroadcaster(connector *SIRIStopMonitoringSubscriptionB
 }
 
 func (broadcaster *FakeStopMonitoringBroadcaster) Start() {
+	broadcaster.multipleDeliveries = broadcaster.connector.Partner().SmMultipleDeliveriesPerNotify()
 	broadcaster.prepareSIRIStopMonitoringNotify()
 }
 
@@ -57,6 +61,7 @@ func NewSIRIStopMonitoringBroadcaster(connector *SIRIStopMonitoringSubscriptionB
 func (smb *StopMonitoringBroadcaster) Start() {
 	logger.Log.Debugf("Start StopMonitoringBroadcaster")
 
+	smb.multipleDeliveries = smb.connector.Partner().SmMultipleDeliveriesPerNotify()
 	smb.stop = make(chan struct{})
 	go smb.run()
 }
@@ -107,13 +112,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		// maximumStopVisits, _ := strconv.Atoi(sub.SubscriptionOption("MaximumStopVisits"))
 		monitoredStopVisits := make(map[model.StopVisitId]struct{}) //Making sure not to send 2 times the same SV
 
-		notification := &siri.SIRINotifyStopMonitoring{
-			Address:                   smb.connector.Partner().Address(),
-			ProducerRef:               smb.connector.Partner().ProducerRef(),
-			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-			ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
-			ResponseTimestamp:         smb.connector.Clock().Now(),
-		}
+		notification := smb.getNotification(sub)
 		deliveries := make(map[string]*siri.SIRINotifyStopMonitoringDelivery)
 
 		for _, stopVisitId := range stopVisits {
@@ -159,9 +158,38 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 				notification.Deliveries = append(notification.Deliveries, delivery)
 			}
 		}
-		if len(notification.Deliveries) != 0 {
+		if !smb.multipleDeliveries && len(notification.Deliveries) != 0 {
 			smb.sendNotification(notification)
 		}
+	}
+	if smb.multipleDeliveries {
+		if len(smb.notification.Deliveries) != 0 {
+			smb.sendNotification(smb.notification)
+		}
+		smb.notification = nil
+	}
+}
+
+func (smb *SMBroadcaster) getNotification(sub *Subscription) *siri.SIRINotifyStopMonitoring {
+	if smb.multipleDeliveries {
+		if smb.notification == nil {
+			smb.notification = &siri.SIRINotifyStopMonitoring{
+				Address:                   smb.connector.Partner().Address(),
+				ProducerRef:               smb.connector.Partner().ProducerRef(),
+				ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
+				ResponseTimestamp:         smb.connector.Clock().Now(),
+			}
+		}
+
+		return smb.notification
+	}
+
+	return &siri.SIRINotifyStopMonitoring{
+		Address:                   smb.connector.Partner().Address(),
+		ProducerRef:               smb.connector.Partner().ProducerRef(),
+		RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
+		ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
+		ResponseTimestamp:         smb.connector.Clock().Now(),
 	}
 }
 
