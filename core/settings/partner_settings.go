@@ -39,7 +39,8 @@ const (
 	COLLECT_USE_DISCOVERED_LINES     = "collect.use_discovered_lines"
 	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
 	COLLECT_PERSISTENT               = "collect.persistent"
-	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages"
+	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
+	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
 	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
 
@@ -103,7 +104,7 @@ type PartnerSettings struct {
 	rewriteJourneyPatternRef            bool
 	gzipGtfs                            bool
 	generalMessageRequestVersion22      bool
-	collectFilteredGeneralMessages      bool
+	collectFilteredSituations           bool
 	ignoreStopWithoutLine               bool
 	smMultipleDeliveriesPerNotify       bool
 	discoveryInterval                   time.Duration
@@ -188,7 +189,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setPersistentCollect(settings)
 	s.setPersistentBroadcastSubscriptions(settings)
 	s.setRewriteJourneyPatternRef(settings)
-	s.setCollectFilteredGeneralMessages(settings)
+	s.setCollectFilteredSituations(settings)
 	s.setIgnoreStopWithoutLine(settings)
 	s.setDiscoveryInterval(settings)
 	s.setCacheTimeouts(settings)
@@ -628,13 +629,14 @@ func (s *PartnerSettings) PersistentBroadcastSubscriptions() bool {
 	return s.persistentBroadcastSubscriptions
 }
 
-func (s *PartnerSettings) setCollectFilteredGeneralMessages(settings map[string]string) {
-	collect, _ := strconv.ParseBool(settings[COLLECT_FILTER_GENERAL_MESSAGES])
-	s.collectFilteredGeneralMessages = collect
+func (s *PartnerSettings) setCollectFilteredSituations(settings map[string]string) {
+	cgm, _ := strconv.ParseBool(settings[COLLECT_FILTER_GENERAL_MESSAGES])
+	cs, _ := strconv.ParseBool(settings[COLLECT_FILTER_SITUATIONS])
+	s.collectFilteredSituations = cgm || cs
 }
 
-func (s *PartnerSettings) CollectFilteredGeneralMessages() bool {
-	return s.collectFilteredGeneralMessages
+func (s *PartnerSettings) CollectFilteredSituations() bool {
+	return s.collectFilteredSituations
 }
 
 func (s *PartnerSettings) setIgnoreStopWithoutLine(settings map[string]string) {

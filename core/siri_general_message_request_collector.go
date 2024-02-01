@@ -9,9 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
-type GeneralMessageRequestCollector interface {
-	RequestSituationUpdate(kind, requestedId string)
-}
+// GeneralMessageRequestCollector uses SituationRequestCollector interface
 
 type SIRIGeneralMessageRequestCollectorFactory struct{}
 
@@ -48,10 +46,8 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	switch kind {
 	case SITUATION_UPDATE_REQUEST_LINE:
 		siriGeneralMessageRequest.LineRef = []string{requestedId}
-		message.Lines = []string{requestedId}
 	case SITUATION_UPDATE_REQUEST_STOP_AREA:
 		siriGeneralMessageRequest.StopPointRef = []string{requestedId}
-		message.StopAreas = []string{requestedId}
 	}
 
 	// Check the request version

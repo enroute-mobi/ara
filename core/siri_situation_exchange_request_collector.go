@@ -32,7 +32,7 @@ func NewSIRISituationExchangeRequestCollector(partner *Partner) *SIRISituationEx
 
 func (connector *SIRISituationExchangeRequestCollector) RequestAllSituationsUpdate() {}
 
-func (connector *SIRISituationExchangeRequestCollector) RequestSituationUpdate(_kind, requestedId string) {
+func (connector *SIRISituationExchangeRequestCollector) RequestSituationUpdate(kind, requestedId string) {
 	message := connector.newBQEvent()
 	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
@@ -41,9 +41,16 @@ func (connector *SIRISituationExchangeRequestCollector) RequestSituationUpdate(_
 	siriSituationExchangeRequest := &siri.SIRIGetSituationExchangeRequest{
 		RequestorRef: connector.Partner().RequestorRef(),
 	}
-
 	siriSituationExchangeRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
 	siriSituationExchangeRequest.RequestTimestamp = connector.Clock().Now()
+
+	// Check the request filter
+	switch kind {
+	case SITUATION_UPDATE_REQUEST_LINE:
+		siriSituationExchangeRequest.LineRef = []string{requestedId}
+	case SITUATION_UPDATE_REQUEST_STOP_AREA:
+		siriSituationExchangeRequest.StopPointRef = []string{requestedId}
+	}
 
 	connector.logSIRISituationExchangeRequest(message, siriSituationExchangeRequest)
 

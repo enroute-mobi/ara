@@ -485,13 +485,9 @@ func (partner *Partner) SituationExchangeRequestCollector() SituationExchangeReq
 	if ok {
 		return client.(SituationExchangeRequestCollector)
 	}
-	return nil
-}
-
-func (partner *Partner) GeneralMessageRequestCollector() GeneralMessageRequestCollector {
-	client, ok := partner.connectors[SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR]
+	client, ok = partner.connectors[SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR]
 	if ok {
-		return client.(GeneralMessageRequestCollector)
+		return client.(SituationExchangeRequestCollector)
 	}
 	return nil
 }

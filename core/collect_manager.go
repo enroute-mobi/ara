@@ -283,16 +283,14 @@ func (manager *CollectManager) requestAllSituations() {
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if partner.CollectFilteredGeneralMessages() {
+		if partner.CollectFilteredSituations() {
 			continue
 		}
 
-		generalMessageRequestConnector := partner.GeneralMessageRequestCollector()
-		situationExchangeRequestConnector := partner.SituationExchangeRequestCollector()
+		requestConnector := partner.SituationExchangeRequestCollector()
 		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
-		if generalMessageRequestConnector == nil &&
-			subscriptionConnector == nil &&
-			situationExchangeRequestConnector == nil {
+		if requestConnector == nil &&
+			subscriptionConnector == nil {
 			continue
 		}
 
@@ -301,11 +299,8 @@ func (manager *CollectManager) requestAllSituations() {
 			subscriptionConnector.RequestAllSituationsUpdate()
 			continue
 		}
-		if generalMessageRequestConnector != nil {
-			generalMessageRequestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
-		}
-		if situationExchangeRequestConnector != nil {
-			situationExchangeRequestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
+		if requestConnector != nil {
+			requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_ALL, "")
 
 		}
 	}
@@ -322,11 +317,11 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if !partner.CollectFilteredGeneralMessages() {
+		if !partner.CollectFilteredSituations() {
 			continue
 		}
 
-		requestConnector := partner.GeneralMessageRequestCollector()
+		requestConnector := partner.SituationExchangeRequestCollector()
 		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
 
 		if requestConnector == nil && subscriptionConnector == nil {
@@ -366,11 +361,11 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
 			continue
 		}
-		if !partner.CollectFilteredGeneralMessages() {
+		if !partner.CollectFilteredSituations() {
 			continue
 		}
 
-		requestConnector := partner.GeneralMessageRequestCollector()
+		requestConnector := partner.SituationExchangeRequestCollector()
 		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
 
 		if requestConnector == nil && subscriptionConnector == nil {

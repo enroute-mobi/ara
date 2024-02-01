@@ -465,7 +465,14 @@ func Test_CollectFilteredGeneralMessages(t *testing.T) {
 	}
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
 
-	assert.True(partnerSettings.CollectFilteredGeneralMessages())
+	assert.True(partnerSettings.CollectFilteredSituations())
+
+	settings = map[string]string{
+		COLLECT_FILTER_SITUATIONS: "true",
+	}
+	partnerSettings = NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.True(partnerSettings.CollectFilteredSituations())
 }
 
 func Test_IgnoreStopWithoutLine(t *testing.T) {
