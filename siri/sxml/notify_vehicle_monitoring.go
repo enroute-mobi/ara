@@ -6,7 +6,7 @@ import (
 )
 
 type XMLNotifyVehicleMonitoring struct {
-	ResponseXMLStructure
+	ResponseXMLStructureWithStatus
 
 	deliveries []*XMLNotifyVehicleMonitoringDelivery
 }
