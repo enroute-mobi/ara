@@ -182,8 +182,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 					if !ok {
 						continue
 					}
-					referenceGenerator := ett.connector.Partner().ReferenceIdentifierGenerator()
-					datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
+					datedVehicleJourneyRef = ett.connector.Partner().NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 				}
 
 				estimatedVehicleJourney = &siri.SIRIEstimatedVehicleJourney{
@@ -375,8 +374,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) getEstimatedVehi
 				continue
 			}
 		}
-		generator := connector.Partner().ReferenceStopAreaIdentifierGenerator()
-		defaultCode := model.NewCode(connector.remoteCodeSpace, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
+		defaultCode := model.NewCode(connector.remoteCodeSpace, connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "StopArea", Id: ref.GetSha1()}))
 		references[refType] = defaultCode.Value()
 	}
 
@@ -401,7 +399,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) getEstimatedVehi
 
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) dataFrameRef() string {
 	modelDate := connector.partner.Model().Date()
-	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+	return connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {

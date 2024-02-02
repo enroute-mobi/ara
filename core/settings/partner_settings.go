@@ -79,6 +79,8 @@ const (
 )
 
 type PartnerSettings struct {
+	idgen.IdentifierGenerator
+
 	ug func() uuid.UUIDGenerator
 
 	collectSettings *CollectSettings
@@ -116,13 +118,6 @@ type PartnerSettings struct {
 	subscriptionMaximumResources     int
 	persistentCollect                bool
 	persistentBroadcastSubscriptions bool
-
-	messageIdentifierGenerator           *idgen.IdentifierGenerator
-	responseMessageIdentifierGenerator   *idgen.IdentifierGenerator
-	dataFrameIdentifierGenerator         *idgen.IdentifierGenerator
-	referenceIdentifierGenerator         *idgen.IdentifierGenerator
-	referenceStopAreaIdentifierGenerator *idgen.IdentifierGenerator
-	subscriptionIdentifierGenerator      *idgen.IdentifierGenerator
 
 	remoteCodeSpaces sync.Map
 	remoteCodeSpace  string
@@ -200,7 +195,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setVehicleJourneyRemoteCodeSpaceWithFallback(settings)
 
 	s.setIgnoreTerminateSubscriptionsRequest(settings)
-	s.setIdentifierGenerators(settings)
+	s.setIdentifierGenerator(settings)
 
 	s.setHttpClientOAuth(settings)
 
@@ -771,55 +766,8 @@ func toMap(s string) (m map[string]struct{}) {
 	return
 }
 
-func (s *PartnerSettings) setIdentifierGenerators(settings map[string]string) {
-	s.messageIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.MESSAGE_IDENTIFIER)
-	s.responseMessageIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.RESPONSE_MESSAGE_IDENTIFIER)
-	s.dataFrameIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.DATA_FRAME_IDENTIFIER)
-	s.referenceIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.REFERENCE_IDENTIFIER)
-	s.referenceStopAreaIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.REFERENCE_STOP_AREA_IDENTIFIER)
-	s.subscriptionIdentifierGenerator = s.createIdentifierGenerator(settings, idgen.SUBSCRIPTION_IDENTIFIER)
-}
-
-func (s *PartnerSettings) MessageIdentifierGenerator() *idgen.IdentifierGenerator {
-	return s.messageIdentifierGenerator
-}
-
-func (s *PartnerSettings) ResponseMessageIdentifierGenerator() *idgen.IdentifierGenerator {
-	return s.responseMessageIdentifierGenerator
-}
-
-func (s *PartnerSettings) DataFrameIdentifierGenerator() *idgen.IdentifierGenerator {
-	return s.dataFrameIdentifierGenerator
-}
-
-func (s *PartnerSettings) ReferenceIdentifierGenerator() *idgen.IdentifierGenerator {
-	return s.referenceIdentifierGenerator
-}
-
-func (s *PartnerSettings) ReferenceStopAreaIdentifierGenerator() *idgen.IdentifierGenerator {
-	return s.referenceStopAreaIdentifierGenerator
-}
-
-func (s *PartnerSettings) SubscriptionIdentifierGenerator() *idgen.IdentifierGenerator {
-	return s.subscriptionIdentifierGenerator
-}
-
-func (s *PartnerSettings) createIdentifierGenerator(settings map[string]string, generatorName string) *idgen.IdentifierGenerator {
-	format := settings[fmt.Sprintf("generators.%v", generatorName)]
-
-	if format == "" {
-		format = idgen.DefaultIdentifierGenerator(generatorName)
-	}
-
-	return idgen.NewIdentifierGenerator(format, s.ug())
-}
-
-func (s *PartnerSettings) NewMessageIdentifier() string {
-	return s.messageIdentifierGenerator.NewMessageIdentifier()
-}
-
-func (s *PartnerSettings) NewResponseMessageIdentifier() string {
-	return s.responseMessageIdentifierGenerator.NewMessageIdentifier()
+func (s *PartnerSettings) setIdentifierGenerator(settings map[string]string) {
+	s.IdentifierGenerator = idgen.NewIdentifierGenerator(settings, s.ug())
 }
 
 // func (s *PartnerSettings) idGeneratorFormat(generatorName string) (formatString string) {

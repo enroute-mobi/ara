@@ -81,7 +81,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 			logger.Log.Debugf("Unknown Code for Situation %s", situation.Id())
 			return
 		}
-		situationNumber = connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
+		situationNumber = connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
 	}
 
 	ptSituationElement := &siri.SIRIPtSituationElement{

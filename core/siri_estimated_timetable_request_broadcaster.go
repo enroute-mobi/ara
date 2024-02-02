@@ -21,8 +21,7 @@ type SIRIEstimatedTimetableRequestBroadcaster struct {
 
 	connector
 
-	useVisitNumber        bool
-	dataFrameGenerator    *idgen.IdentifierGenerator
+	useVisitNumber     bool
 	vjRemoteCodeSpaces []string
 }
 
@@ -30,8 +29,6 @@ type SIRIEstimatedTimetableRequestBroadcasterFactory struct{}
 
 func NewSIRIEstimatedTimetableRequestBroadcaster(partner *Partner) *SIRIEstimatedTimetableRequestBroadcaster {
 	connector := &SIRIEstimatedTimetableRequestBroadcaster{}
-
-	connector.dataFrameGenerator = partner.DataFrameIdentifierGenerator()
 
 	connector.partner = partner
 	return connector
@@ -121,8 +118,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 					logger.Log.Debugf("Vehicle journey with id %v does not have a proper code at %v", vehicleJourneyId, connector.Clock().Now())
 					continue
 				}
-				referenceGenerator := connector.Partner().ReferenceIdentifierGenerator()
-				datedVehicleJourneyRef = referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
+				datedVehicleJourneyRef = connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 			}
 
 			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
@@ -264,8 +260,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedVehicleJo
 				continue
 			}
 		}
-		generator := connector.Partner().ReferenceStopAreaIdentifierGenerator()
-		defaultCode := model.NewCode(connector.remoteCodeSpace, generator.NewIdentifier(idgen.IdentifierAttributes{Id: ref.GetSha1()}))
+		defaultCode := model.NewCode(connector.remoteCodeSpace, connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "StopArea", Id: ref.GetSha1()}))
 		references[refType] = defaultCode.Value()
 	}
 
@@ -283,7 +278,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) noDestinationRefRewri
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) dataFrameRef() string {
 	modelDate := connector.partner.Model().Date()
-	return connector.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+	return connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
 }
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit *model.StopVisit) {

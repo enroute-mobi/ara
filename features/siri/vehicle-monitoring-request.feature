@@ -9,12 +9,12 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
@@ -25,29 +25,29 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    Then the SIRI server should not have received a GetVehicleMonitoring request
 
   @ARA-1306
-  Scenario: VehicleMonitoring request collect and partner CheckStatus is unavailable should send GetVehicleMonitoring request to partner whith setting collect.persistent 
+  Scenario: VehicleMonitoring request collect and partner CheckStatus is unavailable should send GetVehicleMonitoring request to partner whith setting collect.persistent
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-request-collector] and the following settings:
-      | remote_url                       | http://localhost:8090 |
-      | remote_credential                | test                  |
-      | remote_code_space             | internal              |
-      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
-      | local_credential                 | ara                   |
-      | collect.persistent               | true                  |
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_code_space     | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+      | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
@@ -55,20 +55,20 @@ Feature: Support SIRI VehicleMonitoring by request
   @siri-valid @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
-      | local_credential                                                      | test     |
-      | remote_code_space                                                  | internal |
-      | siri-vehicle-monitoring-request-broadcaster.remote_code_space      | other    |
+      | local_credential                                              | test     |
+      | remote_code_space                                             | internal |
+      | siri-vehicle-monitoring-request-broadcaster.remote_code_space | other    |
     Given a Line exists with the following attributes:
       | Codes | "other": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro              |
+      | Name  | Ligne 3 Metro              |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                             |
-      | Codes                | "other": "Test:VehicleJourney:201:LOC" |
+      | Codes                    | "other": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
       | Monitored                | true                                   |
       | Attribute[DirectionName] | Direction Name                         |
     And a Vehicle exists with the following attributes:
-      | Codes        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes            | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -78,7 +78,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
    When I send this SIRI request
      """
-     <?xml version='1.0' encoding='UTF-8'?> 
+     <?xml version='1.0' encoding='UTF-8'?>
      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
       <soap:Body>
         <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -99,7 +99,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
     """
-      <?xml version='1.0' encoding='UTF-8'?> 
+      <?xml version='1.0' encoding='UTF-8'?>
       <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -145,20 +145,20 @@ Feature: Support SIRI VehicleMonitoring by request
   @siri-valid @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with multiple connector setting siri-vehicle-monitoring-request-broadcaster.vehicle_journey_remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
-      | local_credential                                                         | test          |
+      | local_credential                                                      | test          |
       | remote_code_space                                                     | internal      |
       | siri-vehicle-monitoring-request-broadcaster.vehicle_remote_code_space | other, other2 |
     Given a Line exists with the following attributes:
       | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Name  | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                                |
-      | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored                | true                                      |
       | Attribute[DirectionName] | Direction Name                            |
     And a Vehicle exists with the following attributes:
-      | Codes        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes            | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -169,7 +169,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Occupancy        | seatsAvailable                     |
    When I send this SIRI request
      """
-     <?xml version='1.0' encoding='UTF-8'?> 
+     <?xml version='1.0' encoding='UTF-8'?>
      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
       <soap:Body>
         <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -190,7 +190,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
       """
-      <?xml version='1.0' encoding='UTF-8'?> 
+      <?xml version='1.0' encoding='UTF-8'?>
       <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -237,19 +237,19 @@ Feature: Support SIRI VehicleMonitoring by request
   @siri-valid @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
-     | local_credential     | test  |
+     | local_credential  | test  |
      | remote_code_space | wrong |
    Given a Line exists with the following attributes:
      | Codes | "internal": "Test:Line:3:LOC" |
-     | Name      | Ligne 3 Metro                 |
+     | Name  | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | Codes        | "other": "Test:Vehicle:201123:LOC" |
+     | Codes            | "other": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
      | Longitude        | 1.234                              |
@@ -279,7 +279,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
    Then I should receive this SIRI response
       """
-      <?xml version="1.0" encoding="UTF-8"?> 
+      <?xml version="1.0" encoding="UTF-8"?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -321,31 +321,31 @@ Feature: Support SIRI VehicleMonitoring by request
   Scenario: Send all the vehicles in respond to a SIRI VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_code_space  | internal |
+      | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
       | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Name  | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | Codes | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes     | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a VehicleJourney exists with the following attributes:
-      | Name                                  | Passage 33                                |
+      | Name                              | Passage 33                                |
       | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
-      | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                             | true                                      |
+      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored                         | true                                      |
       | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
       | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
       | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
-      | OriginName                            | Origin Name                               |
-      | DestinationName                       | Destination Name                          |
-      | DirectionName                         | Direction Name                            |
-      | DirectionType                         | outbound                                  |
-      | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
+      | OriginName                        | Origin Name                               |
+      | DestinationName                   | Destination Name                          |
+      | DirectionName                     | Direction Name                            |
+      | DirectionType                     | outbound                                  |
+      | Attribute[JourneyPatternName]     | Journey Pattern Name                      |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -357,7 +357,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -369,7 +369,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -403,7 +403,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
     """
-    <?xml version='1.0' encoding='UTF-8'?> 
+    <?xml version='1.0' encoding='UTF-8'?>
     <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
       <S:Body>
         <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -517,31 +517,31 @@ Feature: Support SIRI VehicleMonitoring by request
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_code_space  | internal |
+      | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
       | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Name  | Ligne 3 Metro                 |
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | Codes | "internal": "Test:VehicleJourney:201:LOC" |
+      | Codes     | "internal": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
       | Monitored | true                                      |
     And a VehicleJourney exists with the following attributes:
-      | Name                                  | Passage 33                                |
+      | Name                              | Passage 33                                |
       | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
-      | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                             | true                                      |
+      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored                         | true                                      |
       | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
       | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
       | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
-      | OriginName                            | Origin Name                               |
-      | DestinationName                       | Destination Name                          |
-      | DirectionName                         | Direction Name                            |
-      | DirectionType                         | outbound                                  |
-      | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
+      | OriginName                        | Origin Name                               |
+      | DestinationName                   | Destination Name                          |
+      | DirectionName                     | Direction Name                            |
+      | DirectionType                     | outbound                                  |
+      | Attribute[JourneyPatternName]     | Journey Pattern Name                      |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -553,7 +553,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -565,7 +565,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:3:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -599,7 +599,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
     """
-    <?xml version='1.0' encoding='UTF-8'?> 
+    <?xml version='1.0' encoding='UTF-8'?>
     <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
       <S:Body>
         <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -646,32 +646,32 @@ Feature: Support SIRI VehicleMonitoring by request
     </S:Envelope>
     """
     Then an audit event should exist with these attributes:
-        | Type              | VehicleMonitoringRequest                                           |
-        | Protocol          | siri                                                               |
-        | Direction         | received                                                           |
-        | Status            | OK                                                                 |
-        | Partner           | test                                                               |
-        | Vehicles          | ["Test:Vehicle:1:LOC"]                                             |
-        | RequestIdentifier | Test:1234::LOC                                                     |
-        | Lines             | ["Test:Line:3:LOC"]                                                |
-        | VehicleJourneys   | ["Test:VehicleJourney:201:LOC"]                                  |
+        | Type              | VehicleMonitoringRequest        |
+        | Protocol          | siri                            |
+        | Direction         | received                        |
+        | Status            | OK                              |
+        | Partner           | test                            |
+        | Vehicles          | ["Test:Vehicle:1:LOC"]          |
+        | RequestIdentifier | Test:1234::LOC                  |
+        | Lines             | ["Test:Line:3:LOC"]             |
+        | VehicleJourneys   | ["Test:VehicleJourney:201:LOC"] |
 
   @siri-valid @ARA-1384
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
-     | local_credential     | test     |
+     | local_credential  | test     |
      | remote_code_space | internal |
    Given a Line exists with the following attributes:
      | Codes | "internal": "Test:Line:3:LOC" |
-     | Name      | Ligne 3 Metro                 |
+     | Name  | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | Codes        | "other": "Test:Vehicle:201123:LOC" |
+     | Codes            | "other": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
      | Longitude        | 1.234                              |
@@ -701,7 +701,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
    Then I should receive this SIRI response
       """
-      <?xml version="1.0" encoding="UTF-8"?> 
+      <?xml version="1.0" encoding="UTF-8"?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -742,19 +742,19 @@ Feature: Support SIRI VehicleMonitoring by request
   @siri-valid @ARA-1384
   Scenario: Handle a SIRI VehicleMonitoring request without Vehicle or Line filter should return an Error
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
-     | local_credential     | test     |
+     | local_credential  | test     |
      | remote_code_space | internal |
    Given a Line exists with the following attributes:
      | Codes | "internal": "Test:Line:3:LOC" |
-     | Name      | Ligne 3 Metro                 |
+     | Name  | Ligne 3 Metro                 |
    And a VehicleJourney exists with the following attributes:
      | Name                     | Passage 32                                |
-     | Codes                | "internal": "Test:VehicleJourney:201:LOC" |
+     | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
      | Monitored                | true                                      |
      | Attribute[DirectionName] | Direction Name                            |
    And a Vehicle exists with the following attributes:
-     | Codes        | "internal": "Test:Vehicle:201123:LOC" |
+     | Codes            | "internal": "Test:Vehicle:201123:LOC" |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
      | Longitude        | 1.234                                 |
@@ -824,20 +824,20 @@ Feature: Support SIRI VehicleMonitoring by request
   @siri-valid @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
-      | local_credential                                                      | test     |
-      | remote_code_space                                                  | internal |
-      | siri-vehicle-monitoring-request-broadcaster.remote_code_space      | other    |
+      | local_credential                                              | test     |
+      | remote_code_space                                             | internal |
+      | siri-vehicle-monitoring-request-broadcaster.remote_code_space | other    |
     Given a Line exists with the following attributes:
       | Codes | "other": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro              |
+      | Name  | Ligne 3 Metro              |
     And a VehicleJourney exists with the following attributes:
       | Name                     | Passage 32                             |
-      | Codes                | "other": "Test:VehicleJourney:201:LOC" |
+      | Codes                    | "other": "Test:VehicleJourney:201:LOC" |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
       | Monitored                | true                                   |
       | Attribute[DirectionName] | Direction Name                         |
     And a Vehicle exists with the following attributes:
-      | Codes        | "other": "Test:Vehicle:201123:LOC" |
+      | Codes            | "other": "Test:Vehicle:201123:LOC" |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Longitude        | 1.234                              |
@@ -847,7 +847,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
    When I send this SIRI request
      """
-     <?xml version='1.0' encoding='UTF-8'?> 
+     <?xml version='1.0' encoding='UTF-8'?>
      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
       <soap:Body>
         <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -868,7 +868,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
     """
-      <?xml version='1.0' encoding='UTF-8'?> 
+      <?xml version='1.0' encoding='UTF-8'?>
       <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
         <S:Body>
           <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -982,30 +982,30 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
       | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name      | Carabacel                                     |
+      | Name  | Carabacel                                     |
     And one Line has the following attributes:
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
     And one VehicleJourney has the following attributes:
       | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
       | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
-      | OriginName                            | Deloye / Dubouchage                               |
+      | OriginName                        | Deloye / Dubouchage                               |
       | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
-      | DestinationName                       | Rimiez Saint-George                               |
+      | DestinationName                   | Rimiez Saint-George                               |
       | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
-      | Monitored                             | false                                             |
+      | Monitored                         | false                                             |
     And one Vehicle has the following attributes:
-      | Codes      | "internal": "RLA290"          |
+      | Codes          | "internal": "RLA290"          |
       | Longitude      | 7.276192074052043             |
       | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
@@ -1014,14 +1014,14 @@ Feature: Support SIRI VehicleMonitoring by request
       | Percentage     | 70.0                          |
       | ValidUntilTime | 2021-08-02T08:50:27.733+02:00 |
     And an audit event should exist with these attributes:
-      | Protocol           | siri                                    |
-      | Direction          | sent                                    |
-      | Status             | OK                                      |
-      | Type               | VehicleMonitoringRequest                |
-      | StopAreas          | ["RLA_Bus:StopPoint:BP:PASTO8:LOC"]     |
-      | VehicleJourneys    | ["RLA_Bus:VehicleJourney::2978464:LOC"] |
-      | Lines              | ["RLA_Bus:Line::05:LOC"]                |
-      | Vehicles           | ["RLA290"]                              |
+      | Protocol        | siri                                    |
+      | Direction       | sent                                    |
+      | Status          | OK                                      |
+      | Type            | VehicleMonitoringRequest                |
+      | StopAreas       | ["RLA_Bus:StopPoint:BP:PASTO8:LOC"]     |
+      | VehicleJourneys | ["RLA_Bus:VehicleJourney::2978464:LOC"] |
+      | Lines           | ["RLA_Bus:Line::05:LOC"]                |
+      | Vehicles        | ["RLA290"]                              |
 
   Scenario: Collect Vehicle Position with numeric srsName
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
@@ -1094,30 +1094,30 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
       | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name      | Carabacel                                     |
+      | Name  | Carabacel                                     |
     And one Line has the following attributes:
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
     And one VehicleJourney has the following attributes:
       | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
       | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
-      | OriginName                            | Deloye / Dubouchage                               |
+      | OriginName                        | Deloye / Dubouchage                               |
       | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
-      | DestinationName                       | Rimiez Saint-George                               |
+      | DestinationName                   | Rimiez Saint-George                               |
       | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
-      | Monitored                             | false                                             |
+      | Monitored                         | false                                             |
     And one Vehicle has the following attributes:
-      | Codes      | "internal": "RLA290"          |
+      | Codes          | "internal": "RLA290"          |
       | Longitude      | 7.276192074052043             |
       | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
@@ -1197,31 +1197,31 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url               | http://localhost:8090 |
       | remote_credential        | test                  |
-      | remote_code_space     | internal              |
+      | remote_code_space        | internal              |
       | collect.include_lines    | RLA_Bus:Line::05:LOC  |
       | collect.default_srs_name | EPSG:2154             |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
       | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name      | Carabacel                                     |
+      | Name  | Carabacel                                     |
     And one Line has the following attributes:
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
     And one VehicleJourney has the following attributes:
       | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
       | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
-      | OriginName                            | Deloye / Dubouchage                               |
+      | OriginName                        | Deloye / Dubouchage                               |
       | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
-      | DestinationName                       | Rimiez Saint-George                               |
+      | DestinationName                   | Rimiez Saint-George                               |
       | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
-      | Monitored                             | false                                             |
+      | Monitored                         | false                                             |
     And one Vehicle has the following attributes:
-      | Codes      | "internal": "RLA290"          |
+      | Codes          | "internal": "RLA290"          |
       | Longitude      | 7.276192074052043             |
       | Latitude       | 43.70347861870634             |
       | DriverRef      | "5753"                        |
@@ -1301,23 +1301,23 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
+      | Codes  | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | LineId | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopArea exists with the following attributes:
       | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name      | Carabacel                                     |
+      | Name  | Carabacel                                     |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes            | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | PassageOrder     | 6                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                    |
@@ -1325,7 +1325,7 @@ Feature: Support SIRI VehicleMonitoring by request
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one Vehicle has the following attributes:
-      | Codes        | "internal": "RLA290"              |
+      | Codes            | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1402,39 +1402,39 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
+      | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
+      | Codes  | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
+      | LineId | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopArea exists with the following attributes:
       | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name      | Carabacel                                     |
+      | Name  | Carabacel                                     |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopArea exists with the following attributes:
       | Codes | "internal": "RLA_Bus:StopPoint:BP:CAL05:LOC" |
-      | Name      | Vieux Port                                   |
+      | Name  | Vieux Port                                   |
       # 6ba7b814-9dad-11d1-6-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
+      | Codes            | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
       | PassageOrder     | 6                                                    |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8                    |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                    |
       # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes        | "internal": "RLA920-RLA_Bus:StopPoint:BP:CAL05:LOC"    |
-      | PassageOrder     | 7                                                      |
-      | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8                      |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | Codes            | "internal": "RLA920-RLA_Bus:StopPoint:BP:CAL05:LOC" |
+      | PassageOrder     | 7                                                   |
+      | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8                   |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                   |
       # 6ba7b814-9dad-11d1-8-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "RLA290"              |
+      | Codes            | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1443,7 +1443,7 @@ Feature: Support SIRI VehicleMonitoring by request
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then the Vehicle "6ba7b814-9dad-11d1-9-00c04fd430c8" has the following attributes:
-      | Codes        | "internal": "RLA290"              |
+      | Codes            | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
@@ -1521,16 +1521,16 @@ Feature: Support SIRI VehicleMonitoring by request
     And a Line exists with the following attributes:
       | Codes | "external": "RLA_Bus:Line::05:LOC" |
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
-      | remote_url            | http://localhost:8090 |
-      | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | remote_code_space | internal              |
     And a minute has passed
     And a minute has passed
     Then the SIRI server should not have received a GetVehicleMonitoring request
     And the Partner "test" is updated with the following settings:
-      | remote_url           | http://localhost:8090 |
+      | remote_url        | http://localhost:8090 |
       | remote_code_space | external              |
-      | remote_credential    | test                  |
+      | remote_credential | test                  |
     When a minute has passed
     And a minute has passed
     Then the SIRI server should have received 1 GetVehicleMonitoring request
@@ -1539,38 +1539,38 @@ Feature: Support SIRI VehicleMonitoring by request
   Scenario: Handle a SIRI VehicleMonitoring request with Partner remote_code_space changed
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_code_space  | internal |
+      | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     And a Line exists with the following attributes:
       | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Name  | Ligne 3 Metro                 |
       # Id 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a Line exists with the following attributes:
       | Codes | "external": "Test:Line:A:BUS:LOC" |
-      | Name      | Ligne A Bus                       |
+      | Name  | Ligne A Bus                       |
       # Id 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
       | Name      | Passage 32                                |
-      | Codes | "external": "Test:VehicleJourney:201:LOC" |
+      | Codes     | "external": "Test:VehicleJourney:201:LOC" |
       | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
       | Monitored | true                                      |
       # Id 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name                                  | Passage 33                                |
+      | Name                              | Passage 33                                |
       | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
-      | LineId                                | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                             | true                                      |
+      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Monitored                         | true                                      |
       | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
       | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
       | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
-      | OriginName                            | Origin Name                               |
-      | DestinationName                       | Destination Name                          |
-      | DirectionName                         | Direction Name                            |
-      | DirectionType                         | outbound                                  |
-      | Attribute[JourneyPatternName]         | Journey Pattern Name                      |
+      | OriginName                        | Origin Name                               |
+      | DestinationName                   | Destination Name                          |
+      | DirectionName                     | Direction Name                            |
+      | DirectionType                     | outbound                                  |
+      | Attribute[JourneyPatternName]     | Journey Pattern Name                      |
       # Id 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes            | "internal": "Test:Vehicle:1:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -1582,7 +1582,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | Codes        | "external": "Test:Vehicle:2:LOC"  |
+      | Codes            | "external": "Test:Vehicle:2:LOC"  |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -1619,7 +1619,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
     """
-    <?xml version='1.0' encoding='UTF-8'?> 
+    <?xml version='1.0' encoding='UTF-8'?>
     <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
       <S:Body>
         <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -1671,7 +1671,7 @@ Feature: Support SIRI VehicleMonitoring by request
     </S:Envelope>
     """
     And the Partner "test" is updated with the following settings:
-      | local_credential     | test     |
+      | local_credential  | test     |
       | remote_code_space | external |
     And a minute has passed
     When I send this SIRI request
@@ -1697,7 +1697,7 @@ Feature: Support SIRI VehicleMonitoring by request
       """
     Then I should receive this SIRI response
     """
-     <?xml version='1.0' encoding='UTF-8'?> 
+     <?xml version='1.0' encoding='UTF-8'?>
      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
        <S:Body>
          <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -1743,3 +1743,218 @@ Feature: Support SIRI VehicleMonitoring by request
        </S:Body>
      </S:Envelope>
     """
+
+  @ARA-1363 @siri-valid
+  Scenario: Handle a SIRI VehicleMonitoring request using the generator setting reference_vehicle_journey_identifier
+    # Setting a Partner without default generators
+    Given a Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+      | local_credential                                | test                             |
+      | remote_code_space                            | internal                         |
+      | sort_payload_for_test                           | true                             |
+      | generators.reference_vehicle_journey_identifier | ch:1:ServiceJourney:87_TAC:%{id} |
+    Given a Line exists with the following attributes:
+      | Codes | "internal": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                 |
+    And a VehicleJourney exists with the following attributes:
+      | Name      | Passage 32                                                        |
+      | Codes | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
+      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
+      | Monitored | true                                                              |
+    And a Vehicle exists with the following attributes:
+      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver1                           |
+      | Bearing          | 120                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 12                                |
+      | Percentage       | 42                                |
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>test</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+              <siri:VehicleRef>Test:Vehicle:1:LOC</siri:VehicleRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+    <?xml version='1.0' encoding='UTF-8'?>
+    <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+      <S:Body>
+        <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+            <siri:ProducerRef>Ara</siri:ProducerRef>
+            <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:ResponseMessageIdentifier>
+            <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Answer>
+            <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+              <siri:Status>true</siri:Status>
+              <siri:VehicleActivity>
+                <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                <siri:VehicleMonitoringRef>Test:Vehicle:1:LOC</siri:VehicleMonitoringRef>
+                <siri:ProgressBetweenStops>
+                  <siri:LinkDistance>12</siri:LinkDistance>
+                  <siri:Percentage>42</siri:Percentage>
+                </siri:ProgressBetweenStops>
+                <siri:MonitoredVehicleJourney>
+                  <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                  <siri:FramedVehicleJourneyRef>
+                    <siri:DataFrameRef>2017-01-01</siri:DataFrameRef>
+                    <siri:DatedVehicleJourneyRef>ch:1:ServiceJourney:87_TAC:6ba7b814</siri:DatedVehicleJourneyRef>
+                  </siri:FramedVehicleJourneyRef>
+                  <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                  <siri:Monitored>true</siri:Monitored>
+                  <siri:VehicleLocation>
+                    <siri:Longitude>1.234</siri:Longitude>
+                    <siri:Latitude>5.678</siri:Latitude>
+                  </siri:VehicleLocation>
+                  <siri:Bearing>120</siri:Bearing>
+                  <siri:DriverRef>Driver1</siri:DriverRef>
+                </siri:MonitoredVehicleJourney>
+              </siri:VehicleActivity>
+             </siri:VehicleMonitoringDelivery>
+          </Answer>
+          <AnswerExtension/>
+        </sw:GetVehicleMonitoringResponse>
+      </S:Body>
+    </S:Envelope>
+    """
+    Then an audit event should exist with these attributes:
+        | Type              | VehicleMonitoringRequest                |
+        | Protocol          | siri                                    |
+        | Direction         | received                                |
+        | Status            | OK                                      |
+        | Partner           | test                                    |
+        | Vehicles          | ["Test:Vehicle:1:LOC"]                  |
+        | RequestIdentifier | Test:1234::LOC                          |
+        | Lines             | ["Test:Line:3:LOC"]                     |
+        | VehicleJourneys   | ["ch:1:ServiceJourney:87_TAC:6ba7b814"] |
+
+  @ARA-1363 @siri-valid
+  Scenario: Handle a SIRI VehicleMonitoring request using the default generator should send DatedVehicleJourneyRef according to default setting
+    # Setting a "SIRI Partner" with default generators
+    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+      | local_credential      | test     |
+      | remote_code_space  | internal |
+      | sort_payload_for_test | true     |
+    Given a Line exists with the following attributes:
+      | Codes | "internal": "Test:Line:3:LOC" |
+      | Name      | Ligne 3 Metro                 |
+    And a VehicleJourney exists with the following attributes:
+      | Name      | Passage 32                                                        |
+      | Codes | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
+      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
+      | Monitored | true                                                              |
+    And a Vehicle exists with the following attributes:
+      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | DriverRef        | Driver1                           |
+      | Bearing          | 120                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LinkDistance     | 12                                |
+      | Percentage       | 42                                |
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>test</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+              <siri:VehicleRef>Test:Vehicle:1:LOC</siri:VehicleRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+    <?xml version='1.0' encoding='UTF-8'?>
+    <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+      <S:Body>
+        <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceDeliveryInfo>
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+            <siri:ProducerRef>Ara</siri:ProducerRef>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+          </ServiceDeliveryInfo>
+          <Answer>
+            <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+              <siri:Status>true</siri:Status>
+              <siri:VehicleActivity>
+                <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                <siri:VehicleMonitoringRef>Test:Vehicle:1:LOC</siri:VehicleMonitoringRef>
+                <siri:ProgressBetweenStops>
+                  <siri:LinkDistance>12</siri:LinkDistance>
+                  <siri:Percentage>42</siri:Percentage>
+                </siri:ProgressBetweenStops>
+                <siri:MonitoredVehicleJourney>
+                  <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                  <siri:FramedVehicleJourneyRef>
+                    <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                    <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::6ba7b814:LOC</siri:DatedVehicleJourneyRef>
+                  </siri:FramedVehicleJourneyRef>
+                  <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                  <siri:Monitored>true</siri:Monitored>
+                  <siri:VehicleLocation>
+                    <siri:Longitude>1.234</siri:Longitude>
+                    <siri:Latitude>5.678</siri:Latitude>
+                  </siri:VehicleLocation>
+                  <siri:Bearing>120</siri:Bearing>
+                  <siri:DriverRef>Driver1</siri:DriverRef>
+                </siri:MonitoredVehicleJourney>
+              </siri:VehicleActivity>
+             </siri:VehicleMonitoringDelivery>
+          </Answer>
+          <AnswerExtension/>
+        </sw:GetVehicleMonitoringResponse>
+      </S:Body>
+    </S:Envelope>
+    """
+    Then an audit event should exist with these attributes:
+        | Type              | VehicleMonitoringRequest                 |
+        | Protocol          | siri                                     |
+        | Direction         | received                                 |
+        | Status            | OK                                       |
+        | Partner           | test                                     |
+        | Vehicles          | ["Test:Vehicle:1:LOC"]                   |
+        | RequestIdentifier | Test:1234::LOC                           |
+        | Lines             | ["Test:Line:3:LOC"]                      |
+        | VehicleJourneys   | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |

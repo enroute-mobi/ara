@@ -20,11 +20,8 @@ type BroadcastStopMonitoringBuilder struct {
 	StopVisitTypes string
 	MonitoringRef  string
 
-	referenceGenerator            *idgen.IdentifierGenerator
-	stopAreareferenceGenerator    *idgen.IdentifierGenerator
-	dataFrameGenerator            *idgen.IdentifierGenerator
-	remoteCodeSpace            string
-	vjRemoteCodeSpaces         []string
+	remoteCodeSpace               string
+	vjRemoteCodeSpaces            []string
 	noDestinationRefRewritingFrom []string
 	noDataFrameRefRewritingFrom   []string
 	rewriteJourneyPatternRef      bool
@@ -33,11 +30,8 @@ type BroadcastStopMonitoringBuilder struct {
 func NewBroadcastStopMonitoringBuilder(partner *Partner, connectorName string) *BroadcastStopMonitoringBuilder {
 	return &BroadcastStopMonitoringBuilder{
 		partner:                       partner,
-		referenceGenerator:            partner.ReferenceIdentifierGenerator(),
-		stopAreareferenceGenerator:    partner.ReferenceStopAreaIdentifierGenerator(),
-		dataFrameGenerator:            partner.DataFrameIdentifierGenerator(),
-		remoteCodeSpace:            partner.RemoteCodeSpace(connectorName),
-		vjRemoteCodeSpaces:         partner.VehicleJourneyRemoteCodeSpaceWithFallback(connectorName),
+		remoteCodeSpace:               partner.RemoteCodeSpace(connectorName),
+		vjRemoteCodeSpaces:            partner.VehicleJourneyRemoteCodeSpaceWithFallback(connectorName),
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),
 		rewriteJourneyPatternRef:      partner.RewriteJourneyPatternRef(),
@@ -252,7 +246,7 @@ func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *mode
 			logger.Log.Printf("Ignore StopVisit %s without default Code", stopVisit.Id())
 			return "", false
 		}
-		itemIdentifier = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: defaultCode.Value()})
+		itemIdentifier = builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: defaultCode.Value()})
 	}
 	return itemIdentifier, true
 }
@@ -268,7 +262,7 @@ func (builder *BroadcastStopMonitoringBuilder) datedVehicleJourneyRef(vehicleJou
 		if !ok {
 			return "", false
 		}
-		datedVehicleJourneyRef = builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
+		datedVehicleJourneyRef = builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 	}
 	return datedVehicleJourneyRef, true
 }
@@ -291,16 +285,20 @@ func (builder *BroadcastStopMonitoringBuilder) resolveOperator(references model.
 }
 
 func (builder *BroadcastStopMonitoringBuilder) resolveVJReferences(references model.References, origin string) {
-	for _, refType := range []string{"RouteRef", "JourneyPatternRef", "DatedVehicleJourneyRef"} {
-		if refType == "JourneyPatternRef" && !builder.rewriteJourneyPatternRef {
-			continue
+	if builder.rewriteJourneyPatternRef {
+		if reference, ok := references.Get("JourneyPatternRef"); ok {
+			reference.Code.SetValue(builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "JourneyPattern", Id: reference.GetSha1()}))
 		}
-		reference, ok := references.Get(refType)
-		if !ok {
-			continue
-		}
-		reference.Code.SetValue(builder.referenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Type: refType[:len(refType)-3], Id: reference.GetSha1()}))
 	}
+
+	if reference, ok := references.Get("RouteRef"); ok {
+		reference.Code.SetValue(builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "Route", Id: reference.GetSha1()}))
+	}
+
+	if reference, ok := references.Get("DatedVehicleJourneyRef"); ok {
+		reference.Code.SetValue(builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DatedVehicleJourney", Id: reference.GetSha1()}, "VehicleJourney"))
+	}
+
 	for _, refType := range []string{"PlaceRef", "OriginRef", "DestinationRef"} {
 		reference, ok := references.Get(refType)
 		if !ok || reference.Code == nil || (refType == "DestinationRef" && builder.noDestinationRefRewrite(origin)) {
@@ -319,7 +317,7 @@ func (builder *BroadcastStopMonitoringBuilder) resolveStopAreaRef(reference *mod
 			return
 		}
 	}
-	reference.Code.SetValue(builder.stopAreareferenceGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()}))
+	reference.Code.SetValue(builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "StopArea", Id: reference.GetSha1()}))
 }
 
 func (builder *BroadcastStopMonitoringBuilder) noDestinationRefRewrite(origin string) bool {
@@ -345,5 +343,5 @@ func (builder *BroadcastStopMonitoringBuilder) dataFrameRef(sv *model.StopVisit,
 		return sv.DataFrameRef
 	}
 	modelDate := builder.partner.Model().Date()
-	return builder.dataFrameGenerator.NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+	return builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
 }

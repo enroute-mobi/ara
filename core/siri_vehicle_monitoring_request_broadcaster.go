@@ -51,7 +51,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(reques
 	siriResponse = &siri.SIRIVehicleMonitoringResponse{
 		ResponseTimestamp:         connector.Clock().Now(),
 		ProducerRef:               connector.Partner().ProducerRef(),
-		ResponseMessageIdentifier: connector.Partner().ResponseMessageIdentifierGenerator().NewMessageIdentifier(),
+		ResponseMessageIdentifier: connector.Partner().NewResponseMessageIdentifier(),
 		RequestMessageRef:         messageIdentifier,
 	}
 
@@ -193,7 +193,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 	framedVehicleJourneyRef := &siri.SIRIFramedVehicleJourneyRef{}
 	modelDate := connector.partner.Model().Date()
 	framedVehicleJourneyRef.DataFrameRef =
-		connector.Partner().DataFrameIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: modelDate.String()})
+		connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
 	framedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
 
 	monitoredVehicleJourney.FramedVehicleJourneyRef = framedVehicleJourneyRef
@@ -218,7 +218,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef
 			return "", false
 		}
 		dataVehicleJourneyRef =
-			connector.Partner().ReferenceIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
+			connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 	}
 	return dataVehicleJourneyRef, true
 }
@@ -297,7 +297,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) resolveStopAreaRef(ref
 			return obj.Value()
 		}
 	}
-	return connector.Partner().ReferenceStopAreaIdentifierGenerator().NewIdentifier(idgen.IdentifierAttributes{Id: reference.GetSha1()})
+	return connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "StopArea", Id: reference.GetSha1()})
 }
 
 func (factory *SIRIVehicleMonitoringRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {

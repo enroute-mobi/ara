@@ -238,8 +238,7 @@ func (manager *MemorySubscriptions) Save(subscription *Subscription) bool {
 	defer manager.mutex.Unlock()
 
 	if subscription.Id() == "" {
-		generator := manager.partner.SubscriptionIdentifierGenerator()
-		subscription.id = SubscriptionId(generator.NewIdentifier(idgen.IdentifierAttributes{Id: manager.NewUUID()}))
+		subscription.id = SubscriptionId(manager.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "Subscription", Id: manager.NewUUID()}))
 	}
 
 	subscription.manager = manager

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -16,21 +15,19 @@ type EstimatedTimetableUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	partner            *Partner
-	referenceGenerator *idgen.IdentifierGenerator
-	remoteCodeSpace    string
-	origin             string
+	partner         *Partner
+	remoteCodeSpace string
+	origin          string
 
 	updateEvents *CollectUpdateEvents
 }
 
 func NewEstimatedTimetableUpdateEventBuilder(partner *Partner) EstimatedTimetableUpdateEventBuilder {
 	return EstimatedTimetableUpdateEventBuilder{
-		partner:            partner,
-		referenceGenerator: partner.ReferenceIdentifierGenerator(),
-		remoteCodeSpace:    partner.RemoteCodeSpace(),
-		origin:             string(partner.Slug()),
-		updateEvents:       NewCollectUpdateEvents(),
+		partner:         partner,
+		remoteCodeSpace: partner.RemoteCodeSpace(),
+		origin:          string(partner.Slug()),
+		updateEvents:    NewCollectUpdateEvents(),
 	}
 }
 
