@@ -16,10 +16,10 @@ definitions:
           - apt-get update
           - mkdir -p /usr/share/man/man1 /usr/share/man/man7
           - export PACKAGES="build-essential ruby-dev libpq-dev libxml2-dev zlib1g-dev git-core postgresql-client-common libproj-dev"
-          - export BUNDLER_VERSION="2.2.33"
+          - export BUNDLER_VERSION=$(tail -n1 Gemfile.lock)
           - apt-get -y install --no-install-recommends locales $PACKAGES
           - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
-          - gem install bundler:$BUNDLER_VERSION
+          - gem install bundler -v $BUNDLER_VERSION
 
           # FIXME
           - export BASE_PATH="${GOPATH}/src/bitbucket.org/enroute-mobi"
