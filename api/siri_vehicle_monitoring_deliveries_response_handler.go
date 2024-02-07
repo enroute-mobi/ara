@@ -37,13 +37,13 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(pa
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
 	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
 	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
+	if !handler.xmlRequest.Status() {
+		params.message.Status = "Error"
+	}
 
 	subIds := make(map[string]struct{})
 	for _, delivery := range handler.xmlRequest.VehicleMonitoringDeliveries() {
 		subIds[delivery.SubscriptionRef()] = struct{}{}
-		if !delivery.Status() {
-			params.message.Status = "Error"
-		}
 	}
 	subs := make([]string, 0, len(subIds))
 	for k := range subIds {
