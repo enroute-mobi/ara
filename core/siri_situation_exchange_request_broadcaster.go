@@ -67,7 +67,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) getSituationExchangeDe
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(delivery *siri.SIRISituationExchangeDelivery, situation model.Situation) {
-	if situation.Origin == string(connector.partner.Slug()) || situation.GMValidUntil().Before(connector.Clock().Now()) {
+	if situation.Origin == string(connector.partner.Slug()) || (!situation.GMValidUntil().IsZero() && situation.GMValidUntil().Before(connector.Clock().Now())) {
 		return
 	}
 
