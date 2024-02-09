@@ -19,6 +19,8 @@ type SIRISituationExchangeRequest struct {
 	MessageIdentifier string
 
 	RequestTimestamp time.Time
+	// TODO: to be removed. See ARA-1470
+	StartTime time.Time
 
 	InfoChannelRef []string
 
@@ -35,6 +37,7 @@ func NewSIRISituationExchangeRequest(
 	}
 	request.MessageIdentifier = messageIdentifier
 	request.RequestTimestamp = requestTimestamp
+	request.StartTime = requestTimestamp.Add(-12 * time.Hour)
 	return request
 }
 

@@ -562,6 +562,8 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       <Request version="2.0:FR-IDF-2.4">
         <siri:RequestTimestamp>2017-01-01T12:01:10.000Z</siri:RequestTimestamp>
         <siri:MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:MessageIdentifier>
+        <siri:PreviewInterval>PT12H</siri:PreviewInterval>
+        <siri:StartTime>2017-01-01T00:01:10.000Z</siri:StartTime>
         <siri:LineRef>1234</siri:LineRef>
       </Request>
       <RequestExtension />
@@ -599,6 +601,8 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       <Request version="2.0:FR-IDF-2.4">
         <siri:RequestTimestamp>2017-01-01T12:01:10.000Z</siri:RequestTimestamp>
         <siri:MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:MessageIdentifier>
+        <siri:PreviewInterval>PT12H</siri:PreviewInterval>
+        <siri:StartTime>2017-01-01T00:01:10.000Z</siri:StartTime>
         <siri:StopPointRef>1234</siri:StopPointRef>
       </Request>
       <RequestExtension />
