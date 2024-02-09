@@ -38,11 +38,11 @@ func (connector *SIRISituationExchangeRequestCollector) RequestSituationUpdate(k
 
 	startTime := connector.Clock().Now()
 
-	siriSituationExchangeRequest := &siri.SIRIGetSituationExchangeRequest{
-		RequestorRef: connector.Partner().RequestorRef(),
-	}
-	siriSituationExchangeRequest.MessageIdentifier = connector.Partner().NewMessageIdentifier()
-	siriSituationExchangeRequest.RequestTimestamp = connector.Clock().Now()
+	siriSituationExchangeRequest := siri.NewSIRISituationExchangeRequest(
+		connector.Partner().NewMessageIdentifier(),
+		connector.Partner().RequestorRef(),
+		connector.Clock().Now(),
+	)
 
 	// Check the request filter
 	switch kind {
