@@ -14,17 +14,17 @@ type StopMonitoringUpdateEventBuilder struct {
 	uuid.UUIDConsumer
 
 	originStopAreaCode model.Code
-	partner                *Partner
-	remoteCodeSpace     string
+	partner            *Partner
+	remoteCodeSpace    string
 
 	stopMonitoringUpdateEvents *CollectUpdateEvents
 }
 
 func NewStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaCode model.Code) StopMonitoringUpdateEventBuilder {
 	return StopMonitoringUpdateEventBuilder{
-		originStopAreaCode:     originStopAreaCode,
+		originStopAreaCode:         originStopAreaCode,
 		partner:                    partner,
-		remoteCodeSpace:         partner.RemoteCodeSpace(),
+		remoteCodeSpace:            partner.RemoteCodeSpace(),
 		stopMonitoringUpdateEvents: NewCollectUpdateEvents(),
 	}
 }
@@ -39,9 +39,9 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
-			Origin:   origin,
-			Code: stopAreaCode,
-			Name:     xmlStopVisitEvent.StopPointName(),
+			Origin: origin,
+			Code:   stopAreaCode,
+			Name:   xmlStopVisitEvent.StopPointName(),
 		}
 		if builder.originStopAreaCode.Value() != "" && stopAreaCode.String() != builder.originStopAreaCode.String() {
 			event.ParentCode = builder.originStopAreaCode
@@ -58,9 +58,9 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
-			Origin:   origin,
-			Code: lineCode,
-			Name:     xmlStopVisitEvent.PublishedLineName(),
+			Origin: origin,
+			Code:   lineCode,
+			Name:   xmlStopVisitEvent.PublishedLineName(),
 		}
 
 		builder.stopMonitoringUpdateEvents.Lines[xmlStopVisitEvent.LineRef()] = lineEvent
@@ -74,8 +74,8 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:          origin,
-			Code:        vjCode,
-			LineCode:    lineCode,
+			Code:            vjCode,
+			LineCode:        lineCode,
 			OriginRef:       xmlStopVisitEvent.OriginRef(),
 			OriginName:      xmlStopVisitEvent.OriginName(),
 			DirectionType:   builder.directionRef(xmlStopVisitEvent.DirectionRef()),
@@ -85,7 +85,7 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			Occupancy:       model.NormalizedOccupancyName(xmlStopVisitEvent.Occupancy()),
 
 			CodeSpace: builder.remoteCodeSpace,
-			SiriXML:      &xmlStopVisitEvent.XMLMonitoredVehicleJourney,
+			SiriXML:   &xmlStopVisitEvent.XMLMonitoredVehicleJourney,
 		}
 
 		builder.stopMonitoringUpdateEvents.VehicleJourneys[xmlStopVisitEvent.DatedVehicleJourneyRef()] = vjEvent
@@ -98,21 +98,21 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 	_, ok = builder.stopMonitoringUpdateEvents.StopVisits[xmlStopVisitEvent.StopPointRef()][xmlStopVisitEvent.ItemIdentifier()]
 	if !ok {
 		svEvent := &model.StopVisitUpdateEvent{
-			Origin:                 origin,
+			Origin:             origin,
 			Code:               stopVisitCode,
 			StopAreaCode:       stopAreaCode,
 			VehicleJourneyCode: vjCode,
-			DataFrameRef:           xmlStopVisitEvent.DataFrameRef(),
-			PassageOrder:           xmlStopVisitEvent.Order(),
-			Monitored:              xmlStopVisitEvent.Monitored(),
-			VehicleAtStop:          xmlStopVisitEvent.VehicleAtStop(),
-			ArrivalStatus:          model.SetStopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
-			DepartureStatus:        model.SetStopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
-			RecordedAt:             xmlStopVisitEvent.RecordedAt(),
-			Schedules:              model.NewStopVisitSchedules(),
+			DataFrameRef:       xmlStopVisitEvent.DataFrameRef(),
+			PassageOrder:       xmlStopVisitEvent.Order(),
+			Monitored:          xmlStopVisitEvent.Monitored(),
+			VehicleAtStop:      xmlStopVisitEvent.VehicleAtStop(),
+			ArrivalStatus:      model.SetStopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
+			DepartureStatus:    model.SetStopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
+			RecordedAt:         xmlStopVisitEvent.RecordedAt(),
+			Schedules:          model.NewStopVisitSchedules(),
 
 			CodeSpace: builder.remoteCodeSpace,
-			SiriXML:      xmlStopVisitEvent,
+			SiriXML:   xmlStopVisitEvent,
 		}
 
 		if !xmlStopVisitEvent.AimedDepartureTime().IsZero() || !xmlStopVisitEvent.AimedArrivalTime().IsZero() {

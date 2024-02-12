@@ -151,7 +151,9 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj.Attributes.Set("DirectionName", event.Direction)
 	}
 
-	vj.Occupancy = event.Occupancy
+	if event.Occupancy != Undefined {
+		vj.Occupancy = event.Occupancy
+	}
 	vj.Monitored = event.Monitored
 	if event.DirectionType != "" { // Do not override unknown DirectionType
 		vj.DirectionType = event.DirectionType
@@ -316,7 +318,9 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	} else {
 		vehicle.RecordedAtTime = event.RecordedAt
 	}
-	vehicle.Occupancy = event.Occupancy
+	if event.Occupancy != Undefined {
+		vehicle.Occupancy = event.Occupancy
+	}
 
 	if line != nil {
 		vehicle.LineId = line.Id()
