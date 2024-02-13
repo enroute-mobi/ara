@@ -96,6 +96,8 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		logger.Log.Debugf("%v", err)
 	}
 
+	situationEvent.InternalTags = append(situationEvent.InternalTags, builder.partner.CollectSituationsInternalTags()...)
+
 	for _, validityPeriod := range xmlSituation.ValidityPeriods() {
 		period := &model.TimeRange{
 			StartTime: validityPeriod.StartTime(),
