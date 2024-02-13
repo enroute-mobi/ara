@@ -917,3 +917,156 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
     Then one Situation has the following attributes:
       | Codes        | "external" : "test" |
       | InternalTags | ["first","second"]  |
+
+  @siri-valid @ARA-1444
+  Scenario: Broadcast via a SIRI SX request a Situation with matching internal tags
+    Given a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
+      | Version                      | 1                                 |
+      | ReportType                   | general                           |
+      | Progress                     | published                         |
+      | InternalTags                 | ["first","second"]                |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]    | Description Sample                |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    And a StopArea exists with the following attributes:
+      | Name  | Stop Area Sample     |
+      | Codes | "external": "sample" |
+    And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
+      | local_credential                   | NINOXE:default |
+      | remote_code_space                  | external       |
+      | broadcast.situations.internal_tags | first,another  |
+    When I send this SIRI request
+      """
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <sw:GetSituationExchange xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
+      <ServiceRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+      </ServiceRequestInfo>
+      <Request>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:MessageIdentifier>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:MessageIdentifier>
+      </Request>
+      <RequestExtension />
+    </sw:GetSituationExchange>
+  </soap:Body>
+</soap:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:Situations>
+                <siri:PtSituationElement>
+                    <siri:CreationTime>2017-01-01T03:30:06.000+02:00</siri:CreationTime>
+                    <siri:SituationNumber>test</siri:SituationNumber>
+                    <siri:Version>1</siri:Version>
+                    <siri:Source>
+                      <siri:SourceType>directReport</siri:SourceType>
+                    </siri:Source>
+                    <siri:Progress>published</siri:Progress>
+                    <siri:ValidityPeriod>
+                      <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
+                    </siri:ValidityPeriod>
+                    <siri:UndefinedReason/>
+                    <siri:ReportType>general</siri:ReportType>
+                    <siri:Description>Description Sample</siri:Description>
+                    <siri:Affects>
+                      <siri:StopPoints>
+                        <siri:AffectedStopPoint>
+                          <siri:StopPointRef>sample</siri:StopPointRef>
+                        </siri:AffectedStopPoint>
+                      </siri:StopPoints>
+                    </siri:Affects>
+                </siri:PtSituationElement>
+                </siri:Situations>
+              </siri:SituationExchangeDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetSituationExchangeResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+
+  @siri-valid @ARA-1444
+  Scenario: Do not broadcast a Situation with no matching internal tags
+    Given a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
+      | Version                      | 1                                 |
+      | ReportType                   | general                           |
+      | Progress                     | published                         |
+      | InternalTags                 | ["first","second"]                |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]    | Description Sample                |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    And a StopArea exists with the following attributes:
+      | Name  | Stop Area Sample     |
+      | Codes | "external": "sample" |
+    And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
+      | local_credential                   | NINOXE:default |
+      | remote_code_space                  | external       |
+      | broadcast.situations.internal_tags | another        |
+    When I send this SIRI request
+      """
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <sw:GetSituationExchange xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
+      <ServiceRequestInfo>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+      </ServiceRequestInfo>
+      <Request>
+        <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+        <siri:MessageIdentifier>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:MessageIdentifier>
+      </Request>
+      <RequestExtension />
+    </sw:GetSituationExchange>
+  </soap:Body>
+</soap:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:Situations>
+                </siri:Situations>
+              </siri:SituationExchangeDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetSituationExchangeResponse>
+        </S:Body>
+      </S:Envelope>
+      """
