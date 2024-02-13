@@ -350,6 +350,17 @@ func Test_CollectPriority(t *testing.T) {
 	assert.Equal(5, partnerSettings.CollectPriority())
 }
 
+func Test_CollectSituationInternalTags(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		COLLECT_SITUATIONS_INTERNAL_TAGS: "first,second",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal([]string{"first", "second"}, partnerSettings.CollectSituationsInternalTags())
+}
+
 func Test_DefaultSRSName_Empty(t *testing.T) {
 	assert := assert.New(t)
 
