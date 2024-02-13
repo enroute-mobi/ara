@@ -32,6 +32,7 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		DefaultValue: "Noel",
 	}
 
+	situation.InternalTags = []string{"tag1"}
 	// Affects
 	affectStopArea := NewAffectedStopArea()
 	affectStopArea.StopAreaId = "259344234"
@@ -70,6 +71,7 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 "Origin":"test",
 "ValidityPeriods": null,
 "PublicationWindows": null,
+"InternalTags":["tag1"],
 "Affects":[
 {"Type":"StopArea","StopAreaId":"259344234"},
 {"Type":"Line","LineId":"222",
@@ -94,6 +96,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	text := `{
 "Origin":"test",
 "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+"InternalTags":["tag1"],
 "Affects":[
 {"Type":"StopArea","StopAreaId":"259344234"},
 {"Type":"Line","LineId":"222","AffectedDestinations":[{"StopAreaId":"333"}],
@@ -141,6 +144,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	expectedAffectedLine.AffectedRoutes = append(expectedAffectedLine.AffectedRoutes, expectedAffectedRoute)
 
 	assert.Equal(expectedSmmary, situation.Summary)
+	assert.Equal([]string{"tag1"}, situation.InternalTags)
 	assert.Equal(expectedDescription, situation.Description)
 	assert.Len(situation.Affects, 2)
 	assert.Equal(expectedAffectedStopArea, situation.Affects[0])
