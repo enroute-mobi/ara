@@ -47,15 +47,16 @@ const (
 
 	DISCOVERY_INTERVAL = "discovery_interval"
 
-	BROADCAST_SUBSCRIPTIONS_PERSISTENT                    = "broadcast.subscriptions.persistent"
+	BROADCAST_GTFS_CACHE_TIMEOUT                          = "broadcast.gtfs.cache_timeout"
+	BROADCAST_GZIP_GTFS                                   = "broadcast.gzip_gtfs"
+	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM              = "broadcast.no_dataframeref_rewriting_from"
+	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM            = "broadcast.no_destinationref_rewriting_from"
 	BROADCAST_RECORDED_CALLS_DURATION                     = "broadcast.recorded_calls.duration"
 	BROADCAST_REWRITE_JOURNEY_PATTERN_REF                 = "broadcast.rewrite_journey_pattern_ref"
-	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM            = "broadcast.no_destinationref_rewriting_from"
-	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM              = "broadcast.no_dataframeref_rewriting_from"
-	BROADCAST_GZIP_GTFS                                   = "broadcast.gzip_gtfs"
-	BROADCAST_GTFS_CACHE_TIMEOUT                          = "broadcast.gtfs.cache_timeout"
 	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
 	BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS              = "broadcast.siri.stop_monitoring.multiple_subscriptions"
+	BROADCAST_SITUATIONS_INTERNAL_TAGS                    = "broadcast.situations.internal_tags"
+	BROADCAST_SUBSCRIPTIONS_PERSISTENT                    = "broadcast.subscriptions.persistent"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
 	GENERAL_MESSAGE_REQUEST_2_2     = "generalMessageRequest.version2.2"
@@ -102,6 +103,7 @@ type PartnerSettings struct {
 	envelopeType                        string
 	collectPriority                     int
 	collectSituationsInternalTags       []string
+	broadcastSituationsInternalTags     []string
 	defaultSRSName                      string
 	noDestinationRefRewritingFrom       []string
 	noDataFrameRefRewritingFrom         []string
@@ -179,6 +181,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setSubscriptionMaximumResources(settings)
 	s.setCollectPriority(settings)
 	s.setCollectSituationsInternalTags(settings)
+	s.setBroadcastSituationsInternalTags(settings)
 	s.setDefaultSRSName(settings)
 	s.setNoDestinationRefRewritingFrom(settings)
 	s.setNoDataFrameRefRewritingFrom(settings)
@@ -560,6 +563,15 @@ func (s *PartnerSettings) setCollectSituationsInternalTags(settings map[string]s
 
 func (s *PartnerSettings) CollectSituationsInternalTags() []string {
 	return s.collectSituationsInternalTags
+}
+
+func (s *PartnerSettings) setBroadcastSituationsInternalTags(settings map[string]string) {
+	values := trimedSlice(settings[BROADCAST_SITUATIONS_INTERNAL_TAGS])
+	s.broadcastSituationsInternalTags = values
+}
+
+func (s *PartnerSettings) BroadcastSituationsInternalTags() []string {
+	return s.broadcastSituationsInternalTags
 }
 
 func (s *PartnerSettings) setDefaultSRSName(settings map[string]string) {
