@@ -228,12 +228,15 @@ func (response *XMLSituationExchangeResponse) errorType() string {
 
 func (visit *XMLPtSituationElement) RecordedAtTime() time.Time {
 	if visit.recordedAtTime.IsZero() {
-		visit.recordedAtTime = visit.findTimeChildContent("CreationTime")
+		visit.recordedAtTime = visit.VersionedAtTime()
+		if visit.recordedAtTime.IsZero() {
+			visit.recordedAtTime = visit.findTimeChildContent("CreationTime")
+		}
 	}
 	return visit.recordedAtTime
 }
 
-func (visit *XMLPtSituationElement) VersionedAtime() time.Time {
+func (visit *XMLPtSituationElement) VersionedAtTime() time.Time {
 	if visit.versionedAtTime.IsZero() {
 		visit.versionedAtTime = visit.findTimeChildContent("VersionedAtTime")
 	}

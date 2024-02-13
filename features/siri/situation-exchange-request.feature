@@ -457,7 +457,7 @@ Feature: Support SIRI Situation Exchange by request
     When a minute has passed
     Then one Situation has the following attributes:
       | Codes                                                                              | "external" : "test"                           |
-      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
+      | RecordedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
       | ReportType                                                                         | general                                       |
@@ -695,3 +695,161 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
         </S:Body>
       </S:Envelope>
       """
+
+
+  @siri-valid @ARA-1472
+  Scenario: Ensure a Situation is updated with a VersionedAtTime changed and Version remains the same
+    Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:SituationExchangeDelivery>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:Situations>
+                <siri:PtSituationElement>
+                    <siri:CreationTime>2017-01-01T03:30:00+02:00</siri:CreationTime>
+                    <siri:SituationNumber>test</siri:SituationNumber>
+                    <siri:Version>1</siri:Version>
+                    <siri:Source>
+                      <siri:SourceType>directReport</siri:SourceType>
+                    </siri:Source>
+                    <siri:VersionedAtTime>2017-01-01T12:00:00.000+02:00</siri:VersionedAtTime>
+                    <siri:Progress>closed</siri:Progress>
+                    <siri:ValidityPeriod>
+                      <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
+                    </siri:ValidityPeriod>
+                    <siri:UndefinedReason/>
+                    <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
+                    <siri:Affects>
+                      <siri:StopPoints>
+                        <siri:AffectedStopPoint>
+                          <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        </siri:AffectedStopPoint>
+                      </siri:StopPoints>
+                    </siri:Affects>
+                </siri:PtSituationElement>
+                </siri:Situations>
+              </siri:SituationExchangeDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetSituationExchangeResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-situation-exchange-request-collector] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ineo                  |
+      | remote_code_space | external              |
+    And a StopArea exists with the following attributes:
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:00+02:00         |
+      | VersionedAt                  | 2017-01-01T03:30:00+02:00         |
+      | Version                      | 1                                 |
+      | ReportType                   | general                           |
+      | Progress                     | open                              |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    When a minute has passed
+    And a minute has passed
+    Then one Situation has the following attributes:
+      | Codes                        | "external" : "test"                           |
+      | RecordedAt                   | 2017-01-01T12:00:00+02:00                     |
+      | VersionedAt                  | 2017-01-01T12:00:00+02:00                     |
+      | Version                      | 1                                             |
+      | Progress                     | closed                                        |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00                     |
+      | ValidityPeriods[0]#EndTime   | 0001-01-01T00:00:00Z                          |
+      | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
+
+  @siri-valid @ARA-1472
+  Scenario: Ensure a Situation is updated with a Version changed and no VersionAtTime
+    Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:SituationExchangeDelivery>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:Situations>
+                <siri:PtSituationElement>
+                    <siri:CreationTime>2017-01-01T03:30:00+02:00</siri:CreationTime>
+                    <siri:SituationNumber>test</siri:SituationNumber>
+                    <siri:Version>2</siri:Version>
+                    <siri:Source>
+                      <siri:SourceType>directReport</siri:SourceType>
+                    </siri:Source>
+                    <siri:Progress>closed</siri:Progress>
+                    <siri:ValidityPeriod>
+                      <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
+                    </siri:ValidityPeriod>
+                    <siri:UndefinedReason/>
+                    <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
+                    <siri:Affects>
+                      <siri:StopPoints>
+                        <siri:AffectedStopPoint>
+                          <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        </siri:AffectedStopPoint>
+                      </siri:StopPoints>
+                    </siri:Affects>
+                </siri:PtSituationElement>
+                </siri:Situations>
+              </siri:SituationExchangeDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetSituationExchangeResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-situation-exchange-request-collector] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ineo                  |
+      | remote_code_space | external              |
+    And a StopArea exists with the following attributes:
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:00+02:00         |
+      | Version                      | 1                                 |
+      | ReportType                   | general                           |
+      | Progress                     | open                              |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    When a minute has passed
+    And a minute has passed
+    Then one Situation has the following attributes:
+      | Codes                        | "external" : "test"                           |
+      | RecordedAt                   | 2017-01-01T03:30:00+02:00                     |
+      | Version                      | 2                                             |
+      | Progress                     | closed                                        |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00                     |
+      | ValidityPeriods[0]#EndTime   | 0001-01-01T00:00:00Z                          |
+      | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8             |

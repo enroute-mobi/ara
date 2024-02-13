@@ -22,7 +22,9 @@ func newSituationUpdateManager(model Model) *SituationUpdateManager {
 func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 	for _, event := range events {
 		situation, ok := manager.model.Situations().FindByCode(event.SituationCode)
-		if ok && situation.RecordedAt == event.RecordedAt {
+		if ok &&
+			situation.RecordedAt == event.RecordedAt &&
+			situation.Version == event.Version {
 			continue
 		}
 

@@ -12,12 +12,12 @@ func completeEvent(code Code, testTime time.Time) (event *SituationUpdateEvent) 
 	period := &TimeRange{EndTime: testTime}
 
 	event = &SituationUpdateEvent{
-		RecordedAt:        testTime,
-		SituationCode: code,
-		Version:           1,
-		ProducerRef:       "Ara",
-		ValidityPeriods:   []*TimeRange{period},
-		Keywords:          []string{"channel"},
+		RecordedAt:      testTime,
+		SituationCode:   code,
+		Version:         1,
+		ProducerRef:     "Ara",
+		ValidityPeriods: []*TimeRange{period},
+		Keywords:        []string{"channel"},
 	}
 
 	summary := &SituationTranslatedString{
@@ -74,7 +74,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	assert.True(checkSituation(updatedSituation, code, testTime))
 }
 
-func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
+func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 	assert := assert.New(t)
 	code := NewCode("codeSpace", "value")
 	testTime := time.Now()
@@ -83,7 +83,7 @@ func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
 	situation := model.Situations().New()
 	situation.SetCode(code)
 	situation.RecordedAt = testTime
-	situation.Keywords = []string{"situationChannel"}
+	situation.Version = 1
 	model.Situations().Save(&situation)
 
 	manager := newSituationUpdateManager(model)
@@ -92,7 +92,6 @@ func Test_SituationUpdateManager_SameRecordedAt(t *testing.T) {
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 	assert.False(checkSituation(updatedSituation, code, testTime), "Situation should not be updated")
-	assert.ElementsMatch(updatedSituation.Keywords, []string{"situationChannel"})
 }
 
 func Test_SituationUpdateManager_CreateSituation(t *testing.T) {
