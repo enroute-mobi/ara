@@ -594,3 +594,59 @@ Feature: Support SIRI GeneralMessage for Situation
 </S:Body>
 </S:Envelope>
       """
+
+  @siri-valid @ARA-1443
+  Scenario: Collect GeneralMessage with internal tags
+    Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+        <S:Body>
+          <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-03-29T16:48:00.993+02:00</siri:ResponseTimestamp>
+              <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+              <siri:Address>http://appli.chouette.mobi/siri_france/siri</siri:Address>
+              <siri:ResponseMessageIdentifier>b28e8207-f030-4932-966c-3e6099fad4ef</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</siri:ResponseTimestamp>
+                <siri:Status>true</siri:Status>
+                <siri:GeneralMessage formatRef="FRANCE">
+                  <siri:RecordedAtTime>2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>3477</siri:ItemIdentifier>
+                  <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+                  <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+                  <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
+                  <siri:ValidUntilTime>2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
+                  <siri:Content>
+                   <siri:LineRef>1234</siri:LineRef>
+                    <Message>
+                      <MessageType>longMessage</MessageType>
+                      <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible</MessageText>
+                    </Message>
+                  </siri:Content>
+                </siri:GeneralMessage>
+              </siri:GeneralMessageDelivery>
+            </Answer>
+            <AnswerExtension />
+          </sw:GetGeneralMessageResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-general-message-request-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | ineo                  |
+      | remote_code_space                | internal              |
+      | collect.situations.internal_tags | first,second          |
+    And a Line exists with the following attributes:
+      | Name              | Test              |
+      | Codes             | "internal":"1234" |
+      | CollectSituations | true              |
+    And a minute has passed
+    When a minute has passed
+    And the SIRI server has received a GeneralMessage request
+    Then one Situation has the following attributes:
+      | Codes                        | "internal" : "NINOXE:GeneralMessage:27_1"     |
+      | InternalTags                 | ["first","second"]                            |
