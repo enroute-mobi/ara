@@ -904,24 +904,28 @@ Feature: Support SIRI VehicleMonitoring by subscription
       Then the VehicleJourney "6ba7b814-9dad-11d1-a-00c04fd430c8" has the following attributes:
       | DirectionType | inbound |
 
-  @ARA-1414 @siri-valid
+  @ARA-1414 @ARA-1474 @siri-valid
   Scenario: RAW VehicleMonitoring subscription collect should send VehicleMonitoringSubscriptionRequest to partner
    Given a raw SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
-      | remote_url            | http://localhost:8090 |
-      | remote_credential     | test                  |
-      | remote_code_space     | internal              |
-      | collect.include_lines | RLA_Bus:Line::05:LOC  |
-      | local_credential      | ara                   |
-      | siri.envelope         | raw                   |
+      | remote_url            | http://localhost:8090                     |
+      | remote_credential     | test                                      |
+      | remote_code_space     | internal                                  |
+      | collect.include_lines | RLA_Bus:Line::05:LOC,RLA_Bus:Line::06:LOC |
+      | local_credential      | ara                                       |
+      | siri.envelope         | raw                                       |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+    And a Line exists with the following attributes:
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::06:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw VehicleMonitoringSubscriptionRequest request with:
      | //LineRef | RLA_Bus:Line::05:LOC |
+     | //LineRef | RLA_Bus:Line::06:LOC |
 
   @ARA-1414 @siri-valid
   Scenario: Create Ara models after a RAW VehicleMonitoringDelivery in a subscription
