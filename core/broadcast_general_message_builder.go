@@ -1,6 +1,8 @@
 package core
 
 import (
+	"slices"
+
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -51,7 +53,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 }
 
 func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
-	if situation.Origin == string(builder.partner.Slug()) || situation.GMValidUntil().Before(builder.Clock().Now()) {
+	if !builder.canBroadcast(situation) {
 		return nil
 	}
 
@@ -245,4 +247,27 @@ func (builder *BroadcastGeneralMessageBuilder) checkAffectFilter(affectedRefs []
 		}
 	}
 	return false
+}
+
+func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation model.Situation) bool {
+	if situation.Origin == string(builder.partner.Slug()) {
+		return false
+	}
+
+	if situation.GMValidUntil().Before(builder.Clock().Now()) {
+		return false
+	}
+
+	tagsToBroadcast := builder.partner.BroadcastSituationsInternalTags()
+	if len(tagsToBroadcast) != 0 {
+		var count int
+		for _, tag := range situation.InternalTags {
+			if slices.Contains(tagsToBroadcast, tag) {
+				count++
+			}
+		}
+		return count != 0
+	}
+
+	return true
 }
