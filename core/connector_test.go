@@ -18,6 +18,7 @@ func Test_Factories_CreateConnector(t *testing.T) {
 		"siri-general-message-request-broadcaster",
 		"siri-estimated-timetable-request-broadcaster",
 		"siri-lines-discovery-request-broadcaster",
+		"siri-situation-exchange-subscription-collector",
 	}
 	partner.RefreshConnectors()
 
@@ -50,5 +51,8 @@ func Test_Factories_CreateConnector(t *testing.T) {
 	}
 	if _, ok := partner.Connector("siri-lines-discovery-request-broadcaster"); !ok {
 		t.Error("siri-estimated-timetable-request-broadcaster connector should be initialized")
+	}
+	if _, ok := partner.Connector("siri-situation-exchange-subscription-collector"); !ok {
+		t.Error("siri-situation-exchange-subscription-collector connector should be initialized")
 	}
 }

@@ -20,6 +20,7 @@ const (
 
 	EstimatedTimetableCollect = "EstimatedTimetableCollect"
 	GeneralMessageCollect     = "GeneralMessageCollect"
+	SituationExchangeCollect  = "SituationExchangeCollect"
 	StopMonitoringCollect     = "StopMonitoringCollect"
 	VehicleMonitoringCollect  = "VehicleMonitoringCollect"
 )

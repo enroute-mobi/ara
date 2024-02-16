@@ -37,6 +37,7 @@ const (
 	SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER = "siri-production-timetable-subscription-broadcaster"
 	SIRI_SITUATION_EXCHANGE_REQUEST_BROADCASTER        = "siri-situation-exchange-request-broadcaster"
 	SIRI_SITUATION_EXCHANGE_REQUEST_COLLECTOR          = "siri-situation-exchange-request-collector"
+	SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_COLLECTOR     = "siri-situation-exchange-subscription-collector"
 	SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR          = "siri-vehicle-monitoring-request-collector"
 	SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR     = "siri-vehicle-monitoring-subscription-collector"
 	SIRI_SUBSCRIPTION_REQUEST_DISPATCHER               = "siri-subscription-request-dispatcher"
@@ -69,7 +70,7 @@ type connector struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
 
-	partner            *Partner
+	partner         *Partner
 	remoteCodeSpace string
 }
 
@@ -136,6 +137,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIProductionTimetableSubscriptionBroadcasterFactory{}
 	case SIRI_SITUATION_EXCHANGE_REQUEST_BROADCASTER:
 		return &SIRISituationExchangeRequestBroadcasterFactory{}
+	case SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_COLLECTOR:
+		return &SIRISituationExchangeSubscriptionCollectorFactory{}
 	case SIRI_SITUATION_EXCHANGE_REQUEST_COLLECTOR:
 		return &SIRISituationExchangeRequestCollectorFactory{}
 	case SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR:

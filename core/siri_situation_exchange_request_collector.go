@@ -67,7 +67,7 @@ func (connector *SIRISituationExchangeRequestCollector) RequestSituationUpdate(k
 	situationUpdateEvents := []*model.SituationUpdateEvent{}
 
 	builder := NewSituationExchangeUpdateEventBuilder(connector.partner)
-	builder.SetSituationExchangeDeliveryUpdateEvents(&situationUpdateEvents, xmlSituationExchangeResponse)
+	builder.SetSituationExchangeUpdateEvents(&situationUpdateEvents, xmlSituationExchangeResponse)
 
 	// Log models
 	message.Lines = GetModelReferenceSlice(builder.LineRefs)

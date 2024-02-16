@@ -28,7 +28,7 @@ func NewSituationUpdateRequest(kind, requestedId string) *SituationUpdateRequest
 	}
 }
 
-func (situationUpdateRequest *SituationUpdateRequest) CodeSpace() string {
+func (situationUpdateRequest *SituationUpdateRequest) Kind() string {
 	return situationUpdateRequest.kind
 }
 

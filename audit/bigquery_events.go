@@ -18,6 +18,7 @@ const (
 	NOTIFY_ESTIMATED_TIMETABLE  BigQueryMessageType = "NotifyEstimatedTimetable"
 	NOTIFY_GENERAL_MESSAGE      BigQueryMessageType = "NotifyGeneralMessage"
 	NOTIFY_PRODUCTION_TIMETABLE BigQueryMessageType = "NotifyProductionTimetable"
+	NOTIFY_SITUATION_EXCHANGE   BigQueryMessageType = "NotifySituationExchange"
 	NOTIFY_STOP_MONITORING      BigQueryMessageType = "NotifyStopMonitoring"
 	NOTIFY_VEHICLE_MONITORING   BigQueryMessageType = "NotifyVehicleMonitoring"
 
@@ -45,6 +46,7 @@ const (
 	PRODUCTION_TIMETABLE_SUBSCRIPTION_REQUEST BigQueryMessageType = "ProductionTimetableSubscriptionRequest"
 	STOP_MONITORING_SUBSCRIPTION_REQUEST      BigQueryMessageType = "StopMonitoringSubscriptionRequest"
 	VEHICLE_MONITORING_SUBSCRIPTION_REQUEST   BigQueryMessageType = "VehicleMonitoringSubscriptionRequest"
+	SITUATION_EXCHANGE_SUBSCRIPTION_REQUEST   BigQueryMessageType = "SituationExchangeSubscriptionRequest"
 
 	PUSH_NOTIFICATION BigQueryMessageType = "push-notification"
 )

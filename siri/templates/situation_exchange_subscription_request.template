@@ -1,0 +1,19 @@
+<sw:Subscribe xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri" xmlns:sws="http://wsdl.siri.org.uk/siri">
+	<SubscriptionRequestInfo>
+		<siri:RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:RequestTimestamp>
+		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
+		<siri:MessageIdentifier>{{.MessageIdentifier}}</siri:MessageIdentifier>{{ if .ConsumerAddress }}
+		<siri:ConsumerAddress>{{.ConsumerAddress}}</siri:ConsumerAddress>{{end}}
+	</SubscriptionRequestInfo>
+	<Request>{{ range .Entries }}
+		<siri:SituationExchangeSubscriptionRequest>
+			<siri:SubscriberRef>{{.SubscriberRef}}</siri:SubscriberRef>
+			<siri:SubscriptionIdentifier>{{.SubscriptionIdentifier}}</siri:SubscriptionIdentifier>
+			<siri:InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:InitialTerminationTime>
+			<siri:SituationExchangeRequest>
+				{{ .BuildSituationExchangeRequestXML }}
+			</siri:SituationExchangeRequest>
+		</siri:SituationExchangeSubscriptionRequest>{{ end }}
+	</Request>
+	<RequestExtension/>
+</sw:Subscribe>

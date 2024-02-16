@@ -34,17 +34,20 @@ func NewSituationExchangeUpdateEventBuilder(partner *Partner) SituationExchangeU
 	}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLSituationExchangeResponse) {
+func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlSituationExchangeDelivery *sxml.XMLSituationExchangeDelivery, producerRef string) {
+	for _, xmlSituation := range xmlSituationExchangeDelivery.Situations() {
+		builder.buildSituationExchangeUpdateEvent(event, xmlSituation, producerRef)
+	}
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLSituationExchangeResponse) {
 	xmlSituationExchangeDeliveries := xmlResponse.SituationExchangeDeliveries()
 	if len(xmlSituationExchangeDeliveries) == 0 {
 		return
 	}
 
 	for _, xmlSituationExchangeDelivery := range xmlSituationExchangeDeliveries {
-		for _, xmlSituation := range xmlSituationExchangeDelivery.Situations() {
-			builder.buildSituationExchangeUpdateEvent(event, xmlSituation, xmlResponse.ProducerRef())
-		}
-
+		builder.SetSituationExchangeDeliveryUpdateEvents(event, xmlSituationExchangeDelivery, xmlResponse.ProducerRef())
 	}
 }
 
