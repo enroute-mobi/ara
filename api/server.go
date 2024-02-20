@@ -191,6 +191,10 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 		return
 	}
 
+	if foundStrings[2] == "graphql" {
+		server.handleGraphql(response, request, foundStrings[1])
+	}
+
 	requestData := NewRequestDataFromContent(foundStrings)
 	requestData.Method = request.Method
 	requestData.Url = request.URL.Path
@@ -277,4 +281,17 @@ func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Req
 
 	gtfsHandler := NewGtfsHandler(foundReferential, server.getToken(request))
 	gtfsHandler.serve(response, request, resource)
+}
+
+func (server *Server) handleGraphql(response http.ResponseWriter, request *http.Request, referential string) {
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	logger.Log.Debugf("Graphql request: %v", request)
+
+	graphqlHandler := NewGraphqlHandler(foundReferential, server.getToken(request))
+	graphqlHandler.serve(response, request)
 }
