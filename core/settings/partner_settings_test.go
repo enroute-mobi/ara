@@ -435,6 +435,17 @@ func Test_GzipGtfs(t *testing.T) {
 	assert.True(partnerSettings.GzipGtfs())
 }
 
+func Test_PreferReferentStopArea(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		BROADCAST_PREFER_REFERENT_STOP_AREAS: "true",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.True(partnerSettings.PreferReferentStopArea())
+}
+
 func Test_GeneralMessageRequestVersion22(t *testing.T) {
 	assert := assert.New(t)
 
