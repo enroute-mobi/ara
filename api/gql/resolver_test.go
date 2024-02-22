@@ -169,7 +169,7 @@ func TestResolverMutation(t *testing.T) {
 	schema := graphql.MustParseSchema(Schema, &Resolver{Partner: partner})
 
 	mutation := `mutation {
-  updateVehicle(code: "1234", vehicle: { occupancyStatus: "seatsAvailable", occupancyRate: 0.65 }) {
+  updateVehicle(code: "1234", input: { occupancyStatus: "seatsAvailable", occupancyRate: 0.65 }) {
     code
     occupancyStatus
     occupancyRate
@@ -191,7 +191,7 @@ func TestResolverMutation(t *testing.T) {
 	assert.Equal("Michel", result.UpdateVehicle.DriverRef)
 
 	mutation = `mutation {
-  updateVehicle(code: "1234", vehicle: { occupancyStatus: "notALotOfSeatsAvailable" }) {
+  updateVehicle(code: "1234", input: { occupancyStatus: "notALotOfSeatsAvailable" }) {
     code
     occupancyStatus
     occupancyRate
@@ -212,7 +212,7 @@ func TestResolverMutation(t *testing.T) {
 	assert.Equal("Michel", result.UpdateVehicle.DriverRef)
 
 	mutation = `mutation {
-  updateVehicle(code: "1234", vehicle: { occupancyRate: 34.6 }) {
+  updateVehicle(code: "1234", input: { occupancyRate: 34.6 }) {
     code
     occupancyStatus
     occupancyRate
@@ -260,7 +260,7 @@ func TestResolverMutationWithoutAuthorization(t *testing.T) {
 	schema := graphql.MustParseSchema(Schema, &Resolver{Partner: partner})
 
 	mutation := `mutation {
-  updateVehicle(code: "1234", vehicle: { occupancyStatus: "seatsAvailable", occupancyRate: 0.65 }) {
+  updateVehicle(code: "1234", input: { occupancyStatus: "seatsAvailable", occupancyRate: 0.65 }) {
     code
     occupancyStatus
     occupancyRate

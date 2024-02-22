@@ -85,6 +85,8 @@ type ConnectorFactory interface {
 
 func NewConnectorFactory(connectorType string) ConnectorFactory {
 	switch connectorType {
+	case GRAPHQL_SERVER:
+		return &GraphqlServerFactory{}
 	case PUSH_COLLECTOR:
 		return &PushCollectorFactory{}
 	case SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR:

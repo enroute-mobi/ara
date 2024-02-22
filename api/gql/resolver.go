@@ -27,20 +27,20 @@ func (r *Resolver) Vehicle(args struct{ Code string }) (*vehicleResolver, error)
 	return r.resolverFromVehicle(v), nil
 }
 
-func (r *Resolver) UpdateVehicle(args *struct {
-	Code    string
-	Vehicle vehicleInput
+func (r *Resolver) UpdateVehicle(args struct {
+	Code  string
+	Input vehicleInput
 }) (*vehicleResolver, error) {
 	c := model.NewCode(r.Partner.RemoteCodeSpace(), args.Code)
 	v, ok := r.Partner.Model().Vehicles().FindByCode(c)
 	if !ok {
 		return nil, errors.Errorf("Can't find Vehicle with code %s", args.Code)
 	}
-	if args.Vehicle.OccupancyStatus != nil && r.Partner.IsMutable(OccupancyStatus) {
-		v.Occupancy = *args.Vehicle.OccupancyStatus
+	if args.Input.OccupancyStatus != nil && r.Partner.IsMutable(OccupancyStatus) {
+		v.Occupancy = *args.Input.OccupancyStatus
 	}
-	if args.Vehicle.OccupancyRate != nil && r.Partner.IsMutable(OccupancyRate) {
-		v.Percentage = *args.Vehicle.OccupancyRate
+	if args.Input.OccupancyRate != nil && r.Partner.IsMutable(OccupancyRate) {
+		v.Percentage = *args.Input.OccupancyRate
 	}
 
 	v.Save()
@@ -65,8 +65,8 @@ func (r *Resolver) resolverFromVehicle(v *model.Vehicle) (res *vehicleResolver) 
 			Longitude:       v.Longitude,
 			Latitude:        v.Latitude,
 			Bearing:         v.Bearing,
-			RecordedAtTime:  graphql.Time{Time: v.RecordedAtTime},
-			ValidUntilTime:  graphql.Time{Time: v.ValidUntilTime},
+			RecordedAt:      graphql.Time{Time: v.RecordedAtTime},
+			ValidUntil:      graphql.Time{Time: v.ValidUntilTime},
 		}}
 	return
 }

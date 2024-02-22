@@ -193,6 +193,7 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 
 	if foundStrings[2] == "graphql" {
 		server.handleGraphql(response, request, foundStrings[1])
+		return
 	}
 
 	requestData := NewRequestDataFromContent(foundStrings)

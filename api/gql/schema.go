@@ -16,7 +16,7 @@ var Schema = `
 
 	# The mutation type, represents all updates we can make to our data
 	type Mutation {
-		updateVehicle(code: String!, vehicle: VehicleInput!): Vehicle
+		updateVehicle(code: String!, input: VehicleInput!): Vehicle!
 	}
 
 	type Vehicle {
@@ -33,8 +33,8 @@ var Schema = `
 		longitude:				Float!
 		latitude:					Float!
 		bearing:					Float!
-		recordedAtTime:		Time!
-		validUntilTime:		Time!
+		recordedAt:				Time!
+		validUntil:				Time!
 	}
 
 	input VehicleInput {

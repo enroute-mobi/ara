@@ -23,8 +23,8 @@ type vehicle struct {
 	Longitude       float64
 	Latitude        float64
 	Bearing         float64
-	RecordedAtTime  graphql.Time
-	ValidUntilTime  graphql.Time
+	RecordedAt      graphql.Time
+	ValidUntil      graphql.Time
 }
 
 type vehicleInput struct {
@@ -75,9 +75,9 @@ func (v *vehicleResolver) Latitude() float64 {
 func (v *vehicleResolver) Bearing() float64 {
 	return v.v.Bearing
 }
-func (v *vehicleResolver) RecordedAtTime() graphql.Time {
-	return v.v.RecordedAtTime
+func (v *vehicleResolver) RecordedAt() graphql.Time {
+	return v.v.RecordedAt
 }
-func (v *vehicleResolver) ValidUntilTime() graphql.Time {
-	return v.v.ValidUntilTime
+func (v *vehicleResolver) ValidUntil() graphql.Time {
+	return v.v.ValidUntil
 }
