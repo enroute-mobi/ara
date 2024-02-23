@@ -20,21 +20,21 @@ var Schema = `
 	}
 
 	type Vehicle {
-		id:								ID!
-		stopArea:					ID!
-		line:							ID!
-		vehicleJourney:		ID!
-		nextStopVisit:		ID!
-		code:							String!
-		occupancyStatus:	String!
-		driverRef:				String!
-		linkDistance:			Float!
-		occupancyRate:		Float!
-		longitude:				Float!
-		latitude:					Float!
-		bearing:					Float!
-		recordedAt:				Time!
-		validUntil:				Time!
+		id:              ID!
+		stopArea:        ID!
+		line:            ID!
+		vehicleJourney:  ID!
+		nextStopVisit:   ID!
+		code:            String!
+		occupancyStatus: String!
+		driverRef:       String!
+		linkDistance:    Float!
+		occupancyRate:   Float!
+		longitude:       Float!
+		latitude:        Float!
+		bearing:         Float!
+		recordedAt:      Time!
+		validUntil:      Time!
 	}
 
 	input VehicleInput {
