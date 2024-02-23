@@ -924,8 +924,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw VehicleMonitoringSubscriptionRequest request with:
-     | //LineRef | RLA_Bus:Line::05:LOC |
-     | //LineRef | RLA_Bus:Line::06:LOC |
+     | //siri:LineRef | ["RLA_Bus:Line::05:LOC","RLA_Bus:Line::06:LOC"] |
 
   @ARA-1414 @siri-valid
   Scenario: Create Ara models after a RAW VehicleMonitoringDelivery in a subscription
