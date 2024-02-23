@@ -90,7 +90,7 @@ GEM
     multi_test (1.1.0)
     mutex_m (0.2.0)
     netrc (0.11.0)
-    nokogiri (1.15.5)
+    nokogiri (1.16.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     pg (1.5.4)
@@ -147,4 +147,4 @@ DEPENDENCIES
   webrick
 
 BUNDLED WITH
-   2.4.22
+   2.5.6
