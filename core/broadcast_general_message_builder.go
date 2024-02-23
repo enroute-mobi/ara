@@ -260,13 +260,12 @@ func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation model.Situ
 
 	tagsToBroadcast := builder.partner.BroadcastSituationsInternalTags()
 	if len(tagsToBroadcast) != 0 {
-		var count int
 		for _, tag := range situation.InternalTags {
 			if slices.Contains(tagsToBroadcast, tag) {
-				count++
+				return true
 			}
 		}
-		return count != 0
+		return false
 	}
 
 	return true
