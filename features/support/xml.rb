@@ -23,19 +23,13 @@ module XML
     def values(xpaths = [])
       {}.tap do |values|
         xpaths.each do |xpath|
-          node = REXML::XPath.first(@document, xpath, { "siri" => "http://www.siri.org.uk/siri" })
-          xml_value = node.text if node
-          values[xpath] = xml_value
-        end
-      end
-    end
-
-    def raw_values(xpaths = [])
-      {}.tap do |values|
-        xpaths.each do |xpath|
-          node = REXML::XPath.first(@document, xpath)
-          xml_value = node.text if node
-          values[xpath] = xml_value
+          node = REXML::XPath.match(@document, xpath, { "siri" => "http://www.siri.org.uk/siri" })
+          xml_value = node.map(&:text) if node
+          values[xpath] = if xml_value.size == 1
+                            xml_value[0]
+                          else
+                            values[xpath] = xml_value.sort
+                          end
         end
       end
     end

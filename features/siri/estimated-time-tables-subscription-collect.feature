@@ -460,7 +460,7 @@ Feature: Support SIRI EstimatedTimetable
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw EstimatedTimetableSubscriptionRequest request with:
-     | //LineRef | RLA_Bus:Line::05:LOC |
+     | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
   @ARA-1411 @siri-valid
   Scenario: Create ara models after a RAW EstimatedTimetableDelivery in a subscription

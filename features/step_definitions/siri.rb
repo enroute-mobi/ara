@@ -212,12 +212,11 @@ Then(/^the (?:"([^"]*)" )?SIRI server should have received a( raw)? (\S+) reques
 
   document = XML::Document.new(last_siri_request)
 
-  expected_values = attributes.rows_hash
-  actual_values = if envelope
-                    document.raw_values(expected_values.keys)
-                  else
-                    document.values(expected_values.keys)
-                  end
+  expected_values = attributes.rows_hash.transform_values do |v|
+    v.match(/^\[.*\]$/) ? JSON.parse(v).sort : v
+  end
+
+  actual_values = document.values(expected_values.keys)
 
   expect(actual_values).to eq(expected_values)
 end
