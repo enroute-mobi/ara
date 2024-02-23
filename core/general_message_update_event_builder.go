@@ -86,6 +86,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 
 	content := xmlGeneralMessageEvent.Content().(sxml.IDFGeneralMessageStructure)
 
+	situationEvent.InternalTags = append(situationEvent.InternalTags, builder.partner.CollectSituationsInternalTags()...)
 	builder.buildSituationAndDescriptionFromMessages(content.Messages(), situationEvent)
 
 	builder.setAffects(situationEvent, &content)

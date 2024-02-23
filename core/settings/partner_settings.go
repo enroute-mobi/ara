@@ -30,19 +30,20 @@ const (
 	NOTIFICATIONS_REMOTE_URL          = "notifications.remote_url"
 	SUBSCRIPTIONS_REMOTE_URL          = "subscriptions.remote_url"
 
-	COLLECT_PRIORITY                 = "collect.priority"
-	COLLECT_INCLUDE_LINES            = "collect.include_lines"
+	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
 	COLLECT_EXCLUDE_LINES            = "collect.exclude_lines"
-	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
-	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
-	COLLECT_USE_DISCOVERED_LINES     = "collect.use_discovered_lines"
-	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
-	COLLECT_PERSISTENT               = "collect.persistent"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
 	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
-	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
+	COLLECT_INCLUDE_LINES            = "collect.include_lines"
+	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
+	COLLECT_PERSISTENT               = "collect.persistent"
+	COLLECT_PRIORITY                 = "collect.priority"
+	COLLECT_SITUATIONS_INTERNAL_TAGS = "collect.situations.internal_tags"
+	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
+	COLLECT_USE_DISCOVERED_LINES     = "collect.use_discovered_lines"
+	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
 
 	DISCOVERY_INTERVAL = "discovery_interval"
 
@@ -100,6 +101,7 @@ type PartnerSettings struct {
 	passageOrder                        string
 	envelopeType                        string
 	collectPriority                     int
+	collectSituationsInternalTags       []string
 	defaultSRSName                      string
 	noDestinationRefRewritingFrom       []string
 	noDataFrameRefRewritingFrom         []string
@@ -176,6 +178,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setMaximumChechstatusRetry(settings)
 	s.setSubscriptionMaximumResources(settings)
 	s.setCollectPriority(settings)
+	s.setCollectSituationsInternalTags(settings)
 	s.setDefaultSRSName(settings)
 	s.setNoDestinationRefRewritingFrom(settings)
 	s.setNoDataFrameRefRewritingFrom(settings)
@@ -545,8 +548,18 @@ func (s *PartnerSettings) setCollectPriority(settings map[string]string) {
 	collectPriority, _ := strconv.Atoi(settings[COLLECT_PRIORITY])
 	s.collectPriority = collectPriority
 }
+
 func (s *PartnerSettings) CollectPriority() int {
 	return s.collectPriority
+}
+
+func (s *PartnerSettings) setCollectSituationsInternalTags(settings map[string]string) {
+	values := trimedSlice(settings[COLLECT_SITUATIONS_INTERNAL_TAGS])
+	s.collectSituationsInternalTags = values
+}
+
+func (s *PartnerSettings) CollectSituationsInternalTags() []string {
+	return s.collectSituationsInternalTags
 }
 
 func (s *PartnerSettings) setDefaultSRSName(settings map[string]string) {
