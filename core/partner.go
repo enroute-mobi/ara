@@ -257,13 +257,17 @@ func (partner *Partner) Allow(ip string) bool {
 		return true
 	}
 
+	partner.mutex.RLock()
 	rl, ok := partner.limiters[ip]
+	partner.mutex.RUnlock()
 	if !ok {
 		logger.Log.Debugf("Create a new limiter for ip %v", ip)
 		tick := time.Duration((1.0 / limit) * float64(time.Minute))
 		burst := int(math.Min(limit, 10))
 		limiter := rate.NewLimiter(rate.Every(tick), burst)
+		partner.mutex.Lock()
 		partner.limiters[ip] = limiter
+		partner.mutex.Unlock()
 		rl = limiter
 	}
 	return rl.Allow()
