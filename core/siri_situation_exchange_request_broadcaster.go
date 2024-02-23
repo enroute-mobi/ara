@@ -1,6 +1,7 @@
 package core
 
 import (
+	"slices"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -67,7 +68,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) getSituationExchangeDe
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(delivery *siri.SIRISituationExchangeDelivery, situation model.Situation) {
-	if situation.Origin == string(connector.partner.Slug()) || (!situation.GMValidUntil().IsZero() && situation.GMValidUntil().Before(connector.Clock().Now())) {
+	if !connector.canBroadcast(situation) {
 		return
 	}
 
@@ -272,6 +273,29 @@ func (connector *SIRISituationExchangeRequestBroadcaster) resolveStopAreaRef(sto
 		return "", false
 	}
 	return stopAreaCode.Value(), true
+}
+
+func (connector *SIRISituationExchangeRequestBroadcaster) canBroadcast(situation model.Situation) bool {
+	if situation.Origin == string(connector.partner.Slug()) {
+		return false
+	}
+
+	if !situation.GMValidUntil().IsZero() &&
+		situation.GMValidUntil().Before(connector.Clock().Now()) {
+		return false
+	}
+
+	tagsToBroadcast := connector.partner.BroadcastSituationsInternalTags()
+	if len(tagsToBroadcast) != 0 {
+		for _, tag := range situation.InternalTags {
+			if slices.Contains(tagsToBroadcast, tag) {
+				return true
+			}
+		}
+		return false
+	}
+
+	return true
 }
 
 func (factory *SIRISituationExchangeRequestBroadcasterFactory) CreateConnector(partner *Partner) Connector {

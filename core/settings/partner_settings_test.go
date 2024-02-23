@@ -361,6 +361,17 @@ func Test_CollectSituationInternalTags(t *testing.T) {
 	assert.Equal([]string{"first", "second"}, partnerSettings.CollectSituationsInternalTags())
 }
 
+func Test_BroadcastSituationInternalTags(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		BROADCAST_SITUATIONS_INTERNAL_TAGS: "first,second",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal([]string{"first", "second"}, partnerSettings.BroadcastSituationsInternalTags())
+}
+
 func Test_DefaultSRSName_Empty(t *testing.T) {
 	assert := assert.New(t)
 

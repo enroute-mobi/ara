@@ -1110,3 +1110,127 @@ Feature: Support SIRI GeneralMessage by subscription
     Then one Situation has the following attributes:
       | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
       | InternalTags                 | ["first","second"]                        |
+
+  @ARA-1444    
+  Scenario: Broadcast a GeneralMessage Notification after modification of a Situation with matching InternalTags
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-broadcaster] and the following settings:
+       | remote_url                         | http://localhost:8090 |
+       | remote_credential                  | test                  |
+       | local_credential                   | NINOXE:default        |
+       | remote_code_space                  | internal              |
+       | broadcast.situations.internal_tags | first,another         |
+    And a Subscription exist with the following attributes:
+      | Kind              | GeneralMessageBroadcast                     |
+      | ExternalId        | externalId                                  |
+      | SubscriberRef     | subscriber                                  |
+      | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
+    And a Line exists with the following attributes:
+      | Name              | Test              |
+      | Codes             | "internal":"1234" |
+      | CollectSituations | true              |
+    And a Situation exists with the following attributes:
+      | Codes                      | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
+      | Version                    | 1                                         |
+      | InternalTags               | ["first","second"]                        |
+      | Keywords                   | ["Perturbation"]                          |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
+      | Description[DefaultValue]  | a very very very long message             |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | Affects[StopArea]          | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+    And a StopArea exists with the following attributes:
+        | Name              | Test                                    |
+        | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+        | CollectSituations | true                                    |
+    And 10 seconds have passed
+    When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
+      | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
+      | ValidityPeriods[0]#EndTime | 2017-10-24T20:30:06+02:00              |
+      | Description[DefaultValue]  | an ANOTHER very very very long message |
+      | Version                    | 2                                      |
+    And 15 seconds have passed
+    Then the SIRI server should receive this response
+    """
+     <?xml version='1.0' encoding='utf-8'?>
+     <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+       <S:Body>
+         <sw:NotifyGeneralMessage xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+           <ServiceDeliveryInfo>
+             <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
+             <siri:ProducerRef>test</siri:ProducerRef>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:RequestMessageRef></siri:RequestMessageRef>
+           </ServiceDeliveryInfo>
+           <Notification>
+             <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
+               <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef></siri:RequestMessageRef>
+               <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+               <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+               <siri:Status>true</siri:Status>
+               <siri:GeneralMessage formatRef="STIF-IDF">
+                 <siri:RecordedAtTime>2017-01-01T03:50:06.000+02:00</siri:RecordedAtTime>
+                 <siri:ItemIdentifier>RATPDev:Item::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ItemIdentifier>
+                 <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+                 <siri:InfoMessageVersion>2</siri:InfoMessageVersion>
+                 <siri:InfoChannelRef>Perturbation</siri:InfoChannelRef>
+                 <siri:ValidUntilTime>2017-10-24T20:30:06.000+02:00</siri:ValidUntilTime>
+                 <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                               xsi:type="stif:IDFGeneralMessageStructure">
+                   <siri:LineRef>1234</siri:LineRef>
+                   <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                   <Message>
+                     <MessageType>textOnly</MessageType>
+                     <MessageText>an ANOTHER very very very long message</MessageText>
+                   </Message>
+                 </siri:Content>
+               </siri:GeneralMessage>
+             </siri:GeneralMessageDelivery>
+           </Notification>
+           <SiriExtension />
+         </sw:NotifyGeneralMessage>
+       </S:Body>
+     </S:Envelope>
+    """
+
+  @ARA-1444    
+  Scenario: Do not broadcast a GeneralMessage Notification after modification of a Situation with no matching InternalTags
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-broadcaster] and the following settings:
+      | remote_url                         | http://localhost:8090 |
+      | remote_credential                  | test                  |
+      | local_credential                   | NINOXE:default        |
+      | remote_code_space                  | internal              |
+      | broadcast.situations.internal_tags | first,another         |
+    And a Subscription exist with the following attributes:
+      | Kind              | GeneralMessageBroadcast                     |
+      | ExternalId        | externalId                                  |
+      | SubscriberRef     | subscriber                                  |
+      | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
+    And a Line exists with the following attributes:
+      | Name              | Test              |
+      | Codes             | "internal":"1234" |
+      | CollectSituations | true              |
+    And a Situation exists with the following attributes:
+      | Codes                      | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
+      | Version                    | 1                                         |
+      | InternalTags               | ["wrong"]                                 |
+      | Keywords                   | ["Perturbation"]                          |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
+      | Description[DefaultValue]  | a very very very long message             |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | Affects[StopArea]          | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+    And a StopArea exists with the following attributes:
+      | Name              | Test                                    |
+      | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+      | CollectSituations | true                                    |
+    And 10 seconds have passed
+    When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
+      | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
+      | ValidityPeriods[0]#EndTime | 2017-10-24T20:30:06+02:00              |
+      | Description[DefaultValue]  | an ANOTHER very very very long message |
+      | Version                    | 2                                      |
+    And 15 seconds have passed
+    Then the SIRI server should not have received a NotifyGeneralMessage request
