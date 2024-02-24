@@ -44,11 +44,12 @@ Feature: Support SIRI SituationExchange by subscription
    </S:Envelope>
    """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
-        | remote_url                      | http://localhost:8090 |
-        | remote_credential               | test                  |
-        | local_credential                | NINOXE:default        |
-        | remote_code_space               | internal              |
-        | collect.include_lines           | NINOXE:Line::3:LOC    |
+        | remote_url                       | http://localhost:8090 |
+        | remote_credential                | test                  |
+        | local_credential                 | NINOXE:default        |
+        | remote_code_space                | internal              |
+        | collect.include_lines            | NINOXE:Line::3:LOC    |
+        | collect.situations.internal_tags | first,second          |
     And 30 seconds have passed
     And a Line exists with the following attributes:
       | Codes | "internal": "NINOXE:Line:3:LOC" |
@@ -230,6 +231,7 @@ Feature: Support SIRI SituationExchange by subscription
       """
     Then one Situation has the following attributes:
       | Codes                                                                              | "internal" : "test"                           |
+      | InternalTags                                                                       | ["first","second"]                            |
       | RecordedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
