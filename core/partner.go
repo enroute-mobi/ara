@@ -496,6 +496,14 @@ func (partner *Partner) SituationExchangeRequestCollector() SituationExchangeReq
 	return nil
 }
 
+func (partner *Partner) SituationExchangeSubscriptionCollector() SituationExchangeSubscriptionCollector {
+	client, ok := partner.connectors[SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_COLLECTOR]
+	if ok {
+		return client.(SituationExchangeSubscriptionCollector)
+	}
+	return nil
+}
+
 func (partner *Partner) GeneralMessageSubscriptionCollector() GeneralMessageSubscriptionCollector {
 	client, ok := partner.connectors[SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR]
 	if ok {

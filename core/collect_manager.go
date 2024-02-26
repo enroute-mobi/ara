@@ -266,7 +266,7 @@ func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.Situ
 }
 
 func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) {
-	switch request.CodeSpace() {
+	switch request.Kind() {
 	case SITUATION_UPDATE_REQUEST_ALL:
 		manager.requestAllSituations()
 	case SITUATION_UPDATE_REQUEST_LINE:
@@ -288,15 +288,22 @@ func (manager *CollectManager) requestAllSituations() {
 		}
 
 		requestConnector := partner.SituationExchangeRequestCollector()
-		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		gmSubscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		sxSubscriptionConnector := partner.SituationExchangeSubscriptionCollector()
 		if requestConnector == nil &&
-			subscriptionConnector == nil {
+			gmSubscriptionConnector == nil &&
+			sxSubscriptionConnector == nil {
 			continue
 		}
 
 		logger.Log.Debugf("RequestAllSituationsUpdate for Partner %v", partner.Slug())
-		if subscriptionConnector != nil {
-			subscriptionConnector.RequestAllSituationsUpdate()
+		if gmSubscriptionConnector != nil {
+			gmSubscriptionConnector.RequestAllSituationsUpdate()
+			continue
+		}
+
+		if sxSubscriptionConnector != nil {
+			sxSubscriptionConnector.RequestAllSituationsUpdate()
 			continue
 		}
 		if requestConnector != nil {
@@ -322,9 +329,12 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 		}
 
 		requestConnector := partner.SituationExchangeRequestCollector()
-		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		gmSubscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		sxSubscriptionConnector := partner.SituationExchangeSubscriptionCollector()
 
-		if requestConnector == nil && subscriptionConnector == nil {
+		if requestConnector == nil &&
+			gmSubscriptionConnector == nil &&
+			sxSubscriptionConnector == nil {
 			continue
 		}
 
@@ -340,10 +350,16 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 		}
 
 		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", lineCode.Value(), partner.Slug())
-		if subscriptionConnector != nil {
-			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode)
+		if gmSubscriptionConnector != nil {
+			gmSubscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode)
 			return
 		}
+
+		if sxSubscriptionConnector != nil {
+			sxSubscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode)
+			return
+		}
+
 		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode.Value())
 		return
 	}
@@ -366,9 +382,12 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 		}
 
 		requestConnector := partner.SituationExchangeRequestCollector()
-		subscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		gmSubscriptionConnector := partner.GeneralMessageSubscriptionCollector()
+		sxSubscriptionConnector := partner.SituationExchangeSubscriptionCollector()
 
-		if requestConnector == nil && subscriptionConnector == nil {
+		if requestConnector == nil &&
+			gmSubscriptionConnector == nil &&
+			sxSubscriptionConnector == nil {
 			continue
 		}
 
@@ -397,8 +416,12 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 		}
 
 		logger.Log.Debugf("RequestSituationUpdate %v with Partner %v", stopAreaCode.Value(), partner.Slug())
-		if subscriptionConnector != nil {
-			subscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaCode)
+		if gmSubscriptionConnector != nil {
+			gmSubscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaCode)
+			return
+		}
+		if sxSubscriptionConnector != nil {
+			sxSubscriptionConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaCode)
 			return
 		}
 		requestConnector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_STOP_AREA, stopAreaCode.Value())

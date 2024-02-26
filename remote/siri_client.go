@@ -283,6 +283,20 @@ func (client *SIRIClient) StopMonitoringSubscription(request *siri.SIRIStopMonit
 	return response, nil
 }
 
+func (client *SIRIClient) SituationExchangeSubscription(request *siri.SIRISituationExchangeSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"SubscribeResponse"},
+		acceptGzip:        true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	response := sxml.NewXMLSubscriptionResponse(node)
+	return response, nil
+}
+
 func (client *SIRIClient) GeneralMessageSubscription(request *siri.SIRIGeneralMessageSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:           request,

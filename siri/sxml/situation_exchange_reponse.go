@@ -16,7 +16,7 @@ type XMLSituationExchangeResponse struct {
 }
 
 type XMLSituationExchangeDelivery struct {
-	XMLStructure
+	SubscriptionDeliveryXMLStructure
 
 	situations []*XMLPtSituationElement
 }

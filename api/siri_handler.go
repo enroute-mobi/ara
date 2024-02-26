@@ -69,6 +69,11 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  sxml.NewXMLNotifyGeneralMessage(envelope.Body()),
 			referential: handler.referential,
 		}
+	case "NotifySituationExchange":
+		return &SIRISituationExchangeDeliveriesResponseHandler{
+			xmlRequest:  sxml.NewXMLNotifySituationExchange(envelope.Body()),
+			referential: handler.referential,
+		}
 	case "NotifyEstimatedTimetable", "EstimatedTimetableDelivery":
 		return &SIRIEstimatedTimetableRequestDeliveriesResponseHandler{
 			xmlRequest:  sxml.NewXMLNotifyEstimatedTimetable(envelope.Body()),
