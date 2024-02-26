@@ -16,7 +16,7 @@ type VehicleMonitoringUpdateEventBuilder struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	partner            *Partner
+	partner         *Partner
 	remoteCodeSpace string
 
 	vehicleMonitoringUpdateEvents *VehicleMonitoringUpdateEvents
@@ -36,7 +36,7 @@ type VehicleMonitoringUpdateEvents struct {
 func NewVehicleMonitoringUpdateEventBuilder(partner *Partner) VehicleMonitoringUpdateEventBuilder {
 	return VehicleMonitoringUpdateEventBuilder{
 		partner:                       partner,
-		remoteCodeSpace:            partner.RemoteCodeSpace(),
+		remoteCodeSpace:               partner.RemoteCodeSpace(),
 		vehicleMonitoringUpdateEvents: newVehicleMonitoringUpdateEvents(),
 	}
 }
@@ -64,9 +64,9 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	if !ok {
 		// CollectedAlways is false by default
 		event := &model.StopAreaUpdateEvent{
-			Origin:   origin,
-			Code: stopAreaCode,
-			Name:     xmlVehicleActivity.StopPointName(),
+			Origin: origin,
+			Code:   stopAreaCode,
+			Name:   xmlVehicleActivity.StopPointName(),
 		}
 
 		builder.vehicleMonitoringUpdateEvents.StopAreas[xmlVehicleActivity.StopPointRef()] = event
@@ -80,9 +80,9 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
-			Origin:   origin,
-			Code: lineCode,
-			Name:     xmlVehicleActivity.PublishedLineName(),
+			Origin: origin,
+			Code:   lineCode,
+			Name:   xmlVehicleActivity.PublishedLineName(),
 		}
 
 		builder.vehicleMonitoringUpdateEvents.Lines[xmlVehicleActivity.LineRef()] = lineEvent
@@ -96,8 +96,8 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
 			Origin:          origin,
-			Code:        vjCode,
-			LineCode:    lineCode,
+			Code:            vjCode,
+			LineCode:        lineCode,
 			OriginRef:       xmlVehicleActivity.OriginRef(),
 			OriginName:      xmlVehicleActivity.OriginName(),
 			DestinationRef:  xmlVehicleActivity.DestinationRef(),
@@ -107,7 +107,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 
 			CodeSpace: builder.remoteCodeSpace,
-			SiriXML:      &xmlVehicleActivity.XMLMonitoredVehicleJourney,
+			SiriXML:   &xmlVehicleActivity.XMLMonitoredVehicleJourney,
 		}
 
 		builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()] = vjEvent
@@ -123,18 +123,18 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		percentage, _ := strconv.ParseFloat(xmlVehicleActivity.Percentage(), 64)
 
 		vEvent := &model.VehicleUpdateEvent{
-			Origin:                 origin,
+			Origin:             origin,
 			Code:               vCode,
 			StopAreaCode:       stopAreaCode,
 			VehicleJourneyCode: vjCode,
-			DriverRef:              xmlVehicleActivity.DriverRef(),
-			Bearing:                bearing,
-			LinkDistance:           linkDistance,
-			Percentage:             percentage,
-			ValidUntilTime:         xmlVehicleActivity.ValidUntilTime(),
-			RecordedAt:             xmlVehicleActivity.RecordedAtTime(),
-			Occupancy:              model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
-			NextStopPointOrder:     xmlVehicleActivity.Order(),
+			DriverRef:          xmlVehicleActivity.DriverRef(),
+			Bearing:            bearing,
+			LinkDistance:       linkDistance,
+			Percentage:         percentage,
+			ValidUntilTime:     xmlVehicleActivity.ValidUntilTime(),
+			RecordedAt:         xmlVehicleActivity.RecordedAtTime(),
+			Occupancy:          model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
+			NextStopPointOrder: xmlVehicleActivity.Order(),
 		}
 
 		longitude, latitude, err := builder.handleCoordinates(xmlVehicleActivity)

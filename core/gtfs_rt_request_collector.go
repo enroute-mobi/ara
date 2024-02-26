@@ -26,7 +26,7 @@ type GtfsRequestCollector struct {
 	connector
 
 	remoteCodeSpace string
-	origin             string
+	origin          string
 
 	ttl        time.Duration
 	subscriber UpdateSubscriber
@@ -125,8 +125,8 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 			if !ok {
 				// CollectedAlways is false by default
 				event := &model.StopAreaUpdateEvent{
-					Origin:   connector.origin,
-					Code: stopAreaCode,
+					Origin: connector.origin,
+					Code:   stopAreaCode,
 				}
 
 				events.StopAreas[sid] = event
@@ -137,14 +137,14 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 		if !ok {
 			stopVisitCode := model.NewCode(connector.remoteCodeSpace, svid)
 			svEvent := &model.StopVisitUpdateEvent{
-				Origin:                 connector.origin,
+				Origin:             connector.origin,
 				Code:               stopVisitCode,
 				StopAreaCode:       stopAreaCode,
 				VehicleJourneyCode: vjCode,
-				PassageOrder:           connector.handleStopSequence(stu),
-				Monitored:              true,
-				RecordedAt:             connector.Clock().Now(),
-				Schedules:              model.NewStopVisitSchedules(),
+				PassageOrder:       connector.handleStopSequence(stu),
+				Monitored:          true,
+				RecordedAt:         connector.Clock().Now(),
+				Schedules:          model.NewStopVisitSchedules(),
 			}
 			svEvent.Schedules.SetSchedule(
 				model.STOP_VISIT_SCHEDULE_EXPECTED,
@@ -189,10 +189,10 @@ func (connector *GtfsRequestCollector) handleVehicle(events *CollectUpdateEvents
 			Code:               vCode,
 			StopAreaCode:       model.NewCode(connector.remoteCodeSpace, v.GetStopId()),
 			VehicleJourneyCode: vjCode,
-			Longitude:              float64(p.GetLongitude()),
-			Latitude:               float64(p.GetLatitude()),
-			Bearing:                float64(p.GetBearing()),
-			Occupancy:              occupancyName(occupancy),
+			Longitude:          float64(p.GetLongitude()),
+			Latitude:           float64(p.GetLatitude()),
+			Bearing:            float64(p.GetBearing()),
+			Occupancy:          occupancyName(occupancy),
 		}
 
 		events.Vehicles[vid] = event
@@ -210,8 +210,8 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 	if !ok {
 		// CollectedAlways is false by default
 		lineEvent := &model.LineUpdateEvent{
-			Origin:   connector.origin,
-			Code: lineCode,
+			Origin: connector.origin,
+			Code:   lineCode,
 		}
 
 		events.Lines[rid] = lineEvent
@@ -220,10 +220,10 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 	_, ok = events.VehicleJourneys[tid]
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
-			Origin:       connector.origin,
-			Code:     vjCode,
-			LineCode: lineCode,
-			Monitored:    true,
+			Origin:    connector.origin,
+			Code:      vjCode,
+			LineCode:  lineCode,
+			Monitored: true,
 		}
 		if len(occupancy) != 0 {
 			vjEvent.Occupancy = occupancyName(occupancy[0])
