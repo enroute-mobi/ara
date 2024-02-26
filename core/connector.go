@@ -53,6 +53,7 @@ const (
 	GTFS_RT_REQUEST_COLLECTOR                          = "gtfs-rt-request-collector"
 	GTFS_RT_TRIP_UPDATES_BROADCASTER                   = "gtfs-rt-trip-updates-broadcaster"
 	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER              = "gtfs-rt-vehicle-positions-broadcaster"
+	GRAPHQL_SERVER                                     = "graphql-server"
 )
 
 type Connector interface {
@@ -85,6 +86,8 @@ type ConnectorFactory interface {
 
 func NewConnectorFactory(connectorType string) ConnectorFactory {
 	switch connectorType {
+	case GRAPHQL_SERVER:
+		return &GraphqlServerFactory{}
 	case PUSH_COLLECTOR:
 		return &PushCollectorFactory{}
 	case SIRI_STOP_POINTS_DISCOVERY_REQUEST_COLLECTOR:

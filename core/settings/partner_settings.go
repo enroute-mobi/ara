@@ -79,6 +79,8 @@ const (
 	DEFAULT_GTFS_TTL                         = 30 * time.Second
 
 	SORT_PAYLOAD_FOR_TEST = "sort_payload_for_test"
+
+	GRAPHQL_MUTABLE_ATTRIBUTES = "graphql.mutable_attributes"
 )
 
 type PartnerSettings struct {
@@ -138,6 +140,8 @@ type PartnerSettings struct {
 
 	vehicleJourneyRemoteCodeSpaces            []string
 	vehicleJourneyRemoteCodeSpacesByConnector sync.Map
+
+	graphQLMutableAttributes sync.Map
 
 	// ! Never use these values outside SettingsDefinition()
 	originalSettings map[string]string
@@ -210,6 +214,8 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 
 	// depends on other settings
 	s.setHTTPClientOptions(settings)
+
+	s.setGraphQLMutableAttributes(settings)
 
 	s.originalSettings = settings
 }
@@ -741,6 +747,17 @@ func (s *PartnerSettings) setHTTPClientOptions(settings map[string]string) {
 
 func (s *PartnerSettings) HTTPClientOptions() remote.HTTPClientOptions {
 	return s.httpClientOptions
+}
+
+func (s *PartnerSettings) setGraphQLMutableAttributes(settings map[string]string) {
+	for key := range toMap(settings[GRAPHQL_MUTABLE_ATTRIBUTES]) {
+		s.graphQLMutableAttributes.Store(key, struct{}{})
+	}
+}
+
+func (s *PartnerSettings) IsMutable(attribute string) (ok bool) {
+	_, ok = s.graphQLMutableAttributes.Load(attribute)
+	return
 }
 
 func (s *PartnerSettings) setSiriEnvelopeType(settings map[string]string) {
