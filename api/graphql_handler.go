@@ -72,6 +72,7 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 
 	processingTime := handler.referential.Clock().Since(startTime)
 
+	message.RequestRawMessage = params.Query
 	message.ProcessingTime = processingTime.Seconds()
 
 	response.Header().Set("Content-Type", "application/json")
