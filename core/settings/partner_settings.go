@@ -51,6 +51,7 @@ const (
 	BROADCAST_GZIP_GTFS                                   = "broadcast.gzip_gtfs"
 	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM              = "broadcast.no_dataframeref_rewriting_from"
 	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM            = "broadcast.no_destinationref_rewriting_from"
+	BROADCAST_PREFER_REFERENT_STOP_AREAS                  = "broadcast.prefer_referent_stop_areas"
 	BROADCAST_RECORDED_CALLS_DURATION                     = "broadcast.recorded_calls.duration"
 	BROADCAST_REWRITE_JOURNEY_PATTERN_REF                 = "broadcast.rewrite_journey_pattern_ref"
 	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
@@ -108,6 +109,7 @@ type PartnerSettings struct {
 	noDestinationRefRewritingFrom       []string
 	noDataFrameRefRewritingFrom         []string
 	rewriteJourneyPatternRef            bool
+	preferReferentStopArea              bool
 	gzipGtfs                            bool
 	generalMessageRequestVersion22      bool
 	collectFilteredSituations           bool
@@ -189,6 +191,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setGeneralMessageRequestVersion22(settings)
 	s.setPersistentCollect(settings)
 	s.setPersistentBroadcastSubscriptions(settings)
+	s.setPreferReferentStopArea(settings)
 	s.setRewriteJourneyPatternRef(settings)
 	s.setCollectFilteredSituations(settings)
 	s.setIgnoreStopWithoutLine(settings)
@@ -610,6 +613,15 @@ func (s *PartnerSettings) setRewriteJourneyPatternRef(settings map[string]string
 }
 func (s *PartnerSettings) RewriteJourneyPatternRef() bool {
 	return s.rewriteJourneyPatternRef
+}
+
+func (s *PartnerSettings) setPreferReferentStopArea(settings map[string]string) {
+	preferReferent, _ := strconv.ParseBool(settings[BROADCAST_PREFER_REFERENT_STOP_AREAS])
+	s.preferReferentStopArea = preferReferent
+}
+
+func (s *PartnerSettings) PreferReferentStopArea() bool {
+	return s.preferReferentStopArea
 }
 
 func (s *PartnerSettings) setGzipGtfs(settings map[string]string) {

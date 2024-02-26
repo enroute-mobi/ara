@@ -210,6 +210,17 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) stopPointRef(stopArea
 	if !ok {
 		return &model.StopArea{}, "", false
 	}
+
+	if connector.partner.PreferReferentStopArea() {
+		referent, ok := stopPointRef.Referent()
+		if ok {
+			referentCode, ok := referent.Code(connector.remoteCodeSpace)
+			if ok {
+				return referent, referentCode.Value(), true
+			}
+		}
+	}
+
 	stopPointRefCode, ok := stopPointRef.Code(connector.remoteCodeSpace)
 	if ok {
 		return stopPointRef, stopPointRefCode.Value(), true

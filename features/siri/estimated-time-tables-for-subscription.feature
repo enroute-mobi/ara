@@ -2453,3 +2453,94 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Type            | NotifyEstimatedTimetable                 |
       | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC"]           |
       | VehicleJourneys | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |
+
+  @ARA-1475
+  Scenario: Manage a raw ETT notify after modification of a StopVisit using the setting broadcast.prefer_referent_stop_areas should broadcast Referent StopArea
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+       | remote_url                           | http://localhost:8090 |
+       | remote_credential                    | test                  |
+       | local_credential                     | NINOXE:default        |
+       | remote_code_space                    | internal              |
+       | broadcast.recorded_calls.duration    | 1h                    |
+       | siri.envelope                        | raw                   |
+       | broadcast.prefer_referent_stop_areas | true                  |
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableBroadcast           |
+      | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name  | Referent                                       |
+      | Codes | "internal": "NINOXE:StopPoint:SP:Referent:LOC" |
+    And a StopArea exists with the following attributes:
+      | Name       | Test                                         |
+      | Codes      | "internal": "NINOXE:StopPoint:SP:24:LOC"     |
+      | ReferentId | 6ba7b814-9dad-11d1-3-00c04fd430c8            |
+    And a Line exists with the following attributes:
+      | Codes  | "internal": "NINOXE:Line:3:LOC" |
+      | Name   | Ligne 3 Metro                   |
+      | Number | L3M                             |
+    And a VehicleJourney exists with the following attributes:
+      | Name                           | Passage 32                                                      |
+      | Codes                          | "_default": "6ba7b814", "external": "NINOXE:VehicleJourney:201" |
+      | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8                               |
+      | DirectionType                  | Aller                                                           |
+      | Attribute[OriginName]          | Le début                                                        |
+      | Attribute[DestinationName]     | La fin.                                                         |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"                                      |
+    And a StopVisit exists with the following attributes:
+      | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                | 4                                                                    |
+      | StopAreaId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                                    |
+      | VehicleJourneyId            | 6ba7b814-9dad-11d1-6-00c04fd430c8                                    |
+      | VehicleAtStop               | false                                                                |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
+      | Schedule[aimed]#Arrival     | 2017-01-01T12:00:00.000Z                                             |
+      | Schedule[expected]#Arrival  | 2017-01-01T15:00:00.000Z                                             |
+      | ArrivalStatus               | onTime                                                               |
+    And 10 seconds have passed
+    When the StopVisit "6ba7b814-9dad-11d1-7-00c04fd430c8" is edited with the following attributes:
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
+      | ArrivalStatus              | Delayed                  |
+    And 5 seconds have passed
+    Then the SIRI server should receive this response
+      """
+<?xml version='1.0' encoding='utf-8'?>
+<Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+ <ServiceDelivery>
+   <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
+   <ProducerRef>test</ProducerRef>
+   <ResponseMessageIdentifier>6ba7b814-9dad-11d1-9-00c04fd430c8</ResponseMessageIdentifier>
+   <EstimatedTimetableDelivery>
+     <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
+     <SubscriberRef>subscriber</SubscriberRef>
+     <SubscriptionRef>externalId</SubscriptionRef>
+     <Status>true</Status>
+     <EstimatedJourneyVersionFrame>
+       <RecordedAtTime>2017-01-01T12:00:15.000Z</RecordedAtTime>
+       <EstimatedVehicleJourney>
+         <LineRef>NINOXE:Line:3:LOC</LineRef>
+         <DirectionRef>Aller</DirectionRef>
+          <FramedVehicleJourneyRef>
+            <DataFrameRef>2017-01-01</DataFrameRef>
+            <DatedVehicleJourneyRef>VehicleJourney:6ba7b814</DatedVehicleJourneyRef>
+          </FramedVehicleJourneyRef>
+         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+         <EstimatedCalls>
+           <EstimatedCall>
+             <StopPointRef>NINOXE:StopPoint:SP:Referent:LOC</StopPointRef>
+             <Order>4</Order>
+             <StopPointName>Referent</StopPointName>
+             <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
+             <ArrivalStatus>Delayed</ArrivalStatus>
+           </EstimatedCall>
+         </EstimatedCalls>
+         <IsCompleteStopSequence>false</IsCompleteStopSequence>
+       </EstimatedVehicleJourney>
+     </EstimatedJourneyVersionFrame>
+   </EstimatedTimetableDelivery>
+ </ServiceDelivery>
+</Siri>
+  """
