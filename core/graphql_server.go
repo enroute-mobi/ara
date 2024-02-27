@@ -7,7 +7,7 @@ func (factory *GraphqlServerFactory) Validate(apiPartner *APIPartner) {
 }
 
 func (factory *GraphqlServerFactory) CreateConnector(partner *Partner) Connector {
-	return NewGtfsRequestCollector(partner)
+	return NewGraphqlServer(partner)
 }
 
 // Empty shell for now
