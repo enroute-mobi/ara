@@ -88,10 +88,10 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) RequestVehicleUpdat
 	}
 
 	// Else we find or create a subscription to add the resource
-	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind("VehicleMonitoringCollect")
+	newSubscription := connector.partner.Subscriptions().New("VehicleMonitoringCollect")
 	ref := model.Reference{
 		Code: &lineCode,
-		Type:     "Line",
+		Type: "Line",
 	}
 
 	newSubscription.CreateAndAddNewResource(ref)
