@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -281,6 +282,7 @@ type StopVisits interface {
 	FindAllAfter(time.Time) []*StopVisit
 	Save(*StopVisit) bool
 	Delete(*StopVisit) bool
+	DeleteMultiple([]*StopVisit) bool
 }
 
 func NewMemoryStopVisits() *MemoryStopVisits {
@@ -531,10 +533,27 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 	return true
 }
 
+func (manager *MemoryStopVisits) DeleteMultiple(stopVisits []*StopVisit) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	for _, stopVisit := range stopVisits {
+		manager.UnsafeDelete(stopVisit)
+	}
+
+	return true
+}
+
 func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
+	manager.UnsafeDelete(stopVisit)
+
+	return true
+}
+
+func (manager *MemoryStopVisits) UnsafeDelete(stopVisit *StopVisit) {
 	delete(manager.byIdentifier, stopVisit.id)
 	manager.byCode.Delete(ModelId(stopVisit.id))
 	manager.byStopArea.Delete(ModelId(stopVisit.id))
@@ -543,8 +562,7 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 		vehicleJourneyId:      stopVisit.VehicleJourneyId,
 		stopVisitPassageOrder: stopVisit.PassageOrder,
 	})
-
-	return true
+	logger.Log.Debugf("StopVisit %s deleted", stopVisit.Id())
 }
 
 func (manager *MemoryStopVisits) Load(referentialSlug string) error {
