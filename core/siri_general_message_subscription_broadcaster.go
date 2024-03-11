@@ -87,12 +87,12 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 
 		lastState, ok := resource.LastState(string(situation.Id()))
 
-		if ok && !lastState.(*ls.GeneralMessageLastChange).Haschanged(&situation) {
+		if ok && !lastState.(*ls.SituationLastChange).Haschanged(&situation) {
 			continue
 		}
 
 		if !ok {
-			resource.SetLastState(string(situation.Id()), ls.NewGeneralMessageLastChange(&situation, sub))
+			resource.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
 		}
 		connector.addSituation(sub.Id(), sId)
 	}
@@ -172,7 +172,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *S
 			continue
 		}
 
-		r.SetLastState(string(situations[i].Id()), ls.NewGeneralMessageLastChange(&situations[i], sub))
+		r.SetLastState(string(situations[i].Id()), ls.NewSituationLastChange(&situations[i], sub))
 		connector.addSituation(sub.Id(), situations[i].Id())
 	}
 }
