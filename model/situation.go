@@ -329,7 +329,7 @@ type MemorySituations struct {
 	model *MemoryModel
 
 	mutex          *sync.RWMutex
-	broadcastEvent func(event GeneralMessageBroadcastEvent)
+	broadcastEvent func(event SituationBroadcastEvent)
 	byIdentifier   map[SituationId]*Situation
 }
 
@@ -403,7 +403,7 @@ func (manager *MemorySituations) Save(situation *Situation) bool {
 	situation.model = manager.model
 	manager.byIdentifier[situation.Id()] = situation
 
-	event := GeneralMessageBroadcastEvent{
+	event := SituationBroadcastEvent{
 		SituationId: situation.id,
 	}
 

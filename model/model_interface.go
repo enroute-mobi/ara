@@ -36,7 +36,7 @@ type MemoryModel struct {
 	situations          *MemorySituations
 	operators           *MemoryOperators
 	SMEventsChan        chan StopMonitoringBroadcastEvent
-	GMEventsChan        chan GeneralMessageBroadcastEvent
+	GMEventsChan        chan SituationBroadcastEvent
 	VeEventChan         chan VehicleBroadcastEvent
 	referential         string
 	date                Date
@@ -99,7 +99,7 @@ func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonit
 	model.SMEventsChan = broadcastSMEventChan
 }
 
-func (model *MemoryModel) SetBroadcastGMChan(broadcastGMEventChan chan GeneralMessageBroadcastEvent) {
+func (model *MemoryModel) SetBroadcastGMChan(broadcastGMEventChan chan SituationBroadcastEvent) {
 	model.GMEventsChan = broadcastGMEventChan
 }
 
@@ -131,11 +131,11 @@ func (model *MemoryModel) broadcastVeEvent(event VehicleBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) broadcastGMEvent(event GeneralMessageBroadcastEvent) {
+func (model *MemoryModel) broadcastGMEvent(event SituationBroadcastEvent) {
 	select {
 	case model.GMEventsChan <- event:
 	default:
-		logger.Log.Debugf("BrocasterManager GeneralMessageBroadcastEvent queue is full")
+		logger.Log.Debugf("BrocasterManager GeneralMessage SituationBroadcastEvent queue is full")
 	}
 }
 

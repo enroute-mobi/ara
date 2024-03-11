@@ -11,7 +11,7 @@ type BroadcastManagerInterface interface {
 	state.Stopable
 
 	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
-	GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent
+	GetGeneralMessageBroadcastEventChan() chan model.SituationBroadcastEvent
 	GetVehicleBroadcastEventChan() chan model.VehicleBroadcastEvent
 }
 
@@ -19,7 +19,7 @@ type BroadcastManager struct {
 	Referential *Referential
 
 	smbEventChan chan model.StopMonitoringBroadcastEvent
-	gmbEventChan chan model.GeneralMessageBroadcastEvent
+	gmbEventChan chan model.SituationBroadcastEvent
 	vbEventChan  chan model.VehicleBroadcastEvent
 	stop         chan struct{}
 }
@@ -28,7 +28,7 @@ func NewBroadcastManager(referential *Referential) *BroadcastManager {
 	return &BroadcastManager{
 		Referential:  referential,
 		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 2000),
-		gmbEventChan: make(chan model.GeneralMessageBroadcastEvent, 2000),
+		gmbEventChan: make(chan model.SituationBroadcastEvent, 2000),
 		vbEventChan:  make(chan model.VehicleBroadcastEvent, 2000),
 	}
 }
@@ -37,7 +37,7 @@ func (manager *BroadcastManager) GetStopMonitoringBroadcastEventChan() chan mode
 	return manager.smbEventChan
 }
 
-func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent {
+func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan model.SituationBroadcastEvent {
 	return manager.gmbEventChan
 }
 
@@ -123,7 +123,7 @@ func (manager *BroadcastManager) vmEvent_handler(event model.VehicleBroadcastEve
 	}
 }
 
-func (manager *BroadcastManager) gmsbEvent_handler(event model.GeneralMessageBroadcastEvent) {
+func (manager *BroadcastManager) gmsbEvent_handler(event model.SituationBroadcastEvent) {
 	connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
 		connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)

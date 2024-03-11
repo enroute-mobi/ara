@@ -60,7 +60,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) Start() {
 	connector.generalMessageBroadcaster.Start()
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.SituationBroadcastEvent) {
 	connector.checkEvent(event.SituationId)
 }
 
@@ -184,7 +184,7 @@ type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 type TestGeneralMessageSubscriptionBroadcaster struct {
 	connector
 
-	events []*model.GeneralMessageBroadcastEvent
+	events []*model.SituationBroadcastEvent
 	// generalMessageBroadcaster SIRIGeneralMessageBroadcaster
 }
 
@@ -193,7 +193,7 @@ func NewTestGeneralMessageSubscriptionBroadcaster() *TestGeneralMessageSubscript
 	return connector
 }
 
-func (connector *TestGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+func (connector *TestGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.SituationBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 
