@@ -127,15 +127,17 @@ func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	subscription.RUnlock()
 
 	aux := struct {
-		Id         SubscriptionId        `json:"SubscriptionRef,omitempty"`
-		ExternalId string                `json:"ExternalId,omitempty"`
-		Kind       string                `json:",omitempty"`
-		Resources  []*SubscribedResource `json:",omitempty"`
+		Id                  SubscriptionId        `json:"SubscriptionRef,omitempty"`
+		ExternalId          string                `json:"ExternalId,omitempty"`
+		Kind                string                `json:",omitempty"`
+		Resources           []*SubscribedResource `json:",omitempty"`
+		SubscriptionOptions map[string]string     `json:",omitempty"`
 	}{
-		Id:         subscription.id,
-		ExternalId: subscription.externalId,
-		Kind:       subscription.kind,
-		Resources:  resources,
+		Id:                  subscription.id,
+		ExternalId:          subscription.externalId,
+		Kind:                subscription.kind,
+		Resources:           resources,
+		SubscriptionOptions: subscription.subscriptionOptions,
 	}
 	return json.Marshal(&aux)
 }
