@@ -10,6 +10,7 @@ type SituationLastChange struct {
 	lastState
 
 	recordedAt time.Time
+	version    int
 }
 
 func NewSituationLastChange(situation *model.Situation, sub subscription) *SituationLastChange {
@@ -25,5 +26,6 @@ func (slc *SituationLastChange) UpdateState(situation *model.Situation) bool {
 }
 
 func (slc *SituationLastChange) Haschanged(situation *model.Situation) bool {
-	return !situation.RecordedAt.Equal(slc.recordedAt)
+	return !situation.RecordedAt.Equal(slc.recordedAt) ||
+		situation.Version != slc.version
 }

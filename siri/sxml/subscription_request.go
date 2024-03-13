@@ -15,6 +15,7 @@ type XMLSubscriptionRequest struct {
 
 	smEntries  []*XMLStopMonitoringSubscriptionRequestEntry
 	gmEntries  []*XMLGeneralMessageSubscriptionRequestEntry
+	sxEntries  []*XMLSituationExchangeSubscriptionRequestEntry
 	ettEntries []*XMLEstimatedTimetableSubscriptionRequestEntry
 	pttEntries []*XMLProductionTimetableSubscriptionRequestEntry
 	vmEntries  []*XMLVehicleMonitoringSubscriptionRequestEntry
@@ -88,6 +89,17 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionGMEntries() []*XMLGeneralM
 		request.gmEntries = append(request.gmEntries, NewXMLGeneralMessageSubscriptionRequestEntry(generalMessage))
 	}
 	return request.gmEntries
+}
+
+func (request *XMLSubscriptionRequest) XMLSubscriptionSXEntries() []*XMLSituationExchangeSubscriptionRequestEntry {
+	if len(request.sxEntries) != 0 {
+		return request.sxEntries
+	}
+	nodes := request.findNodes("SituationExchangeSubscriptionRequest")
+	for _, situationExchangeMessage := range nodes {
+		request.sxEntries = append(request.sxEntries, NewXMLSituationExchangeSubscriptionRequestEntry(situationExchangeMessage))
+	}
+	return request.sxEntries
 }
 
 func (request *XMLSubscriptionRequest) ConsumerAddress() string {

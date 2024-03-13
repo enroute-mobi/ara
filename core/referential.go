@@ -174,6 +174,7 @@ func (referential *Referential) Start() {
 	referential.broacasterManager = NewBroadcastManager(referential)
 	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
 	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
+	referential.model.SetBroadcastSXChan(referential.broacasterManager.GetSituationExchangeBroadcastEventChan())
 	referential.model.SetBroadcastVeChan(referential.broacasterManager.GetVehicleBroadcastEventChan())
 
 	referential.broacasterManager.Start()

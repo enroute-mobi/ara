@@ -13,6 +13,9 @@ type XMLGetSituationExchange struct {
 
 type XMLSituationExchangeRequest struct {
 	LightRequestXMLStructure
+
+	lineRefs      []string
+	stopPointRefs []string
 }
 
 func NewXMLGetSituationExchange(node xml.Node) *XMLGetSituationExchange {

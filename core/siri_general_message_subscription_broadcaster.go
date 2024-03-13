@@ -147,7 +147,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		if r == nil {
 			ref := model.Reference{
 				Code: &obj,
-				Type:     "Situation",
+				Type: "Situation",
 			}
 			r = sub.CreateAndAddNewResource(ref)
 			r.Subscribed(connector.Clock().Now())

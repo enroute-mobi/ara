@@ -38,6 +38,7 @@ const (
 	SIRI_SITUATION_EXCHANGE_REQUEST_BROADCASTER        = "siri-situation-exchange-request-broadcaster"
 	SIRI_SITUATION_EXCHANGE_REQUEST_COLLECTOR          = "siri-situation-exchange-request-collector"
 	SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_COLLECTOR     = "siri-situation-exchange-subscription-collector"
+	SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER   = "siri-situation-exchange-subscription-broadcaster"
 	SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR          = "siri-vehicle-monitoring-request-collector"
 	SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR     = "siri-vehicle-monitoring-subscription-collector"
 	SIRI_SUBSCRIPTION_REQUEST_DISPATCHER               = "siri-subscription-request-dispatcher"
@@ -144,6 +145,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRISituationExchangeSubscriptionCollectorFactory{}
 	case SIRI_SITUATION_EXCHANGE_REQUEST_COLLECTOR:
 		return &SIRISituationExchangeRequestCollectorFactory{}
+	case SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER:
+		return &SIRISituationExchangeSubscriptionBroadcasterFactory{}
 	case SIRI_VEHICLE_MONITORING_REQUEST_COLLECTOR:
 		return &SIRIVehicleMonitoringRequestCollectorFactory{}
 	case SIRI_VEHICLE_MONITORING_SUBSCRIPTION_COLLECTOR:

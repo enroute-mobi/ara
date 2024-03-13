@@ -440,6 +440,10 @@ func (partner *Partner) hasSubscribers() bool {
 		return true
 	}
 
+	_, ok = partner.connectors[SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER]
+	if ok {
+		return true
+	}
 	return ok
 }
 
