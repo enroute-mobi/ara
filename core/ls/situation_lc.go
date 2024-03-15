@@ -22,6 +22,7 @@ func NewSituationLastChange(situation *model.Situation, sub subscription) *Situa
 
 func (slc *SituationLastChange) UpdateState(situation *model.Situation) bool {
 	slc.recordedAt = situation.RecordedAt
+	slc.version = situation.Version
 	return true
 }
 

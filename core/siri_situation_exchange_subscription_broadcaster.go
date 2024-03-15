@@ -37,14 +37,15 @@ func (factory *SIRISituationExchangeSubscriptionBroadcasterFactory) Validate(api
 }
 
 func newSIRISituationExchangeSubscriptionBroadcaster(partner *Partner) *SIRISituationExchangeSubscriptionBroadcaster {
-	siriSituationExchangeSubscriptionBroadcaster := &SIRISituationExchangeSubscriptionBroadcaster{}
-	siriSituationExchangeSubscriptionBroadcaster.partner = partner
-	siriSituationExchangeSubscriptionBroadcaster.mutex = &sync.Mutex{}
-	siriSituationExchangeSubscriptionBroadcaster.toBroadcast = make(map[SubscriptionId][]model.SituationId)
+	connector := &SIRISituationExchangeSubscriptionBroadcaster{}
+	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
+	connector.partner = partner
+	connector.mutex = &sync.Mutex{}
+	connector.toBroadcast = make(map[SubscriptionId][]model.SituationId)
 
-	siriSituationExchangeSubscriptionBroadcaster.situationExchangeBroadcaster = NewSIRISituationExchangeBroadcaster(siriSituationExchangeSubscriptionBroadcaster)
+	connector.situationExchangeBroadcaster = NewSIRISituationExchangeBroadcaster(connector)
 
-	return siriSituationExchangeSubscriptionBroadcaster
+	return connector
 }
 
 func (connector *SIRISituationExchangeSubscriptionBroadcaster) Stop() {
@@ -72,6 +73,7 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) addSituation(subI
 
 func (connector *SIRISituationExchangeSubscriptionBroadcaster) checkEvent(sId model.SituationId) {
 	situation, ok := connector.partner.Model().Situations().Find(sId)
+
 	if !ok || situation.Origin == string(connector.partner.Slug()) {
 		return
 	}
@@ -86,15 +88,10 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) checkEvent(sId mo
 		}
 
 		lastState, ok := resource.LastState(string(situation.Id()))
-
 		if ok && !lastState.(*ls.SituationLastChange).Haschanged(&situation) {
 			continue
 		}
-
-		if !ok {
-			resource.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
-		}
-		connector.addSituation(sub.Id(), sId)
+		connector.addfilteredSituations(situation, sub, resource)
 	}
 }
 
@@ -137,8 +134,20 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) HandleSubscriptio
 
 		resps = append(resps, rs)
 
-		sub.SetSubscriptionOption("LineRef", strings.Join(sx.LineRefs(), ","))
-		sub.SetSubscriptionOption("StopPointRef", strings.Join(sx.StopPointRefs(), ","))
+		if len(sx.LineRefs()) != 0 {
+			for _, xmlLineRef := range sx.LineRefs() {
+				sub.SetSubscriptionOption("LineRef", fmt.Sprintf("%s:%s", connector.remoteCodeSpace, xmlLineRef))
+			}
+
+		}
+
+		if len(sx.StopPointRefs()) != 0 {
+			for _, xmlStopPointRef := range sx.StopPointRefs() {
+				sub.SetSubscriptionOption("StopPointRefRef", fmt.Sprintf("%s:%s", connector.remoteCodeSpace, xmlStopPointRef))
+			}
+
+		}
+
 		obj := model.NewCode("SituationResource", "Situation")
 		r := sub.Resource(obj)
 		if r == nil {
@@ -165,11 +174,73 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) HandleSubscriptio
 func (connector *SIRISituationExchangeSubscriptionBroadcaster) addSituations(sub *Subscription, r *SubscribedResource) {
 	situations := connector.partner.Model().Situations().FindAll()
 	for i := range situations {
-		if situations[i].GMValidUntil().Before(connector.Clock().Now()) {
-			continue
-		}
-
-		r.SetLastState(string(situations[i].Id()), ls.NewSituationLastChange(&situations[i], sub))
-		connector.addSituation(sub.Id(), situations[i].Id())
+		connector.addfilteredSituations(situations[i], sub, r)
 	}
+}
+
+func (connector *SIRISituationExchangeSubscriptionBroadcaster) addfilteredSituations(situation model.Situation, sub *Subscription, r *SubscribedResource) {
+	if situation.GMValidUntil().Before(connector.Clock().Now()) {
+		return
+	}
+
+	if sub.SubscriptionOption("LineRef") == "" && sub.SubscriptionOption("StopPointRef") == "" {
+		r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
+		connector.addSituation(sub.Id(), situation.Id())
+		return
+	}
+	// Filtered subscription
+	for _, affect := range situation.Affects {
+		if affect.GetType() == model.SituationTypeLine {
+			if lineRef, ok := connector.lineRef(sub); ok && model.ModelId(lineRef) == affect.GetId() {
+				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
+				connector.addSituation(sub.Id(), situation.Id())
+				continue
+			}
+		}
+		if affect.GetType() == model.SituationTypeStopArea {
+			if stopPointRef, ok := connector.stopPointRef(sub); ok && model.ModelId(stopPointRef) == affect.GetId() {
+				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
+				connector.addSituation(sub.Id(), situation.Id())
+				continue
+			}
+		}
+	}
+}
+
+// Returns the LineId of the line defined in the LineRef subscription option
+// If LineRef isn't defined or with an incorrect format, returns false
+func (connector *SIRISituationExchangeSubscriptionBroadcaster) lineRef(sub *Subscription) (model.LineId, bool) {
+	lineRef := sub.SubscriptionOption("LineRef")
+	if lineRef == "" {
+		return "", false
+	}
+	kindValue := strings.SplitN(lineRef, ":", 2)
+	if len(kindValue) != 2 { // Should not happen but we don't want an index out of range panic
+		logger.Log.Debugf("The LineRef Setting hasn't been stored in the correct format: %v", lineRef)
+		return "", false
+	}
+	line, ok := connector.partner.Model().Lines().FindByCode(model.NewCode(kindValue[0], kindValue[1]))
+	if !ok {
+		return "", false
+	}
+	return line.Id(), true
+}
+
+// Returns the StopAreaId of the stopArea defined in the StopPointRef subscription option
+// If StopPointRef isn't defined or with an incorrect format, returns false
+func (connector *SIRISituationExchangeSubscriptionBroadcaster) stopPointRef(sub *Subscription) (model.StopAreaId, bool) {
+	stopPointRef := sub.SubscriptionOption("StopPointRef")
+	if stopPointRef == "" {
+		return "", false
+	}
+	kindValue := strings.SplitN(stopPointRef, ":", 2)
+	if len(kindValue) != 2 { // Should not happen but we don't want an index out of range panic
+		logger.Log.Debugf("The StopPointRef Setting hasn't been stored in the correct format: %v", stopPointRef)
+		return "", false
+	}
+	stopArea, ok := connector.partner.Model().StopAreas().FindByCode(model.NewCode(kindValue[0], kindValue[1]))
+	if !ok {
+		return "", false
+	}
+	return stopArea.Id(), true
 }

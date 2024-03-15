@@ -516,7 +516,6 @@ Feature: Support SIRI SituationExchange by subscription
       | Description[DefaultValue]  | an ANOTHER very very very long message |
       | Version                    | 2                                      |
     And 15 seconds have passed
-    Then show me ara subscriptions for partner "test"
     Then the SIRI server should receive this response
     """
      <?xml version='1.0' encoding='utf-8'?>
@@ -582,3 +581,67 @@ Feature: Support SIRI SituationExchange by subscription
       | SubscriptionIdentifiers | ["externalId"]                                               |
       | StopAreas               | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
       | Lines                   | ["1234"]                                                     |
+
+  @ARA-1451 @siri-valid
+  Scenario: Handle SituationExchange subscription request to an unknowm line
+    Given a SIRI server on "http://localhost:8090"
+    Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-situation-exchange-subscription-broadcaster] and the following settings:
+       | remote_url        | http://localhost:8090 |
+       | remote_credential | test                  |
+       | local_credential  | NINOXE:default        |
+       | remote_code_space | internal              |
+    And a Line exists with the following attributes:
+      | Name              | Test              |
+      | Codes             | "internal":"1234" |
+      | CollectSituations | true              |
+    And a Situation exists with the following attributes:
+      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                 |
+      | Version                                                                            | 1                                         |
+      | Keywords                                                                           | ["Perturbation"]                          |
+      | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                 |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                 |
+      | Description[DefaultValue]                                                          | a very very very long message             |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+    And a StopArea exists with the following attributes:
+      | Name              | Test                                    |
+      | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
+      | CollectSituations | true                                    |
+    And a StopArea exists with the following attributes:
+      | Name              | Test                                    |
+      | Codes             | "internal":"NINOXE:StopPoint:SP:12:LOC" |
+      | CollectSituations | true                                    |
+    And a minute has passed
+    When I send this SIRI request
+      """
+    <?xml version='1.0' encoding='utf-8'?>
+    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ws:Subscribe xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <SubscriptionRequestInfo>
+            <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+            <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+            <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+          </SubscriptionRequestInfo>
+          <Request>
+            <siri:SituationExchangeSubscriptionRequest>
+              <siri:SubscriberRef>test</siri:SubscriberRef>
+              <siri:SubscriptionIdentifier>6ba7b814-9dad-11d1--00c04fd430c8</siri:SubscriptionIdentifier>
+              <siri:InitialTerminationTime>2017-01-03T12:03:00.000Z</siri:InitialTerminationTime>
+              <siri:SituationExchangeRequest version="2.0:FR-IDF-2.4">
+                <siri:RequestTimestamp>2017-01-01T12:03:00.000Z</siri:RequestTimestamp>
+                <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
+                <siri:LineRef>dummy</siri:LineRef>
+              </siri:SituationExchangeRequest>
+              <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+            </siri:SituationExchangeSubscriptionRequest>
+          </Request>
+          <RequestExtension />
+        </ws:Subscribe>
+      </S:Body>
+    </S:Envelope>
+      """
+    And 30 seconds have passed
+    And the SIRI server should not have received a NotifySituationExchange request
