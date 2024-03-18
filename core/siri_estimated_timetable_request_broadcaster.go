@@ -150,7 +150,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 
 				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i])
 
-				if svs[i].IsRecordable() && connector.Partner().RecordedCallsDuration() != 0 {
+				if svs[i].IsRecordable(connector.Clock().Now()) && connector.Partner().RecordedCallsDuration() != 0 {
 					// recordedCall
 					recordedCall := &siri.SIRIRecordedCall{
 						ArrivalStatus:         string(svs[i].ArrivalStatus),
