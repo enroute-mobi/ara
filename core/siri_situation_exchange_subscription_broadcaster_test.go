@@ -13,7 +13,8 @@ import (
 
 func Test_SituationExchangeBroadcaster_Create_Events(t *testing.T) {
 	assert := assert.New(t)
-	clock.SetDefaultClock(clock.NewFakeClock())
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
@@ -170,6 +171,27 @@ multiple affected StopPoints if at least one of the external resource match`,
 	}
 
 	for _, tt := range TestCases {
+		connector, _ := partner.Connector(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
+		connector.(*SIRISituationExchangeSubscriptionBroadcaster).SetClock(fakeClock)
+		connector.(*SIRISituationExchangeSubscriptionBroadcaster).situationExchangeBroadcaster = NewFakeSituationExchangeBroadcaster(connector.(*SIRISituationExchangeSubscriptionBroadcaster))
+		connector.(*SIRISituationExchangeSubscriptionBroadcaster).situationExchangeBroadcaster.Start()
+
+		// Setup Subscription with the context
+		subs := partner.Subscriptions().New(SituationExchangeBroadcast)
+		subs.CreateAndAddNewResource(reference)
+		subs.SetExternalId("externalId")
+		if tt.hasExternalResource {
+			if tt.subscriptionLineValue != "" {
+				subs.SetSubscriptionOption("LineRef", fmt.Sprintf("%s:%s", partner.RemoteCodeSpace(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER), tt.subscriptionLineValue))
+			}
+			if tt.subscriptionStopPointValue != "" {
+				subs.SetSubscriptionOption("StopPointRef", fmt.Sprintf("%s:%s", partner.RemoteCodeSpace(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER), tt.subscriptionStopPointValue))
+			}
+
+		}
+
+		subs.Save()
+
 		// Setup Situation with the context
 		situation := referential.Model().Situations().New()
 		validityPeriod := &model.TimeRange{
@@ -215,25 +237,8 @@ multiple affected StopPoints if at least one of the external resource match`,
 			}
 			situation.Affects = append(situation.Affects, affect)
 		}
+		time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
 		situation.Save()
-
-		// Setup Subscription with the context
-		subs := partner.Subscriptions().New(SituationExchangeBroadcast)
-		subs.CreateAndAddNewResource(reference)
-		subs.SetExternalId("externalId")
-		if tt.hasExternalResource {
-			if tt.subscriptionLineValue != "" {
-				subs.SetSubscriptionOption("LineRef", fmt.Sprintf("%s:%s", partner.RemoteCodeSpace(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER), tt.subscriptionLineValue))
-			}
-			if tt.subscriptionStopPointValue != "" {
-				subs.SetSubscriptionOption("StopPointRef", fmt.Sprintf("%s:%s", partner.RemoteCodeSpace(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER), tt.subscriptionStopPointValue))
-			}
-
-		}
-
-		subs.Save()
-
-		connector, _ := partner.Connector(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
 
 		event := &model.SituationBroadcastEvent{
 			SituationId: situation.Id(),
@@ -246,8 +251,6 @@ multiple affected StopPoints if at least one of the external resource match`,
 		// Cleanup
 		subs.Delete()
 		connector.(*SIRISituationExchangeSubscriptionBroadcaster).Partner().Model().Situations().Delete(&situation)
-		connector.(*SIRISituationExchangeSubscriptionBroadcaster).mutex.Lock()
-		connector.(*SIRISituationExchangeSubscriptionBroadcaster).toBroadcast = make(map[SubscriptionId][]model.SituationId)
-		connector.(*SIRISituationExchangeSubscriptionBroadcaster).mutex.Unlock()
+		connector.(*SIRISituationExchangeSubscriptionBroadcaster).situationExchangeBroadcaster.Stop()
 	}
 }

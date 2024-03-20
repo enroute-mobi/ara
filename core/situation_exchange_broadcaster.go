@@ -29,6 +29,24 @@ type SituationExchangeBroadcaster struct {
 	stop chan struct{}
 }
 
+type FakeSituationExchangeBroadcaster struct {
+	SXBroadcaster
+
+	clock.ClockConsumer
+}
+
+func NewFakeSituationExchangeBroadcaster(connector *SIRISituationExchangeSubscriptionBroadcaster) SIRISituationExchangeBroadcaster {
+	broadcaster := &FakeSituationExchangeBroadcaster{}
+	broadcaster.connector = connector
+	return broadcaster
+}
+
+func (broadcaster *FakeSituationExchangeBroadcaster) Start() {
+	broadcaster.prepareSIRISituationExchangeNotify()
+}
+
+func (broadcaster *FakeSituationExchangeBroadcaster) Stop() {}
+
 func NewSIRISituationExchangeBroadcaster(connector *SIRISituationExchangeSubscriptionBroadcaster) SIRISituationExchangeBroadcaster {
 	broadcaster := &SituationExchangeBroadcaster{}
 	broadcaster.connector = connector
