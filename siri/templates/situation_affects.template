@@ -1,5 +1,5 @@
-<siri:Affects>
-    {{ if .AffectedLines }}<siri:Networks>
+<siri:Affects>{{ if .AffectedLines }}
+					<siri:Networks>
 						<siri:AffectedNetwork>{{ range .AffectedLines }}
 							<siri:AffectedLine>
 								<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .Destinations }}
