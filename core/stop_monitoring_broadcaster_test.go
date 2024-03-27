@@ -7,10 +7,12 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
@@ -332,6 +334,8 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 }
 
 func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
+	assert := assert.New(t)
+
 	fakeClock := clock.NewFakeClock()
 	clock.SetDefaultClock(fakeClock)
 
@@ -349,6 +353,9 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
 	referential.SetClock(fakeClock)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
+
+	f := audit.NewFakeBigQuery()
+	audit.SetCurrentBigQuery("Un Referential Plutot Cool", f)
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
@@ -398,7 +405,7 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
 
 	subscription2 := partner.Subscriptions().New("StopMonitoringBroadcast")
 	subscription2.SubscriberRef = "subscriber"
-	subscription2.SetExternalId("externalId")
+	subscription2.SetExternalId("externalId2")
 	subscription2.CreateAndAddNewResource(reference2)
 	subscription2.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
 	subscription2.Save()
@@ -435,7 +442,11 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
 	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(response)
 	delivery := notify.StopMonitoringDeliveries()
 
-	if len(delivery) != 2 {
-		t.Errorf("Should have received 2 deliveries but got == %v", len(delivery))
-	}
+	assert.Lenf(delivery, 2,
+		"Should have received 2 deliveries but got %v", len(delivery))
+
+	assert.Len(f.Messages(), 1, "1 message should be sent to BigQuery")
+	assert.ElementsMatch([]string{"externalId", "externalId2"},
+		f.Messages()[0].SubscriptionIdentifiers,
+		"2 subscriptionIdentifiers should be logged in BigQuery")
 }
