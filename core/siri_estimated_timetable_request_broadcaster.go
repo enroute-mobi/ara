@@ -190,13 +190,12 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 
 					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
 				}
-
 				delivery.MonitoringRefs[stopAreaId] = struct{}{}
 			}
 			if len(estimatedVehicleJourney.EstimatedCalls) != 0 || len(estimatedVehicleJourney.RecordedCalls) != 0 {
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
+				delivery.VehicleJourneyRefs[estimatedVehicleJourney.DatedVehicleJourneyRef] = struct{}{}
 			}
-			delivery.VehicleJourneyRefs[datedVehicleJourneyRef] = struct{}{}
 		}
 		if len(journeyFrame.EstimatedVehicleJourneys) != 0 {
 			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
