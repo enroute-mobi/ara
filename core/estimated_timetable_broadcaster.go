@@ -254,7 +254,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) UseVisitNumber()
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *model.StopVisit, sa *model.StopArea, saId string, evj *siri.SIRIEstimatedVehicleJourney) {
 	var useVisitNumber = connector.UseVisitNumber()
 
-	if sv.IsRecordable() && connector.Partner().RecordedCallsDuration() != 0 {
+	if sv.IsRecordable(connector.Clock().Now()) && connector.Partner().RecordedCallsDuration() != 0 {
 		// recordedCall
 		recordedCall := &siri.SIRIRecordedCall{
 			ArrivalStatus:         string(sv.ArrivalStatus),
