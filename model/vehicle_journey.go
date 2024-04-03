@@ -71,7 +71,7 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	type Alias VehicleJourney
 	aux := struct {
-		Codes  Codes            `json:",omitempty"`
+		Codes      Codes                `json:",omitempty"`
 		Attributes Attributes           `json:",omitempty"`
 		References map[string]Reference `json:",omitempty"`
 		*Alias
@@ -121,7 +121,7 @@ func (vehicleJourney *VehicleJourney) Reference(key string) (Reference, bool) {
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	type Alias VehicleJourney
 	aux := &struct {
-		Codes  map[string]string
+		Codes      map[string]string
 		References map[string]Reference
 		*Alias
 	}{
@@ -154,7 +154,7 @@ type MemoryVehicleJourneys struct {
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleJourneyId]*VehicleJourney
-	byCode        *CodeIndex
+	byCode            *CodeIndex
 	byLine            *Index
 	byBroadcastedFull map[string]map[VehicleJourneyId]struct{}
 }
@@ -180,7 +180,7 @@ func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
 	return &MemoryVehicleJourneys{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleJourneyId]*VehicleJourney),
-		byCode:        NewCodeIndex(),
+		byCode:            NewCodeIndex(),
 		byLine:            NewIndex(extractor),
 		byBroadcastedFull: make(map[string]map[VehicleJourneyId]struct{}),
 	}

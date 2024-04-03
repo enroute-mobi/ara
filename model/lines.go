@@ -18,6 +18,7 @@ type Line struct {
 	CodeConsumer
 	Attributes        Attributes
 	id                LineId
+	ReferentId        LineId `json:",omitempty"`
 	Name              string `json:",omitempty"`
 	Number            string `json:",omitempty"`
 	origin            string
@@ -119,6 +120,46 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+func (line *Line) Referent() (*Line, bool) {
+	return line.model.Lines().Find(line.ReferentId)
+}
+
+func (line *Line) ReferentOrSelfCode(codeSpace string) (Code, bool) {
+	ref, ok := line.Referent()
+	if ok {
+		code, ok := ref.Code(codeSpace)
+		if ok {
+			return code, true
+		}
+	}
+	code, ok := line.Code(codeSpace)
+	if ok {
+		return code, true
+	}
+	return Code{}, false
+}
+
+/*
+Returns true if we need to send the Line in a Discovery
+
+We only send the Line if it has no referent with a correct codeSpace.
+If that's the case, we'll send the Referent instead
+*/
+func (line *Line) DiscoveryCode(codeSpace string) (Code, bool) {
+	ref, ok := line.Referent()
+	if ok {
+		_, ok := ref.Code(codeSpace)
+		if ok {
+			return Code{}, false
+		}
+	}
+	code, ok := line.Code(codeSpace)
+	if ok {
+		return code, true
+	}
+	return Code{}, false
+}
+
 func (line *Line) Attribute(key string) (string, bool) {
 	value, present := line.Attributes[key]
 	return value, present
@@ -140,6 +181,7 @@ type MemoryLines struct {
 
 	mutex        *sync.RWMutex
 	byIdentifier map[LineId]*Line
+	byReferent   *Index
 	byCode       *CodeIndex
 }
 
@@ -150,14 +192,19 @@ type Lines interface {
 	Find(LineId) (*Line, bool)
 	FindByCode(Code) (*Line, bool)
 	FindAll() []*Line
+	FindFamily(LineId) []LineId
+	FindFamilyFromCode(Code) []LineId
 	Save(*Line) bool
 	Delete(*Line) bool
 }
 
 func NewMemoryLines() *MemoryLines {
+	referentExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*Line)).ReferentId) }
+
 	return &MemoryLines{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineId]*Line),
+		byReferent:   NewIndex(referentExtractor),
 		byCode:       NewCodeIndex(),
 	}
 }
@@ -175,6 +222,20 @@ func (manager *MemoryLines) Find(id LineId) (*Line, bool) {
 		return line.copy(), true
 	}
 	return &Line{}, false
+}
+
+func (manager *MemoryLines) FindByReferentId(id LineId) (lines []*Line) {
+	manager.mutex.RLock()
+
+	ids, _ := manager.byReferent.Find(ModelId(id))
+
+	for _, id := range ids {
+		l := manager.byIdentifier[LineId(id)]
+		lines = append(lines, l.copy())
+	}
+
+	manager.mutex.RUnlock()
+	return
 }
 
 func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
@@ -200,6 +261,41 @@ func (manager *MemoryLines) FindAll() (lines []*Line) {
 	return
 }
 
+func (manager *MemoryLines) FindFamily(lineId LineId) (lineIds []LineId) {
+	manager.mutex.RLock()
+
+	lineIds = manager.findFamily(lineId)
+
+	manager.mutex.RUnlock()
+
+	return
+}
+
+func (manager *MemoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	id, ok := manager.byCode.Find(code)
+	if !ok {
+		return
+	}
+
+	lineIds = manager.findFamily(LineId(id))
+
+	return
+}
+
+func (manager *MemoryLines) findFamily(lineId LineId) (lineIds []LineId) {
+	lineIds = []LineId{lineId}
+
+	ids, _ := manager.byReferent.Find(ModelId(lineId))
+	for _, id := range ids {
+		lineIds = append(lineIds, manager.findFamily(LineId(id))...)
+	}
+
+	return
+}
+
 func (manager *MemoryLines) Save(line *Line) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
@@ -210,6 +306,7 @@ func (manager *MemoryLines) Save(line *Line) bool {
 
 	line.model = manager.model
 	manager.byIdentifier[line.Id()] = line
+	manager.byReferent.Index(line)
 	manager.byCode.Index(line)
 
 	return true
@@ -220,6 +317,7 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, line.Id())
+	manager.byReferent.Delete(ModelId(line.id))
 	manager.byCode.Delete(ModelId(line.id))
 
 	return true
@@ -239,6 +337,10 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 		if sl.Name.Valid {
 			line.Name = sl.Name.String
 		}
+		if sl.ReferentId.Valid {
+			line.ReferentId = LineId(sl.ReferentId.String)
+		}
+
 		if sl.CollectSituations.Valid {
 			line.CollectSituations = sl.CollectSituations.Bool
 		}

@@ -65,8 +65,10 @@ func (connector *SIRIStopMonitoringRequestBroadcaster) getStopMonitoringDelivery
 	// Prepare StopVisit Selectors
 	selectors := []model.StopVisitSelector{}
 	if request.LineRef() != "" {
-		lineSelectorCode := model.NewCode(connector.remoteCodeSpace, request.LineRef())
-		selectors = append(selectors, model.StopVisitSelectorByLine(lineSelectorCode))
+		lineIds := connector.partner.Model().Lines().FindFamilyFromCode(model.NewCode(connector.remoteCodeSpace, request.LineRef()))
+		if len(lineIds) != 0 {
+			selectors = append(selectors, model.StopVisitSelectorByLines(lineIds))
+		}
 	}
 	if request.PreviewInterval() != 0 {
 		duration := request.PreviewInterval()

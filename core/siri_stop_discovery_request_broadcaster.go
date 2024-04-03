@@ -60,7 +60,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			if lines[i].Origin() == string(connector.partner.Slug()) {
 				continue
 			}
-			code, ok := lines[i].Code(connector.remoteCodeSpace)
+			code, ok := lines[i].DiscoveryCode(connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}

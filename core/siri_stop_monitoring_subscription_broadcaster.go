@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -113,7 +114,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkEvent(sv *model
 			}
 
 			// Handle LineRef filter
-			if lineRef, ok := connector.lineRef(sub); ok && lineRef != vj.LineId {
+			if ok := connector.checkLineRefFilter(sub, vj.LineId); !ok {
 				continue
 			}
 
@@ -220,14 +221,14 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) HandleSubscriptionRe
 
 		ref := model.Reference{
 			Code: &code,
-			Type:     "StopArea",
+			Type: "StopArea",
 		}
 
 		r := sub.CreateAndAddNewResource(ref)
 		r.Subscribed(connector.Clock().Now())
 		r.SubscribedUntil = sm.InitialTerminationTime()
 
-		connector.fillOptions(sub, r, request, sm)
+		connector.fillOptions(sub, request, sm)
 		if sm.LineRef() != "" {
 			sub.SetSubscriptionOption("LineRef", fmt.Sprintf("%s:%s", connector.remoteCodeSpace, sm.LineRef()))
 		}
@@ -261,7 +262,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 
 			// Handle LineRef filter
 			vj, _ := connector.partner.Model().VehicleJourneys().Find(svs[i].VehicleJourneyId)
-			if lineRef, ok := connector.lineRef(sub); ok && lineRef != vj.LineId {
+			if ok := connector.checkLineRefFilter(sub, vj.LineId); !ok {
 				continue
 			}
 
@@ -272,7 +273,7 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 }
 
 // WIP Need to do something about this method Refs #6338
-func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, r *SubscribedResource, request *sxml.XMLSubscriptionRequest, sm *sxml.XMLStopMonitoringSubscriptionRequestEntry) {
+func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscription, request *sxml.XMLSubscriptionRequest, sm *sxml.XMLStopMonitoringSubscriptionRequestEntry) {
 	changeBeforeUpdates := request.ChangeBeforeUpdates()
 	if changeBeforeUpdates == "" {
 		changeBeforeUpdates = "PT1M"
@@ -287,21 +288,21 @@ func (smsb *SIRIStopMonitoringSubscriptionBroadcaster) fillOptions(s *Subscripti
 
 // Returns the LineId of the line defined in the LineRef subscription option
 // If LineRef isn't defined or with an incorrect format, returns false
-func (connector *SIRIStopMonitoringSubscriptionBroadcaster) lineRef(sub *Subscription) (model.LineId, bool) {
+func (connector *SIRIStopMonitoringSubscriptionBroadcaster) checkLineRefFilter(sub *Subscription, lineId model.LineId) (ok bool) {
 	lineRef := sub.SubscriptionOption("LineRef")
 	if lineRef == "" {
-		return "", false
+		return true
 	}
 	kindValue := strings.SplitN(lineRef, ":", 2)
 	if len(kindValue) != 2 { // Should not happen but we don't want an index out of range panic
 		logger.Log.Debugf("The LineRef Setting hasn't been stored in the correct format: %v", lineRef)
-		return "", false
+		return
 	}
-	line, ok := connector.partner.Model().Lines().FindByCode(model.NewCode(kindValue[0], kindValue[1]))
-	if !ok {
-		return "", true
-	}
-	return line.Id(), true
+	lineIds := connector.partner.Model().Lines().FindFamilyFromCode(model.NewCode(kindValue[0], kindValue[1]))
+
+	ok = slices.Contains(lineIds, lineId)
+
+	return
 }
 
 // START TEST
