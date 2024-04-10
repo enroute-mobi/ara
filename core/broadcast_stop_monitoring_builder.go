@@ -49,7 +49,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		logger.Log.Printf("Ignore CancelledStopVisit %s without Line", stopVisit.Id())
 		return nil
 	}
-	lineCode, ok := line.Code(builder.remoteCodeSpace)
+	lineCode, ok := line.ReferentOrSelfCode(builder.remoteCodeSpace)
 	if !ok {
 		logger.Log.Printf("Ignore CancelledStopVisit %s with Line without correct Code", stopVisit.Id())
 		return nil
