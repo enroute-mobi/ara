@@ -104,102 +104,108 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 			RecordedAtTime: currentTime,
 		}
 
-		// SIRIEstimatedVehicleJourney
-		vjs := connector.partner.Model().VehicleJourneys().FindByLineId(line.Id())
-		for i := range vjs {
-			// Handle vehicleJourney Code
-			vehicleJourneyId, ok := vjs[i].CodeWithFallback(connector.vjRemoteCodeSpaces)
-			var datedVehicleJourneyRef string
-			if ok {
-				datedVehicleJourneyRef = vehicleJourneyId.Value()
-			} else {
-				defaultCode, ok := vjs[i].Code("_default")
-				if !ok {
-					logger.Log.Debugf("Vehicle journey with id %v does not have a proper code at %v", vehicleJourneyId, connector.Clock().Now())
-					continue
-				}
-				datedVehicleJourneyRef = connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
-			}
-
-			estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
-				LineRef:                lineCode.Value(),
-				DirectionType:          vjs[i].DirectionType,
-				DatedVehicleJourneyRef: datedVehicleJourneyRef,
-				DataFrameRef:           connector.dataFrameRef(),
-				PublishedLineName:      connector.publishedLineName(line),
-				Attributes:             make(map[string]string),
-				References:             make(map[string]string),
-			}
-			estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vjs[i], vjs[i].Origin)
-			estimatedVehicleJourney.Attributes = vjs[i].Attributes
-
-			// SIRIEstimatedCall
-			connector.Partner().RecordedCallsDuration()
-			svs := connector.partner.Model().StopVisits().FindByVehicleJourneyIdAfter(vjs[i].Id(), connector.Clock().Now().Add(-connector.Partner().RecordedCallsDuration()))
-			for i := range svs {
-				if !selector(svs[i]) {
-					continue
-				}
-
-				// Handle StopPointRef
-				stopArea, stopAreaId, ok := connector.stopPointRef(svs[i].StopAreaId)
-				if !ok {
-					logger.Log.Printf("Ignore Stopvisit %v without StopArea or with StopArea without correct Code", svs[i].Id())
-					continue
-				}
-
-				connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i])
-
-				if svs[i].IsRecordable(connector.Clock().Now()) && connector.Partner().RecordedCallsDuration() != 0 {
-					// recordedCall
-					recordedCall := &siri.SIRIRecordedCall{
-						ArrivalStatus:         string(svs[i].ArrivalStatus),
-						DepartureStatus:       string(svs[i].DepartureStatus),
-						AimedArrivalTime:      svs[i].Schedules.Schedule("aimed").ArrivalTime(),
-						ExpectedArrivalTime:   svs[i].Schedules.Schedule("expected").ArrivalTime(),
-						AimedDepartureTime:    svs[i].Schedules.Schedule("aimed").DepartureTime(),
-						ExpectedDepartureTime: svs[i].Schedules.Schedule("expected").DepartureTime(),
-						Order:                 svs[i].PassageOrder,
-						StopPointRef:          stopAreaId,
-						StopPointName:         stopArea.Name,
-						DestinationDisplay:    svs[i].Attributes["DestinationDisplay"],
-					}
-
-					recordedCall.UseVisitNumber = connector.useVisitNumber
-
-					estimatedVehicleJourney.RecordedCalls = append(estimatedVehicleJourney.RecordedCalls, recordedCall)
+		lineIds := connector.partner.Model().Lines().FindFamily(line.Id())
+		for i := range lineIds {
+			// SIRIEstimatedVehicleJourney
+			vjs := connector.partner.Model().VehicleJourneys().FindByLineId(lineIds[i])
+			for i := range vjs {
+				// Handle vehicleJourney Code
+				vehicleJourneyId, ok := vjs[i].CodeWithFallback(connector.vjRemoteCodeSpaces)
+				var datedVehicleJourneyRef string
+				if ok {
+					datedVehicleJourneyRef = vehicleJourneyId.Value()
 				} else {
-					estimatedCall := &siri.SIRIEstimatedCall{
-						ArrivalStatus:      string(svs[i].ArrivalStatus),
-						DepartureStatus:    string(svs[i].DepartureStatus),
-						AimedArrivalTime:   svs[i].Schedules.Schedule("aimed").ArrivalTime(),
-						AimedDepartureTime: svs[i].Schedules.Schedule("aimed").DepartureTime(),
-						Order:              svs[i].PassageOrder,
-						StopPointRef:       stopAreaId,
-						StopPointName:      stopArea.Name,
-						DestinationDisplay: svs[i].Attributes["DestinationDisplay"],
-						VehicleAtStop:      svs[i].VehicleAtStop,
+					defaultCode, ok := vjs[i].Code("_default")
+					if !ok {
+						logger.Log.Debugf("Vehicle journey with id %v does not have a proper code at %v", vehicleJourneyId, connector.Clock().Now())
+						continue
 					}
-
-					estimatedCall.UseVisitNumber = connector.useVisitNumber
-
-					if stopArea.Monitored {
-						estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
-						estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
-					}
-
-					estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+					datedVehicleJourneyRef = connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "VehicleJourney", Id: defaultCode.Value()})
 				}
-				delivery.MonitoringRefs[stopAreaId] = struct{}{}
+
+				estimatedVehicleJourney := &siri.SIRIEstimatedVehicleJourney{
+					LineRef:                lineCode.Value(),
+					DirectionType:          vjs[i].DirectionType,
+					DatedVehicleJourneyRef: datedVehicleJourneyRef,
+					DataFrameRef:           connector.dataFrameRef(),
+					PublishedLineName:      connector.publishedLineName(line),
+					Attributes:             make(map[string]string),
+					References:             make(map[string]string),
+				}
+				estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vjs[i], vjs[i].Origin)
+				estimatedVehicleJourney.Attributes = vjs[i].Attributes
+
+				// SIRIEstimatedCall
+				connector.Partner().RecordedCallsDuration()
+				svs := connector.partner.Model().StopVisits().FindByVehicleJourneyIdAfter(vjs[i].Id(), connector.Clock().Now().Add(-connector.Partner().RecordedCallsDuration()))
+				for i := range svs {
+					if !selector(svs[i]) {
+						continue
+					}
+
+					// Handle StopPointRef
+					stopArea, stopAreaId, ok := connector.stopPointRef(svs[i].StopAreaId)
+					if !ok {
+						logger.Log.Printf("Ignore Stopvisit %v without StopArea or with StopArea without correct Code", svs[i].Id())
+						continue
+					}
+
+					connector.resolveOperatorRef(estimatedVehicleJourney.References, svs[i])
+
+					if svs[i].IsRecordable(connector.Clock().Now()) && connector.Partner().RecordedCallsDuration() != 0 {
+						// recordedCall
+						recordedCall := &siri.SIRIRecordedCall{
+							ArrivalStatus:         string(svs[i].ArrivalStatus),
+							DepartureStatus:       string(svs[i].DepartureStatus),
+							AimedArrivalTime:      svs[i].Schedules.Schedule("aimed").ArrivalTime(),
+							ExpectedArrivalTime:   svs[i].Schedules.Schedule("expected").ArrivalTime(),
+							AimedDepartureTime:    svs[i].Schedules.Schedule("aimed").DepartureTime(),
+							ExpectedDepartureTime: svs[i].Schedules.Schedule("expected").DepartureTime(),
+							Order:                 svs[i].PassageOrder,
+							StopPointRef:          stopAreaId,
+							StopPointName:         stopArea.Name,
+							DestinationDisplay:    svs[i].Attributes["DestinationDisplay"],
+						}
+
+						recordedCall.UseVisitNumber = connector.useVisitNumber
+
+						estimatedVehicleJourney.RecordedCalls = append(estimatedVehicleJourney.RecordedCalls, recordedCall)
+					} else {
+						estimatedCall := &siri.SIRIEstimatedCall{
+							ArrivalStatus:      string(svs[i].ArrivalStatus),
+							DepartureStatus:    string(svs[i].DepartureStatus),
+							AimedArrivalTime:   svs[i].Schedules.Schedule("aimed").ArrivalTime(),
+							AimedDepartureTime: svs[i].Schedules.Schedule("aimed").DepartureTime(),
+							Order:              svs[i].PassageOrder,
+							StopPointRef:       stopAreaId,
+							StopPointName:      stopArea.Name,
+							DestinationDisplay: svs[i].Attributes["DestinationDisplay"],
+							VehicleAtStop:      svs[i].VehicleAtStop,
+						}
+
+						estimatedCall.UseVisitNumber = connector.useVisitNumber
+
+						if stopArea.Monitored {
+							estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
+							estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
+						}
+
+						estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
+					}
+
+					delivery.MonitoringRefs[stopAreaId] = struct{}{}
+				}
+				if len(estimatedVehicleJourney.EstimatedCalls) != 0 || len(estimatedVehicleJourney.RecordedCalls) != 0 {
+					journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
+					delivery.VehicleJourneyRefs[datedVehicleJourneyRef] = struct{}{}
+				}
 			}
-			if len(estimatedVehicleJourney.EstimatedCalls) != 0 || len(estimatedVehicleJourney.RecordedCalls) != 0 {
-				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
-				delivery.VehicleJourneyRefs[estimatedVehicleJourney.DatedVehicleJourneyRef] = struct{}{}
+			if len(journeyFrame.EstimatedVehicleJourneys) != 0 {
+				delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
 			}
+
 		}
-		if len(journeyFrame.EstimatedVehicleJourneys) != 0 {
-			delivery.EstimatedJourneyVersionFrames = append(delivery.EstimatedJourneyVersionFrames, journeyFrame)
-		}
+
 	}
 	return delivery
 }
