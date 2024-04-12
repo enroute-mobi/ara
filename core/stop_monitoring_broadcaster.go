@@ -279,6 +279,7 @@ func (smb *SMBroadcaster) logSIRIStopMonitoringNotify(message *audit.BigQueryMes
 	VehicleJourneyRefs := make(map[string]struct{})
 
 	for _, delivery := range notification.Deliveries {
+		message.SubscriptionIdentifiers = append(message.SubscriptionIdentifiers, delivery.SubscriptionIdentifier)
 		for _, sv := range delivery.MonitoredStopVisits {
 			monitoringRefs[sv.MonitoringRef] = struct{}{}
 			lineRefs[sv.LineRef] = struct{}{}
@@ -297,8 +298,6 @@ func (smb *SMBroadcaster) logSIRIStopMonitoringNotify(message *audit.BigQueryMes
 	message.VehicleJourneys = GetModelReferenceSlice(VehicleJourneyRefs)
 
 	delivery := notification.Deliveries[0]
-
-	message.SubscriptionIdentifiers = []string{delivery.SubscriptionIdentifier}
 
 	if !delivery.Status {
 		message.Status = "Error"
