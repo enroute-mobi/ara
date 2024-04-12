@@ -1468,7 +1468,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
     And a Line exists with the following attributes:
-      | Codes      | "internal": "NINOXE:Line:4:LOC"   |
+      | Codes      | "external": "NINOXE:Line:4:LOC"   |
       | ReferentId | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Name       | Ligne 3 Metro                     |
     And a VehicleJourney exists with the following attributes:
@@ -1671,7 +1671,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
     And a Line exists with the following attributes:
-      | Codes      | "internal": "NINOXE:Line:4:LOC"   |
+      | Codes      | "external": "NINOXE:Line:4:LOC"   |
       | ReferentId | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Name       | Ligne 3 Metro                     |
     And a VehicleJourney exists with the following attributes:
