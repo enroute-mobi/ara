@@ -141,6 +141,7 @@ type BigQueryVehicleEvent struct {
 	Timestamp      time.Time      `bigquery:"timestamp"`
 	ID             string         `bigquery:"id"`
 	ObjectIDs      []string       `bigquery:"objectids"`
+	Codes          []string       `bigquery:"codes"`
 	Longitude      float64        `bigquery:"longitude"`
 	Latitude       float64        `bigquery:"latitude"`
 	Bearing        float64        `bigquery:"bearing"`
@@ -160,6 +161,7 @@ var bqVehicleSchema = bigquery.Schema{
 	{Name: "bearing", Required: false, Type: bigquery.FloatFieldType},
 	{Name: "recorded_at_time", Required: false, Type: bigquery.DateTimeFieldType},
 	{Name: "objectids", Repeated: true, Type: bigquery.StringFieldType},
+	{Name: "codes", Repeated: true, Type: bigquery.StringFieldType},
 }
 
 type BigQueryLongTermStopVisitEvent struct {
