@@ -13,7 +13,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
-/* CSV Structure
+/*
+	CSV Structure
 
 operator,Id,ModelName,Name,Codes
 stop_area,Id,ParentId,ReferentId,ModelName,Name,Codes,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectSituations
@@ -365,8 +366,15 @@ func (loader *Loader) handleLine(record []string) error {
 		}
 	}
 
-	if len(record) == 9 {
+	if len(record) >= 9 {
 		number = record[8]
+	}
+
+	var referent string
+	if len(record) == 10 && record[9] != "" {
+		referent = fmt.Sprintf("$$%v$$", record[9])
+	} else {
+		referent = "null"
 	}
 
 	if parseErrors.ErrorCount() != 0 {
@@ -378,7 +386,7 @@ func (loader *Loader) handleLine(record []string) error {
 		return err
 	}
 
-	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,%v,$$%v$$),",
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,%v,$$%v$$,%v),",
 		loader.referentialSlug,
 		record[1],
 		record[2],
@@ -388,6 +396,7 @@ func (loader *Loader) handleLine(record []string) error {
 		record[6],
 		collectSituations,
 		number,
+		referent,
 	)
 	loader.lines = append(loader.lines, values...)
 	loader.bulkCounter[LINE]++
@@ -409,7 +418,7 @@ func (loader *Loader) insertLines() {
 		loader.bulkCounter[LINE] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,codes,attributes,siri_references,collect_situations, number) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
+	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,codes,attributes,siri_references,collect_situations, number, referent_id) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("lines", err)
