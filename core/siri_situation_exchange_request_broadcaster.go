@@ -184,7 +184,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(
 			logger.Log.Debugf("Unknown Line %s", affect.GetId())
 			continue
 		}
-		lineCode, ok := line.Code(connector.remoteCodeSpace)
+		lineCode, ok := line.ReferentOrSelfCode(connector.remoteCodeSpace)
 		if !ok {
 			logger.Log.Debugf("Unknown Line Code %s", connector.remoteCodeSpace)
 			continue
@@ -202,7 +202,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affe
 		logger.Log.Debugf("Unknown Line %s", affect.GetId())
 		return nil, false
 	}
-	lineCode, ok := line.Code(connector.remoteCodeSpace)
+	lineCode, ok := line.ReferentOrSelfCode(connector.remoteCodeSpace)
 	if !ok {
 		logger.Log.Debugf("Unknown Line Code %s", connector.remoteCodeSpace)
 		return nil, false
