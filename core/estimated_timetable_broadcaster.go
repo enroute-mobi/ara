@@ -147,7 +147,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 			if !ok {
 				continue
 			}
-			lineCode, ok := line.Code(ett.connector.remoteCodeSpace)
+			lineCode, ok := line.ReferentOrSelfCode(ett.connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
