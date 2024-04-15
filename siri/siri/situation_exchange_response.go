@@ -46,6 +46,7 @@ type SIRIPtSituationElement struct {
 	Keywords           string
 	ReportType         model.ReportType
 	Severity           model.SituationSeverity
+	Reality            model.SituationReality
 	ParticipantRef     string
 	Summary            string
 	Description        string

@@ -97,6 +97,7 @@ Feature: Support SIRI SituationExchange by subscription
                     </siri:Source>
                     <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
                     <siri:Progress>published</siri:Progress>
+                    <siri:Reality>technicalExercise</siri:Reality>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
@@ -239,6 +240,7 @@ Feature: Support SIRI SituationExchange by subscription
       | ParticipantRef                                                                     | "535"                                         |
       | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
       | Progress                                                                           | published                                     |
+      | Reality                                                                            | technicalExercise                             |
       | Severity                                                                           | slight                                        |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
@@ -495,6 +497,7 @@ Feature: Support SIRI SituationExchange by subscription
       | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                 |
       | Version                                                                            | 1                                         |
       | Keywords                                                                           | ["Perturbation"]                          |
+      | Reality                                                                            | technicalExercise                         |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                 |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                 |
       | Description[DefaultValue]                                                          | a very very very long message             |
@@ -540,6 +543,7 @@ Feature: Support SIRI SituationExchange by subscription
                    <siri:Source>
                      <siri:SourceType>directReport</siri:SourceType>
                    </siri:Source>
+                   <siri:Reality>technicalExercise</siri:Reality>
                    <siri:ValidityPeriod>
                      <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                      <siri:EndTime>2017-10-24T20:30:06.000+02:00</siri:EndTime>
