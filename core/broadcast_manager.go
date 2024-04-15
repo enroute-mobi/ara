@@ -11,7 +11,8 @@ type BroadcastManagerInterface interface {
 	state.Stopable
 
 	GetStopMonitoringBroadcastEventChan() chan model.StopMonitoringBroadcastEvent
-	GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent
+	GetGeneralMessageBroadcastEventChan() chan model.SituationBroadcastEvent
+	GetSituationExchangeBroadcastEventChan() chan model.SituationBroadcastEvent
 	GetVehicleBroadcastEventChan() chan model.VehicleBroadcastEvent
 }
 
@@ -19,7 +20,8 @@ type BroadcastManager struct {
 	Referential *Referential
 
 	smbEventChan chan model.StopMonitoringBroadcastEvent
-	gmbEventChan chan model.GeneralMessageBroadcastEvent
+	gmbEventChan chan model.SituationBroadcastEvent
+	sxbEventChan chan model.SituationBroadcastEvent
 	vbEventChan  chan model.VehicleBroadcastEvent
 	stop         chan struct{}
 }
@@ -28,7 +30,8 @@ func NewBroadcastManager(referential *Referential) *BroadcastManager {
 	return &BroadcastManager{
 		Referential:  referential,
 		smbEventChan: make(chan model.StopMonitoringBroadcastEvent, 2000),
-		gmbEventChan: make(chan model.GeneralMessageBroadcastEvent, 2000),
+		gmbEventChan: make(chan model.SituationBroadcastEvent, 2000),
+		sxbEventChan: make(chan model.SituationBroadcastEvent, 2000),
 		vbEventChan:  make(chan model.VehicleBroadcastEvent, 2000),
 	}
 }
@@ -37,12 +40,16 @@ func (manager *BroadcastManager) GetStopMonitoringBroadcastEventChan() chan mode
 	return manager.smbEventChan
 }
 
-func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan model.GeneralMessageBroadcastEvent {
+func (manager *BroadcastManager) GetGeneralMessageBroadcastEventChan() chan model.SituationBroadcastEvent {
 	return manager.gmbEventChan
 }
 
 func (manager *BroadcastManager) GetVehicleBroadcastEventChan() chan model.VehicleBroadcastEvent {
 	return manager.vbEventChan
+}
+
+func (manager *BroadcastManager) GetSituationExchangeBroadcastEventChan() chan model.SituationBroadcastEvent {
+	return manager.sxbEventChan
 }
 
 func (manager *BroadcastManager) Start() {
@@ -61,6 +68,8 @@ func (manager *BroadcastManager) run() {
 			manager.ettsbEvent_handler(event)
 		case event := <-manager.gmbEventChan:
 			manager.gmsbEvent_handler(event)
+		case event := <-manager.sxbEventChan:
+			manager.sxbEvent_handler(event)
 		case event := <-manager.vbEventChan:
 			manager.vmEvent_handler(event)
 		case <-manager.stop:
@@ -123,7 +132,7 @@ func (manager *BroadcastManager) vmEvent_handler(event model.VehicleBroadcastEve
 	}
 }
 
-func (manager *BroadcastManager) gmsbEvent_handler(event model.GeneralMessageBroadcastEvent) {
+func (manager *BroadcastManager) gmsbEvent_handler(event model.SituationBroadcastEvent) {
 	connectorTypes := []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER, TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
 	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
 		connector, ok := partner.Connector(SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
@@ -136,6 +145,17 @@ func (manager *BroadcastManager) gmsbEvent_handler(event model.GeneralMessageBro
 		connector, ok = partner.Connector(TEST_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER)
 		if ok {
 			connector.(*TestGeneralMessageSubscriptionBroadcaster).HandleGeneralMessageBroadcastEvent(&event)
+			continue
+		}
+	}
+}
+
+func (manager *BroadcastManager) sxbEvent_handler(event model.SituationBroadcastEvent) {
+	connectorTypes := []string{SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER}
+	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
+		connector, ok := partner.Connector(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*SIRISituationExchangeSubscriptionBroadcaster).HandleSituationExchangeBroadcastEvent(&event)
 			continue
 		}
 	}

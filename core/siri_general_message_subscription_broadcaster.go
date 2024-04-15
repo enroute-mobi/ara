@@ -60,7 +60,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) Start() {
 	connector.generalMessageBroadcaster.Start()
 }
 
-func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.SituationBroadcastEvent) {
 	connector.checkEvent(event.SituationId)
 }
 
@@ -87,12 +87,12 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) checkEvent(sId model
 
 		lastState, ok := resource.LastState(string(situation.Id()))
 
-		if ok && !lastState.(*ls.GeneralMessageLastChange).Haschanged(&situation) {
+		if ok && !lastState.(*ls.SituationLastChange).Haschanged(&situation) {
 			continue
 		}
 
 		if !ok {
-			resource.SetLastState(string(situation.Id()), ls.NewGeneralMessageLastChange(&situation, sub))
+			resource.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
 		}
 		connector.addSituation(sub.Id(), sId)
 	}
@@ -147,7 +147,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) HandleSubscriptionRe
 		if r == nil {
 			ref := model.Reference{
 				Code: &obj,
-				Type:     "Situation",
+				Type: "Situation",
 			}
 			r = sub.CreateAndAddNewResource(ref)
 			r.Subscribed(connector.Clock().Now())
@@ -172,7 +172,7 @@ func (connector *SIRIGeneralMessageSubscriptionBroadcaster) addSituations(sub *S
 			continue
 		}
 
-		r.SetLastState(string(situations[i].Id()), ls.NewGeneralMessageLastChange(&situations[i], sub))
+		r.SetLastState(string(situations[i].Id()), ls.NewSituationLastChange(&situations[i], sub))
 		connector.addSituation(sub.Id(), situations[i].Id())
 	}
 }
@@ -184,7 +184,7 @@ type TestSIRIGeneralMessageSubscriptionBroadcasterFactory struct{}
 type TestGeneralMessageSubscriptionBroadcaster struct {
 	connector
 
-	events []*model.GeneralMessageBroadcastEvent
+	events []*model.SituationBroadcastEvent
 	// generalMessageBroadcaster SIRIGeneralMessageBroadcaster
 }
 
@@ -193,7 +193,7 @@ func NewTestGeneralMessageSubscriptionBroadcaster() *TestGeneralMessageSubscript
 	return connector
 }
 
-func (connector *TestGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.GeneralMessageBroadcastEvent) {
+func (connector *TestGeneralMessageSubscriptionBroadcaster) HandleGeneralMessageBroadcastEvent(event *model.SituationBroadcastEvent) {
 	connector.events = append(connector.events, event)
 }
 

@@ -376,6 +376,17 @@ func (client *SIRIClient) NotifyGeneralMessage(request *siri.SIRINotifyGeneralMe
 	return nil
 }
 
+func (client *SIRIClient) NotifySituationExchange(request *siri.SIRINotifySituationExchange) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (client *SIRIClient) NotifyEstimatedTimetable(request *siri.SIRINotifyEstimatedTimetable) error {
 	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,

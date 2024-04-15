@@ -60,6 +60,17 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *sxml.XMLSu
 		return &response, nil
 	}
 
+	if len(request.XMLSubscriptionSXEntries()) > 0 {
+		gmbc, ok := connector.Partner().Connector(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("no SituationExchangeSubscriptionBroadcaster Connector")
+		}
+
+		response.ResponseStatus = gmbc.(*SIRISituationExchangeSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
+
+		return &response, nil
+	}
+
 	if len(request.XMLSubscriptionSMEntries()) > 0 {
 		smbc, ok := connector.Partner().Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
 		if !ok {
