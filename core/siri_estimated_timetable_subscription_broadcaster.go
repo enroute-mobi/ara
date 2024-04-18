@@ -124,14 +124,18 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) HandleSubscripti
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) addLineStopVisits(sub *Subscription, res *SubscribedResource, lineId model.LineId) {
-	sas := connector.partner.Model().StopAreas().FindByLineId(lineId)
-	for i := range sas {
-		// Init SA LastChange
-		res.SetLastState(string(sas[i].Id()), ls.NewStopAreaLastChange(sas[i], sub))
-		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
-		for i := range svs {
-			connector.addStopVisit(sub.Id(), svs[i].Id())
+	lineIds := connector.partner.Model().Lines().FindFamily(lineId)
+	for i := range lineIds {
+		sas := connector.partner.Model().StopAreas().FindByLineId(lineIds[i])
+		for i := range sas {
+			// Init SA LastChange
+			res.SetLastState(string(sas[i].Id()), ls.NewStopAreaLastChange(sas[i], sub))
+			svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(sas[i].Id())
+			for i := range svs {
+				connector.addStopVisit(sub.Id(), svs[i].Id())
+			}
 		}
+
 	}
 }
 
@@ -232,7 +236,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) checkEvent(svId 
 		return
 	}
 
-	lineObj, ok := line.Code(connector.remoteCodeSpace)
+	lineObj, ok := line.ReferentOrSelfCode(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}

@@ -192,9 +192,11 @@ func (stopArea *StopArea) ReferentOrSelfCode(codeSpace string) (Code, bool) {
 	return Code{}, false
 }
 
-/* Returns true if we need to send the StopArea in a SPD
-   We only send the StopArea if it has no referent with a correct codeSpace.
-   If that's the case, we'll send the Referent instead
+/*
+Returns true if we need to send the StopArea in a SPD
+
+We only send the StopArea if it has no referent with a correct codeSpace.
+If that's the case, we'll send the Referent instead
 */
 func (stopArea *StopArea) SPDCode(codeSpace string) (Code, bool) {
 	ref, ok := stopArea.Referent()
@@ -227,6 +229,8 @@ type MemoryStopAreas struct {
 
 	mutex        *sync.RWMutex
 	byIdentifier map[StopAreaId]*StopArea
+	byParent     *Index
+	byReferent   *Index
 	byCode       *CodeIndex
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
@@ -249,9 +253,14 @@ type StopAreas interface {
 }
 
 func NewMemoryStopAreas() *MemoryStopAreas {
+	referentExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ReferentId) }
+	parentExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ParentId) }
+
 	return &MemoryStopAreas{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaId]*StopArea),
+		byReferent:   NewIndex(referentExtractor),
+		byParent:     NewIndex(parentExtractor),
 		byCode:       NewCodeIndex(),
 	}
 }
@@ -309,6 +318,34 @@ func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAre
 	return
 }
 
+func (manager *MemoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*StopArea) {
+	manager.mutex.RLock()
+
+	ids, _ := manager.byReferent.Find(ModelId(id))
+
+	for _, id := range ids {
+		sa := manager.byIdentifier[StopAreaId(id)]
+		stopAreas = append(stopAreas, sa.copy())
+	}
+
+	manager.mutex.RUnlock()
+	return
+}
+
+func (manager *MemoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*StopArea) {
+	manager.mutex.RLock()
+
+	ids, _ := manager.byParent.Find(ModelId(id))
+
+	for _, id := range ids {
+		sa := manager.byIdentifier[StopAreaId(id)]
+		stopAreas = append(stopAreas, sa.copy())
+	}
+
+	manager.mutex.RUnlock()
+	return
+}
+
 func (manager *MemoryStopAreas) FindAll() (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
@@ -329,6 +366,8 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
+	manager.byReferent.Index(stopArea)
+	manager.byParent.Index(stopArea)
 	manager.byCode.Index(stopArea)
 
 	manager.mutex.Unlock()
@@ -350,6 +389,8 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, stopArea.Id())
+	manager.byReferent.Delete(ModelId(stopArea.id))
+	manager.byParent.Delete(ModelId(stopArea.id))
 	manager.byCode.Delete(ModelId(stopArea.id))
 
 	return true
@@ -367,11 +408,16 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 
 func (manager *MemoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	stopAreaIds = []StopAreaId{stopAreaId}
-	for _, stopArea := range manager.byIdentifier {
-		if stopArea.ParentId == stopAreaId || stopArea.ReferentId == stopAreaId {
-			stopAreaIds = append(stopAreaIds, manager.findFamily(stopArea.id)...)
-		}
+
+	ids, _ := manager.byParent.Find(ModelId(stopAreaId))
+	for _, id := range ids {
+		stopAreaIds = append(stopAreaIds, manager.findFamily(StopAreaId(id))...)
 	}
+	ids, _ = manager.byReferent.Find(ModelId(stopAreaId))
+	for _, id := range ids {
+		stopAreaIds = append(stopAreaIds, manager.findFamily(StopAreaId(id))...)
+	}
+
 	return
 }
 

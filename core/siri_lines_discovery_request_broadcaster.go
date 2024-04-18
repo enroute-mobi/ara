@@ -45,7 +45,7 @@ func (connector *SIRILinesDiscoveryRequestBroadcaster) Lines(request *sxml.XMLLi
 			continue
 		}
 
-		code, ok := lines[i].Code(connector.remoteCodeSpace)
+		code, ok := lines[i].DiscoveryCode(connector.remoteCodeSpace)
 		if !ok {
 			continue
 		}

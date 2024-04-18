@@ -49,7 +49,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		logger.Log.Printf("Ignore CancelledStopVisit %s without Line", stopVisit.Id())
 		return nil
 	}
-	lineCode, ok := line.Code(builder.remoteCodeSpace)
+	lineCode, ok := line.ReferentOrSelfCode(builder.remoteCodeSpace)
 	if !ok {
 		logger.Log.Printf("Ignore CancelledStopVisit %s with Line without correct Code", stopVisit.Id())
 		return nil
@@ -90,14 +90,9 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		logger.Log.Printf("Ignore StopVisit %s without Vehiclejourney", stopVisit.Id())
 		return nil
 	}
-	line, ok := builder.partner.Model().Lines().Find(vehicleJourney.LineId)
+	line, lineCode, ok := builder.lineAndCode(vehicleJourney.LineId)
 	if !ok {
-		logger.Log.Printf("Ignore StopVisit %s without Line", stopVisit.Id())
-		return nil
-	}
-	lineCode, ok := line.Code(builder.remoteCodeSpace)
-	if !ok {
-		logger.Log.Printf("Ignore StopVisit %s with Line without correct Code", stopVisit.Id())
+		logger.Log.Printf("Ignore StopVisit %s without Line or with Line without correct Code", stopVisit.Id())
 		return nil
 	}
 
@@ -122,7 +117,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		DestinationName:        vehicleJourney.DestinationName,
 		DirectionType:          builder.directionType(vehicleJourney.DirectionType),
 		Monitored:              vehicleJourney.Monitored,
-		LineRef:                lineCode.Value(),
+		LineRef:                lineCode,
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
 		Occupancy:              vehicleJourney.Occupancy,
@@ -220,18 +215,37 @@ func (builder *BroadcastStopMonitoringBuilder) stopPointRef(stopAreaId model.Sto
 	if !ok {
 		return &model.StopArea{}, "", false
 	}
-	stopPointRefCode, ok := stopPointRef.Code(builder.remoteCodeSpace)
+	code, ok := stopPointRef.Code(builder.remoteCodeSpace)
 	if ok {
-		return stopPointRef, stopPointRefCode.Value(), true
+		return stopPointRef, code.Value(), true
 	}
 	referent, ok := stopPointRef.Referent()
 	if ok {
-		referentCode, ok := referent.Code(builder.remoteCodeSpace)
+		code, ok := referent.Code(builder.remoteCodeSpace)
 		if ok {
-			return referent, referentCode.Value(), true
+			return referent, code.Value(), true
 		}
 	}
 	return &model.StopArea{}, "", false
+}
+
+func (builder *BroadcastStopMonitoringBuilder) lineAndCode(lineId model.LineId) (*model.Line, string, bool) {
+	line, ok := builder.partner.Model().Lines().Find(lineId)
+	if !ok {
+		return &model.Line{}, "", false
+	}
+	code, ok := line.Code(builder.remoteCodeSpace)
+	if ok {
+		return line, code.Value(), true
+	}
+	referent, ok := line.Referent()
+	if ok {
+		code, ok := referent.Code(builder.remoteCodeSpace)
+		if ok {
+			return referent, code.Value(), true
+		}
+	}
+	return &model.Line{}, "", false
 }
 
 func (builder *BroadcastStopMonitoringBuilder) getItemIdentifier(stopVisit *model.StopVisit) (string, bool) {

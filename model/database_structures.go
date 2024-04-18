@@ -89,20 +89,22 @@ type SelectStopArea struct {
 }
 
 type DatabaseLine struct {
-	Id                string `db:"id"`
-	ReferentialSlug   string `db:"referential_slug"`
-	ModelName         string `db:"model_name"`
-	Name              string `db:"name"`
-	Codes             string `db:"codes"`
-	Attributes        string `db:"attributes"`
-	References        string `db:"siri_references"`
-	CollectSituations bool   `db:"collect_situations"`
+	Id                string         `db:"id"`
+	ReferentialSlug   string         `db:"referential_slug"`
+	ModelName         string         `db:"model_name"`
+	Name              string         `db:"name"`
+	Codes             string         `db:"codes"`
+	Attributes        string         `db:"attributes"`
+	References        string         `db:"siri_references"`
+	ReferentId        sql.NullString `db:"referent_id"`
+	CollectSituations bool           `db:"collect_situations"`
 }
 
 type SelectLine struct {
 	Id                string
-	ReferentialSlug   string `db:"referential_slug"`
-	ModelName         string `db:"model_name"`
+	ReferentialSlug   string         `db:"referential_slug"`
+	ModelName         string         `db:"model_name"`
+	ReferentId        sql.NullString `db:"referent_id"`
 	Name              sql.NullString
 	Number            sql.NullString `db:"number"`
 	Codes             sql.NullString `db:"codes"`

@@ -41,12 +41,10 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 }
 
 func Test_StopVisitSelectorByLine(t *testing.T) {
-	code := NewCode("codeSpace", "value")
-	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(code)})
-
 	model := NewMemoryModel()
 
 	line := model.Lines().New()
+	code := NewCode("codeSpace", "value")
 	line.SetCode(code)
 	line.Save()
 
@@ -57,6 +55,8 @@ func Test_StopVisitSelectorByLine(t *testing.T) {
 	stopVisit := model.StopVisits().New()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Save()
+
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLines([]LineId{line.id})})
 
 	if !selector(stopVisit) {
 		t.Errorf("Selector should return true, got false")
@@ -83,14 +83,12 @@ func Test_StopVisitSelectorByLine(t *testing.T) {
 func Test_CompositeStopVisitSelector(t *testing.T) {
 	startTime := time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC)
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
-	code := NewCode("codeSpace", "value")
-
-	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLine(code), StopVisitSelectorByTime(startTime, endTime)})
 
 	model := NewMemoryModel()
 
 	// Good VehicleJourney
 	line := model.Lines().New()
+	code := NewCode("codeSpace", "value")
 	line.SetCode(code)
 	line.Save()
 
@@ -102,6 +100,8 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetSchedule("aimed", time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC), time.Time{})
 	stopVisit.Save()
+
+	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByLines([]LineId{line.id}), StopVisitSelectorByTime(startTime, endTime)})
 
 	if !selector(stopVisit) {
 		t.Errorf("Selector should return true, got false")

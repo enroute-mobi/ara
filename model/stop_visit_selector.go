@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"slices"
+	"time"
+)
 
 type StopVisitSelector func(*StopVisit) bool
 
@@ -37,19 +40,14 @@ func StopVisitSelectByStopAreaId(stopAreaId StopAreaId) StopVisitSelector {
 	}
 }
 
-func StopVisitSelectorByLine(code Code) StopVisitSelector {
+func StopVisitSelectorByLines(lineIds []LineId) StopVisitSelector {
 	return func(stopVisit *StopVisit) bool {
 		vehicleJourney := stopVisit.VehicleJourney()
 		if vehicleJourney == nil {
 			return false
 		}
-		line := vehicleJourney.Line()
-		if line == nil {
-			return false
-		}
-		lineCode, ok := line.Code(code.CodeSpace())
-		if ok {
-			return lineCode.Value() == code.Value()
+		if slices.Contains(lineIds, vehicleJourney.LineId) {
+			return true
 		}
 		return false
 	}
