@@ -754,3 +754,28 @@ func (alertCause *SituationAlertCause) FromString(s string) error {
 		return fmt.Errorf("invalid alert cause %s", s)
 	}
 }
+
+type SituationReality string
+
+const (
+	SituationRealityReal              SituationReality = "real"
+	SituationRealitySecurityExercise  SituationReality = "securityExercise"
+	SituationRealityTechnicalExercise SituationReality = "technicalExercise"
+	SituationRealityTest              SituationReality = "test"
+)
+
+func (reality *SituationReality) FromString(s string) error {
+	switch SituationReality(s) {
+	case SituationRealityReal:
+		fallthrough
+	case SituationRealitySecurityExercise:
+		fallthrough
+	case SituationRealityTechnicalExercise:
+		fallthrough
+	case SituationRealityTest:
+		*reality = SituationReality(s)
+		return nil
+	default:
+		return fmt.Errorf("invalid reality %s", s)
+	}
+}

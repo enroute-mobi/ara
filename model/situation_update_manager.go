@@ -52,6 +52,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.AlertCause = event.AlertCause
 		situation.Severity = event.Severity
 		situation.Progress = event.Progress
+		situation.Reality = event.Reality
 		situation.Format = event.Format
 		situation.Affects = event.Affects
 		situation.Consequences = event.Consequences

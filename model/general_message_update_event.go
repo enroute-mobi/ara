@@ -20,6 +20,7 @@ type SituationUpdateEvent struct {
 	InternalTags       []string
 	AlertCause         SituationAlertCause
 	Progress           SituationProgress
+	Reality            SituationReality
 	Severity           SituationSeverity
 	ReportType         ReportType
 	Version            int

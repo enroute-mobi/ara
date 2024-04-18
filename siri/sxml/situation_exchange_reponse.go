@@ -38,6 +38,7 @@ type XMLPtSituationElement struct {
 
 	progress       string
 	severity       string
+	reality        string
 	participantRef string
 	summary        string
 	description    string
@@ -316,6 +317,13 @@ func (visit *XMLPtSituationElement) Severity() string {
 		visit.severity = visit.findStringChildContent("Severity")
 	}
 	return visit.severity
+}
+
+func (visit *XMLPtSituationElement) Reality() string {
+	if visit.reality == "" {
+		visit.reality = visit.findStringChildContent("Reality")
+	}
+	return visit.reality
 }
 
 func (visit *XMLPtSituationElement) Progress() string {

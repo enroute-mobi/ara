@@ -85,6 +85,13 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		logger.Log.Debugf("%v", err)
 	}
 
+	var reality model.SituationReality
+	if err := reality.FromString(xmlSituation.Reality()); err == nil {
+		situationEvent.Reality = reality
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
 	situationEvent.Summary = &model.SituationTranslatedString{
 		DefaultValue: xmlSituation.Summary(),
 	}

@@ -60,6 +60,7 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 		ParticipantRef:     situation.ParticipantRef,
 		VersionedAtTime:    situation.VersionedAt,
 		Progress:           situation.Progress,
+		Reality:            situation.Reality,
 		AlertCause:         situation.AlertCause,
 		Severity:           situation.Severity,
 	}

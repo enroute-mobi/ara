@@ -13,6 +13,7 @@ Feature: Support SIRI Situation Exchange by request
       | ParticipantRef                                                                     | "535"                                         |
       | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
       | Progress                                                                           | published                                     |
+      | Reality                                                                            | test                                          |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | PublicationWindows[0]#StartTime                                                    | 2017-09-01T01:00:00+02:00                     |
@@ -104,6 +105,7 @@ Feature: Support SIRI Situation Exchange by request
                     </siri:Source>
                     <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
                     <siri:Progress>published</siri:Progress>
+                    <siri:Reality>test</siri:Reality>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
@@ -299,6 +301,7 @@ Feature: Support SIRI Situation Exchange by request
                     </siri:Source>
                     <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
                     <siri:Progress>published</siri:Progress>
+                    <siri:Reality>test</siri:Reality>
                     <siri:ValidityPeriod>
                       <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
                       <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
@@ -465,6 +468,7 @@ Feature: Support SIRI Situation Exchange by request
       | VersionedAt                                                                        | 2017-01-01T01:02:03+02:00                     |
       | Progress                                                                           | published                                     |
       | Severity                                                                           | slight                                        |
+      | Reality                                                                            | test                                          |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | PublicationWindows[0]#StartTime                                                    | 2017-09-01T01:00:00+02:00                     |

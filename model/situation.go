@@ -50,6 +50,7 @@ type Situation struct {
 	Keywords       []string                   `json:",omitempty"`
 	ReportType     ReportType                 `json:",omitempty"`
 	AlertCause     SituationAlertCause        `json:",omitempty"`
+	Reality        SituationReality           `json:",omitempty"`
 	ProducerRef    string                     `json:",omitempty"`
 	Format         string                     `json:",omitempty"`
 	InternalTags   []string                   `json:",omitempty"`

@@ -96,6 +96,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ParticipantRef:     situation.ParticipantRef,
 		VersionedAtTime:    situation.VersionedAt,
 		Progress:           situation.Progress,
+		Reality:            situation.Reality,
 		AlertCause:         situation.AlertCause,
 		Severity:           situation.Severity,
 	}
