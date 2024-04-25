@@ -277,6 +277,7 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 		Timestamp:      manager.Clock().Now(),
 		ID:             string(v.id),
 		ObjectIDs:      v.CodeSlice(),
+		Codes:          v.CodeSlice(),
 		Longitude:      v.Longitude,
 		Latitude:       v.Latitude,
 		Bearing:        v.Bearing,
