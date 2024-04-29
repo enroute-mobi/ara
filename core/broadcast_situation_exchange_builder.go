@@ -74,9 +74,10 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 	}
 
 	delivery := &siri.SIRISituationExchangeDelivery{
-		Status:         true,
-		LineRefs:       make(map[string]struct{}),
-		MonitoringRefs: make(map[string]struct{}),
+		ResponseTimestamp: builder.Clock().Now(),
+		Status:            true,
+		LineRefs:          make(map[string]struct{}),
+		MonitoringRefs:    make(map[string]struct{}),
 	}
 
 	for _, affect := range situation.Affects {

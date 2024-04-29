@@ -502,8 +502,17 @@ Feature: Support SIRI SituationExchange by subscription
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                 |
       | Description[DefaultValue]                                                          | a very very very long message             |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-7-00c04fd430c8         |
+    And a Situation exists with the following attributes:
+      | Codes                                                                              | "internal" : "NINOXE:SituationExchange:01_1" |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                    |
+      | Version                                                                            | 1                                            |
+      | Keywords                                                                           | ["test"]                                     |
+      | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                    |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                    |
+      | Description[DefaultValue]                                                          | An Another Very Long Message                 |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8            |
     And a StopArea exists with the following attributes:
       | Name              | Test                                    |
       | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
@@ -518,6 +527,11 @@ Feature: Support SIRI SituationExchange by subscription
       | ValidityPeriods[0]#EndTime | 2017-10-24T20:30:06+02:00              |
       | Description[DefaultValue]  | an ANOTHER very very very long message |
       | Version                    | 2                                      |
+    When the Situation "6ba7b814-9dad-11d1-5-00c04fd430c8" is edited with the following attributes:
+      | RecordedAt                 | 2017-01-01T03:50:06+02:00                   |
+      | ValidityPeriods[0]#EndTime | 2017-10-24T20:30:06+02:00                   |
+      | Description[DefaultValue]  | a SUPER ANOTHER very very very long message |
+      | Version                    | 3                                           |
     And 15 seconds have passed
     Then the SIRI server should receive this response
     """
@@ -528,11 +542,11 @@ Feature: Support SIRI SituationExchange by subscription
            <ServiceDeliveryInfo>
              <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
              <siri:ProducerRef>test</siri:ProducerRef>
-             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
            </ServiceDeliveryInfo>
            <Notification>
              <siri:SituationExchangeDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
-               <siri:ResponseTimestamp>0001-01-01T00:00:00.000Z</siri:ResponseTimestamp>
+               <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
                <siri:RequestMessageRef></siri:RequestMessageRef>
                <siri:Status>true</siri:Status>
                <siri:Situations>
@@ -567,6 +581,37 @@ Feature: Support SIRI SituationExchange by subscription
                          <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                        </siri:AffectedStopPoint>
                      </siri:StopPoints>
+                   </siri:Affects>
+                 </siri:PtSituationElement>
+               </siri:Situations>
+             </siri:SituationExchangeDelivery>
+             <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+               <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
+               <siri:RequestMessageRef/>
+               <siri:Status>true</siri:Status>
+               <siri:Situations>
+                 <siri:PtSituationElement>
+                   <siri:CreationTime>2017-01-01T03:50:06.000+02:00</siri:CreationTime>
+                   <siri:SituationNumber>NINOXE:SituationExchange:01_1</siri:SituationNumber>
+                   <siri:Version>3</siri:Version>
+                   <siri:Source>
+                     <siri:SourceType>directReport</siri:SourceType>
+                   </siri:Source>
+                   <siri:ValidityPeriod>
+                     <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
+                     <siri:EndTime>2017-10-24T20:30:06.000+02:00</siri:EndTime>
+                   </siri:ValidityPeriod>
+                   <siri:UndefinedReason/>
+                   <siri:Keywords>test</siri:Keywords>
+                   <siri:Description>a SUPER ANOTHER very very very long message</siri:Description>
+                   <siri:Affects>
+                     <siri:Networks>
+                       <siri:AffectedNetwork>
+                         <siri:AffectedLine>
+                           <siri:LineRef>1234</siri:LineRef>
+                         </siri:AffectedLine>
+                       </siri:AffectedNetwork>
+                     </siri:Networks>
                    </siri:Affects>
                  </siri:PtSituationElement>
                </siri:Situations>
