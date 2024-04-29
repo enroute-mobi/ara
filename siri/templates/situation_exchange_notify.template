@@ -6,7 +6,7 @@
 		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
 	</ServiceDeliveryInfo>
 	<Notification>{{ range .SituationExchangeDeliveries }}
-		{{ .BuildSituationExchangeDeliveryXML }}
-	</Notification>{{ end }}
+		{{ .BuildSituationExchangeDeliveryXML }}{{ end }}
+	</Notification>
 	<SiriExtension />
 </sw:NotifySituationExchange>
