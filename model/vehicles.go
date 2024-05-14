@@ -276,7 +276,6 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 	vehicleEvent := &audit.BigQueryVehicleEvent{
 		Timestamp:      manager.Clock().Now(),
 		ID:             string(v.id),
-		ObjectIDs:      v.CodeSlice(),
 		Codes:          v.CodeSlice(),
 		Longitude:      v.Longitude,
 		Latitude:       v.Latitude,
