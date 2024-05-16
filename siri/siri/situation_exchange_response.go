@@ -19,9 +19,10 @@ type SIRISituationExchangeResponse struct {
 }
 
 type SIRISituationExchangeDelivery struct {
-	RequestMessageRef string
-
-	ResponseTimestamp time.Time
+	RequestMessageRef      string
+	SubscriberRef          string
+	SubscriptionIdentifier string
+	ResponseTimestamp      time.Time
 
 	Status      bool
 	ErrorType   string

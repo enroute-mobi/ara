@@ -547,7 +547,8 @@ Feature: Support SIRI SituationExchange by subscription
            <Notification>
              <siri:SituationExchangeDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
                <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
-               <siri:RequestMessageRef></siri:RequestMessageRef>
+               <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+               <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
                <siri:Status>true</siri:Status>
                <siri:Situations>
                  <siri:PtSituationElement>
@@ -583,13 +584,6 @@ Feature: Support SIRI SituationExchange by subscription
                      </siri:StopPoints>
                    </siri:Affects>
                  </siri:PtSituationElement>
-               </siri:Situations>
-             </siri:SituationExchangeDelivery>
-             <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
-               <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
-               <siri:RequestMessageRef/>
-               <siri:Status>true</siri:Status>
-               <siri:Situations>
                  <siri:PtSituationElement>
                    <siri:CreationTime>2017-01-01T03:50:06.000+02:00</siri:CreationTime>
                    <siri:SituationNumber>NINOXE:SituationExchange:01_1</siri:SituationNumber>

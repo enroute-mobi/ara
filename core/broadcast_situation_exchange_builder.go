@@ -31,9 +31,9 @@ func NewBroadcastSituationExchangeBuilder(partner *Partner, connector string) *B
 	}
 }
 
-func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation model.Situation) (situationExchangeDelivery *siri.SIRISituationExchangeDelivery) {
+func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation model.Situation, delivery *siri.SIRISituationExchangeDelivery) {
 	if !builder.canBroadcast(situation) {
-		return nil
+		return
 	}
 
 	var situationNumber string
@@ -44,7 +44,7 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 		code, present = situation.Code("_default")
 		if !present {
 			logger.Log.Debugf("Unknown Code for Situation %s", situation.Id())
-			return nil
+			return
 		}
 		situationNumber = builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
 	}
@@ -71,13 +71,6 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 
 	if situation.Summary != nil {
 		ptSituationElement.Summary = situation.Summary.DefaultValue
-	}
-
-	delivery := &siri.SIRISituationExchangeDelivery{
-		ResponseTimestamp: builder.Clock().Now(),
-		Status:            true,
-		LineRefs:          make(map[string]struct{}),
-		MonitoringRefs:    make(map[string]struct{}),
 	}
 
 	for _, affect := range situation.Affects {
@@ -135,9 +128,6 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 	}
 
 	delivery.Situations = append(delivery.Situations, ptSituationElement)
-
-	situationExchangeDelivery = delivery
-	return
 }
 
 func (builder *BroadcastSituationExchangeBuilder) buildAffectedStopArea(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) (*siri.AffectedStopPoint, bool) {
