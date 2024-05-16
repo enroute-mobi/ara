@@ -139,7 +139,13 @@ Feature: Support SIRI StopMonitoring by subscription
       | PassageOrder  |     4 |
       | VehicleAtStop | false |
     Then the VehicleJourney "6ba7b814-9dad-11d1-5-00c04fd430c8" has the following attributes:
-      | DirectionType | inbound |
+      | DirectionType                          | inbound                       |
+      | Attribute[VehicleFeatureRef]           | TRFC_M4_1                     |
+      | Attribute[Delay]                       | P0Y0M0DT0H0M0.000S            |
+      | Attribute[DestinationAimedArrivalTime] | 2016-09-22T08:02:00.000+02:00 |
+      | Attribute[DirectionName]               | Mago-Cime OMNI                |
+      | Attribute[OriginAimedDepartureTime]    | 2016-09-22T07:50:00.000+02:00 |
+      | Attribute[ProductCategoryRef]          | 0                             |
 
   @ARA-1150
   Scenario: Update a StopVisit and all VehicleJourney Attributes after a StopMonitoringDelivery in a subscription
@@ -283,7 +289,8 @@ Feature: Support SIRI StopMonitoring by subscription
       | Attribute[Delay]                       | P0Y0M0DT0H0M0.000S            |
       | Attribute[DestinationAimedArrivalTime] | 2016-09-22T08:02:00.000+02:00 |
       | Attribute[OriginAimedDepartureTime]    | 2016-09-22T07:50:00.000+02:00 |
-      | Attribute[ProductCategoryRef]          |                             0 |
+      | Attribute[ProductCategoryRef]          | 0                             |
+      | Attribute[VehicleFeatureRef]           | TRFC_M4_1                     |
 
   @ARA-1200
   Scenario: Do not update a VehicleJourney DirectionType after a StopMonitoringDelivery having no DirectionRef tag

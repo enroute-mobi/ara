@@ -361,7 +361,14 @@ Feature: Support SIRI StopMonitoring by request
       | Codes | "internal": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
     And one VehicleJourney has the following attributes:
-      | Codes | "internal": "NINOXE:VehicleJourney:201" |
+      | Codes                                  | "internal": "NINOXE:VehicleJourney:201" |
+      | Attribute[VehicleFeatureRef]           | TRFC_M4_1                               |
+      | Attribute[Delay]                       | P0Y0M0DT0H0M0.000S                      |
+      | Attribute[DestinationAimedArrivalTime] | 2016-09-22T08:02:00.000+02:00           |
+      | Attribute[DirectionName]               | Mago-Cime OMNI                          |
+      | Attribute[OriginAimedDepartureTime]    | 2016-09-22T07:50:00.000+02:00           |
+      | Attribute[ProductCategoryRef]          | 0                                       |
+
     And an audit event should exist with these attributes:
       | Protocol           | siri                          |
       | Direction          | sent                          |
