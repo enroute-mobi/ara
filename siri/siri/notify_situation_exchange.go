@@ -13,8 +13,6 @@ type SIRINotifySituationExchange struct {
 	ProducerRef               string
 	RequestMessageRef         string
 	ResponseMessageIdentifier string
-	SubscriberRef             string
-	SubscriptionIdentifier    string
 
 	ResponseTimestamp time.Time
 

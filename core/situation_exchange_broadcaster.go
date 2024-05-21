@@ -94,6 +94,14 @@ func (sxb *SXBroadcaster) prepareSIRISituationExchangeNotify() {
 
 	sxb.connector.mutex.Unlock()
 
+	notify := siri.SIRINotifySituationExchange{
+		Address:                   sxb.connector.Partner().Address(),
+		ProducerRef:               sxb.connector.Partner().ProducerRef(),
+		ResponseMessageIdentifier: sxb.connector.Partner().NewResponseMessageIdentifier(),
+		ResponseTimestamp:         sxb.Clock().Now(),
+		Status:                    true,
+	}
+
 	for subId, situationIds := range events {
 		sub, ok := sxb.connector.Partner().Subscriptions().Find(subId)
 		if !ok {
@@ -102,19 +110,17 @@ func (sxb *SXBroadcaster) prepareSIRISituationExchangeNotify() {
 		}
 		processedSituations := make(map[model.SituationId]struct{}) //Making sure not to send 2 times the same Situation
 
-		notify := siri.SIRINotifySituationExchange{
-			Address:                   sxb.connector.Partner().Address(),
-			ProducerRef:               sxb.connector.Partner().ProducerRef(),
-			ResponseMessageIdentifier: sxb.connector.Partner().NewResponseMessageIdentifier(),
-			SubscriberRef:             sub.SubscriberRef,
-			SubscriptionIdentifier:    sub.ExternalId(),
-			RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-			Status:                    true,
-			ResponseTimestamp:         sxb.Clock().Now(),
-		}
-
 		// Initialize builder
 		builder := NewBroadcastSituationExchangeBuilder(sxb.connector.Partner(), SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
+
+		delivery := &siri.SIRISituationExchangeDelivery{
+			ResponseTimestamp:      builder.Clock().Now(),
+			Status:                 true,
+			SubscriberRef:          sub.SubscriberRef,
+			SubscriptionIdentifier: sub.ExternalId(),
+			LineRefs:               make(map[string]struct{}),
+			MonitoringRefs:         make(map[string]struct{}),
+		}
 
 		for _, situationId := range situationIds {
 			if _, ok := processedSituations[situationId]; ok {
@@ -128,25 +134,26 @@ func (sxb *SXBroadcaster) prepareSIRISituationExchangeNotify() {
 				continue
 			}
 
-			siriSituationExchangeDelivery := builder.BuildSituationExchange(situation)
-
-			if siriSituationExchangeDelivery == nil {
-				continue
-			}
-			notify.SituationExchangeDeliveries = append(notify.SituationExchangeDeliveries, siriSituationExchangeDelivery)
+			builder.BuildSituationExchange(situation, delivery)
 		}
 
-		if len(notify.SituationExchangeDeliveries) != 0 {
-			message := sxb.newBQEvent()
-
-			sxb.logSIRISituationExchangeNotify(message, &notify)
-			t := sxb.Clock().Now()
-
-			sxb.connector.Partner().SIRIClient().NotifySituationExchange(&notify)
-			message.ProcessingTime = sxb.Clock().Since(t).Seconds()
-
-			audit.CurrentBigQuery(string(sxb.connector.Partner().Referential().Slug())).WriteEvent(message)
+		if len(delivery.Situations) == 0 {
+			continue
 		}
+
+		notify.SituationExchangeDeliveries = append(notify.SituationExchangeDeliveries, delivery)
+	}
+
+	if len(notify.SituationExchangeDeliveries) != 0 {
+		message := sxb.newBQEvent()
+
+		sxb.logSIRISituationExchangeNotify(message, &notify)
+		t := sxb.Clock().Now()
+
+		sxb.connector.Partner().SIRIClient().NotifySituationExchange(&notify)
+		message.ProcessingTime = sxb.Clock().Since(t).Seconds()
+
+		audit.CurrentBigQuery(string(sxb.connector.Partner().Referential().Slug())).WriteEvent(message)
 	}
 }
 
@@ -167,11 +174,11 @@ func (sxb *SXBroadcaster) logSIRISituationExchangeNotify(message *audit.BigQuery
 	for _, delivery := range response.SituationExchangeDeliveries {
 		maps.Copy(lineRefs, delivery.LineRefs)
 		maps.Copy(monitoringRefs, delivery.MonitoringRefs)
+		message.SubscriptionIdentifiers = append(message.SubscriptionIdentifiers, delivery.SubscriptionIdentifier)
 	}
 
 	message.RequestIdentifier = response.RequestMessageRef
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
-	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
 
 	message.StopAreas = GetModelReferenceSlice(monitoringRefs)
 	message.Lines = GetModelReferenceSlice(lineRefs)
