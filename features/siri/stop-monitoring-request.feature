@@ -265,19 +265,14 @@ Feature: Support SIRI StopMonitoring by request
     Then one StopVisit has the following attributes:
       | Codes | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC-6" |
 
+  @siri-valid
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-      <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri"
-                                   xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                                   xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                                   xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                                   xmlns:ns7="http://scma/siri"
-                                   xmlns:sw="http://wsdl.siri.org.uk"
-                                   xmlns:ns9="http://wsdl.siri.org.uk/siri">
+      <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <ServiceDeliveryInfo>
         <siri:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</siri:ResponseTimestamp>
         <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
@@ -286,11 +281,10 @@ Feature: Support SIRI StopMonitoring by request
         <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Answer>
-        <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+        <siri:StopMonitoringDelivery>
           <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
-          <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
             <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
@@ -379,19 +373,14 @@ Feature: Support SIRI StopMonitoring by request
       | VehicleJourneys    | ["NINOXE:VehicleJourney:201"] |
       | Lines              | ["NINOXE:Line:3:LOC"]         |
 
+  @siri-valid
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner which respond with multiple deliveries
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-      <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri"
-                                   xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                                   xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                                   xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                                   xmlns:ns7="http://scma/siri"
-                                   xmlns:sw="http://wsdl.siri.org.uk"
-                                   xmlns:ns9="http://wsdl.siri.org.uk/siri">
+      <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <ServiceDeliveryInfo>
         <siri:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</siri:ResponseTimestamp>
         <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
@@ -402,9 +391,8 @@ Feature: Support SIRI StopMonitoring by request
       <Answer>
         <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
           <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
-          <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
             <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
@@ -453,9 +441,8 @@ Feature: Support SIRI StopMonitoring by request
         </siri:StopMonitoringDelivery>
         <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
           <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
-          <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
             <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3</siri:ItemIdentifier>
@@ -1004,19 +991,14 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DistanceFromStop                          |                                                                  800 | StopVisit#Attribute[DistanceFromStop]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:NumberOfStopsAway                         |                                                                    1 | StopVisit#Attribute[NumberOfStopsAway]                |
 
+  @siri-valid
   Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri"
-                                         xmlns:ns4="http://www.ifopt.org.uk/acsb"
-                                         xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-                                         xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-                                         xmlns:ns7="http://scma/siri"
-                                         xmlns:sw="http://wsdl.siri.org.uk"
-                                         xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</siri:ResponseTimestamp>
               <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
@@ -1027,9 +1009,8 @@ Feature: Support SIRI StopMonitoring by request
             <Answer>
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
-                <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
                   <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
