@@ -56,7 +56,7 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 	ue.attributes.Set("ProductCategoryRef", ue.SiriXML.ProductCategoryRef())
 	ue.attributes.Set("ServiceFeatureRef", ue.SiriXML.ServiceFeatureRef())
 	ue.attributes.Set("TrainNumberRef", ue.SiriXML.TrainNumberRef())
-	ue.attributes.Set("VehicleFeature", ue.SiriXML.VehicleFeature())
+	ue.attributes.Set("VehicleFeatureRef", ue.SiriXML.VehicleFeatureRef())
 	ue.attributes.Set("VehicleMode", ue.SiriXML.VehicleMode())
 	ue.attributes.Set("ViaPlaceName", ue.SiriXML.ViaPlaceName())
 	ue.attributes.Set("VehicleJourneyName", ue.SiriXML.VehicleJourneyName())

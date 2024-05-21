@@ -77,7 +77,7 @@ type XMLMonitoredVehicleJourney struct {
 	productCategoryRef          string
 	serviceFeatureRef           string
 	trainNumberRef              string
-	vehicleFeature              string
+	vehicleFeatureRef           string
 	vehicleMode                 string
 	operatorRef                 string
 	viaPlaceName                string
@@ -462,11 +462,11 @@ func (vj *XMLMonitoredVehicleJourney) TrainNumberRef() string {
 	return vj.trainNumberRef
 }
 
-func (vj *XMLMonitoredVehicleJourney) VehicleFeature() string {
-	if vj.vehicleFeature == "" {
-		vj.vehicleFeature = vj.findStringChildContent("VehicleFeature")
+func (vj *XMLMonitoredVehicleJourney) VehicleFeatureRef() string {
+	if vj.vehicleFeatureRef == "" {
+		vj.vehicleFeatureRef = vj.findStringChildContent("VehicleFeatureRef")
 	}
-	return vj.vehicleFeature
+	return vj.vehicleFeatureRef
 }
 
 func (vj *XMLMonitoredVehicleJourney) VehicleJourneyName() string {
