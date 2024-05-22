@@ -124,7 +124,11 @@ def model_attributes(table)
         attributes[name] << {}
       end
 
-      attributes[name][period_number][attribute.to_s] = value
+      attributes[name][period_number][attribute.to_s] = if value == "nil"
+                                                          nil
+                                                        else
+                                                          value
+                                                        end
 
       attributes.delete raw_attribute
     end

@@ -78,7 +78,9 @@ func Test_SituationController_Delete(t *testing.T) {
 
 func Test_SituationController_Update(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Summary":{"DefaultValue":"Noel"},
+"Codes": { "reflex": "FR:77491:ZDE:34004:STIF" },
+"IgnoreValidation":true }`)
 	situation, responseRecorder, referential := prepareSituationRequest("PUT", true, body, t)
 
 	// Check response
@@ -110,8 +112,10 @@ func Test_SituationController_Show(t *testing.T) {
 
 func Test_SituationController_Create(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{ "Affects" : [{"LineId":"lol","Type": "Line"}],
-		"Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Summary":{"DefaultValue":"Noel"},
+                "Affects" : [{"LineId":"lol","Type": "Line"}],
+		"Codes": { "reflex": "FR:77491:ZDE:34004:STIF" },
+                "IgnoreValidation":true }`)
 	_, responseRecorder, referential := prepareSituationRequest("POST", false, body, t)
 
 	// Check response
@@ -125,7 +129,7 @@ func Test_SituationController_Create(t *testing.T) {
 		t.Errorf("Situation should be found after POST request")
 	}
 	situationMarshal, _ := situation.MarshalJSON()
-	expected := `{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"Origin":"","ValidityPeriods":null,"PublicationWindows":null,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Affects":[{"Type":"Line","LineId":"lol"}]}`
+	expected := `{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"Origin":"","ValidityPeriods":null,"PublicationWindows":null,"Summary":{"DefaultValue":"Noel"},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Affects":[{"Type":"Line","LineId":"lol"}]}`
 	if responseRecorder.Body.String() != string(expected) && string(situationMarshal) != string(expected) {
 		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}

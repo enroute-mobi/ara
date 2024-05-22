@@ -16,6 +16,7 @@ const (
 	SETTINGS          = "Settings"
 	CONNECTOR_TYPES   = "ConnectorTypes"
 	ERROR_BLANK       = "Can't be empty"
+	ERROR_FORMAT      = "Invalid format"
 	ERROR_SLUG_FORMAT = "Invalid format: only lowercase alphanumeric characters and _"
 	ERROR_ZERO        = "Can't be zero"
 	ERROR_UNIQUE      = "Is already in use"
