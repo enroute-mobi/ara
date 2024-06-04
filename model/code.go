@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"golang.org/x/exp/maps"
 )
 
 type Codes map[string]Code
@@ -152,14 +154,9 @@ type CodeConsumer struct {
 	codes Codes
 }
 
-func (consumer *CodeConsumer) Copy() CodeConsumer {
-	o := CodeConsumer{
-		codes: make(Codes),
-	}
-	for k, v := range consumer.codes {
-		o.codes[k] = v
-	}
-	return o
+func (consumer *CodeConsumer) Copy() (c CodeConsumer) {
+	c.codes = maps.Clone(consumer.codes)
+	return
 }
 
 func (consumer *CodeConsumer) Code(codeSpace string) (Code, bool) {
