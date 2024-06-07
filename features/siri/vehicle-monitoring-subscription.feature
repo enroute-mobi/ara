@@ -104,6 +104,27 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
       | Occupancy        | manySeatsAvailable                 |
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-7-00c04fd430c8  |
+    And a StopArea exists with the following attributes:
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Carabacel                                |
+      # 6ba7b814-9dad-11d1-6-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | Codes                         | "internal": "Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                  | 4                                                                      |
+      | VehicleAtStop                 | false                                                                  |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8                                      |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                                      |
+      | VehicleAtStop                 | false                                                                  |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                     |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                               |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                               |
+      | ArrivalStatus                 | delayed                                                                |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                               |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                               |
+      | DepartureStatus               | delayed                                                                |
+      | Attribute[DestinationDisplay] | Pouet-pouet                                                            |
+      # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringBroadcast          |
       | SubscriberRef     | Subscriber                          |
@@ -135,7 +156,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Ara</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Notification>
               <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
@@ -183,6 +204,18 @@ Feature: Support SIRI VehicleMonitoring by subscription
                     </siri:VehicleLocation>
                     <siri:Bearing>126</siri:Bearing>
                     <siri:Occupancy>manySeatsAvailable</siri:Occupancy>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Carabacel</siri:StopPointName>
+                      <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
+                      <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-01T15:02:00.000Z</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
+                      <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
+                      <siri:ExpectedDepartureTime>2017-01-01T15:01:00.000Z</siri:ExpectedDepartureTime>
+                      <siri:DepartureStatus>delayed</siri:DepartureStatus>
+                    </siri:MonitoredCall>
                     </siri:MonitoredVehicleJourney>
                   </siri:VehicleActivity>
               </siri:VehicleMonitoringDelivery>

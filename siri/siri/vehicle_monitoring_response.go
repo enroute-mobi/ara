@@ -55,11 +55,29 @@ type SIRIMonitoredVehicleJourney struct {
 	Delay                   *time.Time `json:",omitempty"`
 	Bearing                 float64
 	VehicleLocation         *SIRIVehicleLocation
-	Occupancy               string `json:",omitempty"`
-	DriverRef               string `json:",omitempty"`
-	JourneyPatternRef       string `json:",omitempty"`
-	JourneyPatternName      string `json:",omitempty"`
-	VehicleRef              string `json:",omitempty"`
+	Occupancy               string         `json:",omitempty"`
+	DriverRef               string         `json:",omitempty"`
+	JourneyPatternRef       string         `json:",omitempty"`
+	JourneyPatternName      string         `json:",omitempty"`
+	VehicleRef              string         `json:",omitempty"`
+	MonitoredCall           *MonitoredCall `json:",omitempty"`
+}
+
+type MonitoredCall struct {
+	StopPointRef          string    `json:",omitempty"`
+	StopPointName         string    `json:",omitempty"`
+	VehicleAtStop         bool      `json:",omitempty"`
+	DestinationDisplay    string    `json:",omitempty"`
+	ExpectedArrivalTime   time.Time `json:",omitempty"`
+	ExpectedDepartureTime time.Time `json:",omitempty"`
+	DepartureStatus       string    `json:",omitempty"`
+	Order                 *int      `json:",omitempty"`
+	AimedArrivalTime      time.Time `json:",omitempty"`
+	ArrivalPlatformName   string    `json:",omitempty"`
+	AimedDepartureTime    time.Time `json:",omitempty"`
+	ArrivalStatus         string    `json:",omitempty"`
+	ActualArrivalTime     time.Time `json:",omitempty"`
+	ActualDepartureTime   time.Time `json:",omitempty"`
 }
 
 type SIRIFramedVehicleJourneyRef struct {
