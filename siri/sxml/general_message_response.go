@@ -19,6 +19,7 @@ type XMLGeneralMessageCancellation struct {
 	XMLStructure
 
 	infoMessageIdentifier string
+	recordedAtTime        time.Time
 }
 
 type XMLGeneralMessage struct {
@@ -134,6 +135,13 @@ func (visit *XMLGeneralMessageCancellation) InfoMessageIdentifier() string {
 		visit.infoMessageIdentifier = visit.findStringChildContent("InfoMessageIdentifier")
 	}
 	return visit.infoMessageIdentifier
+}
+
+func (visit *XMLGeneralMessageCancellation) RecordedAtTime() time.Time {
+	if visit.recordedAtTime.IsZero() {
+		visit.recordedAtTime = visit.findTimeChildContent("RecordedAtTime")
+	}
+	return visit.recordedAtTime
 }
 
 func (visit *XMLGeneralMessage) RecordedAtTime() time.Time {
