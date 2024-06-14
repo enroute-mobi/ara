@@ -1,11 +1,11 @@
 package siri
 
 import (
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
-
-	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 type SIRIGeneralMessageResponse struct {
@@ -27,6 +27,12 @@ type SIRIGeneralMessageDelivery struct {
 	ErrorText   string
 
 	GeneralMessages []*SIRIGeneralMessage
+}
+
+type SIRIGeneralMessageCancellation struct {
+	RecordedAtTime        time.Time
+	ItemIdentifier        string
+	InfoMessageIdentifier string
 }
 
 type SIRIGeneralMessage struct {
@@ -105,5 +111,14 @@ func (message *SIRIGeneralMessage) BuildGeneralMessageXML() (string, error) {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
+}
+
+func (message *SIRIGeneralMessageCancellation) BuildGeneralMessageCancellationXML() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "general_message_cancellation.template", message); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return strings.TrimSpace(buffer.String()), nil
 }
