@@ -293,6 +293,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | RecordedAt                                                                         | 2017-03-29T03:30:06+02:00                                                  |
       | Version                                                                            | 1                                                                          |
       | Keywords                                                                           | ["Commercial"]                                                             |
+      | Progress                                                                           | published                                                                  |
       | ProducerRef                                                                        | NINOXE:default                                                             |
       | ValidityPeriods[0]#StartTime                                                       | 2017-03-29T03:30:06+02:00                                                  |
       | ValidityPeriods[0]#EndTime                                                         | 2017-03-29T20:50:06+02:00                                                  |
@@ -310,6 +311,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | Version                      | 1                                         |
       | Keywords                     | ["Commercial"]                            |
       | ProducerRef                  | NINOXE:default                            |
+      | Progress                     | published                                 |
       | ValidityPeriods[0]#StartTime | 2017-03-29T03:30:06+02:00                 |
       | ValidityPeriods[0]#EndTime   | 2017-03-29T20:50:06+02:00                 |
       | Description[DefaultValue]    | carte d'abonnement                        |
