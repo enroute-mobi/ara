@@ -71,6 +71,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 		SituationCode: model.NewCode(builder.remoteCodeSpace, xmlGeneralMessageEvent.InfoMessageIdentifier()),
 		Version:       xmlGeneralMessageEvent.InfoMessageVersion(),
 		ProducerRef:   producerRef,
+		Progress:      model.SituationProgressPublished,
 	}
 	situationEvent.SetId(model.SituationUpdateRequestId(builder.NewUUID()))
 

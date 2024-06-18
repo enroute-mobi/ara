@@ -141,19 +141,21 @@ Feature: Support SIRI GeneralMessage by subscription
     </S:Envelope>
       """
     Then one Situation has the following attributes:
-        | Codes                                                                         | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | Keywords                                                                      | ["Commercial"]                            |
-        | ReportType                                                                    | general                                   |
-        | ValidityPeriods[0]#StartTime                                                  | 2017-03-01T03:30:06+01:00                 |
-        | ValidityPeriods[0]#EndTime                                                    | 2017-03-29T03:30:06+01:00                 |
-        | Version                                                                       | 2                                         |
-        | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
-        | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Codes                                                                         | "internal" : "NINOXE:GeneralMessage:27_1" |
+      | Keywords                                                                      | ["Commercial"]                            |
+      | ReportType                                                                    | general                                   |
+      | Progress                                                                      | published                                 |
+      | ValidityPeriods[0]#StartTime                                                  | 2017-03-01T03:30:06+01:00                 |
+      | ValidityPeriods[0]#EndTime                                                    | 2017-03-29T03:30:06+01:00                 |
+      | Version                                                                       | 2                                         |
+      | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
     Then one Situation has the following attributes:
       | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
       | Keywords                     | ["Commercial"]                            |
       | ReportType                   | general                                   |
+      | Progress                     | published                                 |
       | ValidityPeriods[0]#StartTime | 2017-03-01T03:30:06+01:00                 |
       | ValidityPeriods[0]#EndTime   | 2017-03-29T03:30:06+01:00                 |
       | Version                      | 2                                         |
