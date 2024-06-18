@@ -155,8 +155,10 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 		obj := model.NewCode(connector.remoteCodeSpace, cancellation.InfoMessageIdentifier())
 		situation, ok := connector.partner.Model().Situations().FindByCode(obj)
 		if ok {
-			logger.Log.Debugf("Deleting situation %v cause of cancellation", situation.Id())
-			connector.partner.Model().Situations().Delete(&situation)
+			logger.Log.Debugf("Updating situation %v progress to closed because of cancellation", situation.Id())
+			situation.RecordedAt = cancellation.RecordedAtTime()
+			situation.Progress = model.SituationProgressClosed
+			connector.partner.Model().Situations().Save(&situation)
 		}
 	}
 }

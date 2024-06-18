@@ -217,12 +217,12 @@ Feature: Support SIRI GeneralMessage by subscription
     And a Subscription exist with the following attributes:
       | Kind | GeneralMessageCollect |
     And a Situation exists with the following attributes:
-      | Codes                  | "internal" : "2"          |
+      | Codes                      | "internal" : "2"          |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00 |
       | Version                    | 1                         |
       | Channel                    | Perturbations             |
       | ValidityPeriods[0]#EndTIme | 2017-01-01T20:30:06+02:00 |
-      | Descriptions[DefaultValue] | Les autres non            |
+      | Description[DefaultValue]  | Les autres non            |
     When I send this SIRI request
     """
     <?xml version='1.0' encoding='utf-8'?>
@@ -259,7 +259,14 @@ Feature: Support SIRI GeneralMessage by subscription
       </soap:Body>
     </soap:Envelope>
     """
-    Then a Situation "internal:2" should not exist in Referential "test"
+    Then one Situation has the following attributes:
+      | Codes                        | "internal" : "2"              |
+      | Progress                     | closed                        |
+      | RecordedAt                   | 2017-05-15T13:26:10.116+02:00 |
+      | Version                      | 1                             |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00     |
+      | ValidityPeriods[0]#StartTime | 0001-01-01T00:00:00Z          |
+      | Description[DefaultValue]    | Les autres non                |
 
   Scenario: Brodcast a GeneralMessage Notification after modification of a Situation
     Given a SIRI server on "http://localhost:8090"
