@@ -1,5 +1,7 @@
 package model
 
+import "golang.org/x/exp/maps"
+
 type Attributes map[string]string
 
 func NewAttributes() Attributes {
@@ -18,9 +20,7 @@ func (attributes Attributes) IsEmpty() bool {
 }
 
 func (attributes Attributes) Copy() (c Attributes) {
-	c = make(map[string]string)
-	for k, v := range attributes {
-		c[k] = v
-	}
-	return c
+	c = maps.Clone(attributes)
+
+	return
 }
