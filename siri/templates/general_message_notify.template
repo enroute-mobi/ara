@@ -19,8 +19,9 @@
 					<siri:ErrorText>{{ .ErrorText }}</siri:ErrorText>
 				</siri:{{ .ErrorType }}>
 			</siri:ErrorCondition>{{ else }}{{ range .GeneralMessages }}
-			{{ .BuildGeneralMessageXML }}{{ end }}{{ end }}
-		 </siri:GeneralMessageDelivery>
+			{{ .BuildGeneralMessageXML }}{{ end }}{{ range .GeneralMessageCancellations }}
+			{{ .BuildGeneralMessageCancellationXML }}{{ end }}{{ end }}
+		</siri:GeneralMessageDelivery>
 	</Notification>
 	<SiriExtension />
 </sw:NotifyGeneralMessage>

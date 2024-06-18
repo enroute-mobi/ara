@@ -23,7 +23,8 @@ type SIRINotifyGeneralMessage struct {
 	ErrorNumber int
 	ErrorText   string
 
-	GeneralMessages []*SIRIGeneralMessage
+	GeneralMessages             []*SIRIGeneralMessage
+	GeneralMessageCancellations []*SIRIGeneralMessageCancellation
 }
 
 func (notify *SIRINotifyGeneralMessage) ErrorString() string {

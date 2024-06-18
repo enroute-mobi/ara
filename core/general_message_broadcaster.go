@@ -1,15 +1,15 @@
 package core
 
 import (
-	"strings"
-	"time"
-
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
+
+	"strings"
+	"time"
 )
 
 type SIRIGeneralMessageBroadcaster interface {
@@ -129,13 +129,24 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 				continue
 			}
 
-			siriGeneralMessage := builder.BuildGeneralMessage(situation)
-			if siriGeneralMessage == nil {
-				continue
+			if situation.Progress == model.SituationProgressClosed {
+				siriGeneralMessageCancellation := builder.BuildGeneralMessageCancellation(situation)
+				if siriGeneralMessageCancellation == nil {
+					continue
+				}
+
+				notify.GeneralMessageCancellations = append(notify.GeneralMessageCancellations, siriGeneralMessageCancellation)
+			} else {
+				siriGeneralMessage := builder.BuildGeneralMessage(situation)
+				if siriGeneralMessage == nil {
+					continue
+				}
+				notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
 			}
-			notify.GeneralMessages = append(notify.GeneralMessages, siriGeneralMessage)
+
 		}
-		if len(notify.GeneralMessages) != 0 {
+
+		if len(notify.GeneralMessages) != 0 || len(notify.GeneralMessageCancellations) != 0 {
 			message := gmb.newBQEvent()
 
 			gmb.logSIRIGeneralMessageNotify(message, &notify)

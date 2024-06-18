@@ -1,0 +1,5 @@
+<siri:GeneralMessageCancellation>
+				<siri:RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RecordedAtTime>
+				<siri:ItemIdentifier>{{ .ItemIdentifier }}</siri:ItemIdentifier>
+				<siri:InfoMessageIdentifier>{{ .InfoMessageIdentifier }}</siri:InfoMessageIdentifier>
+			</siri:GeneralMessageCancellation>

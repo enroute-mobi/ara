@@ -52,6 +52,31 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 	}
 }
 
+func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessageCancellation(situation model.Situation) *siri.SIRIGeneralMessageCancellation {
+	if !builder.canBroadcast(situation) {
+		return nil
+	}
+
+	var infoMessageIdentifier string
+	code, present := situation.Code(builder.remoteCodeSpace)
+	if present {
+		infoMessageIdentifier = code.Value()
+	} else {
+		code, present = situation.Code("_default")
+		if !present {
+			return nil
+		}
+		infoMessageIdentifier = builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "InfoMessage", Id: code.Value()})
+	}
+
+	siriGeneralMessageCancellation := &siri.SIRIGeneralMessageCancellation{
+		ItemIdentifier:        builder.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "Item", Id: builder.NewUUID()}),
+		InfoMessageIdentifier: infoMessageIdentifier,
+		RecordedAtTime:        situation.RecordedAt,
+	}
+	return siriGeneralMessageCancellation
+}
+
 func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
 	if !builder.canBroadcast(situation) {
 		return nil
