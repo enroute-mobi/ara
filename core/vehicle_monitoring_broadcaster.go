@@ -191,6 +191,31 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				VehicleLocation:    vm.connector.handleVehicleLocation(vehicle),
 			}
 
+			if vehicle.NextStopVisitId != model.StopVisitId("") {
+				nextStopVisit, ok := vm.connector.Partner().Model().StopVisits().Find(vehicle.NextStopVisitId)
+				if ok {
+					stopArea, stopAreaCode, ok := vm.connector.stopPointRef(nextStopVisit.StopArea().Id())
+					if ok {
+						monitoredCall := &siri.MonitoredCall{
+							StopPointRef:          stopAreaCode,
+							StopPointName:         stopArea.Name,
+							VehicleAtStop:         nextStopVisit.VehicleAtStop,
+							DestinationDisplay:    nextStopVisit.Attributes["DestinationDisplay"],
+							ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED}),
+							ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED}),
+							DepartureStatus:       string(nextStopVisit.DepartureStatus),
+							Order:                 &nextStopVisit.PassageOrder,
+							AimedArrivalTime:      nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED}),
+							AimedDepartureTime:    nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED}),
+							ArrivalStatus:         string(nextStopVisit.ArrivalStatus),
+							ActualArrivalTime:     nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL}),
+							ActualDepartureTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL}),
+						}
+						monitoredVehicleJourney.MonitoredCall = monitoredCall
+					}
+				}
+			}
+
 			framedVehicleJourneyRef := &siri.SIRIFramedVehicleJourneyRef{}
 			modelDate := vm.connector.partner.Model().Date()
 			framedVehicleJourneyRef.DataFrameRef =
@@ -214,6 +239,26 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 		vm.sendDelivery(delivery)
 	}
 
+}
+
+func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
+	stopPointRef, ok := connector.partner.Model().StopAreas().Find(stopAreaId)
+	if !ok {
+		return &model.StopArea{}, "", false
+	}
+
+	stopPointRefCode, ok := stopPointRef.Code(connector.remoteCodeSpace)
+	if ok {
+		return stopPointRef, stopPointRefCode.Value(), true
+	}
+	referent, ok := stopPointRef.Referent()
+	if ok {
+		referentCode, ok := referent.Code(connector.remoteCodeSpace)
+		if ok {
+			return referent, referentCode.Value(), true
+		}
+	}
+	return &model.StopArea{}, "", false
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleRef(refType, origin string, references model.References) string {

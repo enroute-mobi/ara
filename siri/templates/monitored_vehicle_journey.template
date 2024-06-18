@@ -20,5 +20,20 @@
 					<siri:Bearing>{{ .Bearing }}</siri:Bearing>{{ end }}{{ if .Occupancy }}
 					<siri:Occupancy>{{ .Occupancy }}</siri:Occupancy>{{ end }}{{ if .VehicleRef }}
 					<siri:VehicleRef>{{ .VehicleRef }}</siri:VehicleRef>{{ end }}{{ if .DriverRef }}
-					<siri:DriverRef>{{ .DriverRef }}</siri:DriverRef>{{ end }}
+					<siri:DriverRef>{{ .DriverRef }}</siri:DriverRef>{{ end }}{{ if .MonitoredCall }}
+					<siri:MonitoredCall>{{ if .MonitoredCall.StopPointRef }}
+						<siri:StopPointRef>{{ .MonitoredCall.StopPointRef }}</siri:StopPointRef>{{ end  }}{{ if .MonitoredCall.Order }}
+						<siri:Order>{{ .MonitoredCall.Order }}</siri:Order>{{ end }}{{ if .MonitoredCall.StopPointName }}
+						<siri:StopPointName>{{ .MonitoredCall.StopPointName }}</siri:StopPointName>{{ end }}{{ if .MonitoredCall.VehicleAtStop }}
+						<siri:VehicleAtStop>{{ .MonitoredCall.VehicleAtStop}} </siri:VehicleAtStop>{{ end  }}{{ if .MonitoredCall.DestinationDisplay }}
+						<siri:DestinationDisplay>{{ .MonitoredCall.DestinationDisplay}}</siri:DestinationDisplay>{{ end }}{{ if not .MonitoredCall.AimedArrivalTime.IsZero }}
+						<siri:AimedArrivalTime>{{ .MonitoredCall.AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .MonitoredCall.ActualArrivalTime.IsZero }}
+						<siri:ActualArrivalTime>{{ .MonitoredCall.ActualArrivalTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ActualArrivalTime>{{ end }}{{ if not .MonitoredCall.ExpectedArrivalTime.IsZero }}
+						<siri:ExpectedArrivalTime>{{ .MonitoredCall.ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedArrivalTime>{{ end }}{{ if .MonitoredCall.ArrivalStatus }}
+						<siri:ArrivalStatus>{{ .MonitoredCall.ArrivalStatus }}</siri:ArrivalStatus>{{ end }}{{ if not .MonitoredCall.AimedDepartureTime.IsZero }}
+						<siri:AimedDepartureTime>{{ .MonitoredCall.AimedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedDepartureTime>{{ end }}{{ if not .MonitoredCall.ActualDepartureTime.IsZero }}
+						<siri:ActualDepartureTime>{{ .MonitoredCall.ActualDepartureTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ActualDepartureTime>{{ end }}{{ if not .MonitoredCall.ExpectedDepartureTime.IsZero }}
+						<siri:ExpectedDepartureTime>{{ .MonitoredCall.ExpectedDepartureTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedDepartureTime>{{ end }}{{ if .MonitoredCall.DepartureStatus }}
+						<siri:DepartureStatus>{{ .MonitoredCall.DepartureStatus }}</siri:DepartureStatus>{{end}}
+					</siri:MonitoredCall>{{ end }}
 				</siri:MonitoredVehicleJourney>

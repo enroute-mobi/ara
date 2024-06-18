@@ -27,6 +27,27 @@ Feature: Support SIRI VehicleMonitoring
       | RecordedAtTime   | 2017-01-01T13:00:00.000Z              |
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z              |
       | DriverRef        | "1233"                                |
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-6-00c04fd430c8     |
+    And a StopArea exists with the following attributes:
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Carabacel                                |
+    # 6ba7b814-9dad-11d1-5-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | Codes                         | "internal": "Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                  | 4                                                                      |
+      | VehicleAtStop                 | false                                                                  |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-5-00c04fd430c8                                      |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                                      |
+      | VehicleAtStop                 | false                                                                  |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                     |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                               |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                               |
+      | ArrivalStatus                 | delayed                                                                |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                               |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                               |
+      | DepartureStatus               | delayed                                                                |
+      | Attribute[DestinationDisplay] | Pouet-pouet                                                            |
+    # 6ba7b814-9dad-11d1-5-00c04fd430c8
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
       | LineRef           | Test:Line:3:LOC |
@@ -38,7 +59,7 @@ Feature: Support SIRI VehicleMonitoring
     "ServiceDelivery": {
       "ResponseTimestamp": "2017-01-01T12:00:00Z",
       "ProducerRef": "Ara",
-      "ResponseMessageIdentifier": "RATPDev:ResponseMessage::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC",
+      "ResponseMessageIdentifier": "RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC",
       "RequestMessageRef": "Test:1234::LOC",
       "VehicleMonitoringDelivery": {
         "Version": "2.0:FR-IDF-2.4",
@@ -64,7 +85,21 @@ Feature: Support SIRI VehicleMonitoring
               "Latitude": 5.678
             },
             "Occupancy": "seatsAvailable",
-            "DriverRef": "1233"
+            "DriverRef": "1233",
+            "MonitoredCall": {
+            "StopPointRef": "NINOXE:StopPoint:SP:24:LOC",
+              "StopPointName": "Carabacel",
+              "DestinationDisplay": "Pouet-pouet",
+              "ExpectedArrivalTime": "2017-01-01T15:02:00Z",
+              "ExpectedDepartureTime": "2017-01-01T15:01:00Z",
+              "DepartureStatus": "delayed",
+              "Order": 4,
+              "AimedArrivalTime": "2017-01-01T15:00:00Z",
+              "AimedDepartureTime": "2017-01-01T15:01:00Z",
+              "ArrivalStatus": "delayed",
+              "ActualArrivalTime": "0001-01-01T00:00:00Z",
+              "ActualDepartureTime": "0001-01-01T00:00:00Z"
+            }
           }
         }]
       }

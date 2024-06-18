@@ -380,6 +380,27 @@ Feature: Support SIRI VehicleMonitoring by request
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
       | LinkDistance     | 56                                |
       | Percentage       | 21                                |
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+    And a StopArea exists with the following attributes:
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name  | Carabacel                                |
+      # 6ba7b814-9dad-11d1-8-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | Codes                         | "internal": "Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1" |
+      | PassageOrder                  | 4                                                                      |
+      | VehicleAtStop                 | false                                                                  |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-8-00c04fd430c8                                      |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                                      |
+      | VehicleAtStop                 | false                                                                  |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                     |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                               |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                               |
+      | ArrivalStatus                 | delayed                                                                |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                               |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                               |
+      | DepartureStatus               | delayed                                                                |
+      | Attribute[DestinationDisplay] | Pouet-pouet                                                            |
+      # 6ba7b814-9dad-11d1-9-00c04fd430c8
     When I send this SIRI request
       """
       <?xml version='1.0' encoding='UTF-8'?>
@@ -410,7 +431,7 @@ Feature: Support SIRI VehicleMonitoring by request
           <ServiceDeliveryInfo>
             <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
             <siri:ProducerRef>Ara</siri:ProducerRef>
-            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
             <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
           </ServiceDeliveryInfo>
           <Answer>
@@ -493,6 +514,18 @@ Feature: Support SIRI VehicleMonitoring by request
                   </siri:VehicleLocation>
                   <siri:Bearing>163</siri:Bearing>
                   <siri:DriverRef>Driver3</siri:DriverRef>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Carabacel</siri:StopPointName>
+                      <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
+                      <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-01T15:02:00.000Z</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
+                      <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
+                      <siri:ExpectedDepartureTime>2017-01-01T15:01:00.000Z</siri:ExpectedDepartureTime>
+                      <siri:DepartureStatus>delayed</siri:DepartureStatus>
+                    </siri:MonitoredCall>
                 </siri:MonitoredVehicleJourney>
               </siri:VehicleActivity>
             </siri:VehicleMonitoringDelivery>

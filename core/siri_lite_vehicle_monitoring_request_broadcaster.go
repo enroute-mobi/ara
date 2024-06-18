@@ -103,6 +103,32 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef("OriginRef", vj.Origin, refs)
 		activity.MonitoredVehicleJourney.DestinationRef = connector.handleRef("DestinationRef", vj.Origin, refs)
 
+		if vs[i].NextStopVisitId != model.StopVisitId("") {
+			nextStopVisit, ok := connector.Partner().Model().StopVisits().Find(vs[i].NextStopVisitId)
+			if ok {
+				stopArea, stopAreaCode, ok := connector.stopPointRef(nextStopVisit.StopArea().Id())
+				if ok {
+					monitoredCall := &siri.MonitoredCall{}
+					monitoredCall.StopPointRef = stopAreaCode
+					monitoredCall.StopPointName = stopArea.Name
+					monitoredCall.VehicleAtStop = nextStopVisit.VehicleAtStop
+					monitoredCall.DestinationDisplay = nextStopVisit.Attributes["DestinationDisplay"]
+					monitoredCall.ExpectedArrivalTime = nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED})
+					monitoredCall.ExpectedDepartureTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED})
+					monitoredCall.DepartureStatus = string(nextStopVisit.DepartureStatus)
+					monitoredCall.Order = &nextStopVisit.PassageOrder
+					monitoredCall.AimedArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED})
+					monitoredCall.AimedDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED})
+					monitoredCall.ArrivalStatus = string(nextStopVisit.ArrivalStatus)
+					monitoredCall.ActualArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL})
+					monitoredCall.ActualDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL})
+
+					activity.MonitoredVehicleJourney.MonitoredCall = monitoredCall
+				}
+
+			}
+		}
+
 		modelDate := connector.partner.Model().Date()
 		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef =
 			connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
@@ -129,6 +155,26 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	message.VehicleJourneys = GetModelReferenceSlice(vehicleJourneyRefs)
 
 	return siriLiteResponse
+}
+
+func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) stopPointRef(stopAreaId model.StopAreaId) (*model.StopArea, string, bool) {
+	stopPointRef, ok := connector.partner.Model().StopAreas().Find(stopAreaId)
+	if !ok {
+		return &model.StopArea{}, "", false
+	}
+
+	stopPointRefCode, ok := stopPointRef.Code(connector.remoteCodeSpace)
+	if ok {
+		return stopPointRef, stopPointRefCode.Value(), true
+	}
+	referent, ok := stopPointRef.Referent()
+	if ok {
+		referentCode, ok := referent.Code(connector.remoteCodeSpace)
+		if ok {
+			return referent, referentCode.Value(), true
+		}
+	}
+	return &model.StopArea{}, "", false
 }
 
 func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef(vehicleJourney *model.VehicleJourney) (string, bool) {
