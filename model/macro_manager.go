@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+
+	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
 type hook uint8
@@ -111,20 +113,64 @@ type contextBuilder struct {
 func (b *macroBuilder) buildMacros() []error {
 	e := []error{}
 	for _, c := range b.initialContext {
-		if !c.macro.ModelType.Valid {
-			e = append(e, errors.New("Macro with invalid Type"))
-			continue
+		if c.macro != nil { // We are handling a context
+			e = append(e, b.buildContext(c)...)
+		} else { // We should only have one Updater at a time
+			for i := range c.updaters {
+				e = append(e, b.buildUpdater(c.updaters[i])...)
+			}
 		}
-		mt := modelType[c.macro.ModelType.String]
-		h, ok := hooks[c.macro.Hook.String]
-		if !ok {
-			h = AfterSave
-		}
-		m := NewMacro()
-		e = append(e, b.handleContexes(c, m)...)
-		b.manager.macros[h][mt] = append(b.manager.macros[h][mt], *m)
 	}
 	return e
+}
+
+func (b *macroBuilder) buildContext(c *contextBuilder) []error {
+	h, mt, errs := hookAndModelType(c.macro)
+	if len(errs) != 0 {
+		return errs
+	}
+
+	e := []error{}
+
+	m := NewMacro()
+	e = append(e, b.handleContexes(c, m)...)
+	b.manager.macros[h][mt] = append(b.manager.macros[h][mt], *m)
+
+	return e
+}
+
+func (b *macroBuilder) buildUpdater(sm *SelectMacro) []error {
+	h, mt, errs := hookAndModelType(sm)
+	if len(errs) != 0 {
+		return errs
+	}
+
+	e := []error{}
+
+	m := NewMacro()
+	updater, err := NewUpdaterFromDatabase(sm)
+	if err != nil {
+		e = append(e, err)
+		return e
+	}
+	m.AddUpdater(updater)
+	b.manager.macros[h][mt] = append(b.manager.macros[h][mt], *m)
+
+	return e
+}
+
+func hookAndModelType(sm *SelectMacro) (h hook, mt ModelType, errs []error) {
+	if !sm.ModelType.Valid {
+		errs = append(errs, errors.New("Macro with invalid Type"))
+		return
+	}
+	mt = modelType[sm.ModelType.String]
+
+	h, ok := hooks[sm.Hook.String]
+	if !ok {
+		h = AfterSave
+	}
+	return
 }
 
 func (b *macroBuilder) handleContexes(c *contextBuilder, m *Macro) []error {
@@ -196,8 +242,9 @@ func (manager *MacroManager) Load(referentialSlug string) error {
 	}
 
 	errs := builder.buildMacros()
-	if len(errs) == 0 {
-		return nil
+	if len(errs) != 0 {
+		logger.Log.Debugf("errors while loading Macros: %v", errs)
+		return fmt.Errorf("errors while loading Macros: %v", errs)
 	}
-	return fmt.Errorf("errors while loading Macros: %v", errs)
+	return nil
 }

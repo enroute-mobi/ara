@@ -322,11 +322,26 @@ func (schedules *StopVisitSchedules) referenceDepartureTime() time.Time {
 
 func (schedules *StopVisitSchedules) SetDefaultAimedTimes() {
 	schedules.Lock()
+	defer schedules.Unlock()
+
+	_, ok := schedules.byType[Expected]
+	if !ok {
+		schedules.byType[Expected] = &StopVisitSchedule{kind: Expected}
+		return
+	}
+
+	_, ok = schedules.byType[Aimed]
+	if !ok {
+		schedules.byType[Aimed] = &StopVisitSchedule{kind: Aimed}
+		schedules.byType[Aimed].arrivalTime = schedules.byType[Expected].arrivalTime
+		schedules.byType[Aimed].departureTime = schedules.byType[Expected].departureTime
+		return
+	}
+
 	if schedules.byType[Aimed].arrivalTime.IsZero() {
 		schedules.byType[Aimed].arrivalTime = schedules.byType[Expected].arrivalTime
 	}
 	if schedules.byType[Aimed].departureTime.IsZero() {
 		schedules.byType[Aimed].departureTime = schedules.byType[Expected].departureTime
 	}
-	schedules.Unlock()
 }
