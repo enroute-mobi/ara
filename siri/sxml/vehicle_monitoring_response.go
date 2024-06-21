@@ -3,6 +3,7 @@ package sxml
 import (
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -60,7 +61,7 @@ func NewXMLVehicleActivity(node XMLNode) *XMLVehicleActivity {
 func (response *XMLVehicleMonitoringResponse) VehicleMonitoringDeliveries() []*XMLVehicleMonitoringDelivery {
 	if response.deliveries == nil {
 		deliveries := []*XMLVehicleMonitoringDelivery{}
-		nodes := response.findNodes("VehicleMonitoringDelivery")
+		nodes := response.findNodes(siri_attributes.VehicleMonitoringDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLVehicleMonitoringDelivery(node))
 		}
@@ -72,7 +73,7 @@ func (response *XMLVehicleMonitoringResponse) VehicleMonitoringDeliveries() []*X
 func (delivery *XMLVehicleMonitoringDelivery) VehicleActivities() []*XMLVehicleActivity {
 	if delivery.vehicleActivities == nil {
 		activities := []*XMLVehicleActivity{}
-		nodes := delivery.findNodes("VehicleActivity")
+		nodes := delivery.findNodes(siri_attributes.VehicleActivity)
 		for _, node := range nodes {
 			activities = append(activities, NewXMLVehicleActivity(node))
 		}
@@ -83,42 +84,42 @@ func (delivery *XMLVehicleMonitoringDelivery) VehicleActivities() []*XMLVehicleA
 
 func (va *XMLVehicleActivity) ItemIdentifier() string {
 	if va.itemIdentifier == "" {
-		va.itemIdentifier = va.findStringChildContent("ItemIdentifier")
+		va.itemIdentifier = va.findStringChildContent(siri_attributes.ItemIdentifier)
 	}
 	return va.itemIdentifier
 }
 
 func (va *XMLVehicleActivity) LinkDistance() string {
 	if va.linkDistance == "" {
-		va.linkDistance = va.findStringChildContent("LinkDistance")
+		va.linkDistance = va.findStringChildContent(siri_attributes.LinkDistance)
 	}
 	return va.linkDistance
 }
 
 func (va *XMLVehicleActivity) Percentage() string {
 	if va.percentage == "" {
-		va.percentage = va.findStringChildContent("Percentage")
+		va.percentage = va.findStringChildContent(siri_attributes.Percentage)
 	}
 	return va.percentage
 }
 
 func (va *XMLVehicleActivity) VehicleMonitoringRef() string {
 	if va.vehicleMonitoringRef == "" {
-		va.vehicleMonitoringRef = va.findStringChildContent("VehicleMonitoringRef")
+		va.vehicleMonitoringRef = va.findStringChildContent(siri_attributes.VehicleMonitoringRef)
 	}
 	return va.vehicleMonitoringRef
 }
 
 func (va *XMLVehicleActivity) RecordedAtTime() time.Time {
 	if va.recordedAtTime.IsZero() {
-		va.recordedAtTime = va.findTimeChildContent("RecordedAtTime")
+		va.recordedAtTime = va.findTimeChildContent(siri_attributes.RecordedAtTime)
 	}
 	return va.recordedAtTime
 }
 
 func (va *XMLVehicleActivity) ValidUntilTime() time.Time {
 	if va.validUntilTime.IsZero() {
-		va.validUntilTime = va.findTimeChildContent("RecordedAtTime")
+		va.validUntilTime = va.findTimeChildContent(siri_attributes.RecordedAtTime)
 	}
 	return va.validUntilTime
 }

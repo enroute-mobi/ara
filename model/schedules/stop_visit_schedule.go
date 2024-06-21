@@ -1,4 +1,4 @@
-package model
+package schedules
 
 import (
 	"encoding/json"
@@ -9,18 +9,18 @@ import (
 type StopVisitScheduleType string
 
 const (
-	STOP_VISIT_SCHEDULE_AIMED    StopVisitScheduleType = "aimed"
-	STOP_VISIT_SCHEDULE_EXPECTED StopVisitScheduleType = "expected"
-	STOP_VISIT_SCHEDULE_ACTUAL   StopVisitScheduleType = "actual"
+	Aimed    StopVisitScheduleType = "aimed"
+	Expected StopVisitScheduleType = "expected"
+	Actual   StopVisitScheduleType = "actual"
 )
 
-var SCHEDULE_ORDER_ARRAY = [3]StopVisitScheduleType{
-	STOP_VISIT_SCHEDULE_ACTUAL,
-	STOP_VISIT_SCHEDULE_EXPECTED,
-	STOP_VISIT_SCHEDULE_AIMED,
+var ScheduleOrderArray = []StopVisitScheduleType{
+	Actual,
+	Expected,
+	Aimed,
 }
 
-var stopVisitScheduleTypes = [3]StopVisitScheduleType{STOP_VISIT_SCHEDULE_AIMED, STOP_VISIT_SCHEDULE_EXPECTED, STOP_VISIT_SCHEDULE_ACTUAL}
+var stopVisitScheduleTypes = []StopVisitScheduleType{Aimed, Expected, Actual}
 
 type StopVisitSchedule struct {
 	departureTime time.Time
@@ -244,7 +244,7 @@ func (schedules *StopVisitSchedules) schedule(kind StopVisitScheduleType) *StopV
 
 func (schedules *StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitScheduleType) time.Time {
 	if kinds == nil {
-		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
+		kinds = ScheduleOrderArray
 	}
 	schedules.RLock()
 	for _, kind := range kinds {
@@ -259,7 +259,7 @@ func (schedules *StopVisitSchedules) ArrivalTimeFromKind(kinds []StopVisitSchedu
 
 func (schedules *StopVisitSchedules) DepartureTimeFromKind(kinds []StopVisitScheduleType) time.Time {
 	if kinds == nil {
-		kinds = []StopVisitScheduleType{"actual", "expected", "aimed"}
+		kinds = ScheduleOrderArray
 	}
 	schedules.RLock()
 	for _, kind := range kinds {
@@ -297,7 +297,7 @@ func (schedules *StopVisitSchedules) ReferenceArrivalTime() time.Time {
 }
 
 func (schedules *StopVisitSchedules) referenceArrivalTime() time.Time {
-	for _, kind := range SCHEDULE_ORDER_ARRAY {
+	for _, kind := range ScheduleOrderArray {
 		if s := schedules.schedule(kind).arrivalTime; !s.IsZero() {
 			return s
 		}
@@ -312,10 +312,21 @@ func (schedules *StopVisitSchedules) ReferenceDepartureTime() time.Time {
 }
 
 func (schedules *StopVisitSchedules) referenceDepartureTime() time.Time {
-	for _, kind := range SCHEDULE_ORDER_ARRAY {
+	for _, kind := range ScheduleOrderArray {
 		if s := schedules.schedule(kind).departureTime; !s.IsZero() {
 			return s
 		}
 	}
 	return time.Time{}
+}
+
+func (schedules *StopVisitSchedules) SetDefaultAimedTimes() {
+	schedules.Lock()
+	if schedules.byType[Aimed].arrivalTime.IsZero() {
+		schedules.byType[Aimed].arrivalTime = schedules.byType[Expected].arrivalTime
+	}
+	if schedules.byType[Aimed].departureTime.IsZero() {
+		schedules.byType[Aimed].departureTime = schedules.byType[Expected].departureTime
+	}
+	schedules.Unlock()
 }

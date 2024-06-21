@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/mocktracer"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
@@ -80,7 +81,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	defer testSpan.Finish()
 
 	referential := &Referential{
-		model:          model.NewMemoryModel(),
+		model:          model.NewTestMemoryModel(),
 		collectManager: NewTestCollectManager(),
 	}
 	referential.modelGuardian = NewModelGuardian(referential)
@@ -139,13 +140,13 @@ func Test_ModelGuardian_Run_cleanOrUpdateStopVisits(t *testing.T) {
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.Schedules = model.NewStopVisitSchedules()
+	stopVisit.Schedules = schedules.NewStopVisitSchedules()
 
 	stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_ONTIME
 	stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ONTIME
 
-	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_AIMED, fakeClock.Now().Add(1*time.Minute))
-	stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_AIMED, fakeClock.Now().Add(10*time.Minute))
+	stopVisit.Schedules.SetArrivalTime(schedules.Aimed, fakeClock.Now().Add(1*time.Minute))
+	stopVisit.Schedules.SetDepartureTime(schedules.Aimed, fakeClock.Now().Add(10*time.Minute))
 
 	stopVisit.Save()
 
@@ -200,26 +201,26 @@ func Test_ModelGuardian_Run_cleanOrUpdateStopVisits_Clean(t *testing.T) {
 
 	sv1 := referential.Model().StopVisits().New()
 	sv1.VehicleJourneyId = vj1.Id()
-	sv1.Schedules = model.NewStopVisitSchedules()
-	sv1.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, fakeClock.Now().Add(-1*time.Hour))
+	sv1.Schedules = schedules.NewStopVisitSchedules()
+	sv1.Schedules.SetArrivalTime(schedules.Actual, fakeClock.Now().Add(-1*time.Hour))
 	sv1.Save()
 
 	sv2 := referential.Model().StopVisits().New()
 	sv2.VehicleJourneyId = vj1.Id()
-	sv2.Schedules = model.NewStopVisitSchedules()
-	sv2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, fakeClock.Now().Add(-1*time.Hour))
+	sv2.Schedules = schedules.NewStopVisitSchedules()
+	sv2.Schedules.SetArrivalTime(schedules.Actual, fakeClock.Now().Add(-1*time.Hour))
 	sv2.Save()
 
 	sv3 := referential.Model().StopVisits().New()
 	sv3.VehicleJourneyId = vj2.Id()
-	sv3.Schedules = model.NewStopVisitSchedules()
-	sv3.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, fakeClock.Now().Add(-1*time.Hour))
+	sv3.Schedules = schedules.NewStopVisitSchedules()
+	sv3.Schedules.SetArrivalTime(schedules.Actual, fakeClock.Now().Add(-1*time.Hour))
 	sv3.Save()
 
 	sv4 := referential.Model().StopVisits().New()
 	sv4.VehicleJourneyId = vj2.Id()
-	sv4.Schedules = model.NewStopVisitSchedules()
-	sv4.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, fakeClock.Now())
+	sv4.Schedules = schedules.NewStopVisitSchedules()
+	sv4.Schedules.SetArrivalTime(schedules.Actual, fakeClock.Now())
 	sv4.Save()
 
 	referential.modelGuardian.cleanOrUpdateStopVisits(spanCtx)

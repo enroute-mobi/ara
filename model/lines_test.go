@@ -63,7 +63,7 @@ func Test_Line_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Line_Save(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	line := model.Lines().New()
 	code := NewCode("codeSpace", "value")
 	line.SetCode(code)
@@ -216,7 +216,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	model.date = Date{
 		Year:  2017,
 		Month: time.January,

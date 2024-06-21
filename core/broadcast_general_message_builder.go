@@ -103,7 +103,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	if present {
 		infoMessageIdentifier = code.Value()
 	} else {
-		code, present = situation.Code("_default")
+		code, present = situation.Code(model.Default)
 		if !present {
 			return nil
 		}

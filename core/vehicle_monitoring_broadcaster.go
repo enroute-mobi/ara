@@ -10,7 +10,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/state"
 )
 
@@ -140,7 +142,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			if ok {
 				datedVehicleJourneyRef = vjId.Value()
 			} else {
-				defaultCode, ok := vj.Code("_default")
+				defaultCode, ok := vj.Code(model.Default)
 				if !ok {
 					continue
 				}
@@ -176,7 +178,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{
 				LineRef:            lineRef,
 				PublishedLineName:  line.Name,
-				DirectionName:      vj.Attributes["DirectionName"],
+				DirectionName:      vj.Attributes[siri_attributes.DirectionName],
 				DirectionType:      vj.DirectionType,
 				OriginName:         vj.OriginName,
 				DestinationName:    vj.DestinationName,
@@ -184,8 +186,8 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				Bearing:            vehicle.Bearing,
 				DriverRef:          vehicle.DriverRef,
 				Occupancy:          vehicle.Occupancy,
-				OriginRef:          vm.connector.handleRef("OriginRef", vj.Origin, refs),
-				DestinationRef:     vm.connector.handleRef("DestinationRef", vj.Origin, refs),
+				OriginRef:          vm.connector.handleRef(siri_attributes.OriginRef, vj.Origin, refs),
+				DestinationRef:     vm.connector.handleRef(siri_attributes.DestinationRef, vj.Origin, refs),
 				JourneyPatternRef:  vm.connector.handleJourneyPatternRef(refs),
 				JourneyPatternName: vm.connector.handleJourneyPatternName(refs),
 				VehicleLocation:    vm.connector.handleVehicleLocation(vehicle),
@@ -201,15 +203,15 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 							StopPointName:         stopArea.Name,
 							VehicleAtStop:         nextStopVisit.VehicleAtStop,
 							DestinationDisplay:    nextStopVisit.Attributes["DestinationDisplay"],
-							ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED}),
-							ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED}),
+							ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
+							ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 							DepartureStatus:       string(nextStopVisit.DepartureStatus),
 							Order:                 &nextStopVisit.PassageOrder,
-							AimedArrivalTime:      nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED}),
-							AimedDepartureTime:    nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED}),
+							AimedArrivalTime:      nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed}),
+							AimedDepartureTime:    nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed}),
 							ArrivalStatus:         string(nextStopVisit.ArrivalStatus),
-							ActualArrivalTime:     nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL}),
-							ActualDepartureTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL}),
+							ActualArrivalTime:     nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual}),
+							ActualDepartureTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual}),
 						}
 						monitoredVehicleJourney.MonitoredCall = monitoredCall
 					}
@@ -263,7 +265,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) stopPointRef(stop
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleRef(refType, origin string, references model.References) string {
 	reference, ok := references.Get(refType)
-	if !ok || reference.Code == nil || (refType == "DestinationRef" && connector.noDestinationRefRewritingFrom(origin)) {
+	if !ok || reference.Code == nil || (refType == siri_attributes.DestinationRef && connector.noDestinationRefRewritingFrom(origin)) {
 		return ""
 	}
 	return connector.resolveStopAreaRef(reference)
@@ -291,7 +293,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) resolveStopAreaRe
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatternRef(refs model.References) string {
-	journeyPatternRef, ok := refs.Get("JourneyPatternRef")
+	journeyPatternRef, ok := refs.Get(siri_attributes.JourneyPatternRef)
 	if ok {
 		if connector.remoteCodeSpace == journeyPatternRef.Code.CodeSpace() {
 			return journeyPatternRef.Code.Value()
@@ -302,7 +304,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatt
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) handleJourneyPatternName(refs model.References) string {
-	journeyPatternName, ok := refs.Get("JourneyPatternName")
+	journeyPatternName, ok := refs.Get(siri_attributes.JourneyPatternName)
 	if ok {
 		if connector.remoteCodeSpace == journeyPatternName.Code.CodeSpace() {
 			return journeyPatternName.Code.Value()

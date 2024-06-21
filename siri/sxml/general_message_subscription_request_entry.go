@@ -2,6 +2,8 @@ package sxml
 
 import (
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type XMLGeneralMessageSubscriptionRequestEntry struct {
@@ -20,21 +22,21 @@ func NewXMLGeneralMessageSubscriptionRequestEntry(node XMLNode) *XMLGeneralMessa
 
 func (request *XMLGeneralMessageSubscriptionRequestEntry) SubscriberRef() string {
 	if request.subscriberRef == "" {
-		request.subscriberRef = request.findStringChildContent("SubscriberRef")
+		request.subscriberRef = request.findStringChildContent(siri_attributes.SubscriberRef)
 	}
 	return request.subscriberRef
 }
 
 func (request *XMLGeneralMessageSubscriptionRequestEntry) SubscriptionIdentifier() string {
 	if request.subscriptionIdentifier == "" {
-		request.subscriptionIdentifier = request.findStringChildContent("SubscriptionIdentifier")
+		request.subscriptionIdentifier = request.findStringChildContent(siri_attributes.SubscriptionIdentifier)
 	}
 	return request.subscriptionIdentifier
 }
 
 func (request *XMLGeneralMessageSubscriptionRequestEntry) InitialTerminationTime() time.Time {
 	if request.initialTerminationTime.IsZero() {
-		request.initialTerminationTime = request.findTimeChildContent("InitialTerminationTime")
+		request.initialTerminationTime = request.findTimeChildContent(siri_attributes.InitialTerminationTime)
 	}
 	return request.initialTerminationTime
 }

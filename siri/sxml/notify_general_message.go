@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -42,7 +43,7 @@ func NewXMLGeneralMessageDelivery(node XMLNode) *XMLGeneralMessageDelivery {
 func (notify *XMLNotifyGeneralMessage) GeneralMessagesDeliveries() []*XMLGeneralMessageDelivery {
 	if notify.deliveries == nil {
 		deliveries := []*XMLGeneralMessageDelivery{}
-		nodes := notify.findNodes("GeneralMessageDelivery")
+		nodes := notify.findNodes(siri_attributes.GeneralMessageDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLGeneralMessageDelivery(node))
 		}
@@ -53,7 +54,7 @@ func (notify *XMLNotifyGeneralMessage) GeneralMessagesDeliveries() []*XMLGeneral
 
 func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessages() []*XMLGeneralMessage {
 	if delivery.xmlGeneralMessages == nil {
-		nodes := delivery.findNodes("GeneralMessage")
+		nodes := delivery.findNodes(siri_attributes.GeneralMessage)
 		for _, node := range nodes {
 			delivery.xmlGeneralMessages = append(delivery.xmlGeneralMessages, NewXMLGeneralMessage(node))
 		}
@@ -64,7 +65,7 @@ func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessages() []*XMLGeneralMes
 func (delivery *XMLGeneralMessageDelivery) XMLGeneralMessagesCancellations() []*XMLGeneralMessageCancellation {
 	if delivery.xmlGeneralMessagesCancellations == nil {
 		cancellations := []*XMLGeneralMessageCancellation{}
-		nodes := delivery.findNodes("GeneralMessageCancellation")
+		nodes := delivery.findNodes(siri_attributes.GeneralMessageCancellation)
 		for _, node := range nodes {
 			cancellations = append(cancellations, NewXMLCancelledGeneralMessage(node))
 		}

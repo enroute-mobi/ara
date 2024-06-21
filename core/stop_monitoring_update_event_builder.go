@@ -5,6 +5,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -109,20 +110,20 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			ArrivalStatus:      model.SetStopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
 			DepartureStatus:    model.SetStopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
 			RecordedAt:         xmlStopVisitEvent.RecordedAt(),
-			Schedules:          model.NewStopVisitSchedules(),
+			Schedules:          schedules.NewStopVisitSchedules(),
 
 			CodeSpace: builder.remoteCodeSpace,
 			SiriXML:   xmlStopVisitEvent,
 		}
 
 		if !xmlStopVisitEvent.AimedDepartureTime().IsZero() || !xmlStopVisitEvent.AimedArrivalTime().IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, xmlStopVisitEvent.AimedDepartureTime(), xmlStopVisitEvent.AimedArrivalTime())
+			svEvent.Schedules.SetSchedule(schedules.Aimed, xmlStopVisitEvent.AimedDepartureTime(), xmlStopVisitEvent.AimedArrivalTime())
 		}
 		if !xmlStopVisitEvent.ExpectedDepartureTime().IsZero() || !xmlStopVisitEvent.ExpectedArrivalTime().IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, xmlStopVisitEvent.ExpectedDepartureTime(), xmlStopVisitEvent.ExpectedArrivalTime())
+			svEvent.Schedules.SetSchedule(schedules.Expected, xmlStopVisitEvent.ExpectedDepartureTime(), xmlStopVisitEvent.ExpectedArrivalTime())
 		}
 		if !xmlStopVisitEvent.ActualDepartureTime().IsZero() || !xmlStopVisitEvent.ActualArrivalTime().IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, xmlStopVisitEvent.ActualDepartureTime(), xmlStopVisitEvent.ActualArrivalTime())
+			svEvent.Schedules.SetSchedule(schedules.Actual, xmlStopVisitEvent.ActualDepartureTime(), xmlStopVisitEvent.ActualArrivalTime())
 		}
 
 		if builder.stopMonitoringUpdateEvents.StopVisits[xmlStopVisitEvent.StopPointRef()] == nil {

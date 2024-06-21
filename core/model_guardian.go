@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
@@ -248,7 +249,7 @@ func (simulator *ActualAttributesSimulator) Now() time.Time {
 }
 
 func (simulator *ActualAttributesSimulator) ArrivalTime() time.Time {
-	return simulator.stopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{"expected", "aimed"})
+	return simulator.stopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected, schedules.Aimed})
 }
 
 func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
@@ -256,7 +257,7 @@ func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
 }
 
 func (simulator *ActualAttributesSimulator) DepartureTime() time.Time {
-	return simulator.stopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{"expected", "aimed"})
+	return simulator.stopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected, schedules.Aimed})
 }
 
 func (simulator *ActualAttributesSimulator) AfterDepartureTime() bool {
@@ -274,7 +275,7 @@ func (simulator *ActualAttributesSimulator) Simulate() bool {
 func (simulator *ActualAttributesSimulator) simulateArrival() bool {
 	if simulator.AfterArrivalTime() && simulator.CanArrive() {
 		simulator.stopVisit.ArrivalStatus = model.STOP_VISIT_ARRIVAL_ARRIVED
-		simulator.stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.ArrivalTime())
+		simulator.stopVisit.Schedules.SetArrivalTime(schedules.Actual, simulator.ArrivalTime())
 
 		logger.Log.Printf("Set StopVisit %s ArrivalStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_ARRIVAL_CANCELLED)
 
@@ -311,7 +312,7 @@ func (simulator *ActualAttributesSimulator) simulateDeparture() bool {
 	if simulator.AfterDepartureTime() && simulator.CanDepart() {
 		simulator.stopVisit.DepartureStatus = model.STOP_VISIT_DEPARTURE_DEPARTED
 
-		simulator.stopVisit.Schedules.SetDepartureTime(model.STOP_VISIT_SCHEDULE_ACTUAL, simulator.DepartureTime())
+		simulator.stopVisit.Schedules.SetDepartureTime(schedules.Actual, simulator.DepartureTime())
 		simulator.stopVisit.VehicleAtStop = false
 
 		logger.Log.Printf("Set StopVisit %s DepartureStatus at %s", simulator.stopVisit.Id(), model.STOP_VISIT_DEPARTURE_CANCELLED)

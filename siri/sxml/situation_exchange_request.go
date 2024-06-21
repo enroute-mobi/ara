@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -35,7 +36,7 @@ func NewXMLGetSituationExchangeFromContent(content []byte) (*XMLGetSituationExch
 
 func (request *XMLGetSituationExchange) RequestorRef() string {
 	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent("RequestorRef")
+		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
 	}
 	return request.requestorRef
 }

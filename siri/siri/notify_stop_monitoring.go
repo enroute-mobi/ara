@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type SIRINotifyStopMonitoring struct {
@@ -58,7 +59,7 @@ func (delivery *SIRINotifyStopMonitoringDelivery) ErrorString() string {
 }
 
 func (delivery *SIRINotifyStopMonitoringDelivery) errorType() string {
-	if delivery.ErrorType == "OtherError" {
+	if delivery.ErrorType == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", delivery.ErrorType, delivery.ErrorNumber)
 	}
 	return delivery.ErrorType

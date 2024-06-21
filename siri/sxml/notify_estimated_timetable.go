@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -26,7 +27,7 @@ func NewXMLNotifyEstimatedTimetableDelivery(node XMLNode) *XMLNotifyEstimatedTim
 func (notify *XMLNotifyEstimatedTimetable) EstimatedTimetableDeliveries() []*XMLNotifyEstimatedTimetableDelivery {
 	if notify.deliveries == nil {
 		deliveries := []*XMLNotifyEstimatedTimetableDelivery{}
-		nodes := notify.findNodes("EstimatedTimetableDelivery")
+		nodes := notify.findNodes(siri_attributes.EstimatedTimetableDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLNotifyEstimatedTimetableDelivery(node))
 		}
@@ -53,7 +54,7 @@ func NewXMLNotifyEstimatedTimetableFromContent(content []byte) (*XMLNotifyEstima
 func (delivery *XMLNotifyEstimatedTimetableDelivery) EstimatedJourneyVersionFrames() []*XMLEstimatedJourneyVersionFrame {
 	if delivery.estimatedJourneyVersionFrames == nil {
 		estimatedJourneyVersionFrames := []*XMLEstimatedJourneyVersionFrame{}
-		nodes := delivery.findNodes("EstimatedJourneyVersionFrame")
+		nodes := delivery.findNodes(siri_attributes.EstimatedJourneyVersionFrame)
 		for _, node := range nodes {
 			estimatedJourneyVersionFrames = append(estimatedJourneyVersionFrames, NewXMLEstimatedJourneyVersionFrame(node))
 		}

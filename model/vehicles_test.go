@@ -72,7 +72,7 @@ func Test_Vehicle_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Vehicle_Save(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	vehicle := model.Vehicles().New()
 	code := NewCode("codeSpace", "value")
 	vehicle.SetCode(code)
@@ -99,7 +99,7 @@ func Test_Vehicle_Save(t *testing.T) {
 func Test_Vehicle_Save_WithNextStopVisitId(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	vehicle := model.Vehicles().New()
 	stopVisit := model.StopVisits().New()
 	stopVisit.Save()
@@ -119,7 +119,7 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 
 	var ok bool
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	vehicleA := model.Vehicles().New()
 	vehicleB := model.Vehicles().New()
 	stopVisit1 := model.StopVisits().New()
@@ -264,7 +264,7 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 
 func Test_MemoryVehicles_Delete_WithNextStopVisitId(t *testing.T) {
 	assert := assert.New(t)
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 
 	vehicle := model.Vehicles().New()
 
@@ -290,7 +290,7 @@ func Test_Save_BiqQuery(t *testing.T) {
 	f := audit.NewFakeBigQuery()
 	audit.SetCurrentBigQuery("ref", f)
 
-	m := NewMemoryModel("ref")
+	m := NewTestMemoryModel("ref")
 	vehicles := NewMemoryVehicles()
 	vehicles.model = m
 	v := vehicles.New()

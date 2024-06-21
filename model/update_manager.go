@@ -3,6 +3,7 @@ package model
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 
 	"golang.org/x/exp/maps"
@@ -69,6 +70,16 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 
 	stopArea.Updated(manager.Clock().Now())
 
+	// Default is AfterCreate
+	var h hook
+	if found {
+		h = AfterSave
+	}
+	macros := manager.model.Macros().GetMacros(h, StopAreaType)
+	for i := range macros {
+		macros[i].Update(stopArea)
+	}
+
 	manager.model.StopAreas().Save(stopArea)
 	if event.Origin != "" {
 		status, ok := stopArea.Origins.Origin(event.Origin)
@@ -97,7 +108,7 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 		line = manager.model.Lines().New()
 
 		line.SetCode(event.Code)
-		line.SetCode(NewCode("_default", event.Code.HashValue()))
+		line.SetCode(NewCode(Default, event.Code.HashValue()))
 
 		line.CollectSituations = true
 
@@ -107,6 +118,16 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 	}
 
 	line.Updated(manager.Clock().Now())
+
+	// Default is AfterCreate
+	var h hook
+	if found {
+		h = AfterSave
+	}
+	macros := manager.model.Macros().GetMacros(h, LineType)
+	for i := range macros {
+		macros[i].Update(line)
+	}
 
 	manager.model.Lines().Save(line)
 }
@@ -128,10 +149,10 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj = manager.model.VehicleJourneys().New()
 
 		vj.SetCode(event.Code)
-		vj.SetCode(NewCode("_default", event.Code.HashValue()))
+		vj.SetCode(NewCode(Default, event.Code.HashValue()))
 
 		vj.Origin = event.Origin
-		vj.Name = event.Attributes()["VehicleJourneyName"]
+		vj.Name = event.Attributes()[siri_attributes.VehicleJourneyName]
 		vj.LineId = l.Id()
 	}
 
@@ -148,7 +169,7 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	vj.DestinationName = event.DestinationName
 
 	if event.Direction != "" { // Only used for Push collector
-		vj.Attributes.Set("DirectionName", event.Direction)
+		vj.Attributes.Set(siri_attributes.DirectionName, event.Direction)
 	}
 
 	if event.Occupancy != Undefined {
@@ -157,6 +178,16 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	vj.Monitored = event.Monitored
 	if event.DirectionType != "" { // Do not override unknown DirectionType
 		vj.DirectionType = event.DirectionType
+	}
+
+	// Default is AfterCreate
+	var h hook
+	if found {
+		h = AfterSave
+	}
+	macros := manager.model.Macros().GetMacros(h, VehicleJourneyType)
+	for i := range macros {
+		macros[i].Update(vj)
 	}
 
 	manager.model.VehicleJourneys().Save(vj)
@@ -175,9 +206,10 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 	var sa *StopArea
 	var sv *StopVisit
+	var found bool
 	if event.StopAreaCode.Value() == "" {
-		sv, ok = manager.model.StopVisits().FindByCode(event.Code)
-		if !ok {
+		sv, found = manager.model.StopVisits().FindByCode(event.Code)
+		if !found {
 			logger.Log.Debugf("Can't find Stopvisit from update event without stop area id")
 			return
 		}
@@ -193,12 +225,12 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			return
 		}
 
-		sv, ok = manager.model.StopVisits().FindByCode(event.Code)
-		if !ok {
+		sv, found = manager.model.StopVisits().FindByCode(event.Code)
+		if !found {
 			sv = manager.model.StopVisits().New()
 
 			sv.SetCode(event.Code)
-			sv.SetCode(NewCode("_default", event.Code.HashValue()))
+			sv.SetCode(NewCode(Default, event.Code.HashValue()))
 
 			sv.StopAreaId = sa.Id()
 			sv.VehicleJourneyId = vj.Id()
@@ -254,6 +286,16 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		if status != event.Monitored || !ok {
 			manager.updateMonitoredStopArea(sa.Id(), event.Origin, event.Monitored)
 		}
+	}
+
+	// Default is AfterCreate
+	var h hook
+	if found {
+		h = AfterSave
+	}
+	macros := manager.model.Macros().GetMacros(h, StopVisitType)
+	for i := range macros {
+		macros[i].Update(sv)
 	}
 
 	manager.model.StopVisits().Save(sv)
@@ -324,6 +366,16 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 
 	if line != nil {
 		vehicle.LineId = line.Id()
+	}
+
+	// Default is AfterCreate
+	var h hook
+	if found {
+		h = AfterSave
+	}
+	macros := manager.model.Macros().GetMacros(h, VehicleType)
+	for i := range macros {
+		macros[i].Update(vehicle)
 	}
 
 	manager.model.Vehicles().Save(vehicle)

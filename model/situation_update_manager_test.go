@@ -60,7 +60,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	code := NewCode("codeSpace", "value")
 	testTime := time.Now()
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	situation := model.Situations().New()
 	situation.SetCode(code)
 	situation.SetCode(NewCode("_default", code.HashValue()))
@@ -79,7 +79,7 @@ func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 	code := NewCode("codeSpace", "value")
 	testTime := time.Now()
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	situation := model.Situations().New()
 	situation.SetCode(code)
 	situation.RecordedAt = testTime
@@ -99,7 +99,7 @@ func Test_SituationUpdateManager_CreateSituation(t *testing.T) {
 	code := NewCode("codeSpace", "value")
 	testTime := time.Now()
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 
 	manager := newSituationUpdateManager(model)
 	event := completeEvent(code, testTime)

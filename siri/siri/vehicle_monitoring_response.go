@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type SIRIVehicleMonitoringResponse struct {
@@ -179,7 +180,7 @@ func (delivery *SIRIVehicleMonitoringDelivery) ErrorString() string {
 }
 
 func (delivery *SIRIVehicleMonitoringDelivery) errorType() string {
-	if delivery.ErrorCondition.ErrorType == "OtherError" {
+	if delivery.ErrorCondition.ErrorType == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", delivery.ErrorCondition.ErrorType, delivery.ErrorCondition.ErrorType)
 	}
 	return delivery.ErrorCondition.ErrorType

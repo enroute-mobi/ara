@@ -19,7 +19,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	collectManager := NewTestCollectManager()
 	referential := &Referential{
 		collectManager: collectManager,
-		model:          model.NewMemoryModel(),
+		model:          model.NewTestMemoryModel(),
 	}
 	referential.Model().StopAreas().(*model.MemoryStopAreas).SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -36,7 +36,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space":               "_internal",
+		"remote_code_space":                  "_internal",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -88,13 +88,13 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	// Create a SIRIStopMonitoringRequestCollector
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_url":           ts.URL,
+		"remote_url":        ts.URL,
 		"remote_code_space": "test_kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -135,7 +135,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	// Create a SIRIStopMonitoringRequestCollector
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
@@ -144,7 +144,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
-		"remote_code_space":               "test_kind",
+		"remote_code_space":                  "test_kind",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -193,7 +193,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
@@ -202,7 +202,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
-		"remote_code_space":               "test_kind",
+		"remote_code_space":                  "test_kind",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)

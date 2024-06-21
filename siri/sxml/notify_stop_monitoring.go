@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -29,7 +30,7 @@ func NewXMLNotifyStopMonitoringDelivery(node XMLNode) *XMLNotifyStopMonitoringDe
 func (notify *XMLNotifyStopMonitoring) StopMonitoringDeliveries() []*XMLNotifyStopMonitoringDelivery {
 	if notify.deliveries == nil {
 		deliveries := []*XMLNotifyStopMonitoringDelivery{}
-		nodes := notify.findNodes("StopMonitoringDelivery")
+		nodes := notify.findNodes(siri_attributes.StopMonitoringDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLNotifyStopMonitoringDelivery(node))
 		}
@@ -40,7 +41,7 @@ func (notify *XMLNotifyStopMonitoring) StopMonitoringDeliveries() []*XMLNotifySt
 
 func (delivery *XMLNotifyStopMonitoringDelivery) MonitoringRef() string {
 	if delivery.monitoringRef == "" {
-		delivery.monitoringRef = delivery.findStringChildContent("MonitoringRef")
+		delivery.monitoringRef = delivery.findStringChildContent(siri_attributes.MonitoringRef)
 	}
 	return delivery.monitoringRef
 }
@@ -48,7 +49,7 @@ func (delivery *XMLNotifyStopMonitoringDelivery) MonitoringRef() string {
 func (delivery *XMLNotifyStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {
 	if delivery.monitoredStopVisits == nil {
 		stopVisits := []*XMLMonitoredStopVisit{}
-		nodes := delivery.findNodes("MonitoredStopVisit")
+		nodes := delivery.findNodes(siri_attributes.MonitoredStopVisit)
 		for _, node := range nodes {
 			stopVisits = append(stopVisits, NewXMLMonitoredStopVisit(node))
 		}
@@ -60,7 +61,7 @@ func (delivery *XMLNotifyStopMonitoringDelivery) XMLMonitoredStopVisits() []*XML
 func (delivery *XMLNotifyStopMonitoringDelivery) XMLMonitoredStopVisitCancellations() []*XMLMonitoredStopVisitCancellation {
 	if delivery.monitoredStopVisitCancellations == nil {
 		cancellations := []*XMLMonitoredStopVisitCancellation{}
-		nodes := delivery.findNodes("MonitoredStopVisitCancellation")
+		nodes := delivery.findNodes(siri_attributes.MonitoredStopVisitCancellation)
 		for _, node := range nodes {
 			cancellations = append(cancellations, NewXMLCancelledStopVisit(node))
 		}

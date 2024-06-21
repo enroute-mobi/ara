@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/remote"
 )
 
@@ -144,10 +145,10 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 				PassageOrder:       connector.handleStopSequence(stu),
 				Monitored:          true,
 				RecordedAt:         connector.Clock().Now(),
-				Schedules:          model.NewStopVisitSchedules(),
+				Schedules:          schedules.NewStopVisitSchedules(),
 			}
 			svEvent.Schedules.SetSchedule(
-				model.STOP_VISIT_SCHEDULE_EXPECTED,
+				schedules.Expected,
 				time.Unix(stu.GetDeparture().GetTime(), 0),
 				time.Unix(stu.GetArrival().GetTime(), 0))
 

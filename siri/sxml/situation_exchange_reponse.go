@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -174,7 +175,7 @@ func NewXMLPtSituationElement(node XMLNode) *XMLPtSituationElement {
 func (response *XMLSituationExchangeResponse) SituationExchangeDeliveries() []*XMLSituationExchangeDelivery {
 	if response.deliveries == nil {
 		deliveries := []*XMLSituationExchangeDelivery{}
-		nodes := response.findNodes("SituationExchangeDelivery")
+		nodes := response.findNodes(siri_attributes.SituationExchangeDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLSituationExchangeDelivery(node))
 		}
@@ -186,7 +187,7 @@ func (response *XMLSituationExchangeResponse) SituationExchangeDeliveries() []*X
 func (delivery *XMLSituationExchangeDelivery) Situations() []*XMLPtSituationElement {
 	if delivery.situations == nil {
 		situations := []*XMLPtSituationElement{}
-		nodes := delivery.findNodes("PtSituationElement")
+		nodes := delivery.findNodes(siri_attributes.PtSituationElement)
 		for _, node := range nodes {
 			situations = append(situations, NewXMLPtSituationElement(node))
 		}
@@ -197,21 +198,21 @@ func (delivery *XMLSituationExchangeDelivery) Situations() []*XMLPtSituationElem
 
 func (s *XMLPtSituationElement) Summary() string {
 	if s.summary == "" {
-		s.summary = s.findStringChildContent("Summary")
+		s.summary = s.findStringChildContent(siri_attributes.Summary)
 	}
 	return s.summary
 }
 
 func (s *XMLPtSituationElement) Description() string {
 	if s.description == "" {
-		s.description = s.findStringChildContent("Description")
+		s.description = s.findStringChildContent(siri_attributes.Description)
 	}
 	return s.description
 }
 
 func (s *XMLPtSituationElement) AlertCause() string {
 	if s.alertCause == "" {
-		s.alertCause = s.findStringChildContent("AlertCause")
+		s.alertCause = s.findStringChildContent(siri_attributes.AlertCause)
 	}
 	return s.alertCause
 }
@@ -221,7 +222,7 @@ func (response *XMLSituationExchangeResponse) ErrorString() string {
 }
 
 func (response *XMLSituationExchangeResponse) errorType() string {
-	if response.ErrorType() == "OtherError" {
+	if response.ErrorType() == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
 	}
 	return response.ErrorType()
@@ -231,7 +232,7 @@ func (visit *XMLPtSituationElement) RecordedAtTime() time.Time {
 	if visit.recordedAtTime.IsZero() {
 		visit.recordedAtTime = visit.VersionedAtTime()
 		if visit.recordedAtTime.IsZero() {
-			visit.recordedAtTime = visit.findTimeChildContent("CreationTime")
+			visit.recordedAtTime = visit.findTimeChildContent(siri_attributes.CreationTime)
 		}
 	}
 	return visit.recordedAtTime
@@ -239,28 +240,28 @@ func (visit *XMLPtSituationElement) RecordedAtTime() time.Time {
 
 func (visit *XMLPtSituationElement) VersionedAtTime() time.Time {
 	if visit.versionedAtTime.IsZero() {
-		visit.versionedAtTime = visit.findTimeChildContent("VersionedAtTime")
+		visit.versionedAtTime = visit.findTimeChildContent(siri_attributes.VersionedAtTime)
 	}
 	return visit.versionedAtTime
 }
 
 func (visit *XMLPtSituationElement) SituationNumber() string {
 	if visit.situationNumber == "" {
-		visit.situationNumber = visit.findStringChildContent("SituationNumber")
+		visit.situationNumber = visit.findStringChildContent(siri_attributes.SituationNumber)
 	}
 	return visit.situationNumber
 }
 
 func (visit *XMLPtSituationElement) Version() int {
 	if !visit.version.Defined {
-		visit.version.SetValueWithDefault(visit.findIntChildContent("Version"), 1)
+		visit.version.SetValueWithDefault(visit.findIntChildContent(siri_attributes.Version), 1)
 	}
 	return visit.version.Value
 }
 
 func (visit *XMLPtSituationElement) Keywords() []string {
 	if len(visit.keywords) == 0 {
-		keywords := strings.Split(visit.findStringChildContent("Keywords"), " ")
+		keywords := strings.Split(visit.findStringChildContent(siri_attributes.Keywords), " ")
 		visit.keywords = keywords
 	}
 
@@ -269,7 +270,7 @@ func (visit *XMLPtSituationElement) Keywords() []string {
 
 func (visit *XMLPtSituationElement) ReportType() string {
 	if visit.reportType == "" {
-		visit.reportType = visit.findStringChildContent("ReportType")
+		visit.reportType = visit.findStringChildContent(siri_attributes.ReportType)
 	}
 	return visit.reportType
 }
@@ -277,7 +278,7 @@ func (visit *XMLPtSituationElement) ReportType() string {
 func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
 	if visit.publicationWindows == nil {
 		publicationWindows := []*XMLPeriod{}
-		nodes := visit.findNodes("PublicationWindow")
+		nodes := visit.findNodes(siri_attributes.PublicationWindow)
 		for _, node := range nodes {
 			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
 		}
@@ -289,7 +290,7 @@ func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
 func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLPeriod {
 	if visit.validityPeriods == nil {
 		validityPeriods := []*XMLPeriod{}
-		nodes := visit.findNodes("ValidityPeriod")
+		nodes := visit.findNodes(siri_attributes.ValidityPeriod)
 		for _, node := range nodes {
 			validityPeriods = append(validityPeriods, NewXMLPeriod(node))
 		}
@@ -300,42 +301,42 @@ func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLPeriod {
 
 func (v *XMLPeriod) StartTime() time.Time {
 	if v.startTime.IsZero() {
-		v.startTime = v.findTimeChildContent("StartTime")
+		v.startTime = v.findTimeChildContent(siri_attributes.StartTime)
 	}
 	return v.startTime
 }
 
 func (v *XMLPeriod) EndTime() time.Time {
 	if v.endTime.IsZero() {
-		v.endTime = v.findTimeChildContent("EndTime")
+		v.endTime = v.findTimeChildContent(siri_attributes.EndTime)
 	}
 	return v.endTime
 }
 
 func (visit *XMLPtSituationElement) Severity() string {
 	if visit.severity == "" {
-		visit.severity = visit.findStringChildContent("Severity")
+		visit.severity = visit.findStringChildContent(siri_attributes.Severity)
 	}
 	return visit.severity
 }
 
 func (visit *XMLPtSituationElement) Reality() string {
 	if visit.reality == "" {
-		visit.reality = visit.findStringChildContent("Reality")
+		visit.reality = visit.findStringChildContent(siri_attributes.Reality)
 	}
 	return visit.reality
 }
 
 func (visit *XMLPtSituationElement) Progress() string {
 	if visit.progress == "" {
-		visit.progress = visit.findStringChildContent("Progress")
+		visit.progress = visit.findStringChildContent(siri_attributes.Progress)
 	}
 	return visit.progress
 }
 
 func (visit *XMLPtSituationElement) ParticipantRef() string {
 	if visit.participantRef == "" {
-		visit.participantRef = visit.findStringChildContent("ParticipantRef")
+		visit.participantRef = visit.findStringChildContent(siri_attributes.ParticipantRef)
 	}
 	return visit.participantRef
 }
@@ -343,7 +344,7 @@ func (visit *XMLPtSituationElement) ParticipantRef() string {
 func (visit *XMLPtSituationElement) Consequences() []*XMLConsequence {
 	if visit.consequences == nil {
 		consequences := []*XMLConsequence{}
-		nodes := visit.findNodes("Consequences")
+		nodes := visit.findNodes(siri_attributes.Consequences)
 		for _, node := range nodes {
 			consequences = append(consequences, NewXMLConsequence(node))
 		}
@@ -355,7 +356,7 @@ func (visit *XMLPtSituationElement) Consequences() []*XMLConsequence {
 func (consequence *XMLConsequence) Periods() []*XMLPeriod {
 	if consequence.periods == nil {
 		periods := []*XMLPeriod{}
-		nodes := consequence.findNodes("Period")
+		nodes := consequence.findNodes(siri_attributes.Period)
 		for _, node := range nodes {
 			periods = append(periods, NewXMLPeriod(node))
 		}
@@ -366,7 +367,7 @@ func (consequence *XMLConsequence) Periods() []*XMLPeriod {
 
 func (consequence *XMLConsequence) Severity() string {
 	if consequence.severity == "" {
-		consequence.severity = consequence.findStringChildContent("Severity")
+		consequence.severity = consequence.findStringChildContent(siri_attributes.Severity)
 	}
 	return consequence.severity
 }
@@ -374,7 +375,7 @@ func (consequence *XMLConsequence) Severity() string {
 func (c *XMLConsequence) Affects() []*XMLAffect {
 	if c.affects == nil {
 		affects := []*XMLAffect{}
-		nodes := c.findNodes("Affects")
+		nodes := c.findNodes(siri_attributes.Affects)
 		for _, node := range nodes {
 			affects = append(affects, NewXMLAffect(node))
 		}
@@ -384,7 +385,7 @@ func (c *XMLConsequence) Affects() []*XMLAffect {
 }
 
 func (c *XMLConsequence) HasBlocking() bool {
-	node := c.findNode("Blocking")
+	node := c.findNode(siri_attributes.Blocking)
 	if node != nil {
 		c.hasBlocking = true
 	}
@@ -393,9 +394,9 @@ func (c *XMLConsequence) HasBlocking() bool {
 
 func (c *XMLConsequence) JourneyPlanner() bool {
 	if !c.journeyPlanner.Defined {
-		node := c.findNode("Blocking")
+		node := c.findNode(siri_attributes.Blocking)
 		if node != nil {
-			c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+			c.journeyPlanner.SetValue(c.findBoolChildContent(siri_attributes.JourneyPlanner))
 		}
 	}
 	return c.journeyPlanner.Value
@@ -403,11 +404,11 @@ func (c *XMLConsequence) JourneyPlanner() bool {
 
 func (c *XMLConsequence) RealTime() bool {
 	if !c.realTime.Defined {
-		node := c.findNode("Blocking")
+		node := c.findNode(siri_attributes.Blocking)
 		if node != nil {
-			c.journeyPlanner.SetValue(c.findBoolChildContent("JourneyPlanner"))
+			c.journeyPlanner.SetValue(c.findBoolChildContent(siri_attributes.JourneyPlanner))
 		}
-		c.realTime.SetValue(c.findBoolChildContent("RealTime"))
+		c.realTime.SetValue(c.findBoolChildContent(siri_attributes.RealTime))
 	}
 	return c.realTime.Value
 }
@@ -426,7 +427,7 @@ func (visit *XMLPtSituationElement) Affects() []*XMLAffect {
 
 func (a *XMLAffect) AffectedNetworks() []*XMLAffectedNetwork {
 	if len(a.affectedNetworks) == 0 {
-		nodes := a.findNodes("AffectedNetwork")
+		nodes := a.findNodes(siri_attributes.AffectedNetwork)
 		for _, affectedNetwork := range nodes {
 			a.affectedNetworks = append(a.affectedNetworks, NewXMLAffectedNetwork(affectedNetwork))
 		}
@@ -436,7 +437,7 @@ func (a *XMLAffect) AffectedNetworks() []*XMLAffectedNetwork {
 
 func (an *XMLAffectedNetwork) LineRefs() []string {
 	if len(an.lineRefs) == 0 {
-		nodes := an.findNodes("LineRef")
+		nodes := an.findNodes(siri_attributes.LineRef)
 		for _, lineRef := range nodes {
 			an.lineRefs = append(an.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
 		}
@@ -446,7 +447,7 @@ func (an *XMLAffectedNetwork) LineRefs() []string {
 
 func (an *XMLAffectedNetwork) AffectedRoutes() []*XMLAffectedRoute {
 	if len(an.affectedRoutes) == 0 {
-		nodes := an.findNodes("AffectedRoute")
+		nodes := an.findNodes(siri_attributes.AffectedRoute)
 		for _, affectedRoute := range nodes {
 			an.affectedRoutes = append(an.affectedRoutes, NewXMLAffectedRoute(affectedRoute))
 		}
@@ -456,7 +457,7 @@ func (an *XMLAffectedNetwork) AffectedRoutes() []*XMLAffectedRoute {
 
 func (ar *XMLAffectedRoute) RouteRef() string {
 	if ar.routeRef == "" {
-		ar.routeRef = ar.findStringChildContent("RouteRef")
+		ar.routeRef = ar.findStringChildContent(siri_attributes.RouteRef)
 	}
 	return ar.routeRef
 }
@@ -465,7 +466,7 @@ func (ar *XMLAffectedRoute) AffectedStopPoints() []*XMLAffectedStopPoint {
 		stopPointsNodes := ar.findDirectChildrenNodes("StopPoints")
 		if stopPointsNodes != nil {
 			xmlStopPoints := NewXMLAffectedStopPoint(stopPointsNodes[0])
-			nodes := xmlStopPoints.findNodes("AffectedStopPoint")
+			nodes := xmlStopPoints.findNodes(siri_attributes.AffectedStopPoint)
 			for _, affectedStopPoint := range nodes {
 				ar.affectedStopPoints = append(ar.affectedStopPoints, NewXMLAffectedStopPoint(affectedStopPoint))
 			}
@@ -477,7 +478,7 @@ func (ar *XMLAffectedRoute) AffectedStopPoints() []*XMLAffectedStopPoint {
 
 func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {
 	if len(an.affectedSections) == 0 {
-		nodes := an.findNodes("AffectedSection")
+		nodes := an.findNodes(siri_attributes.AffectedSection)
 		for _, section := range nodes {
 			an.affectedSections = append(an.affectedSections, NewXMLAffectedSection(section))
 		}
@@ -487,21 +488,21 @@ func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {
 
 func (s *XMLAffectedSection) FirstStop() string {
 	if s.firstStop == "" {
-		s.firstStop = s.findStringChildContent("FirstStopPointRef")
+		s.firstStop = s.findStringChildContent(siri_attributes.FirstStopPointRef)
 	}
 	return s.firstStop
 }
 
 func (s *XMLAffectedSection) LastStop() string {
 	if s.lastStop == "" {
-		s.lastStop = s.findStringChildContent("LastStopPointRef")
+		s.lastStop = s.findStringChildContent(siri_attributes.LastStopPointRef)
 	}
 	return s.lastStop
 }
 
 func (an *XMLAffectedNetwork) AffectedDestinations() []string {
 	if len(an.affectedDestinations) == 0 {
-		nodes := an.findNodes("StopPlaceRef")
+		nodes := an.findNodes(siri_attributes.StopPlaceRef)
 		for _, routeRef := range nodes {
 			an.affectedDestinations = append(an.affectedDestinations, strings.TrimSpace(routeRef.NativeNode().Content()))
 		}
@@ -514,7 +515,7 @@ func (a *XMLAffect) AffectedStopPoints() []*XMLAffectedStopPoint {
 		stopPointsNodes := a.findDirectChildrenNodes("StopPoints")
 		if stopPointsNodes != nil {
 			xmlStopPoints := NewXMLAffectedStopPoint(stopPointsNodes[0])
-			nodes := xmlStopPoints.findNodes("AffectedStopPoint")
+			nodes := xmlStopPoints.findNodes(siri_attributes.AffectedStopPoint)
 			for _, affectedStopPoint := range nodes {
 				a.affectedStopPoints = append(a.affectedStopPoints, NewXMLAffectedStopPoint(affectedStopPoint))
 			}
@@ -526,14 +527,14 @@ func (a *XMLAffect) AffectedStopPoints() []*XMLAffectedStopPoint {
 
 func (asp *XMLAffectedStopPoint) StopPointRef() string {
 	if asp.stopPointRef == "" {
-		asp.stopPointRef = asp.findStringChildContent("StopPointRef")
+		asp.stopPointRef = asp.findStringChildContent(siri_attributes.StopPointRef)
 	}
 	return asp.stopPointRef
 }
 
 func (asp *XMLAffectedStopPoint) LineRefs() []string {
 	if len(asp.lineRefs) == 0 {
-		nodes := asp.findNodes("LineRef")
+		nodes := asp.findNodes(siri_attributes.LineRef)
 		for _, lineRef := range nodes {
 			asp.lineRefs = append(asp.lineRefs, strings.TrimSpace(lineRef.NativeNode().Content()))
 		}

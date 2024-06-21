@@ -158,7 +158,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Situation_Save(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	situation := model.Situations().New()
 	code := NewCode("codeSpace", "value")
 	situation.SetCode(code)

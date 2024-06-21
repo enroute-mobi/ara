@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type SIRINotifyProductionTimetable struct {
@@ -29,7 +30,7 @@ func (notify *SIRINotifyProductionTimetable) ErrorString() string {
 }
 
 func (notify *SIRINotifyProductionTimetable) errorType() string {
-	if notify.ErrorType == "OtherError" {
+	if notify.ErrorType == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", notify.ErrorType, notify.ErrorNumber)
 	}
 	return notify.ErrorType

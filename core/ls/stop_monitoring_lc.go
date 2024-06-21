@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 type StopMonitoringLastChange struct {
@@ -11,7 +12,7 @@ type StopMonitoringLastChange struct {
 	optionParser
 	schedulesHandler
 
-	schedules       *model.StopVisitSchedules
+	schedules       *schedules.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 }
@@ -52,7 +53,7 @@ func (smlc *StopMonitoringLastChange) Haschanged(stopVisit *model.StopVisit) boo
 		duration = 1 * time.Minute
 	}
 
-	orderMap := []model.StopVisitScheduleType{"actual", "expected", "aimed"}
+	orderMap := []schedules.StopVisitScheduleType{schedules.Actual, schedules.Expected, schedules.Aimed}
 	for _, kind := range orderMap {
 		ok := smlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)
 		ok = ok || smlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), smlc.schedules.Schedule(kind), duration)

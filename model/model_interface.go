@@ -24,6 +24,7 @@ type Model interface {
 	VehicleJourneys() VehicleJourneys
 	Operators() Operators
 	Vehicles() Vehicles
+	Macros() Macros
 }
 
 type MemoryModel struct {
@@ -35,6 +36,7 @@ type MemoryModel struct {
 	vehicleJourneys     *MemoryVehicleJourneys
 	situations          *MemorySituations
 	operators           *MemoryOperators
+	macros              *MacroManager
 	SMEventsChan        chan StopMonitoringBroadcastEvent
 	GMEventsChan        chan SituationBroadcastEvent
 	SXEventsChan        chan SituationBroadcastEvent
@@ -43,8 +45,18 @@ type MemoryModel struct {
 	date                Date
 }
 
-// Optionnal argument for tests
-func NewMemoryModel(referential ...string) *MemoryModel {
+func NewMemoryModel(referential string) *MemoryModel {
+	model := &MemoryModel{
+		date:        NewDate(clock.DefaultClock().Now()),
+		referential: referential,
+	}
+
+	model.refresh()
+
+	return model
+}
+
+func NewTestMemoryModel(referential ...string) *MemoryModel {
 	model := &MemoryModel{
 		date: NewDate(clock.DefaultClock().Now()),
 	}
@@ -95,6 +107,13 @@ func (model *MemoryModel) refresh() {
 	vehicles.model = model
 	model.vehicles = vehicles
 	model.vehicles.broadcastEvent = model.broadcastVeEvent
+
+	model.macros = NewMacroManager()
+}
+
+func (model *MemoryModel) RefreshMacros() {
+	model.macros = NewMacroManager()
+	model.macros.Load(model.referential)
 }
 
 func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
@@ -153,10 +172,10 @@ func (model *MemoryModel) broadcastSXEvent(event SituationBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) Reload(referentialSlug string) *MemoryModel {
+func (model *MemoryModel) Reload() *MemoryModel {
 	model.refresh()
 	model.date = NewDate(clock.DefaultClock().Now())
-	model.Load(referentialSlug)
+	model.Load()
 	return model
 }
 
@@ -196,26 +215,34 @@ func (model *MemoryModel) Vehicles() Vehicles {
 	return model.vehicles
 }
 
-func (model *MemoryModel) Load(referentialSlug string) error {
-	err := model.stopAreas.Load(referentialSlug)
+func (model *MemoryModel) Macros() Macros {
+	return model.macros
+}
+
+func (model *MemoryModel) Load() error {
+	err := model.stopAreas.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopAreas: %v", err)
 	}
-	err = model.lines.Load(referentialSlug)
+	err = model.lines.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Lines: %v", err)
 	}
-	err = model.vehicleJourneys.Load(referentialSlug)
+	err = model.vehicleJourneys.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading VehicleJourneys: %v", err)
 	}
-	err = model.scheduledStopVisits.Load(referentialSlug)
+	err = model.scheduledStopVisits.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopVisits: %v", err)
 	}
-	err = model.operators.Load(referentialSlug)
+	err = model.operators.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Operators: %v", err)
+	}
+	err = model.macros.Load(model.referential)
+	if err != nil {
+		logger.Log.Debugf("Error while loading Macros: %v", err)
 	}
 	return nil
 }

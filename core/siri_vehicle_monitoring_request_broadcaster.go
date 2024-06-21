@@ -8,7 +8,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
 )
@@ -200,15 +202,15 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 					StopPointName:         stopArea.Name,
 					VehicleAtStop:         nextStopVisit.VehicleAtStop,
 					DestinationDisplay:    nextStopVisit.Attributes["DestinationDisplay"],
-					ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED}),
-					ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED}),
+					ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
+					ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 					DepartureStatus:       string(nextStopVisit.DepartureStatus),
 					Order:                 &nextStopVisit.PassageOrder,
-					AimedArrivalTime:      nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED}),
-					AimedDepartureTime:    nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED}),
+					AimedArrivalTime:      nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed}),
+					AimedDepartureTime:    nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed}),
 					ArrivalStatus:         string(nextStopVisit.ArrivalStatus),
-					ActualArrivalTime:     nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL}),
-					ActualDepartureTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL}),
+					ActualArrivalTime:     nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual}),
+					ActualDepartureTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual}),
 				}
 				monitoredVehicleJourney.MonitoredCall = monitoredCall
 			}
@@ -258,7 +260,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) datedVehicleJourneyRef
 	if ok {
 		dataVehicleJourneyRef = vehicleJourneyId.Value()
 	} else {
-		defaultCode, ok := vehicleJourney.Code("_default")
+		defaultCode, ok := vehicleJourney.Code(model.Default)
 		if !ok {
 			return "", false
 		}
@@ -306,7 +308,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleJourneyPatternRe
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) handleJourneyPatternName(refs model.References) string {
-	journeyPatternName, ok := refs.Get("JourneyPatternName")
+	journeyPatternName, ok := refs.Get(siri_attributes.JourneyPatternName)
 	if ok {
 		if connector.remoteCodeSpace == journeyPatternName.Code.CodeSpace() {
 			return journeyPatternName.Code.Value()

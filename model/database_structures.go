@@ -166,3 +166,24 @@ type SelectStopVisit struct {
 	References       sql.NullString `db:"siri_references"`
 	PassageOrder     sql.NullInt64  `db:"passage_order"`
 }
+
+// type DatabaseMacro struct {
+// 	ReferentialId  string         `db:"referential_id"`
+// 	Slug           string         `db:"slug"`
+// 	Name           string         `db:"name"`
+// 	Settings       string         `db:"settings"`
+// 	Tokens         string         `db:"tokens"`
+// 	ImportTokens   string         `db:"import_tokens"`
+// 	OrganisationId sql.NullString `db:"organisation_id"`
+// }
+
+type SelectMacro struct {
+	Id              string
+	ReferentialSlug string         `db:"referential_slug"`
+	ContextId       sql.NullString `db:"context_id"`
+	Position        int
+	Type            string
+	ModelType       sql.NullString `db:"model_type"`
+	Hook            sql.NullString
+	Attributes      sql.NullString
+}

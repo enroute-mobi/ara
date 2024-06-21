@@ -21,7 +21,7 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 
@@ -64,7 +64,7 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
@@ -103,7 +103,7 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
@@ -157,7 +157,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
@@ -203,7 +203,7 @@ func Test_CancelSubscription(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
@@ -243,7 +243,7 @@ func Test_CancelSubscriptionAll(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
@@ -300,7 +300,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
 	referential.broacasterManager.Start()
@@ -401,7 +401,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
 	referential.broacasterManager.Start()

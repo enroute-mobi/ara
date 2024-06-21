@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type SiriLiteResponse struct {
@@ -33,7 +35,7 @@ type ErrorCondition struct {
 func (ec *ErrorCondition) MarshalJson() ([]byte, error) {
 	aux := make(map[string]map[string]string)
 	aux[ec.ErrorType] = make(map[string]string)
-	if ec.ErrorType == "OtherError" {
+	if ec.ErrorType == siri_attributes.OtherError {
 		aux[ec.ErrorType]["number"] = strconv.Itoa(ec.ErrorNumber)
 	}
 	aux[ec.ErrorType]["ErrorText"] = ec.ErrorText

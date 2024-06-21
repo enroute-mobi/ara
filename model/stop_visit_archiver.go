@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"cloud.google.com/go/bigquery"
 )
 
@@ -32,14 +34,14 @@ func (sva *StopVisitArchiver) Archive() {
 	vj := sva.VehicleJourney()
 	longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
 		StopVisitUUID:      string(sv.Id()),
-		AimedArrivalTime:   sva.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
-		AimedDepartureTime: sva.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_AIMED),
+		AimedArrivalTime:   sva.setArrivalTimeEventFromKind(sv, schedules.Aimed),
+		AimedDepartureTime: sva.setDepartureTimeEventFromKind(sv, schedules.Aimed),
 
-		ExpectedArrivalTime:   sva.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_EXPECTED),
-		ExpectedDepartureTime: sva.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_EXPECTED),
+		ExpectedArrivalTime:   sva.setArrivalTimeEventFromKind(sv, schedules.Expected),
+		ExpectedDepartureTime: sva.setDepartureTimeEventFromKind(sv, schedules.Expected),
 
-		ActualArrivalTime:   sva.setArrivalTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_ACTUAL),
-		ActualDepartureTime: sva.setDepartureTimeEventFromKind(sv, STOP_VISIT_SCHEDULE_ACTUAL),
+		ActualArrivalTime:   sva.setArrivalTimeEventFromKind(sv, schedules.Actual),
+		ActualDepartureTime: sva.setDepartureTimeEventFromKind(sv, schedules.Actual),
 
 		StopAreaName:        sa.Name,
 		StopAreaCoordinates: fmt.Sprintf("POINT(%f %f)", sa.Longitude, sa.Latitude),
@@ -60,7 +62,7 @@ func (sva *StopVisitArchiver) Archive() {
 			longTermStopVisitEvent.VehicleJourneyCodes = append(longTermStopVisitEvent.VehicleJourneyCodes, *code)
 		}
 
-		transportMode, ok := vj.Attribute("VehicleMode")
+		transportMode, ok := vj.Attribute(siri_attributes.VehicleMode)
 		if ok {
 			longTermStopVisitEvent.TransportMode = transportMode
 		}
@@ -97,9 +99,9 @@ func (sva *StopVisitArchiver) Archive() {
 	audit.CurrentBigQuery(sva.Model.Referential()).WriteEvent(longTermStopVisitEvent)
 }
 
-func (sva *StopVisitArchiver) setArrivalTimeEventFromKind(sv *StopVisit, kind StopVisitScheduleType) bigquery.NullTimestamp {
+func (sva *StopVisitArchiver) setArrivalTimeEventFromKind(sv *StopVisit, kind schedules.StopVisitScheduleType) bigquery.NullTimestamp {
 	t := bigquery.NullTimestamp{}
-	arrivalTime := sv.Schedules.ArrivalTimeFromKind([]StopVisitScheduleType{kind})
+	arrivalTime := sv.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{kind})
 	if arrivalTime == (time.Time{}) {
 		t.Valid = false
 	} else {
@@ -110,9 +112,9 @@ func (sva *StopVisitArchiver) setArrivalTimeEventFromKind(sv *StopVisit, kind St
 	return t
 }
 
-func (sva *StopVisitArchiver) setDepartureTimeEventFromKind(sv *StopVisit, kind StopVisitScheduleType) bigquery.NullTimestamp {
+func (sva *StopVisitArchiver) setDepartureTimeEventFromKind(sv *StopVisit, kind schedules.StopVisitScheduleType) bigquery.NullTimestamp {
 	t := bigquery.NullTimestamp{}
-	departureTime := sv.Schedules.DepartureTimeFromKind([]StopVisitScheduleType{kind})
+	departureTime := sv.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{kind})
 	if departureTime == (time.Time{}) {
 		t.Valid = false
 	} else {

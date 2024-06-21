@@ -8,6 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 type PushCollector struct {
@@ -206,8 +207,8 @@ func (pc *PushCollector) handleVehicles(vs []*em.ExternalVehicle) (vehicles []st
 	return
 }
 
-func handleSchedules(sc *model.StopVisitSchedules, protoDeparture, protoArrival *em.ExternalStopVisit_Times) {
-	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, protoDeparture.GetAimed().AsTime(), protoArrival.GetAimed().AsTime())
-	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, protoDeparture.GetActual().AsTime(), protoArrival.GetActual().AsTime())
-	sc.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, protoDeparture.GetExpected().AsTime(), protoArrival.GetExpected().AsTime())
+func handleSchedules(sc *schedules.StopVisitSchedules, protoDeparture, protoArrival *em.ExternalStopVisit_Times) {
+	sc.SetSchedule(schedules.Aimed, protoDeparture.GetAimed().AsTime(), protoArrival.GetAimed().AsTime())
+	sc.SetSchedule(schedules.Actual, protoDeparture.GetActual().AsTime(), protoArrival.GetActual().AsTime())
+	sc.SetSchedule(schedules.Expected, protoDeparture.GetExpected().AsTime(), protoArrival.GetExpected().AsTime())
 }

@@ -32,7 +32,7 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 			situation = manager.model.Situations().New()
 			situation.Origin = event.Origin
 			situation.SetCode(event.SituationCode)
-			situation.SetCode(NewCode("_default", event.SituationCode.HashValue()))
+			situation.SetCode(NewCode(Default, event.SituationCode.HashValue()))
 		}
 
 		situation.RecordedAt = event.RecordedAt

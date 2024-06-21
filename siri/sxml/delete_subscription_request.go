@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -29,7 +30,7 @@ func NewXMLDeleteSubscriptionRequestFromContent(content []byte) (*XMLDeleteSubsc
 
 func (request *XMLDeleteSubscriptionRequest) SubscriptionRef() string {
 	if request.subscriptionRef == "" {
-		request.subscriptionRef = request.findStringChildContent("SubscriptionRef")
+		request.subscriptionRef = request.findStringChildContent(siri_attributes.SubscriptionRef)
 	}
 	return request.subscriptionRef
 }

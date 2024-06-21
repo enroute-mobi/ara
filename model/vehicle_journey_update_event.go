@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
@@ -40,26 +41,26 @@ func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
 		return ue.attributes
 	}
 
-	ue.attributes.Set("Delay", ue.SiriXML.Delay())
-	ue.attributes.Set("Bearing", ue.SiriXML.Bearing())
-	ue.attributes.Set("InPanic", ue.SiriXML.InPanic())
-	ue.attributes.Set("InCongestion", ue.SiriXML.InCongestion())
-	ue.attributes.Set("SituationRef", ue.SiriXML.SituationRef())
-	ue.attributes.Set("DirectionName", ue.SiriXML.DirectionName())
-	ue.attributes.Set("FirstOrLastJourney", ue.SiriXML.FirstOrLastJourney())
-	ue.attributes.Set("HeadwayService", ue.SiriXML.HeadwayService())
-	ue.attributes.Set("JourneyNote", ue.SiriXML.JourneyNote())
-	ue.attributes.Set("JourneyPatternName", ue.SiriXML.JourneyPatternName())
-	ue.attributes.Set("MonitoringError", ue.SiriXML.MonitoringError())
-	ue.attributes.Set("OriginAimedDepartureTime", ue.SiriXML.OriginAimedDepartureTime())
-	ue.attributes.Set("DestinationAimedArrivalTime", ue.SiriXML.DestinationAimedArrivalTime())
-	ue.attributes.Set("ProductCategoryRef", ue.SiriXML.ProductCategoryRef())
-	ue.attributes.Set("ServiceFeatureRef", ue.SiriXML.ServiceFeatureRef())
-	ue.attributes.Set("TrainNumberRef", ue.SiriXML.TrainNumberRef())
-	ue.attributes.Set("VehicleFeatureRef", ue.SiriXML.VehicleFeatureRef())
-	ue.attributes.Set("VehicleMode", ue.SiriXML.VehicleMode())
-	ue.attributes.Set("ViaPlaceName", ue.SiriXML.ViaPlaceName())
-	ue.attributes.Set("VehicleJourneyName", ue.SiriXML.VehicleJourneyName())
+	ue.attributes.Set(siri_attributes.Delay, ue.SiriXML.Delay())
+	ue.attributes.Set(siri_attributes.Bearing, ue.SiriXML.Bearing())
+	ue.attributes.Set(siri_attributes.InPanic, ue.SiriXML.InPanic())
+	ue.attributes.Set(siri_attributes.InCongestion, ue.SiriXML.InCongestion())
+	ue.attributes.Set(siri_attributes.SituationRef, ue.SiriXML.SituationRef())
+	ue.attributes.Set(siri_attributes.DirectionName, ue.SiriXML.DirectionName())
+	ue.attributes.Set(siri_attributes.FirstOrLastJourney, ue.SiriXML.FirstOrLastJourney())
+	ue.attributes.Set(siri_attributes.HeadwayService, ue.SiriXML.HeadwayService())
+	ue.attributes.Set(siri_attributes.JourneyNote, ue.SiriXML.JourneyNote())
+	ue.attributes.Set(siri_attributes.JourneyPatternName, ue.SiriXML.JourneyPatternName())
+	ue.attributes.Set(siri_attributes.MonitoringError, ue.SiriXML.MonitoringError())
+	ue.attributes.Set(siri_attributes.OriginAimedDepartureTime, ue.SiriXML.OriginAimedDepartureTime())
+	ue.attributes.Set(siri_attributes.DestinationAimedArrivalTime, ue.SiriXML.DestinationAimedArrivalTime())
+	ue.attributes.Set(siri_attributes.ProductCategoryRef, ue.SiriXML.ProductCategoryRef())
+	ue.attributes.Set(siri_attributes.ServiceFeatureRef, ue.SiriXML.ServiceFeatureRef())
+	ue.attributes.Set(siri_attributes.TrainNumberRef, ue.SiriXML.TrainNumberRef())
+	ue.attributes.Set(siri_attributes.VehicleFeatureRef, ue.SiriXML.VehicleFeatureRef())
+	ue.attributes.Set(siri_attributes.VehicleMode, ue.SiriXML.VehicleMode())
+	ue.attributes.Set(siri_attributes.ViaPlaceName, ue.SiriXML.ViaPlaceName())
+	ue.attributes.Set(siri_attributes.VehicleJourneyName, ue.SiriXML.VehicleJourneyName())
 
 	// filter empty attributes
 	for k := range ue.attributes {
@@ -82,8 +83,8 @@ func (ue *VehicleJourneyUpdateEvent) References() References {
 		return *ue.references
 	}
 
-	ue.references.SetCode("PlaceRef", NewCode(ue.CodeSpace, ue.SiriXML.PlaceRef()))
-	ue.references.SetCode("JourneyPatternRef", NewCode(ue.CodeSpace, ue.SiriXML.JourneyPatternRef()))
-	ue.references.SetCode("RouteRef", NewCode(ue.CodeSpace, ue.SiriXML.RouteRef()))
+	ue.references.SetCode(siri_attributes.PlaceRef, NewCode(ue.CodeSpace, ue.SiriXML.PlaceRef()))
+	ue.references.SetCode(siri_attributes.JourneyPatternRef, NewCode(ue.CodeSpace, ue.SiriXML.JourneyPatternRef()))
+	ue.references.SetCode(siri_attributes.RouteRef, NewCode(ue.CodeSpace, ue.SiriXML.RouteRef()))
 	return *ue.references
 }

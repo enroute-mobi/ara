@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -40,7 +41,7 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionSMEntries() []*XMLStopMoni
 	if len(request.smEntries) != 0 {
 		return request.smEntries
 	}
-	nodes := request.findNodes("StopMonitoringSubscriptionRequest")
+	nodes := request.findNodes(siri_attributes.StopMonitoringSubscriptionRequest)
 	for _, stopMonitoring := range nodes {
 		request.smEntries = append(request.smEntries, NewXMLStopMonitoringSubscriptionRequestEntry(stopMonitoring))
 	}
@@ -51,7 +52,7 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionETTEntries() []*XMLEstimat
 	if len(request.ettEntries) != 0 {
 		return request.ettEntries
 	}
-	nodes := request.findNodes("EstimatedTimetableSubscriptionRequest")
+	nodes := request.findNodes(siri_attributes.EstimatedTimetableSubscriptionRequest)
 	for _, ett := range nodes {
 		request.ettEntries = append(request.ettEntries, NewXMLEstimatedTimetableSubscriptionRequestEntry(ett))
 	}
@@ -62,7 +63,7 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionVMEntries() []*XMLVehicleM
 	if len(request.vmEntries) != 0 {
 		return request.vmEntries
 	}
-	nodes := request.findNodes("VehicleMonitoringSubscriptionRequest")
+	nodes := request.findNodes(siri_attributes.VehicleMonitoringSubscriptionRequest)
 	for _, vm := range nodes {
 		request.vmEntries = append(request.vmEntries, NewXMLVehicleMonitoringSubscriptionRequestEntry(vm))
 	}
@@ -73,7 +74,7 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionPTTEntries() []*XMLProduct
 	if len(request.pttEntries) != 0 {
 		return request.pttEntries
 	}
-	nodes := request.findNodes("ProductionTimetableSubscriptionRequest")
+	nodes := request.findNodes(siri_attributes.ProductionTimetableSubscriptionRequest)
 	for _, ett := range nodes {
 		request.pttEntries = append(request.pttEntries, NewXMLProductionTimetableSubscriptionRequestEntry(ett))
 	}
@@ -84,7 +85,7 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionGMEntries() []*XMLGeneralM
 	if len(request.gmEntries) != 0 {
 		return request.gmEntries
 	}
-	nodes := request.findNodes("GeneralMessageSubscriptionRequest")
+	nodes := request.findNodes(siri_attributes.GeneralMessageSubscriptionRequest)
 	for _, generalMessage := range nodes {
 		request.gmEntries = append(request.gmEntries, NewXMLGeneralMessageSubscriptionRequestEntry(generalMessage))
 	}
@@ -95,7 +96,7 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionSXEntries() []*XMLSituatio
 	if len(request.sxEntries) != 0 {
 		return request.sxEntries
 	}
-	nodes := request.findNodes("SituationExchangeSubscriptionRequest")
+	nodes := request.findNodes(siri_attributes.SituationExchangeSubscriptionRequest)
 	for _, situationExchangeMessage := range nodes {
 		request.sxEntries = append(request.sxEntries, NewXMLSituationExchangeSubscriptionRequestEntry(situationExchangeMessage))
 	}
@@ -104,21 +105,21 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionSXEntries() []*XMLSituatio
 
 func (request *XMLSubscriptionRequest) ConsumerAddress() string {
 	if request.consumerAddress == "" {
-		request.consumerAddress = request.findStringChildContent("ConsumerAddress")
+		request.consumerAddress = request.findStringChildContent(siri_attributes.ConsumerAddress)
 	}
 	return request.consumerAddress
 }
 
 func (request *XMLSubscriptionRequest) ChangeBeforeUpdates() string {
 	if request.changeBeforeUpdates == "" {
-		request.changeBeforeUpdates = request.findStringChildContent("ChangeBeforeUpdates")
+		request.changeBeforeUpdates = request.findStringChildContent(siri_attributes.ChangeBeforeUpdates)
 	}
 	return request.changeBeforeUpdates
 }
 
 func (request *XMLSubscriptionRequest) IncrementalUpdates() string {
 	if request.incrementalUpdates == "" {
-		request.incrementalUpdates = request.findStringChildContent("IncrementalUpdates")
+		request.incrementalUpdates = request.findStringChildContent(siri_attributes.IncrementalUpdates)
 	}
 	return request.incrementalUpdates
 }

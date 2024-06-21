@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -29,7 +30,7 @@ func NewXMLNotifySituationExchangeFromContent(content []byte) (*XMLNotifySituati
 func (notify *XMLNotifySituationExchange) SituationExchangesDeliveries() []*XMLSituationExchangeDelivery {
 	if notify.deliveries == nil {
 		deliveries := []*XMLSituationExchangeDelivery{}
-		nodes := notify.findNodes("SituationExchangeDelivery")
+		nodes := notify.findNodes(siri_attributes.SituationExchangeDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLSituationExchangeDelivery(node))
 		}

@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -20,7 +21,7 @@ type StopVisit struct {
 	model       Model
 	References  References
 	Attributes  Attributes
-	Schedules   *StopVisitSchedules
+	Schedules   *schedules.StopVisitSchedules
 	CodeConsumer
 	VehicleJourneyId VehicleJourneyId         `json:",omitempty"`
 	StopAreaId       StopAreaId               `json:",omitempty"`
@@ -37,7 +38,7 @@ type StopVisit struct {
 func NewStopVisit(model Model) *StopVisit {
 	stopVisit := &StopVisit{
 		model:      model,
-		Schedules:  NewStopVisitSchedules(),
+		Schedules:  schedules.NewStopVisitSchedules(),
 		Attributes: NewAttributes(),
 		References: NewReferences(),
 	}
@@ -105,8 +106,8 @@ func (stopVisit *StopVisit) NotCollected(notCollectedAt time.Time) {
 		stopVisit.DepartureStatus = STOP_VISIT_DEPARTURE_DEPARTED
 	}
 
-	stopVisit.Schedules.SetArrivalTimeIfNotDefined(STOP_VISIT_SCHEDULE_ACTUAL, notCollectedAt)
-	stopVisit.Schedules.SetDepartureTimeIfNotDefined(STOP_VISIT_SCHEDULE_ACTUAL, notCollectedAt)
+	stopVisit.Schedules.SetArrivalTimeIfNotDefined(schedules.Actual, notCollectedAt)
+	stopVisit.Schedules.SetDepartureTimeIfNotDefined(schedules.Actual, notCollectedAt)
 }
 
 func (stopVisit *StopVisit) CollectedAt() time.Time {
@@ -145,7 +146,7 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		RecordedAt  *time.Time `json:",omitempty"`
 		Attributes  Attributes `json:",omitempty"`
 		Id          StopVisitId
-		Schedules   []StopVisitSchedule `json:",omitempty"`
+		Schedules   []schedules.StopVisitSchedule `json:",omitempty"`
 		Collected   bool
 	}{
 		Id:        stopVisit.id,
@@ -184,7 +185,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 		Codes       map[string]string
 		References  map[string]Reference
 		*Alias
-		Schedules []StopVisitSchedule
+		Schedules []schedules.StopVisitSchedule
 	}{
 		Alias: (*Alias)(stopVisit),
 	}
@@ -203,7 +204,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Schedules != nil {
-		stopVisit.Schedules = NewStopVisitSchedules()
+		stopVisit.Schedules = schedules.NewStopVisitSchedules()
 		for _, schedule := range aux.Schedules {
 			stopVisit.Schedules.SetSchedule(schedule.Kind(), schedule.DepartureTime(), schedule.ArrivalTime())
 		}
@@ -618,11 +619,11 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 		}
 
 		if sv.Schedules.Valid && len(sv.Schedules.String) > 0 {
-			scheduleSlice := []StopVisitSchedule{}
+			scheduleSlice := []schedules.StopVisitSchedule{}
 			if err = json.Unmarshal([]byte(sv.Schedules.String), &scheduleSlice); err != nil {
 				return err
 			}
-			stopVisit.Schedules = NewStopVisitSchedules()
+			stopVisit.Schedules = schedules.NewStopVisitSchedules()
 			for _, schedule := range scheduleSlice {
 				stopVisit.Schedules.SetSchedule(schedule.Kind(), schedule.DepartureTime(), schedule.ArrivalTime())
 			}

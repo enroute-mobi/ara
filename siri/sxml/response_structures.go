@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type ResponseXMLStructure struct {
@@ -61,111 +63,111 @@ type XMLStatus struct {
 
 func (response *ResponseXMLStructure) Address() string {
 	if response.address == "" {
-		response.address = response.findStringChildContent("Address")
+		response.address = response.findStringChildContent(siri_attributes.Address)
 	}
 	return response.address
 }
 
 func (response *ResponseXMLStructure) ProducerRef() string {
 	if response.producerRef == "" {
-		response.producerRef = response.findStringChildContent("ProducerRef")
+		response.producerRef = response.findStringChildContent(siri_attributes.ProducerRef)
 	}
 	return response.producerRef
 }
 
 func (response *ResponseXMLStructure) ResponseMessageIdentifier() string {
 	if response.responseMessageIdentifier == "" {
-		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
+		response.responseMessageIdentifier = response.findStringChildContent(siri_attributes.ResponseMessageIdentifier)
 	}
 	return response.responseMessageIdentifier
 }
 
 func (response *ResponseXMLStructure) RequestMessageRef() string {
 	if response.requestMessageRef == "" {
-		response.requestMessageRef = response.findStringChildContent("RequestMessageRef")
+		response.requestMessageRef = response.findStringChildContent(siri_attributes.RequestMessageRef)
 	}
 	return response.requestMessageRef
 }
 
 func (response *ResponseXMLStructure) ResponseTimestamp() time.Time {
 	if response.responseTimestamp.IsZero() {
-		response.responseTimestamp = response.findTimeChildContent("ResponseTimestamp")
+		response.responseTimestamp = response.findTimeChildContent(siri_attributes.ResponseTimestamp)
 	}
 	return response.responseTimestamp
 }
 
 func (response *ResponseXMLStructureWithStatus) Address() string {
 	if response.address == "" {
-		response.address = response.findStringChildContent("Address")
+		response.address = response.findStringChildContent(siri_attributes.Address)
 	}
 	return response.address
 }
 
 func (response *ResponseXMLStructureWithStatus) ProducerRef() string {
 	if response.producerRef == "" {
-		response.producerRef = response.findStringChildContent("ProducerRef")
+		response.producerRef = response.findStringChildContent(siri_attributes.ProducerRef)
 	}
 	return response.producerRef
 }
 
 func (response *ResponseXMLStructureWithStatus) ResponseMessageIdentifier() string {
 	if response.responseMessageIdentifier == "" {
-		response.responseMessageIdentifier = response.findStringChildContent("ResponseMessageIdentifier")
+		response.responseMessageIdentifier = response.findStringChildContent(siri_attributes.ResponseMessageIdentifier)
 	}
 	return response.responseMessageIdentifier
 }
 
 func (delivery *DeliveryXMLStructure) RequestMessageRef() string {
 	if delivery.requestMessageRef == "" {
-		delivery.requestMessageRef = delivery.findStringChildContent("RequestMessageRef")
+		delivery.requestMessageRef = delivery.findStringChildContent(siri_attributes.RequestMessageRef)
 	}
 	return delivery.requestMessageRef
 }
 
 func (delivery *LightDeliveryXMLStructure) ResponseTimestamp() time.Time {
 	if delivery.responseTimestamp.IsZero() {
-		delivery.responseTimestamp = delivery.findTimeChildContent("ResponseTimestamp")
+		delivery.responseTimestamp = delivery.findTimeChildContent(siri_attributes.ResponseTimestamp)
 	}
 	return delivery.responseTimestamp
 }
 
 func (delivery *SubscriptionDeliveryXMLStructure) RequestMessageRef() string {
 	if delivery.requestMessageRef == "" {
-		delivery.requestMessageRef = delivery.findStringChildContent("RequestMessageRef")
+		delivery.requestMessageRef = delivery.findStringChildContent(siri_attributes.RequestMessageRef)
 	}
 	return delivery.requestMessageRef
 }
 
 func (delivery *LightSubscriptionDeliveryXMLStructure) SubscriberRef() string {
 	if delivery.subscriberRef == "" {
-		delivery.subscriberRef = delivery.findStringChildContent("SubscriberRef")
+		delivery.subscriberRef = delivery.findStringChildContent(siri_attributes.SubscriberRef)
 	}
 	return delivery.subscriberRef
 }
 
 func (delivery *LightSubscriptionDeliveryXMLStructure) SubscriptionRef() string {
 	if delivery.subscriptionRef == "" {
-		delivery.subscriptionRef = delivery.findStringChildContent("SubscriptionRef")
+		delivery.subscriptionRef = delivery.findStringChildContent(siri_attributes.SubscriptionRef)
 	}
 	return delivery.subscriptionRef
 }
 
 func (response *XMLStatus) Status() bool {
 	if !response.status.Defined {
-		response.status.SetValue(response.findBoolChildContent("Status"))
+		response.status.SetValue(response.findBoolChildContent(siri_attributes.Status))
 	}
 	return response.status.Value
 }
 
 func (response *XMLStatus) ErrorType() string {
 	if !response.Status() && response.errorType == "" {
-		node := response.findNode("ErrorText")
+		node := response.findNode(siri_attributes.ErrorText)
 		if node != nil {
 			response.errorType = node.Parent().Name()
 			// Find errorText and errorNumber to avoir too much parsing
 			response.errorText = strings.TrimSpace(node.Content())
-			if response.errorType == "OtherError" {
-				n, err := strconv.Atoi(node.Parent().Attr("number"))
+			if response.errorType == siri_attributes.OtherError {
+				n, err := strconv.Atoi(node.Parent().Attr(siri_attributes.Number))
 				if err != nil {
 					return ""
 				}
@@ -177,9 +179,9 @@ func (response *XMLStatus) ErrorType() string {
 }
 
 func (response *XMLStatus) ErrorNumber() int {
-	if !response.Status() && response.ErrorType() == "OtherError" && !response.errorNumber.Defined {
-		node := response.findNode("ErrorText")
-		n, err := strconv.Atoi(node.Parent().Attr("number"))
+	if !response.Status() && response.ErrorType() == siri_attributes.OtherError && !response.errorNumber.Defined {
+		node := response.findNode(siri_attributes.ErrorText)
+		n, err := strconv.Atoi(node.Parent().Attr(siri_attributes.Number))
 		if err != nil {
 			return -1
 		}
@@ -190,14 +192,14 @@ func (response *XMLStatus) ErrorNumber() int {
 
 func (response *XMLStatus) ErrorText() string {
 	if !response.Status() && response.errorText == "" {
-		response.errorText = response.findStringChildContent("ErrorText")
+		response.errorText = response.findStringChildContent(siri_attributes.ErrorText)
 	}
 	return response.errorText
 }
 
 func (response *XMLStatus) ErrorDescription() string {
 	if !response.Status() && response.errorDescription == "" {
-		response.errorDescription = response.findStringChildContent("Description")
+		response.errorDescription = response.findStringChildContent(siri_attributes.Description)
 	}
 	return response.errorDescription
 }

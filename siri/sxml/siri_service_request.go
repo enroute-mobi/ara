@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -30,7 +31,7 @@ func NewXMLSiriServiceRequestFromContent(content []byte) (*XMLSiriServiceRequest
 
 func (request *XMLSiriServiceRequest) StopMonitoringRequests() []*XMLStopMonitoringRequest {
 	if len(request.stopMonitoringRequests) == 0 {
-		nodes := request.findNodes("StopMonitoringRequest")
+		nodes := request.findNodes(siri_attributes.StopMonitoringRequest)
 		if nodes == nil {
 			return request.stopMonitoringRequests
 		}
@@ -45,7 +46,7 @@ func (request *XMLSiriServiceRequest) StopMonitoringRequests() []*XMLStopMonitor
 
 func (request *XMLSiriServiceRequest) GeneralMessageRequests() []*XMLGeneralMessageRequest {
 	if len(request.generalMessageRequests) == 0 {
-		nodes := request.findNodes("GeneralMessageRequest")
+		nodes := request.findNodes(siri_attributes.GeneralMessageRequest)
 		if nodes == nil {
 			return request.generalMessageRequests
 		}
@@ -60,7 +61,7 @@ func (request *XMLSiriServiceRequest) GeneralMessageRequests() []*XMLGeneralMess
 
 func (request *XMLSiriServiceRequest) EstimatedTimetableRequests() []*XMLEstimatedTimetableRequest {
 	if len(request.estimatedTimetableRequests) == 0 {
-		nodes := request.findNodes("EstimatedTimetableRequest")
+		nodes := request.findNodes(siri_attributes.EstimatedTimetableRequest)
 		if nodes == nil {
 			return request.estimatedTimetableRequests
 		}

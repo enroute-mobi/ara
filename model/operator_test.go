@@ -52,7 +52,7 @@ func Test_Operator_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Operator_Save(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	operator := model.Operators().New()
 	code := NewCode("codeSpace", "value")
 	operator.SetCode(code)
@@ -199,7 +199,7 @@ func Test_MemoryOperators_Load(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	model.date = Date{
 		Year:  2017,
 		Month: time.January,
