@@ -11,12 +11,13 @@ type contexFactory func(contextAttributes) (context, error)
 type updaterFactory func(updaterAttributes) (updater, error)
 
 const (
-	VehicleJourneyDirectionNameContext = "VehicleJourneyDirectionNameContext"
-	VehicleJourneyDirectionTypeUpdater = "VehicleJourneyDirectionTypeUpdater"
+	IfAttribute               = "IfAttribute"
+	SetAttribute              = "SetAttribute"
+	DefineAimedScheduledTimes = "DefineAimedScheduledTimes"
 )
 
-var contexes = []string{VehicleJourneyDirectionNameContext}
-var updaters = []string{VehicleJourneyDirectionTypeUpdater}
+var contexes = []string{IfAttribute}
+var updaters = []string{SetAttribute, DefineAimedScheduledTimes}
 
 type Macro struct {
 	c context
@@ -64,16 +65,16 @@ func (m *Macro) Update(mi ModelInstance) (ok bool, err error) {
 }
 
 func NewContexFromDatabase(sm *SelectMacro) (context, error) {
-	if sm.ModelType.String == "VehicleJourney" && sm.Type == "IfAttribute" {
+	if sm.ModelType.String == "VehicleJourney" && sm.Type == IfAttribute {
 		return NewVehicleJourneyIfAttributeContext(sm)
 	}
 	return nil, nil
 }
 
 func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
-	if sm.ModelType.String == "VehicleJourney" && sm.Type == "SetAttribute" {
+	if sm.ModelType.String == "VehicleJourney" && sm.Type == SetAttribute {
 		return NewVehicleJourneySetAttributeUpdater(sm)
-	} else if sm.ModelType.String == "StopVisit" && sm.Type == "DefineAimedScheduledTimes" {
+	} else if sm.ModelType.String == "StopVisit" && sm.Type == DefineAimedScheduledTimes {
 		return NewStopVisitDefineAimedScheduledTimesUpdater(sm)
 	}
 	return nil, nil

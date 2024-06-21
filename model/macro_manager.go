@@ -210,7 +210,7 @@ func (manager *MacroManager) Load(referentialSlug string) error {
 
 	var selectMacros []SelectMacro
 
-	sqlQuery := fmt.Sprintf("select * from macros where referential_slug = '%s' order by context_id, position", referentialSlug)
+	sqlQuery := fmt.Sprintf("select * from macros where referential_slug = '%s' order by context_id nulls first, position", referentialSlug)
 	_, err := Database.Select(&selectMacros, sqlQuery)
 	if err != nil {
 		return err
@@ -218,7 +218,9 @@ func (manager *MacroManager) Load(referentialSlug string) error {
 
 	for _, sm := range selectMacros {
 		if !sm.ContextId.Valid {
-			context := &contextBuilder{}
+			context := &contextBuilder{
+				updaters: make([]*SelectMacro, 0),
+			}
 			if IsContext(sm.Type) {
 				context.macro = &sm
 			} else {
