@@ -24,6 +24,8 @@ import (
 	"github.com/jbowtie/gokogiri/xml"
 )
 
+const timeFormat = "2006-01-02T15:04:05Z07:00"
+
 var durationRegex = regexp.MustCompile(`P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?`)
 
 type XMLNode interface {
@@ -167,7 +169,7 @@ func (xmlStruct *XMLStructure) findTimeChildContent(localName string) time.Time 
 	if node == nil {
 		return time.Time{}
 	}
-	t, err := time.Parse("2006-01-02T15:04:05Z07:00", strings.TrimSpace(node.Content()))
+	t, err := time.Parse(timeFormat, strings.TrimSpace(node.Content()))
 	if err != nil {
 		return time.Time{}
 	}

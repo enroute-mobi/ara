@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -41,7 +42,7 @@ func NewXMLNotifyVehicleMonitoringDelivery(node XMLNode) *XMLNotifyVehicleMonito
 func (notify *XMLNotifyVehicleMonitoring) VehicleMonitoringDeliveries() []*XMLNotifyVehicleMonitoringDelivery {
 	if notify.deliveries == nil {
 		deliveries := []*XMLNotifyVehicleMonitoringDelivery{}
-		nodes := notify.findNodes("VehicleMonitoringDelivery")
+		nodes := notify.findNodes(siri_attributes.VehicleMonitoringDelivery)
 		for _, node := range nodes {
 			deliveries = append(deliveries, NewXMLNotifyVehicleMonitoringDelivery(node))
 		}
@@ -53,7 +54,7 @@ func (notify *XMLNotifyVehicleMonitoring) VehicleMonitoringDeliveries() []*XMLNo
 func (delivery *XMLNotifyVehicleMonitoringDelivery) VehicleActivities() []*XMLVehicleActivity {
 	if delivery.vehicleActivities == nil {
 		vas := []*XMLVehicleActivity{}
-		nodes := delivery.findNodes("VehicleActivity")
+		nodes := delivery.findNodes(siri_attributes.VehicleActivity)
 		for _, node := range nodes {
 			vas = append(vas, NewXMLVehicleActivity(node))
 		}

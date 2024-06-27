@@ -11,6 +11,10 @@ import (
 
 type Codes map[string]Code
 
+const (
+	Default = "_default"
+)
+
 func NewCodesFromMap(codeMap map[string]string) (codes Codes) {
 	codes = make(Codes)
 	for key, value := range codeMap {

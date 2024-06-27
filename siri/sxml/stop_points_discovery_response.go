@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -51,7 +52,7 @@ func (response *XMLStopPointsDiscoveryResponse) ErrorString() string {
 }
 
 func (response *XMLStopPointsDiscoveryResponse) errorType() string {
-	if response.ErrorType() == "OtherError" {
+	if response.ErrorType() == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
 	}
 	return response.ErrorType()
@@ -60,7 +61,7 @@ func (response *XMLStopPointsDiscoveryResponse) errorType() string {
 func (response *XMLStopPointsDiscoveryResponse) AnnotatedStopPointRefs() []*XMLAnnotatedStopPointRef {
 	if response.annotatedStopPointRefs == nil {
 		annotatedStopPointRefs := []*XMLAnnotatedStopPointRef{}
-		nodes := response.findNodes("AnnotatedStopPointRef")
+		nodes := response.findNodes(siri_attributes.AnnotatedStopPointRef)
 		for _, node := range nodes {
 			annotatedStopPointRefs = append(annotatedStopPointRefs, NewXMLAnnotatedStopPointRef(node))
 		}
@@ -71,21 +72,21 @@ func (response *XMLStopPointsDiscoveryResponse) AnnotatedStopPointRefs() []*XMLA
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) StopPointRef() string {
 	if annotatedStopPoint.stopPointRef == "" {
-		annotatedStopPoint.stopPointRef = annotatedStopPoint.findStringChildContent("StopPointRef")
+		annotatedStopPoint.stopPointRef = annotatedStopPoint.findStringChildContent(siri_attributes.StopPointRef)
 	}
 	return annotatedStopPoint.stopPointRef
 }
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) StopName() string {
 	if annotatedStopPoint.stopName == "" {
-		annotatedStopPoint.stopName = annotatedStopPoint.findStringChildContent("StopName")
+		annotatedStopPoint.stopName = annotatedStopPoint.findStringChildContent(siri_attributes.StopName)
 	}
 	return annotatedStopPoint.stopName
 }
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) LineRefs() []string {
 	if len(annotatedStopPoint.lineRefs) == 0 {
-		nodes := annotatedStopPoint.findNodes("LineRef")
+		nodes := annotatedStopPoint.findNodes(siri_attributes.LineRef)
 		for _, node := range nodes {
 			annotatedStopPoint.lineRefs = append(annotatedStopPoint.lineRefs, strings.TrimSpace(node.NativeNode().Content()))
 		}
@@ -95,7 +96,7 @@ func (annotatedStopPoint *XMLAnnotatedStopPointRef) LineRefs() []string {
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) Monitored() bool {
 	if !annotatedStopPoint.monitored.Defined {
-		annotatedStopPoint.monitored.SetValue(annotatedStopPoint.findBoolChildContent("Monitored"))
+		annotatedStopPoint.monitored.SetValue(annotatedStopPoint.findBoolChildContent(siri_attributes.Monitored))
 	}
 	return annotatedStopPoint.monitored.Value
 }

@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -31,7 +32,7 @@ func prepare_SIRILiteStopMonitoringRequestCollector(t *testing.T, responseFilePa
 	partner := partners.New("slug")
 
 	settings := map[string]string{
-		"remote_url":           ts.URL,
+		"remote_url":        ts.URL,
 		"remote_code_space": "test kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -89,12 +90,12 @@ func Test_SIRILiteStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testin
 	assert.Equal(model.STOP_VISIT_DEPARTURE_ONTIME, stopVisitEvent.DepartureStatus)
 
 	// No actual Schedules
-	actualSchedule := stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL)
+	actualSchedule := stopVisitEvent.Schedules.Schedule(schedules.Actual)
 	assert.Zero(actualSchedule.ArrivalTime())
 	assert.Zero(actualSchedule.DepartureTime())
 
 	// Existing expected schedules
-	expectedSchedule := stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED)
+	expectedSchedule := stopVisitEvent.Schedules.Schedule(schedules.Expected)
 	expectedDeparture, _ := time.Parse(time.RFC3339, "2023-06-02T08:47:40.000Z")
 	assert.Equal(expectedDeparture, expectedSchedule.DepartureTime(), "expected Departure")
 
@@ -102,7 +103,7 @@ func Test_SIRILiteStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testin
 	assert.Equal(expectedArrival, expectedSchedule.ArrivalTime(), "expected Arrival")
 
 	// Existing aimed schedules
-	aimedSchedule := stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED)
+	aimedSchedule := stopVisitEvent.Schedules.Schedule(schedules.Aimed)
 	aimedDeparture, _ := time.Parse(time.RFC3339, "2023-06-02T08:47:40.000Z")
 	assert.Equal(aimedDeparture, aimedSchedule.DepartureTime())
 

@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -111,7 +112,7 @@ func (response *XMLGeneralMessageResponse) ErrorString() string {
 }
 
 func (response *XMLGeneralMessageResponse) errorType() string {
-	if response.ErrorType() == "OtherError" {
+	if response.ErrorType() == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
 	}
 	return response.ErrorType()
@@ -119,7 +120,7 @@ func (response *XMLGeneralMessageResponse) errorType() string {
 
 func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMessage {
 	if len(response.xmlGeneralMessages) == 0 {
-		nodes := response.findNodes("GeneralMessage")
+		nodes := response.findNodes(siri_attributes.GeneralMessage)
 		if nodes == nil {
 			return response.xmlGeneralMessages
 		}
@@ -132,7 +133,7 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMes
 
 func (visit *XMLGeneralMessageCancellation) InfoMessageIdentifier() string {
 	if visit.infoMessageIdentifier == "" {
-		visit.infoMessageIdentifier = visit.findStringChildContent("InfoMessageIdentifier")
+		visit.infoMessageIdentifier = visit.findStringChildContent(siri_attributes.InfoMessageIdentifier)
 	}
 	return visit.infoMessageIdentifier
 }
@@ -146,42 +147,42 @@ func (visit *XMLGeneralMessageCancellation) RecordedAtTime() time.Time {
 
 func (visit *XMLGeneralMessage) RecordedAtTime() time.Time {
 	if visit.recordedAtTime.IsZero() {
-		visit.recordedAtTime = visit.findTimeChildContent("RecordedAtTime")
+		visit.recordedAtTime = visit.findTimeChildContent(siri_attributes.RecordedAtTime)
 	}
 	return visit.recordedAtTime
 }
 
 func (visit *XMLGeneralMessage) ValidUntilTime() time.Time {
 	if visit.validUntilTime.IsZero() {
-		visit.validUntilTime = visit.findTimeChildContent("ValidUntilTime")
+		visit.validUntilTime = visit.findTimeChildContent(siri_attributes.ValidUntilTime)
 	}
 	return visit.validUntilTime
 }
 
 func (visit *XMLGeneralMessage) ItemIdentifier() string {
 	if visit.itemIdentifier == "" {
-		visit.itemIdentifier = visit.findStringChildContent("ItemIdentifier")
+		visit.itemIdentifier = visit.findStringChildContent(siri_attributes.ItemIdentifier)
 	}
 	return visit.itemIdentifier
 }
 
 func (visit *XMLGeneralMessage) InfoMessageIdentifier() string {
 	if visit.infoMessageIdentifier == "" {
-		visit.infoMessageIdentifier = visit.findStringChildContent("InfoMessageIdentifier")
+		visit.infoMessageIdentifier = visit.findStringChildContent(siri_attributes.InfoMessageIdentifier)
 	}
 	return visit.infoMessageIdentifier
 }
 
 func (visit *XMLGeneralMessage) InfoMessageVersion() int {
 	if !visit.infoMessageVersion.Defined {
-		visit.infoMessageVersion.SetValueWithDefault(visit.findIntChildContent("InfoMessageVersion"), 1)
+		visit.infoMessageVersion.SetValueWithDefault(visit.findIntChildContent(siri_attributes.InfoMessageVersion), 1)
 	}
 	return visit.infoMessageVersion.Value
 }
 
 func (visit *XMLGeneralMessage) InfoChannelRef() string {
 	if visit.infoChannelRef == "" {
-		visit.infoChannelRef = visit.findStringChildContent("InfoChannelRef")
+		visit.infoChannelRef = visit.findStringChildContent(siri_attributes.InfoChannelRef)
 	}
 	return visit.infoChannelRef
 }
@@ -195,7 +196,7 @@ func (visit *XMLGeneralMessage) FormatRef() string {
 
 func (visit *XMLGeneralMessage) createNewContent() IDFGeneralMessageStructure {
 	content := IDFGeneralMessageStructure{}
-	content.node = NewXMLNode(visit.findNode("Content"))
+	content.node = NewXMLNode(visit.findNode(siri_attributes.Content))
 	return content
 }
 
@@ -209,7 +210,7 @@ func (visit *XMLGeneralMessage) Content() interface{} {
 
 func (visit *IDFGeneralMessageStructure) RouteRef() []string {
 	if len(visit.routeRef) == 0 {
-		nodes := visit.findNodes("RouteRef")
+		nodes := visit.findNodes(siri_attributes.RouteRef)
 		for _, routeRef := range nodes {
 			visit.routeRef = append(visit.routeRef, strings.TrimSpace(routeRef.NativeNode().Content()))
 		}
@@ -219,7 +220,7 @@ func (visit *IDFGeneralMessageStructure) RouteRef() []string {
 
 func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
 	if len(visit.destinationRef) == 0 {
-		nodes := visit.findNodes("DestinationRef")
+		nodes := visit.findNodes(siri_attributes.DestinationRef)
 		for _, destinationRef := range nodes {
 			visit.destinationRef = append(visit.destinationRef, strings.TrimSpace(destinationRef.NativeNode().Content()))
 		}
@@ -229,7 +230,7 @@ func (visit *IDFGeneralMessageStructure) DestinationRef() []string {
 
 func (visit *IDFGeneralMessageStructure) StopPointRef() []string {
 	if len(visit.stopPointRef) == 0 {
-		nodes := visit.findNodes("StopPointRef")
+		nodes := visit.findNodes(siri_attributes.StopPointRef)
 		for _, stopPointRef := range nodes {
 			visit.stopPointRef = append(visit.stopPointRef, strings.TrimSpace(stopPointRef.NativeNode().Content()))
 		}
@@ -249,7 +250,7 @@ func (visit *IDFGeneralMessageStructure) LineRefs() []string {
 
 func (visit *IDFGeneralMessageStructure) LineSections() []*IDFLineSectionStructure {
 	if len(visit.lineSections) == 0 {
-		nodes := visit.findNodes("LineSection")
+		nodes := visit.findNodes(siri_attributes.LineSection)
 		for _, lineNode := range nodes {
 			visit.lineSections = append(visit.lineSections, NewXMLLineSection(lineNode))
 		}
@@ -259,7 +260,7 @@ func (visit *IDFGeneralMessageStructure) LineSections() []*IDFLineSectionStructu
 
 func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 	if len(visit.messages) == 0 {
-		nodes := visit.findNodes("Message")
+		nodes := visit.findNodes(siri_attributes.Message)
 		for _, messageNode := range nodes {
 			message := NewXMLMessage(messageNode)
 			// shortMessage should be inserted first
@@ -275,49 +276,49 @@ func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 
 func (visit *IDFLineSectionStructure) FirstStop() string {
 	if visit.firstStop == "" {
-		visit.firstStop = visit.findStringChildContent("FirstStop")
+		visit.firstStop = visit.findStringChildContent(siri_attributes.FirstStop)
 	}
 	return visit.firstStop
 }
 
 func (visit *IDFLineSectionStructure) LastStop() string {
 	if visit.lastStop == "" {
-		visit.lastStop = visit.findStringChildContent("LastStop")
+		visit.lastStop = visit.findStringChildContent(siri_attributes.LastStop)
 	}
 	return visit.lastStop
 }
 
 func (visit *IDFLineSectionStructure) LineRef() string {
 	if visit.lineRef == "" {
-		visit.lineRef = visit.findStringChildContent("LineRef")
+		visit.lineRef = visit.findStringChildContent(siri_attributes.LineRef)
 	}
 	return visit.lineRef
 }
 
 func (message *XMLMessage) MessageText() string {
 	if message.messageText == "" {
-		message.messageText = message.findStringChildContent("MessageText")
+		message.messageText = message.findStringChildContent(siri_attributes.MessageText)
 	}
 	return message.messageText
 }
 
 func (message *XMLMessage) MessageType() string {
 	if message.messageType == "" {
-		message.messageType = message.findStringChildContent("MessageType")
+		message.messageType = message.findStringChildContent(siri_attributes.MessageType)
 	}
 	return message.messageType
 }
 
 func (message *XMLMessage) NumberOfLines() int {
 	if !message.numberOfLines.Defined {
-		message.numberOfLines.SetValue(message.findIntChildContent("NumberOfLines"))
+		message.numberOfLines.SetValue(message.findIntChildContent(siri_attributes.NumberOfLines))
 	}
 	return message.numberOfLines.Value
 }
 
 func (message *XMLMessage) NumberOfCharPerLine() int {
 	if !message.numberOfCharPerLine.Defined {
-		message.numberOfCharPerLine.SetValue(message.findIntChildContent("NumberOfCharPerLine"))
+		message.numberOfCharPerLine.SetValue(message.findIntChildContent(siri_attributes.NumberOfCharPerLine))
 	}
 	return message.numberOfCharPerLine.Value
 }

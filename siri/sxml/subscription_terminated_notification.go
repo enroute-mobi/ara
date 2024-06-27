@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -28,7 +29,7 @@ func NewXMLSubscriptionTerminatedNotificationFromContent(content []byte) (*XMLSu
 
 func (response *XMLSubscriptionTerminatedNotification) ProducerRef() string {
 	if response.producerRef == "" {
-		response.producerRef = response.findStringChildContent("ProducerRef")
+		response.producerRef = response.findStringChildContent(siri_attributes.ProducerRef)
 	}
 	return response.producerRef
 }

@@ -2,6 +2,8 @@ package sxml
 
 import (
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type XMLEstimatedJourneyVersionFrame struct {
@@ -40,7 +42,7 @@ func NewXMLEstimatedVehicleJourney(node XMLNode) *XMLEstimatedVehicleJourney {
 
 func (ejvf *XMLEstimatedJourneyVersionFrame) RecordedAt() time.Time {
 	if ejvf.recordedAt.IsZero() {
-		ejvf.recordedAt = ejvf.findTimeChildContent("RecordedAtTime")
+		ejvf.recordedAt = ejvf.findTimeChildContent(siri_attributes.RecordedAtTime)
 	}
 	return ejvf.recordedAt
 }
@@ -48,7 +50,7 @@ func (ejvf *XMLEstimatedJourneyVersionFrame) RecordedAt() time.Time {
 func (ejvf *XMLEstimatedJourneyVersionFrame) EstimatedVehicleJourneys() []*XMLEstimatedVehicleJourney {
 	if ejvf.estimatedVehicleJourneys == nil {
 		estimatedVehicleJourneys := []*XMLEstimatedVehicleJourney{}
-		nodes := ejvf.findNodes("EstimatedVehicleJourney")
+		nodes := ejvf.findNodes(siri_attributes.EstimatedVehicleJourney)
 		for _, node := range nodes {
 			estimatedVehicleJourneys = append(estimatedVehicleJourneys, NewXMLEstimatedVehicleJourney(node))
 		}
@@ -60,7 +62,7 @@ func (ejvf *XMLEstimatedJourneyVersionFrame) EstimatedVehicleJourneys() []*XMLEs
 func (evj *XMLEstimatedVehicleJourney) EstimatedCalls() []*XMLCall {
 	if evj.estimatedCalls == nil {
 		estimatedCalls := []*XMLCall{}
-		nodes := evj.findNodes("EstimatedCall")
+		nodes := evj.findNodes(siri_attributes.EstimatedCall)
 		for _, node := range nodes {
 			estimatedCalls = append(estimatedCalls, NewXMLCall(node))
 		}
@@ -72,7 +74,7 @@ func (evj *XMLEstimatedVehicleJourney) EstimatedCalls() []*XMLCall {
 func (evj *XMLEstimatedVehicleJourney) RecordedCalls() []*XMLCall {
 	if evj.recordedCalls == nil {
 		recordedCalls := []*XMLCall{}
-		nodes := evj.findNodes("RecordedCall")
+		nodes := evj.findNodes(siri_attributes.RecordedCall)
 		for _, node := range nodes {
 			recordedCalls = append(recordedCalls, NewXMLCall(node))
 		}
@@ -83,42 +85,42 @@ func (evj *XMLEstimatedVehicleJourney) RecordedCalls() []*XMLCall {
 
 func (evj *XMLEstimatedVehicleJourney) LineRef() string {
 	if evj.lineRef == "" {
-		evj.lineRef = evj.findStringChildContent("LineRef")
+		evj.lineRef = evj.findStringChildContent(siri_attributes.LineRef)
 	}
 	return evj.lineRef
 }
 
 func (evj *XMLEstimatedVehicleJourney) DirectionRef() string {
 	if evj.directionRef == "" {
-		evj.directionRef = evj.findStringChildContent("DirectionRef")
+		evj.directionRef = evj.findStringChildContent(siri_attributes.DirectionRef)
 	}
 	return evj.directionRef
 }
 
 func (evj *XMLEstimatedVehicleJourney) OperatorRef() string {
 	if evj.operatorRef == "" {
-		evj.operatorRef = evj.findStringChildContent("OperatorRef")
+		evj.operatorRef = evj.findStringChildContent(siri_attributes.OperatorRef)
 	}
 	return evj.operatorRef
 }
 
 func (evj *XMLEstimatedVehicleJourney) DatedVehicleJourneyRef() string {
 	if evj.datedVehicleJourneyRef == "" {
-		evj.datedVehicleJourneyRef = evj.findStringChildContent("DatedVehicleJourneyRef")
+		evj.datedVehicleJourneyRef = evj.findStringChildContent(siri_attributes.DatedVehicleJourneyRef)
 	}
 	return evj.datedVehicleJourneyRef
 }
 
 func (evj *XMLEstimatedVehicleJourney) OriginRef() string {
 	if evj.originRef == "" {
-		evj.originRef = evj.findStringChildContent("OriginRef")
+		evj.originRef = evj.findStringChildContent(siri_attributes.OriginRef)
 	}
 	return evj.originRef
 }
 
 func (evj *XMLEstimatedVehicleJourney) DestinationRef() string {
 	if evj.destinationRef == "" {
-		evj.destinationRef = evj.findStringChildContent("DestinationRef")
+		evj.destinationRef = evj.findStringChildContent(siri_attributes.DestinationRef)
 	}
 	return evj.destinationRef
 }

@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 type schedulesHandler struct{}
 
-func (sh *schedulesHandler) handleArrivalTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
+func (sh *schedulesHandler) handleArrivalTime(sc, lssc *schedules.StopVisitSchedule, duration time.Duration) bool {
 	if sc.ArrivalTime().IsZero() {
 		return false
 	}
@@ -18,7 +19,7 @@ func (sh *schedulesHandler) handleArrivalTime(sc, lssc *model.StopVisitSchedule,
 	return !(sc.ArrivalTime().Before(lssc.ArrivalTime().Add(duration)) && sc.ArrivalTime().After(lssc.ArrivalTime().Add(-duration)))
 }
 
-func (sh *schedulesHandler) handleDepartedTime(sc, lssc *model.StopVisitSchedule, duration time.Duration) bool {
+func (sh *schedulesHandler) handleDepartedTime(sc, lssc *schedules.StopVisitSchedule, duration time.Duration) bool {
 	if sc.DepartureTime().IsZero() {
 		return false
 	}

@@ -9,7 +9,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
 type VehicleMonitoringLiteRequestBroadcaster interface {
@@ -92,7 +94,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 		activity.VehicleMonitoringRef = vehicleId.Value()
 		activity.MonitoredVehicleJourney.LineRef = lineRef
 		activity.MonitoredVehicleJourney.PublishedLineName = line.Name
-		activity.MonitoredVehicleJourney.DirectionName = vj.Attributes["DirectionName"]
+		activity.MonitoredVehicleJourney.DirectionName = vj.Attributes[siri_attributes.DirectionName]
 		activity.MonitoredVehicleJourney.OriginName = vj.OriginName
 		activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
 		activity.MonitoredVehicleJourney.Monitored = vj.Monitored
@@ -113,15 +115,15 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 					monitoredCall.StopPointName = stopArea.Name
 					monitoredCall.VehicleAtStop = nextStopVisit.VehicleAtStop
 					monitoredCall.DestinationDisplay = nextStopVisit.Attributes["DestinationDisplay"]
-					monitoredCall.ExpectedArrivalTime = nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED})
-					monitoredCall.ExpectedDepartureTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_EXPECTED})
+					monitoredCall.ExpectedArrivalTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
+					monitoredCall.ExpectedDepartureTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
 					monitoredCall.DepartureStatus = string(nextStopVisit.DepartureStatus)
 					monitoredCall.Order = &nextStopVisit.PassageOrder
-					monitoredCall.AimedArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED})
-					monitoredCall.AimedDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_AIMED})
+					monitoredCall.AimedArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed})
+					monitoredCall.AimedDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed})
 					monitoredCall.ArrivalStatus = string(nextStopVisit.ArrivalStatus)
-					monitoredCall.ActualArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL})
-					monitoredCall.ActualDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]model.StopVisitScheduleType{model.STOP_VISIT_SCHEDULE_ACTUAL})
+					monitoredCall.ActualArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual})
+					monitoredCall.ActualDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual})
 
 					activity.MonitoredVehicleJourney.MonitoredCall = monitoredCall
 				}
@@ -184,7 +186,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) datedVehicleJourne
 	if ok {
 		dataVehicleJourneyRef = vehicleJourneyId.Value()
 	} else {
-		defaultCode, ok := vehicleJourney.Code("_default")
+		defaultCode, ok := vehicleJourney.Code(model.Default)
 		if !ok {
 			return "", false
 		}

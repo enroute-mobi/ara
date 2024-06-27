@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 func Test_CollectManager_StopVisitUpdate(t *testing.T) {
@@ -34,9 +35,9 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 		Code:               code,
 		StopAreaCode:       saCode,
 		VehicleJourneyCode: vjCode,
-		DepartureStatus:        model.STOP_VISIT_DEPARTURE_ONTIME,
-		ArrivalStatus:          model.STOP_VISIT_ARRIVAL_ARRIVED,
-		Schedules:              model.NewStopVisitSchedules(),
+		DepartureStatus:    model.STOP_VISIT_DEPARTURE_ONTIME,
+		ArrivalStatus:      model.STOP_VISIT_ARRIVAL_ARRIVED,
+		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 	referential.collectManager.BroadcastUpdateEvent(event)
 

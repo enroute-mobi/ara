@@ -13,7 +13,7 @@ func Test_NewStopAreaLogger(t *testing.T) {
 	referential := referentials.New("default")
 	referential.SetSetting("logger.verbose.stop_areas", "codeSpace:value")
 
-	memoryModel := model.NewMemoryModel()
+	memoryModel := model.NewTestMemoryModel()
 	stopArea := memoryModel.StopAreas().New()
 
 	code := model.NewCode("codeSpace", "value")
@@ -29,7 +29,7 @@ func Test_NewStopAreaLogger_WithMultipleCodes(t *testing.T) {
 	referential := referentials.New("default")
 	referential.SetSetting("logger.verbose.stop_areas", "codeSpace:value")
 
-	memoryModel := model.NewMemoryModel()
+	memoryModel := model.NewTestMemoryModel()
 	stopArea := memoryModel.StopAreas().New()
 
 	code := model.NewCode("codeSpace", "value")
@@ -47,7 +47,7 @@ func Test_NewStopAreaLogger_NoMatch(t *testing.T) {
 	referential := referentials.New("default")
 	referential.SetSetting("logger.debug.stop_areas", "codeSpace:value")
 
-	memoryModel := model.NewMemoryModel()
+	memoryModel := model.NewTestMemoryModel()
 	stopArea := memoryModel.StopAreas().New()
 
 	code := model.NewCode("no", "match")

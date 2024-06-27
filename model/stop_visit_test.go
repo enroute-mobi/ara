@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,7 +23,7 @@ func Test_StopVisit_Id(t *testing.T) {
 func Test_StopVisit_MarshalJSON(t *testing.T) {
 	stopVisit := StopVisit{
 		id:        "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		Schedules: NewStopVisitSchedules(),
+		Schedules: schedules.NewStopVisitSchedules(),
 	}
 	expected := `{"Origin":"","VehicleAtStop":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Collected":false}`
 	jsonBytes, err := stopVisit.MarshalJSON()
@@ -79,7 +80,7 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_StopVisit_Save(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	stopVisit := model.StopVisits().New()
 	code := NewCode("codeSpace", "value")
 	stopVisit.SetCode(code)
@@ -201,7 +202,7 @@ func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		sv := stopVisits.New()
-		sv.Schedules.SetArrivalTime(STOP_VISIT_SCHEDULE_ACTUAL, time.Now().Add(-time.Duration(i)*time.Minute))
+		sv.Schedules.SetArrivalTime(schedules.Actual, time.Now().Add(-time.Duration(i)*time.Minute))
 		stopVisits.Save(sv)
 	}
 
@@ -284,7 +285,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	model.date = Date{
 		Year:  2017,
 		Month: time.January,

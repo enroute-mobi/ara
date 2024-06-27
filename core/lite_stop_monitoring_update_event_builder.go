@@ -3,6 +3,7 @@ package core
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/slite"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -13,7 +14,7 @@ type LiteStopMonitoringUpdateEventBuilder struct {
 
 	originStopAreaCode model.Code
 	partner            *Partner
-	remoteCodeSpace     string
+	remoteCodeSpace    string
 
 	stopMonitoringUpdateEvents *CollectUpdateEvents
 }
@@ -22,7 +23,7 @@ func NewLiteStopMonitoringUpdateEventBuilder(partner *Partner, originStopAreaCod
 	return LiteStopMonitoringUpdateEventBuilder{
 		originStopAreaCode:         originStopAreaCode,
 		partner:                    partner,
-		remoteCodeSpace:             partner.RemoteCodeSpace(),
+		remoteCodeSpace:            partner.RemoteCodeSpace(),
 		stopMonitoringUpdateEvents: NewCollectUpdateEvents(),
 	}
 }
@@ -113,7 +114,7 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 			ArrivalStatus:      model.SetStopVisitArrivalStatus(monitoredCall.ArrivalStatus),
 			DepartureStatus:    model.SetStopVisitDepartureStatus(monitoredCall.DepartureStatus),
 			RecordedAt:         StopVisitEvent.RecordedAtTime,
-			Schedules:          model.NewStopVisitSchedules(),
+			Schedules:          schedules.NewStopVisitSchedules(),
 			Monitored:          StopVisitEvent.GetMonitored(),
 
 			CodeSpace: builder.remoteCodeSpace,
@@ -122,19 +123,19 @@ func (builder *LiteStopMonitoringUpdateEventBuilder) buildUpdateEvents(StopVisit
 		aimedDerpatureTime := monitoredCall.AimedDepartureTime
 		aimedArrivalTime := monitoredCall.AimedArrivalTime
 		if !aimedDerpatureTime.IsZero() || !aimedArrivalTime.IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, aimedDerpatureTime, aimedArrivalTime)
+			svEvent.Schedules.SetSchedule(schedules.Aimed, aimedDerpatureTime, aimedArrivalTime)
 		}
 
 		expectedArrivalTime := monitoredCall.ExpectedArrivalTime
 		expectedDepartureTime := monitoredCall.ExpectedDepartureTime
 		if !expectedDepartureTime.IsZero() || !expectedArrivalTime.IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, expectedDepartureTime, expectedArrivalTime)
+			svEvent.Schedules.SetSchedule(schedules.Expected, expectedDepartureTime, expectedArrivalTime)
 		}
 
 		actualArrivalTime := monitoredCall.ActualArrivalTime
 		actualDepartureTime := monitoredCall.ActualDepartureTime
 		if !actualDepartureTime.IsZero() || !actualArrivalTime.IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, actualDepartureTime, actualArrivalTime)
+			svEvent.Schedules.SetSchedule(schedules.Actual, actualDepartureTime, actualArrivalTime)
 		}
 
 		if builder.stopMonitoringUpdateEvents.StopVisits[stopPointRef] == nil {

@@ -41,7 +41,7 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 	if present {
 		situationNumber = code.Value()
 	} else {
-		code, present = situation.Code("_default")
+		code, present = situation.Code(model.Default)
 		if !present {
 			logger.Log.Debugf("Unknown Code for Situation %s", situation.Id())
 			return

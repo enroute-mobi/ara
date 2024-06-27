@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 type EstimatedTimetableLastChange struct {
@@ -11,7 +12,7 @@ type EstimatedTimetableLastChange struct {
 	optionParser
 	schedulesHandler
 
-	schedules       *model.StopVisitSchedules
+	schedules       *schedules.StopVisitSchedules
 	departureStatus model.StopVisitDepartureStatus
 	arrivalStatuts  model.StopVisitArrivalStatus
 	vehicleAtStop   bool
@@ -58,7 +59,7 @@ func (ettlc *EstimatedTimetableLastChange) Haschanged(stopVisit *model.StopVisit
 		duration = 1 * time.Minute
 	}
 
-	orderMap := []model.StopVisitScheduleType{"actual", "expected", "aimed"}
+	orderMap := []schedules.StopVisitScheduleType{schedules.Actual, schedules.Expected, schedules.Aimed}
 	for _, kind := range orderMap {
 		ok := ettlc.handleArrivalTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)
 		ok = ok || ettlc.handleDepartedTime(stopVisit.Schedules.Schedule(kind), ettlc.schedules.Schedule(kind), duration)

@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 type fakeBroadcaster struct {
@@ -41,7 +42,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	partner := partners.New("slug")
 
 	settings := map[string]string{
-		"remote_url":           ts.URL,
+		"remote_url":        ts.URL,
 		"remote_code_space": "test kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -94,7 +95,7 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 		t.Errorf("Wrong Code for stopVisitEvent:\n expected: %v\n got: %v", expected, stopVisitEvent.Code.Value())
 	}
 	// Aimed schedule
-	schedule := stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_AIMED)
+	schedule := stopVisitEvent.Schedules.Schedule(schedules.Aimed)
 	if !schedule.DepartureTime().IsZero() {
 		t.Errorf("AimedDepartureTime for stopVisitEvent should be zero, got: %v", schedule.DepartureTime())
 	}
@@ -102,12 +103,12 @@ func Test_SIRIStopMonitoringRequestCollector_RequestStopAreaUpdate(t *testing.T)
 		t.Errorf("Wrong AimedArrivalTime for stopVisitEvent:\n expected: %v\n got: %v", expected, schedule.ArrivalTime())
 	}
 	// Expected schedule
-	schedule = stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED)
+	schedule = stopVisitEvent.Schedules.Schedule(schedules.Expected)
 	if !schedule.DepartureTime().IsZero() || !schedule.ArrivalTime().IsZero() {
-		t.Errorf("Expected Schedule shouldn't be created, got: %v", stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_EXPECTED))
+		t.Errorf("Expected Schedule shouldn't be created, got: %v", stopVisitEvent.Schedules.Schedule(schedules.Expected))
 	}
 	// Actual schedule
-	schedule = stopVisitEvent.Schedules.Schedule(model.STOP_VISIT_SCHEDULE_ACTUAL)
+	schedule = stopVisitEvent.Schedules.Schedule(schedules.Actual)
 	if !schedule.DepartureTime().IsZero() {
 		t.Errorf("ActualDepartureTime for stopVisitEvent should be zero, got: %v", schedule.DepartureTime())
 	}
@@ -153,9 +154,9 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_url":           "remote_url",
+		"remote_url":        "remote_url",
 		"remote_code_space": "remote_code_space",
-		"remote_credential":    "remote_credential",
+		"remote_credential": "remote_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -34,7 +35,7 @@ func (response *XMLCheckStatusResponse) ErrorString() string {
 }
 
 func (response *XMLCheckStatusResponse) errorType() string {
-	if response.ErrorType() == "OtherError" {
+	if response.ErrorType() == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
 	}
 	return response.ErrorType()
@@ -42,7 +43,7 @@ func (response *XMLCheckStatusResponse) errorType() string {
 
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
 	if response.serviceStartedTime.IsZero() {
-		response.serviceStartedTime = response.findTimeChildContent("ServiceStartedTime")
+		response.serviceStartedTime = response.findTimeChildContent(siri_attributes.ServiceStartedTime)
 	}
 	return response.serviceStartedTime
 }

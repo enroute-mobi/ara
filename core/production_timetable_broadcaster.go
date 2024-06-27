@@ -10,7 +10,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/ls"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/state"
 )
 
@@ -185,7 +187,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 				if ok {
 					datedVehicleJourneyRef = vehicleJourneyId.Value()
 				} else {
-					defaultCode, ok := vehicleJourney.Code("_default")
+					defaultCode, ok := vehicleJourney.Code(model.Default)
 					if !ok {
 						continue
 					}
@@ -199,7 +201,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
-				datedVehicleJourney.References["OperatorRef"] = ptt.connector.operatorRef(stopVisit)
+				datedVehicleJourney.References[siri_attributes.OperatorRef] = ptt.connector.operatorRef(stopVisit)
 				datedVehicleJourney.Attributes = vehicleJourney.Attributes
 
 				datedTTVersionFrame.DatedVehicleJourneys = append(datedTTVersionFrame.DatedVehicleJourneys, datedVehicleJourney)
@@ -208,12 +210,12 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 
 			// DatedCall
 			datedCall := &siri.SIRIDatedCall{
-				AimedArrivalTime:   stopVisit.Schedules.Schedule("aimed").ArrivalTime(),
-				AimedDepartureTime: stopVisit.Schedules.Schedule("aimed").DepartureTime(),
+				AimedArrivalTime:   stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime(),
+				AimedDepartureTime: stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime(),
 				Order:              stopVisit.PassageOrder,
 				StopPointRef:       stopAreaId,
 				StopPointName:      stopArea.Name,
-				DestinationDisplay: stopVisit.Attributes["DestinationDisplay"],
+				DestinationDisplay: stopVisit.Attributes[siri_attributes.DestinationDisplay],
 			}
 
 			datedCall.UseVisitNumber = ptt.connector.useVisitNumber()
@@ -310,7 +312,7 @@ func (connector *SIRIProductionTimetableSubscriptionBroadcaster) dataFrameRef() 
 }
 
 func (connector *SIRIProductionTimetableSubscriptionBroadcaster) operatorRef(stopVisit *model.StopVisit) string {
-	operatorRef, ok := stopVisit.Reference("OperatorRef")
+	operatorRef, ok := stopVisit.Reference(siri_attributes.OperatorRef)
 	if !ok || operatorRef == (model.Reference{}) || operatorRef.Code == nil {
 		return ""
 	}

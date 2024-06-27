@@ -1,6 +1,7 @@
 package sxml
 
 import (
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -29,14 +30,14 @@ func NewXMLNotifySubscriptionTerminatedFromContent(content []byte) (*XMLNotifySu
 
 func (delivery *XMLNotifySubscriptionTerminated) SubscriberRef() string {
 	if delivery.subscriberRef == "" {
-		delivery.subscriberRef = delivery.findStringChildContent("SubscriberRef")
+		delivery.subscriberRef = delivery.findStringChildContent(siri_attributes.SubscriberRef)
 	}
 	return delivery.subscriberRef
 }
 
 func (delivery *XMLNotifySubscriptionTerminated) SubscriptionRef() string {
 	if delivery.subscriptionRef == "" {
-		delivery.subscriptionRef = delivery.findStringChildContent("SubscriptionRef")
+		delivery.subscriptionRef = delivery.findStringChildContent(siri_attributes.SubscriptionRef)
 	}
 	return delivery.subscriptionRef
 }

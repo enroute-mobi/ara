@@ -3,31 +3,33 @@ package model
 import (
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type StopVisitUpdateEvent struct {
-	RecordedAt             time.Time
-	Schedules              *StopVisitSchedules
-	attributes             Attributes
-	SiriXML                *sxml.XMLMonitoredStopVisit
-	references             *References
+	RecordedAt         time.Time
+	Schedules          *schedules.StopVisitSchedules
+	attributes         Attributes
+	SiriXML            *sxml.XMLMonitoredStopVisit
+	references         *References
 	VehicleJourneyCode Code
 	StopAreaCode       Code
 	Code               Code
-	CodeSpace           string
-	DepartureStatus        StopVisitDepartureStatus
-	ArrivalStatus          StopVisitArrivalStatus
-	DataFrameRef           string
-	Origin                 string
-	PassageOrder           int
-	Monitored              bool
-	VehicleAtStop          bool
+	CodeSpace          string
+	DepartureStatus    StopVisitDepartureStatus
+	ArrivalStatus      StopVisitArrivalStatus
+	DataFrameRef       string
+	Origin             string
+	PassageOrder       int
+	Monitored          bool
+	VehicleAtStop      bool
 }
 
 func NewStopVisitUpdateEvent() *StopVisitUpdateEvent {
 	return &StopVisitUpdateEvent{
-		Schedules: NewStopVisitSchedules(),
+		Schedules: schedules.NewStopVisitSchedules(),
 	}
 }
 
@@ -45,18 +47,18 @@ func (ue *StopVisitUpdateEvent) Attributes() Attributes {
 		return ue.attributes
 	}
 
-	ue.attributes.Set("Delay", ue.SiriXML.Delay())
-	ue.attributes.Set("ActualQuayName", ue.SiriXML.ActualQuayName())
-	ue.attributes.Set("AimedHeadwayInterval", ue.SiriXML.AimedHeadwayInterval())
-	ue.attributes.Set("ArrivalPlatformName", ue.SiriXML.ArrivalPlatformName())
-	ue.attributes.Set("ArrivalProximyTest", ue.SiriXML.ArrivalProximyTest())
-	ue.attributes.Set("DepartureBoardingActivity", ue.SiriXML.DepartureBoardingActivity())
-	ue.attributes.Set("DeparturePlatformName", ue.SiriXML.DeparturePlatformName())
-	ue.attributes.Set("DestinationDisplay", ue.SiriXML.DestinationDisplay())
-	ue.attributes.Set("DistanceFromStop", ue.SiriXML.DistanceFromStop())
-	ue.attributes.Set("ExpectedHeadwayInterval", ue.SiriXML.ExpectedHeadwayInterval())
-	ue.attributes.Set("NumberOfStopsAway", ue.SiriXML.NumberOfStopsAway())
-	ue.attributes.Set("PlatformTraversal", ue.SiriXML.PlatformTraversal())
+	ue.attributes.Set(siri_attributes.Delay, ue.SiriXML.Delay())
+	ue.attributes.Set(siri_attributes.ActualQuayName, ue.SiriXML.ActualQuayName())
+	ue.attributes.Set(siri_attributes.AimedHeadwayInterval, ue.SiriXML.AimedHeadwayInterval())
+	ue.attributes.Set(siri_attributes.ArrivalPlatformName, ue.SiriXML.ArrivalPlatformName())
+	ue.attributes.Set(siri_attributes.ArrivalProximyTest, ue.SiriXML.ArrivalProximyTest())
+	ue.attributes.Set(siri_attributes.DepartureBoardingActivity, ue.SiriXML.DepartureBoardingActivity())
+	ue.attributes.Set(siri_attributes.DeparturePlatformName, ue.SiriXML.DeparturePlatformName())
+	ue.attributes.Set(siri_attributes.DestinationDisplay, ue.SiriXML.DestinationDisplay())
+	ue.attributes.Set(siri_attributes.DistanceFromStop, ue.SiriXML.DistanceFromStop())
+	ue.attributes.Set(siri_attributes.ExpectedHeadwayInterval, ue.SiriXML.ExpectedHeadwayInterval())
+	ue.attributes.Set(siri_attributes.NumberOfStopsAway, ue.SiriXML.NumberOfStopsAway())
+	ue.attributes.Set(siri_attributes.PlatformTraversal, ue.SiriXML.PlatformTraversal())
 
 	return ue.attributes
 }
@@ -72,7 +74,7 @@ func (ue *StopVisitUpdateEvent) References() References {
 		return *ue.references
 	}
 
-	ue.references.SetCode("OperatorRef", NewCode(ue.CodeSpace, ue.SiriXML.OperatorRef()))
+	ue.references.SetCode(siri_attributes.OperatorRef, NewCode(ue.CodeSpace, ue.SiriXML.OperatorRef()))
 
 	return *ue.references
 }

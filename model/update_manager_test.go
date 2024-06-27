@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +14,7 @@ import (
 func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -49,7 +50,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 		Code:               code,
 		StopAreaCode:       code,
 		VehicleJourneyCode: code,
-		NextStopPointOrder:     5,
+		NextStopPointOrder: 5,
 	}
 
 	manager.Update(event)
@@ -62,7 +63,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -98,7 +99,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 		Code:               code,
 		StopAreaCode:       code,
 		VehicleJourneyCode: code,
-		NextStopPointOrder:     5,
+		NextStopPointOrder: 5,
 	}
 
 	manager.Update(event)
@@ -111,7 +112,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVisit(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -159,7 +160,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVis
 func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_One_StopVisit(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -212,7 +213,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 }
 
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -233,9 +234,9 @@ func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 		Code:               code,
 		StopAreaCode:       code,
 		VehicleJourneyCode: code,
-		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
-		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
-		Schedules:              NewStopVisitSchedules(),
+		DepartureStatus:    STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:      STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -259,7 +260,7 @@ func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 }
 
 func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -284,9 +285,9 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 		Code:               code,
 		StopAreaCode:       code,
 		VehicleJourneyCode: code,
-		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
-		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
-		Schedules:              NewStopVisitSchedules(),
+		DepartureStatus:    STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:      STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -309,7 +310,7 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 	emptyCode := NewCode("codeSpace", "")
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -330,9 +331,9 @@ func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 		Code:               code,
 		StopAreaCode:       emptyCode,
 		VehicleJourneyCode: code,
-		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
-		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
-		Schedules:              NewStopVisitSchedules(),
+		DepartureStatus:    STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:      STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -345,7 +346,7 @@ func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 	emptyCode := NewCode("codeSpace", "")
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -371,9 +372,9 @@ func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 		Code:               code,
 		StopAreaCode:       emptyCode,
 		VehicleJourneyCode: code,
-		DepartureStatus:        STOP_VISIT_DEPARTURE_CANCELLED,
-		ArrivalStatus:          STOP_VISIT_ARRIVAL_ONTIME,
-		Schedules:              NewStopVisitSchedules(),
+		DepartureStatus:    STOP_VISIT_DEPARTURE_CANCELLED,
+		ArrivalStatus:      STOP_VISIT_ARRIVAL_ONTIME,
+		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
 	manager.Update(event)
@@ -394,7 +395,7 @@ func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 }
 
 func Test_UpdateManager_UpdateStatus(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	manager := newUpdateManager(model)
 
 	sa := model.StopAreas().New()
@@ -433,7 +434,7 @@ func Test_UpdateManager_UpdateStatus(t *testing.T) {
 func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	manager := newUpdateManager(model)
 	code := NewCode("codeSpace", "value")
 
@@ -461,8 +462,8 @@ func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 
 	assert.False(updatedStopVisit.collected)
 
-	assert.Equal(time, updatedStopVisit.Schedules.Schedule(STOP_VISIT_SCHEDULE_ACTUAL).ArrivalTime())
-	assert.Equal(time, updatedStopVisit.Schedules.Schedule(STOP_VISIT_SCHEDULE_ACTUAL).DepartureTime())
+	assert.Equal(time, updatedStopVisit.Schedules.Schedule(schedules.Actual).ArrivalTime())
+	assert.Equal(time, updatedStopVisit.Schedules.Schedule(schedules.Actual).DepartureTime())
 }
 
 func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
@@ -475,7 +476,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "vehicleJourney",
-		Codes:       `{"internal":"value"}`,
+		Codes:           `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Attributes:      "{}",
 		References:      `{}`,
@@ -488,7 +489,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	model.date = Date{
 		Year:  2017,
 		Month: time.January,
@@ -523,8 +524,8 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 	code := NewCode("internal", "value")
 	event := &VehicleJourneyUpdateEvent{
 		CodeSpace: "internal",
-		Code:     code,
-		SiriXML:      &response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0].XMLMonitoredVehicleJourney,
+		Code:      code,
+		SiriXML:   &response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0].XMLMonitoredVehicleJourney,
 	}
 
 	manager.Update(event)

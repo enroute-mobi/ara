@@ -7,7 +7,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
 )
@@ -115,7 +117,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 				if ok {
 					datedVehicleJourneyRef = vehicleJourneyId.Value()
 				} else {
-					defaultCode, ok := vjs[i].Code("_default")
+					defaultCode, ok := vjs[i].Code(model.Default)
 					if !ok {
 						logger.Log.Debugf("Vehicle journey with id %v does not have a proper code at %v", vehicleJourneyId, connector.Clock().Now())
 						continue
@@ -157,14 +159,14 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 						recordedCall := &siri.SIRIRecordedCall{
 							ArrivalStatus:         string(svs[i].ArrivalStatus),
 							DepartureStatus:       string(svs[i].DepartureStatus),
-							AimedArrivalTime:      svs[i].Schedules.Schedule("aimed").ArrivalTime(),
-							ExpectedArrivalTime:   svs[i].Schedules.Schedule("expected").ArrivalTime(),
-							AimedDepartureTime:    svs[i].Schedules.Schedule("aimed").DepartureTime(),
-							ExpectedDepartureTime: svs[i].Schedules.Schedule("expected").DepartureTime(),
+							AimedArrivalTime:      svs[i].Schedules.Schedule(schedules.Aimed).ArrivalTime(),
+							ExpectedArrivalTime:   svs[i].Schedules.Schedule(schedules.Expected).ArrivalTime(),
+							AimedDepartureTime:    svs[i].Schedules.Schedule(schedules.Aimed).DepartureTime(),
+							ExpectedDepartureTime: svs[i].Schedules.Schedule(schedules.Expected).DepartureTime(),
 							Order:                 svs[i].PassageOrder,
 							StopPointRef:          stopAreaId,
 							StopPointName:         stopArea.Name,
-							DestinationDisplay:    svs[i].Attributes["DestinationDisplay"],
+							DestinationDisplay:    svs[i].Attributes[siri_attributes.DestinationDisplay],
 						}
 
 						recordedCall.UseVisitNumber = connector.useVisitNumber
@@ -174,20 +176,20 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 						estimatedCall := &siri.SIRIEstimatedCall{
 							ArrivalStatus:      string(svs[i].ArrivalStatus),
 							DepartureStatus:    string(svs[i].DepartureStatus),
-							AimedArrivalTime:   svs[i].Schedules.Schedule("aimed").ArrivalTime(),
-							AimedDepartureTime: svs[i].Schedules.Schedule("aimed").DepartureTime(),
+							AimedArrivalTime:   svs[i].Schedules.Schedule(schedules.Aimed).ArrivalTime(),
+							AimedDepartureTime: svs[i].Schedules.Schedule(schedules.Aimed).DepartureTime(),
 							Order:              svs[i].PassageOrder,
 							StopPointRef:       stopAreaId,
 							StopPointName:      stopArea.Name,
-							DestinationDisplay: svs[i].Attributes["DestinationDisplay"],
+							DestinationDisplay: svs[i].Attributes[siri_attributes.DestinationDisplay],
 							VehicleAtStop:      svs[i].VehicleAtStop,
 						}
 
 						estimatedCall.UseVisitNumber = connector.useVisitNumber
 
 						if stopArea.Monitored {
-							estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule("expected").ArrivalTime()
-							estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule("expected").DepartureTime()
+							estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule(schedules.Expected).ArrivalTime()
+							estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule(schedules.Expected).DepartureTime()
 						}
 
 						estimatedVehicleJourney.EstimatedCalls = append(estimatedVehicleJourney.EstimatedCalls, estimatedCall)
@@ -296,25 +298,25 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) dataFrameRef() string
 }
 
 func (connector *SIRIEstimatedTimetableRequestBroadcaster) resolveOperatorRef(refs map[string]string, stopVisit *model.StopVisit) {
-	if _, ok := refs["OperatorRef"]; ok {
+	if _, ok := refs[siri_attributes.OperatorRef]; ok {
 		return
 	}
 
-	operatorRef, ok := stopVisit.Reference("OperatorRef")
+	operatorRef, ok := stopVisit.Reference(siri_attributes.OperatorRef)
 	if !ok || operatorRef == (model.Reference{}) || operatorRef.Code == nil {
 		return
 	}
 	operator, ok := connector.partner.Model().Operators().FindByCode(*operatorRef.Code)
 	if !ok {
-		refs["OperatorRef"] = operatorRef.Code.Value()
+		refs[siri_attributes.OperatorRef] = operatorRef.Code.Value()
 		return
 	}
 	obj, ok := operator.Code(connector.remoteCodeSpace)
 	if !ok {
-		refs["OperatorRef"] = operatorRef.Code.Value()
+		refs[siri_attributes.OperatorRef] = operatorRef.Code.Value()
 		return
 	}
-	refs["OperatorRef"] = obj.Value()
+	refs[siri_attributes.OperatorRef] = obj.Value()
 }
 
 func (factory *SIRIEstimatedTimetableRequestBroadcasterFactory) Validate(apiPartner *APIPartner) {

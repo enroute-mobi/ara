@@ -3,6 +3,8 @@ package model
 import (
 	"testing"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 func Test_CompositeStopVisitSelector_Empty(t *testing.T) {
@@ -22,7 +24,7 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 	selector := CompositeStopVisitSelector([]StopVisitSelector{StopVisitSelectorByTime(startTime, endTime)})
 
 	stopVisit := &StopVisit{
-		Schedules: NewStopVisitSchedules(),
+		Schedules: schedules.NewStopVisitSchedules(),
 	}
 	stopVisit.Schedules.SetSchedule("aimed", time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC), time.Time{})
 
@@ -31,7 +33,7 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 	}
 
 	stopVisit2 := &StopVisit{
-		Schedules: NewStopVisitSchedules(),
+		Schedules: schedules.NewStopVisitSchedules(),
 	}
 	stopVisit2.Schedules.SetSchedule("aimed", time.Date(2017, time.April, 2, 1, 0, 0, 0, time.UTC), time.Time{})
 
@@ -41,7 +43,7 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 }
 
 func Test_StopVisitSelectorByLine(t *testing.T) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 
 	line := model.Lines().New()
 	code := NewCode("codeSpace", "value")
@@ -84,7 +86,7 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	startTime := time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC)
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
 
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 
 	// Good VehicleJourney
 	line := model.Lines().New()

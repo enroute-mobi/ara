@@ -255,7 +255,7 @@ func (referential *Referential) NextReloadAt() time.Time {
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model for referential %v", referential.slug)
 	referential.Stop()
-	referential.model = referential.model.Reload(string(referential.Slug()))
+	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
 	referential.Start()
 }
@@ -276,7 +276,7 @@ func (referential *Referential) setNextReloadAt() {
 
 func (referential *Referential) Load() {
 	referential.Partners().Load()
-	referential.model.Load(string(referential.slug))
+	referential.model.Load()
 }
 
 type MemoryReferentials struct {

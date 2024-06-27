@@ -18,7 +18,7 @@ func Test_SituationExchangeBroadcaster_Create_Events(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 
 	referential.model.SetBroadcastSXChan(referential.broacasterManager.GetSituationExchangeBroadcastEventChan())
 	referential.broacasterManager.Start()

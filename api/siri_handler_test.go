@@ -12,6 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
@@ -310,21 +311,21 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
+	stopVisit.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(2*time.Hour))
 	stopVisit.SetCode(model.NewCode("codeSpace", "second"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
-	stopVisit2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
+	stopVisit2.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(1*time.Hour))
 	stopVisit2.SetCode(model.NewCode("codeSpace", "first"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
 	pastStopVisit.StopAreaId = stopArea.Id()
-	pastStopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(-1*time.Hour))
+	pastStopVisit.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(-1*time.Hour))
 	pastStopVisit.SetCode(model.NewCode("codeSpace", "past"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.Save()
@@ -402,21 +403,21 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
-	stopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
+	stopVisit.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(2*time.Hour))
 	stopVisit.SetCode(model.NewCode("codeSpace", "second"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
-	stopVisit2.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
+	stopVisit2.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(1*time.Hour))
 	stopVisit2.SetCode(model.NewCode("codeSpace", "first"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
 	pastStopVisit.StopAreaId = stopArea.Id()
-	pastStopVisit.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(-1*time.Hour))
+	pastStopVisit.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(-1*time.Hour))
 	pastStopVisit.SetCode(model.NewCode("codeSpace", "past"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.Save()
@@ -439,14 +440,14 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 
 	stopVisit3 := referential.Model().StopVisits().New()
 	stopVisit3.StopAreaId = stopArea2.Id()
-	stopVisit3.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(2*time.Hour))
+	stopVisit3.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(2*time.Hour))
 	stopVisit3.SetCode(model.NewCode("codeSpace", "third"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.Save()
 
 	stopVisit4 := referential.Model().StopVisits().New()
 	stopVisit4.StopAreaId = stopArea2.Id()
-	stopVisit4.Schedules.SetArrivalTime(model.STOP_VISIT_SCHEDULE_ACTUAL, referential.Clock().Now().Add(1*time.Hour))
+	stopVisit4.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(1*time.Hour))
 	stopVisit4.SetCode(model.NewCode("codeSpace", "fourth"))
 	stopVisit4.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit4.Save()

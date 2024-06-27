@@ -3,6 +3,7 @@ package sxml
 import (
 	"fmt"
 
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
 )
@@ -48,7 +49,7 @@ func (response *XMLLinesDiscoveryResponse) ErrorString() string {
 }
 
 func (response *XMLLinesDiscoveryResponse) errorType() string {
-	if response.ErrorType() == "OtherError" {
+	if response.ErrorType() == siri_attributes.OtherError {
 		return fmt.Sprintf("%v %v", response.ErrorType(), response.ErrorNumber())
 	}
 	return response.ErrorType()
@@ -57,7 +58,7 @@ func (response *XMLLinesDiscoveryResponse) errorType() string {
 func (response *XMLLinesDiscoveryResponse) AnnotatedLineRefs() []*XMLAnnotatedLineRef {
 	if response.annotatedLineRefs == nil {
 		annotatedLineRefs := []*XMLAnnotatedLineRef{}
-		nodes := response.findNodes("AnnotatedLineRef")
+		nodes := response.findNodes(siri_attributes.AnnotatedLineRef)
 		for _, node := range nodes {
 			annotatedLineRefs = append(annotatedLineRefs, NewXMLAnnotatedLineRef(node))
 		}
@@ -68,21 +69,21 @@ func (response *XMLLinesDiscoveryResponse) AnnotatedLineRefs() []*XMLAnnotatedLi
 
 func (annotatedLine *XMLAnnotatedLineRef) LineRef() string {
 	if annotatedLine.lineRef == "" {
-		annotatedLine.lineRef = annotatedLine.findStringChildContent("LineRef")
+		annotatedLine.lineRef = annotatedLine.findStringChildContent(siri_attributes.LineRef)
 	}
 	return annotatedLine.lineRef
 }
 
 func (annotatedLine *XMLAnnotatedLineRef) LineName() string {
 	if annotatedLine.lineName == "" {
-		annotatedLine.lineName = annotatedLine.findStringChildContent("LineName")
+		annotatedLine.lineName = annotatedLine.findStringChildContent(siri_attributes.LineName)
 	}
 	return annotatedLine.lineName
 }
 
 func (annotatedLine *XMLAnnotatedLineRef) Monitored() bool {
 	if !annotatedLine.monitored.Defined {
-		annotatedLine.monitored.SetValue(annotatedLine.findBoolChildContent("Monitored"))
+		annotatedLine.monitored.SetValue(annotatedLine.findBoolChildContent(siri_attributes.Monitored))
 	}
 	return annotatedLine.monitored.Value
 }

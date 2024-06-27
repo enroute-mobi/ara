@@ -27,7 +27,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 
 	partners := NewPartnerManager(referential)
@@ -260,7 +260,7 @@ func Test_setAffectedStopArea(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 
 	partners := NewPartnerManager(referential)
@@ -309,7 +309,7 @@ func Test_setAffectedLine(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 
 	partners := NewPartnerManager(referential)
@@ -357,7 +357,7 @@ func Test_setAffectedDestination(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 
 	partners := NewPartnerManager(referential)
@@ -418,7 +418,7 @@ func Test_setAffectedSection(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("slug")
-	referential.model = model.NewMemoryModel()
+	referential.model = model.NewTestMemoryModel()
 	referentials.Save(referential)
 
 	partners := NewPartnerManager(referential)

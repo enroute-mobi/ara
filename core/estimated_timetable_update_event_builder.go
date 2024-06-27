@@ -7,6 +7,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -118,19 +119,19 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjCode model.Cod
 			ArrivalStatus:   model.SetStopVisitArrivalStatus(call.ArrivalStatus()),
 			DepartureStatus: model.SetStopVisitDepartureStatus(call.DepartureStatus()),
 			RecordedAt:      recordedAt,
-			Schedules:       model.NewStopVisitSchedules(),
+			Schedules:       schedules.NewStopVisitSchedules(),
 
 			CodeSpace: builder.remoteCodeSpace,
 		}
 
 		if !call.AimedDepartureTime().IsZero() || !call.AimedArrivalTime().IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_AIMED, call.AimedDepartureTime(), call.AimedArrivalTime())
+			svEvent.Schedules.SetSchedule(schedules.Aimed, call.AimedDepartureTime(), call.AimedArrivalTime())
 		}
 		if !call.ExpectedDepartureTime().IsZero() || !call.ExpectedArrivalTime().IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_EXPECTED, call.ExpectedDepartureTime(), call.ExpectedArrivalTime())
+			svEvent.Schedules.SetSchedule(schedules.Expected, call.ExpectedDepartureTime(), call.ExpectedArrivalTime())
 		}
 		if !call.ActualDepartureTime().IsZero() || !call.ActualArrivalTime().IsZero() {
-			svEvent.Schedules.SetSchedule(model.STOP_VISIT_SCHEDULE_ACTUAL, call.ActualDepartureTime(), call.ActualArrivalTime())
+			svEvent.Schedules.SetSchedule(schedules.Actual, call.ActualDepartureTime(), call.ActualArrivalTime())
 		}
 
 		if builder.updateEvents.StopVisits[call.StopPointRef()] == nil {

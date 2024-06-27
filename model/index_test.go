@@ -106,7 +106,7 @@ var benchmarkResult []*StopVisit
 var benchmarkResultId []ModelId
 
 func benchmarkFindWithoutIndex(sv int, b *testing.B) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 
 	for i := 0; i < sv; i++ {
 		stopVisit := model.StopVisits().New()
@@ -125,7 +125,7 @@ func benchmarkFindWithoutIndex(sv int, b *testing.B) {
 }
 
 func benchmarkFindWithIndex(sv int, b *testing.B) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	index := createTestIndex()
 
 	for i := 0; i < sv; i++ {
@@ -147,7 +147,7 @@ func benchmarkFindWithIndex(sv int, b *testing.B) {
 }
 
 func benchmarkIndexing(sv int, b *testing.B) {
-	model := NewMemoryModel()
+	model := NewTestMemoryModel()
 	index := createTestIndex()
 
 	for i := 0; i < sv; i++ {
