@@ -2,10 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 
+	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/sym01/htmlsanitizer"
 )
 
 type SituationId string
@@ -131,8 +134,8 @@ func NewAffectedLine() *AffectedLine {
 }
 
 type TimeRange struct {
-	StartTime time.Time `json:",omitempty"`
-	EndTime   time.Time `json:",omitempty"`
+	StartTime time.Time
+	EndTime   time.Time
 }
 
 func NewSituation(model Model) *Situation {
@@ -191,8 +194,28 @@ func (c *Consequence) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (situation *Situation) UnmarshalJSON(data []byte) error {
-	type Alias Situation
+func (apiSituation *APISituation) MarshalJSON() ([]byte, error) {
+	type Alias APISituation
+	aux := struct {
+		*Alias
+		Codes  Codes    `json:",omitempty"`
+		Errors e.Errors `json:"Errors,omitempty"`
+	}{
+		Alias: (*Alias)(apiSituation),
+	}
+
+	if !apiSituation.Codes().Empty() {
+		aux.Codes = apiSituation.Codes()
+	}
+
+	if !apiSituation.Errors.Empty() {
+		aux.Errors = apiSituation.Errors
+	}
+	return json.Marshal(&aux)
+}
+
+func (situation *APISituation) UnmarshalJSON(data []byte) error {
+	type Alias APISituation
 
 	aux := &struct {
 		Codes   map[string]string
@@ -254,6 +277,53 @@ func (affect AffectedLine) MarshalJSON() ([]byte, error) {
 	}{
 		Type:  SituationTypeLine,
 		Alias: (Alias)(affect),
+	}
+
+	return json.Marshal(&aux)
+}
+
+func (t *TimeRange) UnmarshalJSON(data []byte) error {
+	aux := &struct {
+		StartTime *time.Time
+		EndTime   *time.Time
+	}{}
+
+	err := json.Unmarshal(data, aux)
+	if err != nil {
+		return err
+	}
+
+	if aux.StartTime == nil {
+		t.StartTime = time.Time{}
+	} else {
+		t.StartTime = *aux.StartTime
+	}
+
+	if aux.EndTime == nil {
+		t.EndTime = time.Time{}
+	} else {
+		t.EndTime = *aux.EndTime
+	}
+
+	return nil
+}
+
+func (t *TimeRange) MarshalJSON() ([]byte, error) {
+	type Alias TimeRange
+	aux := struct {
+		StartTime *time.Time `json:",omitempty"`
+		EndTime   *time.Time `json:",omitempty"`
+		*Alias
+	}{
+		Alias: (*Alias)(t),
+	}
+
+	if !t.StartTime.IsZero() {
+		aux.StartTime = &t.StartTime
+	}
+
+	if !t.EndTime.IsZero() {
+		aux.EndTime = &t.EndTime
 	}
 
 	return json.Marshal(&aux)
@@ -322,6 +392,167 @@ func (situation *Situation) containsKeyword(str string) bool {
 		}
 	}
 	return false
+}
+
+type APISituation struct {
+	Id     SituationId `json:",omitempty"`
+	Origin string      `json:",omitempty"`
+	CodeConsumer
+
+	CodeSpace             string    `json:",omitempty"`
+	SituationNumber       string    `json:",omitempty"`
+	ExistingSituationCode bool      `json:"-"`
+	RecordedAt            time.Time `json:",omitempty"`
+	Version               *int      `json:",omitempty"`
+
+	VersionedAt        time.Time    `json:",omitempty"`
+	ValidityPeriods    []*TimeRange `json:",omitempty"`
+	PublicationWindows []*TimeRange `json:",omitempty"`
+
+	Progress       SituationProgress          `json:",omitempty"`
+	Severity       SituationSeverity          `json:",omitempty"`
+	Reality        SituationReality           `json:",omitempty"`
+	Keywords       []string                   `json:",omitempty"`
+	ReportType     ReportType                 `json:",omitempty"`
+	AlertCause     SituationAlertCause        `json:",omitempty"`
+	ProducerRef    string                     `json:",omitempty"`
+	Format         string                     `json:",omitempty"`
+	InternalTags   []string                   `json:",omitempty"`
+	ParticipantRef string                     `json:",omitempty"`
+	Summary        *SituationTranslatedString `json:",omitempty"`
+	Description    *SituationTranslatedString `json:",omitempty"`
+
+	Affects      []Affect       `json:",omitempty"`
+	Consequences []*Consequence `json:",omitempty"`
+
+	Errors e.Errors `json:"Errors,omitempty"`
+
+	IgnoreValidation bool `json:",omitempty"`
+}
+
+func (apiSituation *APISituation) Validate() bool {
+	if apiSituation.CodeSpace == "" {
+		apiSituation.Errors.Add("CodeSpace", e.ERROR_BLANK)
+	}
+
+	if apiSituation.SituationNumber == "" {
+		apiSituation.Errors.Add("SituationNumber", e.ERROR_BLANK)
+	}
+
+	if apiSituation.ExistingSituationCode {
+		apiSituation.Errors.Add("SituationNumber", e.ERROR_UNIQUE)
+	}
+
+	if apiSituation.Version == nil {
+		apiSituation.Errors.Add("Version", e.ERROR_BLANK)
+	}
+
+	if apiSituation.Summary != nil {
+		if apiSituation.Summary.DefaultValue == "" {
+			apiSituation.Errors.Add("Summary", e.ERROR_BLANK)
+		}
+	}
+
+	sanitizer := htmlsanitizer.NewHTMLSanitizer()
+	if apiSituation.Summary != nil {
+		sanitizedSummary, err := sanitizer.Sanitize([]byte(apiSituation.Summary.DefaultValue))
+		if err != nil {
+			apiSituation.Errors.Add("Summary", fmt.Sprintf("%s: %v", e.ERROR_FORMAT, err))
+		} else {
+			apiSituation.Summary.DefaultValue = string(sanitizedSummary)
+		}
+	}
+
+	if apiSituation.Description != nil {
+		sanitizedDescription, err := sanitizer.Sanitize([]byte(apiSituation.Description.DefaultValue))
+		if err != nil {
+			apiSituation.Errors.Add("Description", fmt.Sprintf("%s: %v", e.ERROR_FORMAT, err))
+		} else {
+			apiSituation.Description.DefaultValue = string(sanitizedDescription)
+		}
+	}
+
+	if len(apiSituation.ValidityPeriods) == 0 {
+		apiSituation.Errors.Add("ValidityPeriods", e.ERROR_BLANK)
+	}
+
+	for _, period := range apiSituation.ValidityPeriods {
+		if period.StartTime.IsZero() {
+			apiSituation.Errors.Add("ValidityPeriods", e.ERROR_BLANK)
+			break
+		}
+	}
+
+	if len(apiSituation.Affects) == 0 {
+		apiSituation.Errors.Add("Affects", e.ERROR_BLANK)
+	}
+
+	return len(apiSituation.Errors) == 0
+}
+
+func (situation *Situation) Definition() *APISituation {
+	apiSituation := &APISituation{
+		Id:                 situation.Id(),
+		Affects:            []Affect{},
+		AlertCause:         situation.AlertCause,
+		Consequences:       []*Consequence{},
+		Description:        situation.Description,
+		Errors:             e.NewErrors(),
+		Format:             situation.Format,
+		InternalTags:       situation.InternalTags,
+		Keywords:           situation.Keywords,
+		Origin:             situation.Origin,
+		ParticipantRef:     situation.ParticipantRef,
+		ProducerRef:        situation.ProducerRef,
+		Progress:           situation.Progress,
+		PublicationWindows: situation.PublicationWindows,
+		Reality:            situation.Reality,
+		RecordedAt:         situation.RecordedAt,
+		ReportType:         situation.ReportType,
+		Severity:           situation.Severity,
+		Summary:            situation.Summary,
+		ValidityPeriods:    situation.ValidityPeriods,
+		Version:            &situation.Version,
+		VersionedAt:        situation.VersionedAt,
+		IgnoreValidation:   false,
+	}
+
+	apiSituation.codes = make(Codes)
+	return apiSituation
+}
+
+func (situation *Situation) SetDefinition(apiSituation *APISituation) {
+	situation.Affects = apiSituation.Affects
+	situation.AlertCause = apiSituation.AlertCause
+	situation.Consequences = apiSituation.Consequences
+	situation.Description = apiSituation.Description
+	situation.Format = apiSituation.Format
+	situation.InternalTags = apiSituation.InternalTags
+	situation.Keywords = apiSituation.Keywords
+	situation.Origin = apiSituation.Origin
+	situation.ParticipantRef = apiSituation.ParticipantRef
+	situation.ProducerRef = apiSituation.ProducerRef
+	situation.Progress = apiSituation.Progress
+	situation.PublicationWindows = apiSituation.PublicationWindows
+	situation.Reality = apiSituation.Reality
+	situation.RecordedAt = apiSituation.RecordedAt
+	situation.ReportType = apiSituation.ReportType
+	situation.Severity = apiSituation.Severity
+	situation.Summary = apiSituation.Summary
+	situation.ValidityPeriods = apiSituation.ValidityPeriods
+	situation.Version = *apiSituation.Version
+	situation.VersionedAt = apiSituation.VersionedAt
+
+	if apiSituation.codes.Empty() {
+		if apiSituation.CodeSpace != "" && apiSituation.SituationNumber != "" {
+			situation.codes = make(Codes)
+			code := NewCode(apiSituation.CodeSpace, apiSituation.SituationNumber)
+			situation.SetCode(code)
+		}
+	} else {
+		// keep cucumber scenarios compatibility with API
+		situation.codes = apiSituation.codes
+	}
 }
 
 type MemorySituations struct {

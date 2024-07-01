@@ -9,7 +9,10 @@ end
 
 
 Given(/^a Situation exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, situation|
-  RestClient.post situations_path(referential: referential), model_attributes(situation).to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
+  attributes = model_attributes(situation)
+  attributes['IgnoreValidation'] = true
+  RestClient.post situations_path(referential: referential), attributes.to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
+
 end
 
 When(/^a Situation is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, situation|
@@ -23,12 +26,13 @@ end
 When(/^the Situation "([^"]+)":"([^"]+)" is edited with a Consequence with the following attributes:$/) do |kind, code, attributes|
   response = RestClient.get situations_path, { content_type: :json, :Authorization => "Token token=#{$token}" }
   situation = JSON.parse(response.body).find { |a| a['Codes'][kind] == code }
-  situation_id = situation.delete('Id')
-  
-  situation_consequences = { 'Consequences' => [] }
-  situation_consequences['Consequences'] << model_attributes(attributes)
+  situation_id = situation['Id']
 
-  RestClient.put situation_path(situation_id), situation_consequences.to_json, {:Authorization => "Token token=#{$token}"}
+  situation['Consequences'] = []
+
+  situation['Consequences'] << model_attributes(attributes)
+  situation['IgnoreValidation'] = true
+  RestClient.put situation_path(situation_id), situation.to_json, {:Authorization => "Token token=#{$token}"}
 end
  
 When(/^the Situation "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, code, referential|
@@ -40,8 +44,15 @@ When(/^the Situation "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destro
 end
 
 When(/^the Situation "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
-  RestClient.put situation_path(identifier), model_attributes(attributes).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  # Kernel.puts RestClient.get stop_visits_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  response = RestClient.get situations_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  responseArray = JSON.parse(response.body)
+  situation = responseArray.find { |s| s["Id"] == identifier }
+
+  situation = situation.deep_merge(model_attributes(attributes))
+  situation['IgnoreValidation'] = true
+
+  RestClient.put situation_path(identifier), situation.to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  Kernel.puts RestClient.get situations_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
 end
 
 Then(/^one Situation(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|

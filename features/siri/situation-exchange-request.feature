@@ -777,7 +777,6 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Version                      | 1                                             |
       | Progress                     | closed                                        |
       | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00                     |
-      | ValidityPeriods[0]#EndTime   | 0001-01-01T00:00:00Z                          |
       | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
 
@@ -854,7 +853,6 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Version                      | 2                                             |
       | Progress                     | closed                                        |
       | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00                     |
-      | ValidityPeriods[0]#EndTime   | 0001-01-01T00:00:00Z                          |
       | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
 

@@ -110,8 +110,10 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 "Summary":{"DefaultValue":"Noel"},
 "Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 
-	situation := &Situation{}
-	err := json.Unmarshal([]byte(text), &situation)
+	apiSituation := &APISituation{}
+	apiSituation.codes = make(Codes)
+
+	err := json.Unmarshal([]byte(text), &apiSituation)
 	assert.Nil(err)
 
 	expectedCodes := []Code{
@@ -143,15 +145,15 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	expectedAffectedRoute := &AffectedRoute{RouteRef: "Route:66:LOC"}
 	expectedAffectedLine.AffectedRoutes = append(expectedAffectedLine.AffectedRoutes, expectedAffectedRoute)
 
-	assert.Equal(expectedSmmary, situation.Summary)
-	assert.Equal([]string{"tag1"}, situation.InternalTags)
-	assert.Equal(expectedDescription, situation.Description)
-	assert.Len(situation.Affects, 2)
-	assert.Equal(expectedAffectedStopArea, situation.Affects[0])
-	assert.Equal(expectedAffectedLine, situation.Affects[1])
+	assert.Equal(expectedSmmary, apiSituation.Summary)
+	assert.Equal([]string{"tag1"}, apiSituation.InternalTags)
+	assert.Equal(expectedDescription, apiSituation.Description)
+	assert.Len(apiSituation.Affects, 2)
+	assert.Equal(expectedAffectedStopArea, apiSituation.Affects[0])
+	assert.Equal(expectedAffectedLine, apiSituation.Affects[1])
 
 	for _, expectedCode := range expectedCodes {
-		code, found := situation.Code(expectedCode.CodeSpace())
+		code, found := apiSituation.Code(expectedCode.CodeSpace())
 		assert.True(found)
 		assert.Equal(expectedCode, code)
 	}
@@ -203,6 +205,86 @@ func Test_Situation_Code(t *testing.T) {
 	}
 }
 
+func Test_Validate_Empty(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+	apiSituation := situation.Definition()
+
+	assert.False(apiSituation.Validate())
+
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("CodeSpace"))
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("SituationNumber"))
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("Affects"))
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("ValidityPeriods"))
+}
+
+func Test_Validate_Empty_Summary(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+	situation.Summary = &SituationTranslatedString{
+		DefaultValue: "",
+	}
+	apiSituation := situation.Definition()
+
+	assert.False(apiSituation.Validate())
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("Summary"))
+}
+
+func Test_Validate_SituationAlreadyExists(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+	apiSituation := situation.Definition()
+	apiSituation.SituationNumber = "test"
+	apiSituation.ExistingSituationCode = true
+	apiSituation.Validate()
+
+	assert.Equal([]string{"Is already in use"}, apiSituation.Errors.Get("SituationNumber"))
+}
+
+func Test_Validate_Sanitize_Summary(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+	situation.Summary = &SituationTranslatedString{
+		DefaultValue: "<script>alert('Boo!');</script>",
+	}
+	apiSituation := situation.Definition()
+	apiSituation.Validate()
+	assert.Equal("", apiSituation.Summary.DefaultValue, "Shoud saninitze the summary")
+}
+
+func Test_Validate_Sanitize_Description(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+	situation.Description = &SituationTranslatedString{
+		DefaultValue: "<script>alert('Boo!');</script>",
+	}
+	apiSituation := situation.Definition()
+	apiSituation.Validate()
+	assert.Equal("", apiSituation.Description.DefaultValue, "Shoud saninitze the summary")
+}
+
+func Test_Validate_ValidityPeriods_Without_StartTime(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+
+	timeLayout := "2006/01/02-15:04:05"
+	testTime, _ := time.Parse(timeLayout, "2007/01/02-15:04:05")
+	period := &TimeRange{
+		EndTime: testTime,
+	}
+	situation.ValidityPeriods = append(situation.ValidityPeriods, period)
+
+	apiSituation := situation.Definition()
+	apiSituation.Validate()
+
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("ValidityPeriods"))
+}
 func Test_MemorySituations_New(t *testing.T) {
 	situations := NewMemorySituations()
 

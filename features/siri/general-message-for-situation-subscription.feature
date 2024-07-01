@@ -265,7 +265,6 @@ Feature: Support SIRI GeneralMessage by subscription
       | RecordedAt                   | 2017-05-15T13:26:10.116+02:00 |
       | Version                      | 1                             |
       | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00     |
-      | ValidityPeriods[0]#StartTime | 0001-01-01T00:00:00Z          |
       | Description[DefaultValue]    | Les autres non                |
 
   Scenario: Brodcast a GeneralMessage Notification after modification of a Situation
