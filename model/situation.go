@@ -253,6 +253,7 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 	if aux.Codes != nil {
 		situation.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
+
 	return nil
 }
 
@@ -403,7 +404,7 @@ type APISituation struct {
 	SituationNumber       string    `json:",omitempty"`
 	ExistingSituationCode bool      `json:"-"`
 	RecordedAt            time.Time `json:",omitempty"`
-	Version               *int      `json:",omitempty"`
+	Version               int       `json:",omitempty"`
 
 	VersionedAt        time.Time    `json:",omitempty"`
 	ValidityPeriods    []*TimeRange `json:",omitempty"`
@@ -443,7 +444,7 @@ func (apiSituation *APISituation) Validate() bool {
 		apiSituation.Errors.Add("SituationNumber", e.ERROR_UNIQUE)
 	}
 
-	if apiSituation.Version == nil {
+	if apiSituation.Version == 0 && apiSituation.Id == "" {
 		apiSituation.Errors.Add("Version", e.ERROR_BLANK)
 	}
 
@@ -512,7 +513,7 @@ func (situation *Situation) Definition() *APISituation {
 		Severity:           situation.Severity,
 		Summary:            situation.Summary,
 		ValidityPeriods:    situation.ValidityPeriods,
-		Version:            &situation.Version,
+		Version:            situation.Version,
 		VersionedAt:        situation.VersionedAt,
 		IgnoreValidation:   false,
 	}
@@ -540,7 +541,7 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 	situation.Severity = apiSituation.Severity
 	situation.Summary = apiSituation.Summary
 	situation.ValidityPeriods = apiSituation.ValidityPeriods
-	situation.Version = *apiSituation.Version
+	situation.Version = apiSituation.Version
 	situation.VersionedAt = apiSituation.VersionedAt
 
 	if apiSituation.codes.Empty() {
