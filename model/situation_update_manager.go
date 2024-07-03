@@ -57,6 +57,16 @@ func (manager *SituationUpdateManager) Update(events []*SituationUpdateEvent) {
 		situation.Affects = event.Affects
 		situation.Consequences = event.Consequences
 
+		// Default is AfterCreate
+		var h hook
+		if ok {
+			h = AfterSave
+		}
+		macros := manager.model.Macros().GetMacros(h, MacroSituationType)
+		for i := range macros {
+			macros[i].Update(&situation)
+		}
+
 		situation.Save()
 	}
 }

@@ -1,6 +1,8 @@
 package model
 
-import "slices"
+import (
+	"slices"
+)
 
 type MacroId string
 type contextAttributes interface{}
@@ -14,6 +16,7 @@ const (
 	IfAttribute               = "IfAttribute"
 	SetAttribute              = "SetAttribute"
 	DefineAimedScheduledTimes = "DefineAimedScheduledTimes"
+	DefineSituationAffects    = "DefineSituationAffects"
 )
 
 var contexes = []string{IfAttribute}
@@ -76,6 +79,8 @@ func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
 		return NewVehicleJourneySetAttributeUpdater(sm)
 	} else if sm.ModelType.String == "StopVisit" && sm.Type == DefineAimedScheduledTimes {
 		return NewStopVisitDefineAimedScheduledTimesUpdater(sm)
+	} else if sm.ModelType.String == "Situation" && sm.Type == DefineSituationAffects {
+		return NewDefineSituationAffectsUpdater(sm)
 	}
 	return nil, nil
 }
