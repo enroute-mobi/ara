@@ -11,7 +11,7 @@ import (
 	"github.com/sym01/htmlsanitizer"
 )
 
-type SituationId string
+type SituationId ModelId
 
 type Message struct {
 	Content             string `json:"MessageText,omitempty"`
@@ -328,6 +328,10 @@ func (t *TimeRange) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(&aux)
+}
+
+func (situation *Situation) modelId() ModelId {
+	return ModelId(situation.id)
 }
 
 func (situation *Situation) MarshalJSON() ([]byte, error) {

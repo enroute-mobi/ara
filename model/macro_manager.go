@@ -30,8 +30,9 @@ const (
 	VehicleJourneyType
 	StopVisitType
 	VehicleType
+	MacroSituationType
 
-	totalModelTypes = 5
+	totalModelTypes = 6
 )
 
 var modelType = map[string]ModelType{
@@ -40,6 +41,7 @@ var modelType = map[string]ModelType{
 	"VehicleJourney": VehicleJourneyType,
 	"StopVisit":      StopVisitType,
 	"Vehicle":        VehicleType,
+	"Situation":      MacroSituationType,
 }
 
 var hooks = map[string]hook{
