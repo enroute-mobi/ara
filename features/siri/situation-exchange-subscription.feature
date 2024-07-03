@@ -30,7 +30,7 @@ Feature: Support SIRI SituationExchange by subscription
          xmlns:ns6="http://wsdl.siri.org.uk/siri">
          <ns5:ResponseStatus>
              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-             <ns5:RequestMessageRef>6ba7b814-9dad-11d1-f-00c04fd430c8</ns5:RequestMessageRef>
+             <ns5:RequestMessageRef>{LastRequestMessageRef}</ns5:RequestMessageRef>
              <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
              <ns5:SubscriptionRef>6ba7b814-9dad-11d1-a-00c04fd430c8</ns5:SubscriptionRef>
              <ns5:Status>true</ns5:Status>
