@@ -102,12 +102,12 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 
 	// Building
 	builder := NewGeneralMessageUpdateEventBuilder(partner)
-	events := &[]*model.SituationUpdateEvent{}
+	events := NewCollectUpdateEvents()
 
 	builder.buildGeneralMessageUpdateEvent(events, response.XMLGeneralMessages()[0], "producer")
-	assert.Len(*events, 1, "One event should have been created")
+	assert.Len(events.Situations, 1, "One event should have been created")
 
-	event := (*events)[0]
+	event := events.Situations[0]
 	assert.Equal("FRANCE", event.Format)
 	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)
 	assert.Equal(model.ReportType("general"), event.ReportType)

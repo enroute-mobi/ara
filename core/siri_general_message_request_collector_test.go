@@ -15,14 +15,14 @@ import (
 )
 
 type fakeSituationBroadcaster struct {
-	Events []*model.SituationUpdateEvent
+	Events []model.UpdateEvent
 }
 
-func (fb *fakeSituationBroadcaster) FakeBroadcaster(events []*model.SituationUpdateEvent) {
-	fb.Events = events
+func (fb *fakeSituationBroadcaster) FakeBroadcaster(event model.UpdateEvent) {
+	fb.Events = append(fb.Events, event)
 }
 
-func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath string) []*model.SituationUpdateEvent {
+func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath string) []model.UpdateEvent {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
@@ -40,7 +40,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_url":           ts.URL,
+		"remote_url":        ts.URL,
 		"remote_code_space": "test kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -59,7 +59,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	siriGeneralMessageRequestCollector := NewSIRIGeneralMessageRequestCollector(partner)
 
 	fs := fakeSituationBroadcaster{}
-	siriGeneralMessageRequestCollector.SetSituationUpdateSubscriber(fs.FakeBroadcaster)
+	siriGeneralMessageRequestCollector.SetUpdateSubscriber(fs.FakeBroadcaster)
 	siriGeneralMessageRequestCollector.SetClock(clock.NewFakeClock())
 	siriGeneralMessageRequestCollector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, "line value")
 
@@ -81,9 +81,9 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_url":           "remote_url",
+		"remote_url":        "remote_url",
 		"remote_code_space": "remote_code_space",
-		"remote_credential":    "remote_credential",
+		"remote_credential": "remote_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {
@@ -93,15 +93,15 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 
 func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T) {
 	assert := assert.New(t)
-	situationUpdateEvents := prepare_SIRIGeneralMessageRequestCollector(t, "testdata/generalmessage-response-soap.xml")
-	if situationUpdateEvents == nil {
+	updateEvents := prepare_SIRIGeneralMessageRequestCollector(t, "testdata/generalmessage-response-soap.xml")
+	if updateEvents == nil {
 		t.Error("RequestSituationUpdate should not return nil")
 	}
 
-	if len(situationUpdateEvents) != 2 {
-		t.Errorf("RequestSituationUpdate should have 2 SituationUpdateEvents, got: %v", len(situationUpdateEvents))
+	if len(updateEvents) != 2 {
+		t.Errorf("RequestSituationUpdate should have 2 SituationUpdateEvents, got: %v", len(updateEvents))
 	}
-	situationEvent := situationUpdateEvents[0]
+	situationEvent, _ := updateEvents[0].(*model.SituationUpdateEvent)
 
 	if expected := clock.FAKE_CLOCK_INITIAL_DATE; situationEvent.CreatedAt != expected {
 		t.Errorf("Wrong Created_At for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.CreatedAt)

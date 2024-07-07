@@ -10,6 +10,7 @@ type CollectUpdateEvents struct {
 	VehicleJourneys map[string]*model.VehicleJourneyUpdateEvent
 	StopVisits      map[string]map[string]*model.StopVisitUpdateEvent
 	Vehicles        map[string]*model.VehicleUpdateEvent
+	Situations      []*model.SituationUpdateEvent
 	Cancellations   []*model.NotCollectedUpdateEvent
 	*CollectedRefs
 }

@@ -9,7 +9,6 @@ import (
 	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
-type SituationUpdateSubscriber func([]*model.SituationUpdateEvent)
 type UpdateSubscriber func(model.UpdateEvent)
 
 type CollectManagerInterface interface {
@@ -18,21 +17,17 @@ type CollectManagerInterface interface {
 	UpdateStopArea(request *StopAreaUpdateRequest)
 	UpdateLine(ctx context.Context, request *LineUpdateRequest)
 	UpdateVehicle(ctx context.Context, request *VehicleUpdateRequest)
+	UpdateSituation(request *SituationUpdateRequest)
 
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
 	BroadcastUpdateEvent(event model.UpdateEvent)
-
-	UpdateSituation(request *SituationUpdateRequest)
-	HandleSituationUpdateEvent(SituationUpdateSubscriber)
-	BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent)
 }
 
 type CollectManager struct {
 	uuid.UUIDConsumer
 
-	SituationUpdateSubscribers []SituationUpdateSubscriber
-	UpdateSubscribers          []UpdateSubscriber
-	referential                *Referential
+	UpdateSubscribers []UpdateSubscriber
+	referential       *Referential
 }
 
 // TestCollectManager has a test StopAreaUpdateSubscriber method
@@ -67,9 +62,6 @@ func (manager *TestCollectManager) BroadcastUpdateEvent(event model.UpdateEvent)
 }
 
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
-func (manager *TestCollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber) {}
-func (manager *TestCollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
-}
 func (manager *TestCollectManager) UpdateLine(context.Context, *LineUpdateRequest)       {}
 func (manager *TestCollectManager) UpdateVehicle(context.Context, *VehicleUpdateRequest) {}
 
@@ -77,9 +69,8 @@ func (manager *TestCollectManager) UpdateVehicle(context.Context, *VehicleUpdate
 
 func NewCollectManager(referential *Referential) CollectManagerInterface {
 	return &CollectManager{
-		referential:                referential,
-		SituationUpdateSubscribers: make([]SituationUpdateSubscriber, 0),
-		UpdateSubscribers:          make([]UpdateSubscriber, 0),
+		referential:       referential,
+		UpdateSubscribers: make([]UpdateSubscriber, 0),
 	}
 }
 
@@ -252,16 +243,6 @@ func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *Vehic
 		}
 		requestCollector.RequestVehicleUpdate(request)
 		return
-	}
-}
-
-func (manager *CollectManager) HandleSituationUpdateEvent(SituationUpdateSubscriber SituationUpdateSubscriber) {
-	manager.SituationUpdateSubscribers = append(manager.SituationUpdateSubscribers, SituationUpdateSubscriber)
-}
-
-func (manager *CollectManager) BroadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
-	for _, SituationUpdateSubscriber := range manager.SituationUpdateSubscribers {
-		SituationUpdateSubscriber(event)
 	}
 }
 

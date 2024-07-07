@@ -34,13 +34,13 @@ func NewSituationExchangeUpdateEventBuilder(partner *Partner) SituationExchangeU
 	}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlSituationExchangeDelivery *sxml.XMLSituationExchangeDelivery, producerRef string) {
+func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeDeliveryUpdateEvents(events *CollectUpdateEvents, xmlSituationExchangeDelivery *sxml.XMLSituationExchangeDelivery, producerRef string) {
 	for _, xmlSituation := range xmlSituationExchangeDelivery.Situations() {
-		builder.buildSituationExchangeUpdateEvent(event, xmlSituation, producerRef)
+		builder.buildSituationExchangeUpdateEvent(events, xmlSituation, producerRef)
 	}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLSituationExchangeResponse) {
+func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeUpdateEvents(event *CollectUpdateEvents, xmlResponse *sxml.XMLSituationExchangeResponse) {
 	xmlSituationExchangeDeliveries := xmlResponse.SituationExchangeDeliveries()
 	if len(xmlSituationExchangeDeliveries) == 0 {
 		return
@@ -51,7 +51,7 @@ func (builder *SituationExchangeUpdateEventBuilder) SetSituationExchangeUpdateEv
 	}
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdateEvent(event *[]*model.SituationUpdateEvent, xmlSituation *sxml.XMLPtSituationElement, producerRef string) {
+func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdateEvent(event *CollectUpdateEvents, xmlSituation *sxml.XMLPtSituationElement, producerRef string) {
 	if len(xmlSituation.Affects()) == 0 {
 		return
 	}
@@ -141,7 +141,7 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setConsequence(situationEvent, consequence)
 	}
 
-	*event = append(*event, situationEvent)
+	event.Situations = append(event.Situations, situationEvent)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {

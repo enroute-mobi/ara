@@ -2,9 +2,8 @@ package model
 
 import (
 	"database/sql"
-	"testing"
-
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func Test_Macro_DefineSituationAffects(t *testing.T) {
@@ -67,7 +66,7 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 	s.SetCode(code)
 	s.Save()
 
-	updateManager := newSituationUpdateManager(model)
+	updateManager := newUpdateManager(model)
 
 	event := &SituationUpdateEvent{
 		SituationCode: code,
@@ -76,7 +75,8 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 		Consequences:  []*Consequence{c1, c2},
 	}
 
-	updateManager.Update([]*SituationUpdateEvent{event})
+	updateManager.Update(event)
+
 	updatedSituation, ok := model.Situations().FindByCode(code)
 	assert.True(ok)
 
