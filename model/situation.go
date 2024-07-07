@@ -2,11 +2,13 @@ package model
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/sym01/htmlsanitizer"
 )
@@ -662,4 +664,93 @@ func (manager *MemorySituations) Delete(situation *Situation) bool {
 
 	delete(manager.byIdentifier, situation.Id())
 	return true
+}
+
+func (t *SituationTranslatedString) FromProto(value interface{}) error {
+	var ts SituationTranslatedString
+	switch v := value.(type) {
+	case *gtfs.TranslatedString_Translation:
+		if v.GetLanguage() == "fr" {
+			ts.DefaultValue = v.GetText()
+		}
+	default:
+		return fmt.Errorf("unsupported value %T", value)
+	}
+
+	*t = ts
+	return nil
+}
+
+func (t *TimeRange) FromProto(value interface{}) error {
+	var timeRange TimeRange
+	switch v := value.(type) {
+	case *gtfs.TimeRange:
+		if v.GetStart() == 0 {
+			return errors.New("gtfs.Timerange missing Start")
+		}
+		timeRange.StartTime = time.Unix(int64(v.GetStart()), 0)
+
+		if v.GetEnd() != 0 {
+			timeRange.EndTime = time.Unix(int64(v.GetEnd()), 0)
+		}
+
+	default:
+		return fmt.Errorf("unsupported value %T", value)
+	}
+
+	*t = timeRange
+	return nil
+}
+
+type AffectRefs struct {
+	MonitoringRefs map[string]struct{}
+	LineRefs       map[string]struct{}
+}
+
+func AffectFromProto(value interface{}, remoteCodeSpace string, m Model) (Affect, *AffectRefs, error) {
+	collectedRefs := &AffectRefs{
+		MonitoringRefs: make(map[string]struct{}),
+		LineRefs:       make(map[string]struct{}),
+	}
+
+	switch v := value.(type) {
+	case *gtfs.EntitySelector:
+		lineId := v.GetRouteId()
+		stopId := v.GetStopId()
+
+		if stopId != "" {
+			stopCode := NewCode(remoteCodeSpace, stopId)
+			stopArea, ok := m.StopAreas().FindByCode(stopCode)
+			if !ok {
+				return nil, nil, fmt.Errorf("unknow stopId: %v", stopId)
+			}
+			affect := NewAffectedStopArea()
+			affect.StopAreaId = stopArea.Id()
+			collectedRefs.MonitoringRefs[stopId] = struct{}{}
+			if lineId != "" {
+				lineCode := NewCode(remoteCodeSpace, lineId)
+				line, ok := m.Lines().FindByCode(lineCode)
+				if ok {
+					affect.LineIds = append(affect.LineIds, line.Id())
+					collectedRefs.LineRefs[lineId] = struct{}{}
+				}
+			}
+			return affect, collectedRefs, nil
+		}
+
+		if lineId != "" {
+			lineCode := NewCode(remoteCodeSpace, lineId)
+			line, ok := m.Lines().FindByCode(lineCode)
+			if !ok {
+				return nil, nil, fmt.Errorf("unknow lineId: %v", lineId)
+			}
+			affect := NewAffectedLine()
+			affect.LineId = line.Id()
+			collectedRefs.LineRefs[lineId] = struct{}{}
+			return affect, collectedRefs, nil
+		}
+	default:
+		return nil, nil, fmt.Errorf("invalide type: %T", value)
+	}
+	return nil, nil, errors.New("cannot find line/stopArea model from gtfs ")
 }

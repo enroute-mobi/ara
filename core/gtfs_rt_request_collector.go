@@ -1,15 +1,19 @@
 package core
 
 import (
-	"fmt"
-	"time"
-
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/remote"
+
+	"crypto/sha1"
+	"encoding/binary"
+	"encoding/json"
+	"fmt"
+	"golang.org/x/exp/maps"
+	"time"
 )
 
 type GtfsRequestCollectorFactory struct{}
@@ -101,12 +105,136 @@ func (connector *GtfsRequestCollector) requestGtfs() {
 			connector.handleTripUpdate(updateEvents, entity.GetTripUpdate())
 		} else if entity.GetVehicle() != nil {
 			connector.handleVehicle(updateEvents, entity.GetVehicle())
+		} else if entity.GetAlert() != nil {
+			connector.handleAlert(updateEvents, entity.GetAlert(), entity.GetId(), feed.GetHeader().GetTimestamp())
 		}
 	}
+
+	// logging
+	message.Lines = GetModelReferenceSlice(updateEvents.LineRefs)
+	message.StopAreas = GetModelReferenceSlice(updateEvents.MonitoringRefs)
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(updateEvents)
 	connector.Partner().GtfsStatus(OPERATIONNAL_STATUS_UP)
+}
+
+func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, a *gtfs.Alert, id string, timestamp uint64) {
+	entities := a.GetInformedEntity()
+	if len(entities) == 0 {
+		logger.Log.Debugf("%d affects for this Alert, skipping message", len(entities))
+		return
+	}
+
+	event := &model.SituationUpdateEvent{
+		RecordedAt:  connector.Clock().Now(),
+		VersionedAt: time.Unix(int64(timestamp), 0),
+		Origin:      string(connector.Partner().Slug()),
+		Progress:    model.SituationProgressPublished,
+	}
+
+	// Affects
+	for _, entity := range entities {
+		affect, collectedRefs, err := model.AffectFromProto(entity,
+			connector.remoteCodeSpace,
+			connector.Partner().Model(),
+		)
+		if err != nil {
+			logger.Log.Debugf("cannot convert Proto entity: %v", err)
+			continue
+		}
+		maps.Copy(events.MonitoringRefs, collectedRefs.MonitoringRefs)
+		maps.Copy(events.LineRefs, collectedRefs.LineRefs)
+		event.Affects = append(event.Affects, affect)
+	}
+
+	if len(event.Affects) == 0 {
+		logger.Log.Debugf("%d affected line/stopArea found for this Alert, skipping message", len(event.Affects))
+		return
+	}
+
+	// Version
+	alert, err := json.Marshal(a)
+	if err != nil {
+		logger.Log.Debugf("Cannot Marshal gtfs Alert: %v", err)
+		return
+	}
+	hasher := sha1.New()
+	hasher.Write(alert)
+	data := binary.BigEndian.Uint64(hasher.Sum(nil))
+	version := int(data)
+	if version < 0 {
+		version = -version
+	}
+	event.Version = version
+
+	// Code
+	code := model.NewCode(connector.remoteCodeSpace, id)
+	event.SituationCode = code
+
+	// ValidityPeriods
+	var validityPeriods []*model.TimeRange
+	periods := a.GetActivePeriod()
+	for _, period := range periods {
+		var timePeriod model.TimeRange
+		if err := timePeriod.FromProto(period); err != nil {
+			logger.Log.Debugf("cannot convert Proto TimeRange: %v", err)
+			continue
+		}
+		validityPeriods = append(validityPeriods, &timePeriod)
+	}
+	event.ValidityPeriods = validityPeriods
+
+	// Summary
+	var s model.SituationTranslatedString
+	headerTexts := a.GetHeaderText().GetTranslation()
+	for _, text := range headerTexts {
+		if err := s.FromProto(text); err != nil {
+			logger.Log.Debugf("cannot convert Proto TranslatedString: %v", err)
+			continue
+		}
+	}
+	event.Summary = &s
+
+	// Description
+	var d model.SituationTranslatedString
+	descriptionTexts := a.GetDescriptionText().GetTranslation()
+	for _, text := range descriptionTexts {
+		if err := d.FromProto(text); err != nil {
+			logger.Log.Debugf("cannot convert Proto TranslatedString: %v", err)
+			continue
+		}
+	}
+	event.Description = &d
+
+	// AlertCause
+	var alertCause model.SituationAlertCause
+	if err := alertCause.FromProto(a.GetCause()); err != nil {
+		logger.Log.Debugf("error in alert cause: %v", err)
+	} else {
+		event.AlertCause = alertCause
+	}
+
+	// Severity
+	var severity model.SituationSeverity
+	if err := severity.FromProto(a.GetSeverityLevel()); err != nil {
+		logger.Log.Debugf("error in severity: %v", err)
+	} else {
+		event.Severity = severity
+	}
+
+	// Condition
+	var condition model.SituationCondition
+	if err := condition.FromProto(a.GetEffect()); err != nil {
+		logger.Log.Debugf("error in severity: %v", err)
+	} else {
+		consequence := &model.Consequence{
+			Condition: condition,
+		}
+		event.Consequences = append(event.Consequences, consequence)
+	}
+
+	events.Situations = append(events.Situations, event)
 }
 
 func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEvents, t *gtfs.TripUpdate) {
@@ -259,6 +387,9 @@ func (connector *GtfsRequestCollector) broadcastUpdateEvents(events *CollectUpda
 		}
 	}
 	for _, e := range events.Vehicles {
+		connector.subscriber(e)
+	}
+	for _, e := range events.Situations {
 		connector.subscriber(e)
 	}
 }
