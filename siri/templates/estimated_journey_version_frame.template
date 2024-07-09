@@ -28,7 +28,8 @@
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .UseVisitNumber }}
 							<siri:VisitNumber>{{ .Order }}</siri:VisitNumber>{{ else }}
 							<siri:Order>{{ .Order }}</siri:Order>{{ end }}{{ if .StopPointName }}
-							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}
+							<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{ end }}{{ if .Occupancy }}
+							<siri:Occupancy>{{ .Occupancy }}</siri:Occupancy>{{ end  }}
 							<siri:VehicleAtStop>{{ .VehicleAtStop }}</siri:VehicleAtStop>{{ if .DestinationDisplay }}
 							<siri:DestinationDisplay>{{ .DestinationDisplay }}</siri:DestinationDisplay>{{ end }}{{ if not .AimedArrivalTime.IsZero }}
 							<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}

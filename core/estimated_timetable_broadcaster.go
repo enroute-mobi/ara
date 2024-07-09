@@ -292,6 +292,11 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *mo
 
 		estimatedCall.UseVisitNumber = useVisitNumber
 
+		vehicle, ok := connector.partner.Model().Vehicles().FindByNextStopVisitId(sv.Id())
+		if ok {
+			estimatedCall.Occupancy = vehicle.Occupancy
+		}
+
 		evj.EstimatedCalls = append(evj.EstimatedCalls, estimatedCall)
 	}
 }
