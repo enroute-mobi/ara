@@ -86,6 +86,7 @@ type SIRIEstimatedCall struct {
 	StopPointName      string
 	DestinationDisplay string
 
+	Occupancy     string
 	VehicleAtStop bool
 
 	Order          int

@@ -187,6 +187,11 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 
 						estimatedCall.UseVisitNumber = connector.useVisitNumber
 
+						vehicle, ok := connector.partner.Model().Vehicles().FindByNextStopVisitId(svs[i].Id())
+						if ok {
+							estimatedCall.Occupancy = vehicle.Occupancy
+						}
+
 						if stopArea.Monitored {
 							estimatedCall.ExpectedArrivalTime = svs[i].Schedules.Schedule(schedules.Expected).ArrivalTime()
 							estimatedCall.ExpectedDepartureTime = svs[i].Schedules.Schedule(schedules.Expected).DepartureTime()
