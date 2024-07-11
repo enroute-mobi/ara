@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
@@ -18,14 +17,14 @@ type SIRISituationExchangeRequestCollectorFactory struct{}
 type SIRISituationExchangeRequestCollector struct {
 	connector
 
-	situationUpdateSubscriber SituationUpdateSubscriber
+	updateSubscriber UpdateSubscriber
 }
 
 func NewSIRISituationExchangeRequestCollector(partner *Partner) *SIRISituationExchangeRequestCollector {
 	siriSituationExchangeRequestCollector := &SIRISituationExchangeRequestCollector{}
 	siriSituationExchangeRequestCollector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriSituationExchangeRequestCollector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
+	siriSituationExchangeRequestCollector.updateSubscriber = manager.BroadcastUpdateEvent
 
 	return siriSituationExchangeRequestCollector
 }
@@ -64,25 +63,29 @@ func (connector *SIRISituationExchangeRequestCollector) RequestSituationUpdate(k
 	}
 
 	logXMLSituationExchangeResponse(message, xmlSituationExchangeResponse)
-	situationUpdateEvents := []*model.SituationUpdateEvent{}
+	updateEvents := NewCollectUpdateEvents()
 
 	builder := NewSituationExchangeUpdateEventBuilder(connector.partner)
-	builder.SetSituationExchangeUpdateEvents(&situationUpdateEvents, xmlSituationExchangeResponse)
+	builder.SetSituationExchangeUpdateEvents(updateEvents, xmlSituationExchangeResponse)
 
 	// Log models
 	message.Lines = GetModelReferenceSlice(builder.LineRefs)
 	message.StopAreas = GetModelReferenceSlice(builder.MonitoringRefs)
 
-	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
+	connector.broadcastSituationUpdateEvent(updateEvents)
 }
 
-func (connector *SIRISituationExchangeRequestCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
-	connector.situationUpdateSubscriber = situationUpdateSubscriber
+func (connector *SIRISituationExchangeRequestCollector) SetUpdateSubscriber(updateSubscriber UpdateSubscriber) {
+	connector.updateSubscriber = updateSubscriber
 }
 
-func (connector *SIRISituationExchangeRequestCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
-	if connector.situationUpdateSubscriber != nil {
-		connector.situationUpdateSubscriber(event)
+func (connector *SIRISituationExchangeRequestCollector) broadcastSituationUpdateEvent(events *CollectUpdateEvents) {
+	if connector.updateSubscriber == nil {
+		return
+
+	}
+	for _, e := range events.Situations {
+		connector.updateSubscriber(e)
 	}
 }
 

@@ -30,6 +30,9 @@ type SituationUpdateEvent struct {
 	Consequences       []*Consequence
 }
 
+func (ue *SituationUpdateEvent) EventKind() EventKind {
+	return SITUATION_EVENT
+}
 func (event *SituationUpdateEvent) Id() SituationUpdateRequestId {
 	return event.id
 }

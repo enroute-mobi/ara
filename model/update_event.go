@@ -10,6 +10,7 @@ const (
 	STOP_VISIT_EVENT
 	NOT_COLLECTED_EVENT
 	VEHICLE_EVENT
+	SITUATION_EVENT
 )
 
 type UpdateEvent interface {

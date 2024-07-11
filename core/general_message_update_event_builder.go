@@ -37,7 +37,7 @@ func NewGeneralMessageUpdateEventBuilder(partner *Partner) GeneralMessageUpdateE
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLGeneralMessageDelivery, producerRef string) {
+func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdateEvents(event *CollectUpdateEvents, xmlResponse *sxml.XMLGeneralMessageDelivery, producerRef string) {
 	xmlGeneralMessageEvents := xmlResponse.XMLGeneralMessages()
 	if len(xmlGeneralMessageEvents) == 0 {
 		return
@@ -48,7 +48,7 @@ func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageDeliveryUpdate
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageResponseUpdateEvents(event *[]*model.SituationUpdateEvent, xmlResponse *sxml.XMLGeneralMessageResponse) {
+func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageResponseUpdateEvents(event *CollectUpdateEvents, xmlResponse *sxml.XMLGeneralMessageResponse) {
 	xmlGeneralMessageEvents := xmlResponse.XMLGeneralMessages()
 	if len(xmlGeneralMessageEvents) == 0 {
 		return
@@ -59,7 +59,7 @@ func (builder *GeneralMessageUpdateEventBuilder) SetGeneralMessageResponseUpdate
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(event *[]*model.SituationUpdateEvent, xmlGeneralMessageEvent *sxml.XMLGeneralMessage, producerRef string) {
+func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(event *CollectUpdateEvents, xmlGeneralMessageEvent *sxml.XMLGeneralMessage, producerRef string) {
 	if xmlGeneralMessageEvent.Content() == nil {
 		return
 	}
@@ -92,7 +92,7 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 
 	builder.setAffects(situationEvent, &content)
 
-	*event = append(*event, situationEvent)
+	event.Situations = append(event.Situations, situationEvent)
 }
 
 func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFromMessages(messages []*sxml.XMLMessage, event *model.SituationUpdateEvent) {

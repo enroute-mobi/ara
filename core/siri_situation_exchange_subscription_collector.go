@@ -24,7 +24,7 @@ type SIRISituationExchangeSubscriptionCollector struct {
 
 	deletedSubscriptions        *DeletedSubscriptions
 	situationExchangeSubscriber SIRISituationExchangeSubscriber
-	situationUpdateSubscriber   SituationUpdateSubscriber
+	updateSubscriber            UpdateSubscriber
 }
 
 type SIRISituationExchangeSubscriptionCollectorFactory struct{}
@@ -44,7 +44,7 @@ func NewSIRISituationExchangeSubscriptionCollector(partner *Partner) *SIRISituat
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.situationExchangeSubscriber = NewSIRISituationExchangeSubscriber(connector)
 
 	return connector
@@ -100,7 +100,7 @@ func (connector *SIRISituationExchangeSubscriptionCollector) HandleNotifySituati
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
-	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
+	updateEvents := NewCollectUpdateEvents()
 	builder := NewSituationExchangeUpdateEventBuilder(connector.partner)
 
 	collectedRefs = NewCollectedRefs()
@@ -128,12 +128,12 @@ func (connector *SIRISituationExchangeSubscriptionCollector) HandleNotifySituati
 			continue
 		}
 
-		builder.SetSituationExchangeDeliveryUpdateEvents(situationUpdateEvents, delivery, notify.ProducerRef())
+		builder.SetSituationExchangeDeliveryUpdateEvents(updateEvents, delivery, notify.ProducerRef())
 
 		maps.Copy(collectedRefs.LineRefs, builder.LineRefs)
 		maps.Copy(collectedRefs.MonitoringRefs, builder.MonitoringRefs)
 
-		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
+		connector.broadcastSituationUpdateEvent(updateEvents)
 	}
 
 	for subId := range subToDelete {
@@ -147,12 +147,15 @@ func (connector *SIRISituationExchangeSubscriptionCollector) SetSituationExchang
 	connector.situationExchangeSubscriber = situationExchangeSubscriber
 }
 
-func (connector *SIRISituationExchangeSubscriptionCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
-	connector.situationUpdateSubscriber = situationUpdateSubscriber
+func (connector *SIRISituationExchangeSubscriptionCollector) SetSituationUpdateSubscriber(updateSubscriber UpdateSubscriber) {
+	connector.updateSubscriber = updateSubscriber
 }
 
-func (connector *SIRISituationExchangeSubscriptionCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
-	if connector.situationUpdateSubscriber != nil {
-		connector.situationUpdateSubscriber(event)
+func (connector *SIRISituationExchangeSubscriptionCollector) broadcastSituationUpdateEvent(event *CollectUpdateEvents) {
+	if connector.updateSubscriber == nil {
+		return
+	}
+	for _, e := range event.Situations {
+		connector.updateSubscriber(e)
 	}
 }

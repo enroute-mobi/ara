@@ -74,7 +74,7 @@ func (guardian *ModelGuardian) routineWork() {
 	guardian.refreshStopAreas(spanContext)
 	guardian.refreshLines(spanContext)
 	guardian.cleanOrUpdateStopVisits(spanContext)
-	guardian.requestSituations()
+	guardian.requestSituations(spanContext)
 }
 
 func (guardian *ModelGuardian) checkReloadModel() bool {
@@ -164,7 +164,9 @@ func (guardian *ModelGuardian) randDuration() time.Duration {
 	return time.Duration(rand.Intn(20)-10)*time.Second + guardian.referential.ModelRefreshTime()
 }
 
-func (guardian *ModelGuardian) requestSituations() {
+func (guardian *ModelGuardian) requestSituations(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "request_situations")
+	defer child.Finish()
 	defer monitoring.HandlePanic()
 
 	if guardian.Clock().Now().Before(guardian.gmTimer.Add(1 * time.Minute)) {

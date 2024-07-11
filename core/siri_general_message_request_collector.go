@@ -4,26 +4,23 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
-
-// GeneralMessageRequestCollector uses SituationRequestCollector interface
 
 type SIRIGeneralMessageRequestCollectorFactory struct{}
 
 type SIRIGeneralMessageRequestCollector struct {
 	connector
 
-	situationUpdateSubscriber SituationUpdateSubscriber
+	updateSubscriber UpdateSubscriber
 }
 
 func NewSIRIGeneralMessageRequestCollector(partner *Partner) *SIRIGeneralMessageRequestCollector {
 	siriGeneralMessageRequestCollector := &SIRIGeneralMessageRequestCollector{}
 	siriGeneralMessageRequestCollector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriGeneralMessageRequestCollector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
+	siriGeneralMessageRequestCollector.updateSubscriber = manager.BroadcastUpdateEvent
 
 	return siriGeneralMessageRequestCollector
 }
@@ -68,25 +65,29 @@ func (connector *SIRIGeneralMessageRequestCollector) RequestSituationUpdate(kind
 	}
 
 	logXMLGeneralMessageResponse(message, xmlGeneralMessageResponse)
-	situationUpdateEvents := []*model.SituationUpdateEvent{}
+	updateEvents := NewCollectUpdateEvents()
 
 	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
-	builder.SetGeneralMessageResponseUpdateEvents(&situationUpdateEvents, xmlGeneralMessageResponse)
+	builder.SetGeneralMessageResponseUpdateEvents(updateEvents, xmlGeneralMessageResponse)
 
 	// Log VehicleRefs
 	message.Lines = GetModelReferenceSlice(builder.LineRefs)
 	message.StopAreas = GetModelReferenceSlice(builder.MonitoringRefs)
 
-	connector.broadcastSituationUpdateEvent(situationUpdateEvents)
+	connector.broadcastSituationUpdateEvent(updateEvents)
 }
 
-func (connector *SIRIGeneralMessageRequestCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
-	connector.situationUpdateSubscriber = situationUpdateSubscriber
+func (connector *SIRIGeneralMessageRequestCollector) SetUpdateSubscriber(updateSubscriber UpdateSubscriber) {
+	connector.updateSubscriber = updateSubscriber
 }
 
-func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
-	if connector.situationUpdateSubscriber != nil {
-		connector.situationUpdateSubscriber(event)
+func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEvent(event *CollectUpdateEvents) {
+	if connector.updateSubscriber == nil {
+		return
+
+	}
+	for _, e := range event.Situations {
+		connector.updateSubscriber(e)
 	}
 }
 

@@ -42,7 +42,59 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 		manager.updateStatus(event.(*StatusUpdateEvent))
 	case NOT_COLLECTED_EVENT:
 		manager.updateNotCollected(event.(*NotCollectedUpdateEvent))
+	case SITUATION_EVENT:
+		manager.updateSituation(event.(*SituationUpdateEvent))
 	}
+}
+
+func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
+	situation, ok := manager.model.Situations().FindByCode(event.SituationCode)
+	if ok &&
+		situation.RecordedAt == event.RecordedAt &&
+		situation.Version == event.Version {
+		return
+	}
+
+	if !ok {
+		situation = manager.model.Situations().New()
+		situation.Origin = event.Origin
+		situation.SetCode(event.SituationCode)
+		situation.SetCode(NewCode(Default, event.SituationCode.HashValue()))
+	}
+
+	situation.RecordedAt = event.RecordedAt
+	situation.Version = event.Version
+	situation.ProducerRef = event.ProducerRef
+	situation.ParticipantRef = event.ParticipantRef
+	situation.InternalTags = event.InternalTags
+
+	situation.Summary = event.Summary
+	situation.Description = event.Description
+
+	situation.VersionedAt = event.VersionedAt
+	situation.ValidityPeriods = event.ValidityPeriods
+	situation.PublicationWindows = event.PublicationWindows
+	situation.Keywords = event.Keywords
+	situation.ReportType = event.ReportType
+	situation.AlertCause = event.AlertCause
+	situation.Severity = event.Severity
+	situation.Progress = event.Progress
+	situation.Reality = event.Reality
+	situation.Format = event.Format
+	situation.Affects = event.Affects
+	situation.Consequences = event.Consequences
+
+	// Default is AfterCreate
+	var h hook
+	if ok {
+		h = AfterSave
+	}
+	macros := manager.model.Macros().GetMacros(h, MacroSituationType)
+	for i := range macros {
+		macros[i].Update(&situation)
+	}
+
+	situation.Save()
 }
 
 func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {

@@ -22,9 +22,9 @@ type GeneralMessageSubscriptionCollector interface {
 type SIRIGeneralMessageSubscriptionCollector struct {
 	connector
 
-	deletedSubscriptions      *DeletedSubscriptions
-	generalMessageSubscriber  SIRIGeneralMessageSubscriber
-	situationUpdateSubscriber SituationUpdateSubscriber
+	deletedSubscriptions     *DeletedSubscriptions
+	generalMessageSubscriber SIRIGeneralMessageSubscriber
+	updateSubscriber         UpdateSubscriber
 }
 
 type SIRIGeneralMessageSubscriptionCollectorFactory struct{}
@@ -44,7 +44,7 @@ func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMe
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.situationUpdateSubscriber = manager.BroadcastSituationUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.generalMessageSubscriber = NewSIRIGeneralMessageSubscriber(connector)
 
 	return connector
@@ -100,7 +100,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 
-	situationUpdateEvents := &[]*model.SituationUpdateEvent{}
+	updateEvents := NewCollectUpdateEvents()
 	builder := NewGeneralMessageUpdateEventBuilder(connector.partner)
 
 	collectedRefs = NewCollectedRefs()
@@ -129,12 +129,12 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 		}
 		connector.cancelGeneralMessage(delivery)
 
-		builder.SetGeneralMessageDeliveryUpdateEvents(situationUpdateEvents, delivery, notify.ProducerRef())
+		builder.SetGeneralMessageDeliveryUpdateEvents(updateEvents, delivery, notify.ProducerRef())
 
 		maps.Copy(collectedRefs.LineRefs, builder.LineRefs)
 		maps.Copy(collectedRefs.MonitoringRefs, builder.MonitoringRefs)
 
-		connector.broadcastSituationUpdateEvent(*situationUpdateEvents)
+		connector.broadcastSituationUpdateEvent(updateEvents)
 	}
 
 	for subId := range subToDelete {
@@ -167,12 +167,16 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) SetGeneralMessageSubsc
 	connector.generalMessageSubscriber = generalMessageSubscriber
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) SetSituationUpdateSubscriber(situationUpdateSubscriber SituationUpdateSubscriber) {
-	connector.situationUpdateSubscriber = situationUpdateSubscriber
+func (connector *SIRIGeneralMessageSubscriptionCollector) SetSituationUpdateSubscriber(updateSubscriber UpdateSubscriber) {
+	connector.updateSubscriber = updateSubscriber
 }
 
-func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpdateEvent(event []*model.SituationUpdateEvent) {
-	if connector.situationUpdateSubscriber != nil {
-		connector.situationUpdateSubscriber(event)
+func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpdateEvent(events *CollectUpdateEvents) {
+	if connector.updateSubscriber == nil {
+		return
+	}
+
+	for _, e := range events.Situations {
+		connector.updateSubscriber(e)
 	}
 }

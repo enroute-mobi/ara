@@ -348,7 +348,6 @@ func (manager *MemoryReferentials) Save(referential *Referential) bool {
 	}
 	referential.manager = manager
 	referential.model.SetReferential(string(referential.slug))
-	referential.collectManager.HandleSituationUpdateEvent(model.NewSituationUpdateManager(referential.Model()))
 	referential.collectManager.HandleUpdateEvent(model.NewUpdateManager(referential.Model()))
 	manager.byId[referential.id] = referential
 	return true
