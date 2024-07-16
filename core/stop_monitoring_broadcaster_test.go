@@ -208,9 +208,10 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
-		"remote_code_space": "internal",
-		"local_credential":  "external",
-		"remote_url":        ts.URL,
+		s.BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS: "true",
+		"remote_code_space":                        "internal",
+		"local_credential":                         "external",
+		"remote_url":                               ts.URL,
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -265,19 +266,19 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit.SetCode(code)
+	stopVisit.SetCode(model.NewCode("internal", "svid"))
 	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit2.SetCode(model.NewCode("internal", string(stopArea.Id())))
+	stopVisit2.SetCode(model.NewCode("internal", "svid2"))
 	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	stopVisit3 := referential.Model().StopVisits().New()
 	stopVisit3.StopAreaId = stopArea2.Id()
 	stopVisit3.VehicleJourneyId = vehicleJourney.Id()
-	stopVisit3.SetCode(model.NewCode("internal", string(stopArea2.Id())))
+	stopVisit3.SetCode(model.NewCode("internal", "svid3"))
 	stopVisit3.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
 
 	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
@@ -449,4 +450,88 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
 	assert.ElementsMatch([]string{"externalId", "externalId2"},
 		f.Messages()[0].SubscriptionIdentifiers,
 		"2 subscriptionIdentifiers should be logged in BigQuery")
+}
+
+func Test_StopMonitoringBroadcaster_Receive_Two_Notifications_With_MaxPerDelivery(t *testing.T) {
+	assert := assert.New(t)
+
+	fakeClock := clock.NewFakeClock()
+	clock.SetDefaultClock(fakeClock)
+
+	// Create a test referential
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("Un Referential Plutot Cool")
+	referential.SetClock(fakeClock)
+	referential.broacasterManager.Start()
+	defer referential.broacasterManager.Stop()
+
+	f := audit.NewFakeBigQuery()
+	audit.SetCurrentBigQuery("Un Referential Plutot Cool", f)
+
+	partner := referential.Partners().New("Un Partner tout autant cool")
+	settings := map[string]string{
+		s.BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS:         "false",
+		s.BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY: "1",
+		"remote_code_space":                                "internal",
+		"local_credential":                                 "external",
+		"remote_url":                                       "URL",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
+	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).SetClock(fakeClock)
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster = NewFakeStopMonitoringBroadcaster(connector.(*SIRIStopMonitoringSubscriptionBroadcaster))
+
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Save()
+
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
+
+	reference := model.Reference{
+		Code: &code,
+		Type: "StopArea",
+	}
+
+	subscription := partner.Subscriptions().New("StopMonitoringBroadcast")
+	subscription.SubscriberRef = "subscriber"
+	subscription.SetExternalId("externalId")
+	subscription.CreateAndAddNewResource(reference)
+	subscription.subscriptionOptions["ChangeBeforeUpdates"] = "PT4M"
+	subscription.Save()
+
+	line := referential.Model().Lines().New()
+	line.SetCode(code)
+	line.Save()
+
+	vehicleJourney := referential.Model().VehicleJourneys().New()
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.SetCode(code)
+	vehicleJourney.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit.SetCode(code)
+	stopVisit.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+
+	stopVisit2 := referential.Model().StopVisits().New()
+	stopVisit2.StopAreaId = stopArea.Id()
+	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
+	stopVisit2.SetCode(model.NewCode("internal", string(stopArea.Id())))
+	stopVisit2.Schedules.SetArrivalTime("actual", referential.Clock().Now().Add(1*time.Minute))
+
+	time.Sleep(10 * time.Millisecond) // Wait for the goRoutine to start ...
+	stopVisit.Save()
+	time.Sleep(10 * time.Millisecond)
+	stopVisit2.Save()
+
+	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
+	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
+
+	assert.Len(f.Messages(), 2, "2 messages should be sent to BigQuery")
 }

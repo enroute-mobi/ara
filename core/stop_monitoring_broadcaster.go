@@ -24,6 +24,7 @@ type SMBroadcaster struct {
 
 	notification       *siri.SIRINotifyStopMonitoring
 	multipleDeliveries bool
+	maxPerDelivery     int
 }
 
 type StopMonitoringBroadcaster struct {
@@ -46,6 +47,7 @@ func NewFakeStopMonitoringBroadcaster(connector *SIRIStopMonitoringSubscriptionB
 
 func (broadcaster *FakeStopMonitoringBroadcaster) Start() {
 	broadcaster.multipleDeliveries = broadcaster.connector.Partner().SmMultipleDeliveriesPerNotify()
+	broadcaster.maxPerDelivery = broadcaster.connector.Partner().MaxStopVisitPerDelivery()
 	broadcaster.prepareSIRIStopMonitoringNotify()
 }
 
@@ -134,7 +136,7 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			}
 
 			// Get the delivery
-			delivery := smb.getDelivery(deliveries, sub, monitoringRef)
+			delivery := smb.getDelivery(notification, deliveries, sub, monitoringRef)
 
 			// Get the monitoredStopVisit
 			stopMonitoringBuilder.MonitoringRef = monitoringRef
@@ -154,19 +156,21 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 		}
 
 		for _, delivery := range deliveries {
-			if len(delivery.MonitoredStopVisits) != 0 || len(delivery.CancelledStopVisits) != 0 {
-				notification.Deliveries = append(notification.Deliveries, delivery)
-			}
-		}
-		if !smb.multipleDeliveries && len(notification.Deliveries) != 0 {
-			smb.sendNotification(notification)
+			smb.addDeliveryToNotification(delivery, notification)
 		}
 	}
-	if smb.multipleDeliveries && smb.notification != nil {
-		if len(smb.notification.Deliveries) != 0 {
-			smb.sendNotification(smb.notification)
+	if smb.multipleDeliveries && len(smb.notification.Deliveries) != 0 {
+		smb.sendNotification(smb.notification)
+	}
+	smb.notification = nil
+}
+
+func (smb *SMBroadcaster) addDeliveryToNotification(d *siri.SIRINotifyStopMonitoringDelivery, n *siri.SIRINotifyStopMonitoring) {
+	if len(d.MonitoredStopVisits) != 0 || len(d.CancelledStopVisits) != 0 {
+		n.Deliveries = append(n.Deliveries, d)
+		if !smb.multipleDeliveries {
+			smb.sendNotification(n)
 		}
-		smb.notification = nil
 	}
 }
 
@@ -193,19 +197,28 @@ func (smb *SMBroadcaster) getNotification(sub *Subscription) *siri.SIRINotifySto
 	}
 }
 
-func (smb *SMBroadcaster) getDelivery(deliveries map[string]*siri.SIRINotifyStopMonitoringDelivery, sub *Subscription, monitoringRef string) (delivery *siri.SIRINotifyStopMonitoringDelivery) {
+func (smb *SMBroadcaster) getDelivery(notification *siri.SIRINotifyStopMonitoring, deliveries map[string]*siri.SIRINotifyStopMonitoringDelivery, sub *Subscription, monitoringRef string) *siri.SIRINotifyStopMonitoringDelivery {
 	delivery, ok := deliveries[monitoringRef]
 	if !ok {
-		delivery = &siri.SIRINotifyStopMonitoringDelivery{
-			MonitoringRef:          monitoringRef,
-			RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
-			ResponseTimestamp:      smb.connector.Clock().Now(),
-			SubscriberRef:          sub.SubscriberRef,
-			SubscriptionIdentifier: sub.ExternalId(),
-			Status:                 true,
-		}
-		deliveries[monitoringRef] = delivery
+		delivery = smb.newDelivery(deliveries, sub, monitoringRef)
+	} else if smb.maxPerDelivery != 0 && (len(delivery.MonitoredStopVisits)+len(delivery.CancelledStopVisits)) >= smb.maxPerDelivery {
+		smb.addDeliveryToNotification(delivery, notification)
+		delivery = smb.newDelivery(deliveries, sub, monitoringRef)
 	}
+
+	return delivery
+}
+
+func (smb *SMBroadcaster) newDelivery(deliveries map[string]*siri.SIRINotifyStopMonitoringDelivery, sub *Subscription, monitoringRef string) (d *siri.SIRINotifyStopMonitoringDelivery) {
+	d = &siri.SIRINotifyStopMonitoringDelivery{
+		MonitoringRef:          monitoringRef,
+		RequestMessageRef:      sub.SubscriptionOption("MessageIdentifier"),
+		ResponseTimestamp:      smb.connector.Clock().Now(),
+		SubscriberRef:          sub.SubscriberRef,
+		SubscriptionIdentifier: sub.ExternalId(),
+		Status:                 true,
+	}
+	deliveries[monitoringRef] = d
 	return
 }
 
@@ -248,6 +261,10 @@ func (smb *SMBroadcaster) handleMonitoredStopVisit(stopVisit *model.StopVisit, d
 }
 
 func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring) {
+	if notify == nil {
+		return
+	}
+
 	message := smb.newBQEvent()
 
 	smb.logSIRIStopMonitoringNotify(message, notify)
@@ -259,6 +276,8 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 	if err != nil {
 		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)
 	}
+
+	notify.Deliveries = []*siri.SIRINotifyStopMonitoringDelivery{}
 
 	audit.CurrentBigQuery(string(smb.connector.Partner().Referential().Slug())).WriteEvent(message)
 }
