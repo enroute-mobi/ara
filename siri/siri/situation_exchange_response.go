@@ -66,6 +66,7 @@ type SIRIAffects struct {
 type Consequence struct {
 	Periods    []*model.TimeRange
 	Severity   model.SituationSeverity
+	Condition  model.SituationCondition
 	HasAffects bool
 	SIRIAffects
 	Blocking *model.Blocking
