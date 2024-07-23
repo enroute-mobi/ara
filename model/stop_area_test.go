@@ -1,13 +1,14 @@
 package model
 
 import (
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"database/sql"
 	"encoding/json"
+
+	"github.com/stretchr/testify/assert"
 	"reflect"
 	"testing"
 	"time"
-
-	"bitbucket.org/enroute-mobi/ara/clock"
 )
 
 func Test_StopArea_Id(t *testing.T) {
@@ -21,16 +22,99 @@ func Test_StopArea_Id(t *testing.T) {
 }
 
 func Test_StopArea_Lines(t *testing.T) {
+	assert := assert.New(t)
+
 	model := NewTestMemoryModel()
 	line := model.Lines().New()
 	line.Save()
-	stopArea := StopArea{
-		model:   model,
-		LineIds: []LineId{line.Id()},
+
+	line1 := model.Lines().New()
+	line1.Save()
+
+	lineReferent := model.Lines().New()
+	lineReferent.Save()
+
+	stopAreaReferent := model.StopAreas().New()
+	stopAreaReferent.Save()
+
+	stopAreaParticular := model.StopAreas().New()
+	stopAreaParticular.Save()
+
+	stopAreaParticularWithLines := model.StopAreas().New()
+	stopAreaParticularWithLines.LineIds.Add(line1.Id())
+	stopAreaParticularWithLines.Save()
+
+	var TestCases = []struct {
+		stopArea      StopArea
+		expectedLines []*Line
+		hasParticular bool
+		particular    *StopArea
+	}{
+		{
+			stopArea: StopArea{
+				model: model,
+			},
+			expectedLines: nil,
+		},
+		{
+			stopArea: StopArea{
+				model:   model,
+				LineIds: []LineId{line.Id()},
+			},
+			expectedLines: []*Line{line},
+		},
+		{
+			stopArea: StopArea{
+				model:      model,
+				LineIds:    []LineId{line.Id()},
+				ReferentId: stopAreaReferent.Id(),
+			},
+			expectedLines: []*Line{line},
+		},
+		{
+			stopArea: StopArea{
+				model:   model,
+				LineIds: []LineId{line.Id()},
+			},
+			hasParticular: true,
+			particular:    stopAreaParticular,
+			expectedLines: []*Line{line},
+		},
+		{
+			stopArea: StopArea{
+				model:   model,
+				LineIds: []LineId{line.Id()},
+			},
+			hasParticular: true,
+			particular:    stopAreaParticularWithLines,
+			expectedLines: []*Line{line, line1},
+		},
+		{
+			stopArea: StopArea{
+				model: model,
+			},
+			hasParticular: true,
+			particular:    stopAreaParticular,
+			expectedLines: nil,
+		},
+		{
+			stopArea: StopArea{
+				model: model,
+			},
+			hasParticular: true,
+			particular:    stopAreaParticularWithLines,
+			expectedLines: []*Line{line1},
+		},
 	}
 
-	if len(stopArea.Lines()) != 1 || stopArea.Lines()[0].Id() != line.Id() {
-		t.Errorf("StopArea.Lines() returns wrong values, got: %v, required: [%s]", stopArea.Lines(), line.Id())
+	for _, tt := range TestCases {
+		tt.stopArea.Save()
+		if tt.hasParticular {
+			tt.particular.ReferentId = tt.stopArea.id
+			tt.particular.Save()
+		}
+
+		assert.Equal(tt.expectedLines, tt.stopArea.Lines())
 	}
 }
 

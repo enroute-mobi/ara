@@ -159,14 +159,29 @@ func (stopArea *StopArea) Reference(key string) (Reference, bool) {
 	return value, present
 }
 
-func (stopArea *StopArea) Lines() (lines []*Line) {
+func (stopArea *StopArea) Lines() []*Line {
+	var lines []*Line
+	h := make(map[LineId]*Line)
 	for _, lineId := range stopArea.LineIds {
 		foundLine, ok := stopArea.model.Lines().Find(lineId)
 		if ok {
-			lines = append(lines, foundLine)
+			h[foundLine.Id()] = foundLine
 		}
 	}
-	return
+
+	particulars := stopArea.model.StopAreas().FindByReferentId(stopArea.Id())
+	for i := range particulars {
+		ls := particulars[i].Lines()
+		for j := range ls {
+			h[ls[j].Id()] = ls[j]
+		}
+	}
+
+	for _, v := range h {
+		lines = append(lines, v)
+	}
+
+	return lines
 }
 
 func (stopArea *StopArea) Parent() (*StopArea, bool) {
@@ -183,27 +198,6 @@ func (stopArea *StopArea) ReferentOrSelfCode(codeSpace string) (Code, bool) {
 		code, ok := ref.Code(codeSpace)
 		if ok {
 			return code, true
-		}
-	}
-	code, ok := stopArea.Code(codeSpace)
-	if ok {
-		return code, true
-	}
-	return Code{}, false
-}
-
-/*
-Returns true if we need to send the StopArea in a SPD
-
-We only send the StopArea if it has no referent with a correct codeSpace.
-If that's the case, we'll send the Referent instead
-*/
-func (stopArea *StopArea) SPDCode(codeSpace string) (Code, bool) {
-	ref, ok := stopArea.Referent()
-	if ok {
-		_, ok := ref.Code(codeSpace)
-		if ok {
-			return Code{}, false
 		}
 	}
 	code, ok := stopArea.Code(codeSpace)
@@ -245,7 +239,9 @@ type StopAreas interface {
 	FindByLineId(LineId) []*StopArea
 	FindByOrigin(string) []StopAreaId
 	FindAll() []*StopArea
+	FindAllValues() []StopArea
 	FindFamily(StopAreaId) []StopAreaId
+	FindByReferentId(StopAreaId) []*StopArea
 	FindAscendants(StopAreaId) []*StopArea
 	FindAscendantsWithCodeSpace(StopAreaId, string) []Code
 	Save(*StopArea) bool
@@ -340,6 +336,17 @@ func (manager *MemoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*Stop
 	for _, id := range ids {
 		sa := manager.byIdentifier[StopAreaId(id)]
 		stopAreas = append(stopAreas, sa.copy())
+	}
+
+	manager.mutex.RUnlock()
+	return
+}
+
+func (manager *MemoryStopAreas) FindAllValues() (stopAreas []StopArea) {
+	manager.mutex.RLock()
+
+	for _, stopArea := range manager.byIdentifier {
+		stopAreas = append(stopAreas, *stopArea.copy())
 	}
 
 	manager.mutex.RUnlock()
