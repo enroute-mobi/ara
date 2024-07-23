@@ -9,6 +9,7 @@ const (
 	ArrivalStatus               = "ArrivalStatus"
 	Bearing                     = "Bearing"
 	ChangeBeforeUpdates         = "ChangeBeforeUpdates"
+	Condition                   = "Condition"
 	ConsumerAddress             = "ConsumerAddress"
 	Coordinates                 = "Coordinates"
 	Delay                       = "Delay"
