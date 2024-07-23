@@ -779,3 +779,157 @@ func (reality *SituationReality) FromString(s string) error {
 		return fmt.Errorf("invalid reality %s", s)
 	}
 }
+
+type SituationCondition string
+
+const (
+	SituationConditionAdditionalRide              SituationCondition = "additionalRide"
+	SituationConditionAdditionalService           SituationCondition = "additionalService"
+	SituationContitionAdditionalStop              SituationCondition = "additionalStop"
+	SituationConditionAltered                     SituationCondition = "altered"
+	SituationConditionArrivesEarly                SituationCondition = "arrivesEarly"
+	SituationConditionBoarding                    SituationCondition = "boarding"
+	SituationConditionCancelled                   SituationCondition = "cancelled"
+	SituationConditionChangeOfPlatform            SituationCondition = "changeOfPlatform"
+	SituationConditionDelay                       SituationCondition = "delay"
+	SituationConditionDelayed                     SituationCondition = "delayed"
+	SituationConditionDiscontinuedOperation       SituationCondition = "discontinuedOperation"
+	SituationConditionDisrupted                   SituationCondition = "disrupted"
+	SituationConditionDisruption                  SituationCondition = "disruption"
+	SituationConditionDisturbanceRectified        SituationCondition = "disturbanceRectified"
+	SituationConditionDiverted                    SituationCondition = "diverted"
+	SituationConditionExtendedService             SituationCondition = "extendedService"
+	SituationConditionFullLengthService           SituationCondition = "fullLengthService"
+	SituationConditionGoToGate                    SituationCondition = "goToGate"
+	SituationConditionIntermittentService         SituationCondition = "intermittentService"
+	SituationConditionIrregularTraffic            SituationCondition = "irregularTraffic"
+	SituationConditionLimitedOperation            SituationCondition = "limitedOperation"
+	SituationConditionLineCancellation            SituationCondition = "lineCancellation"
+	SituationConditionMajorDelays                 SituationCondition = "majorDelays"
+	SituationConditionMinorDelays                 SituationCondition = "minorDelays"
+	SituationConditionNormalService               SituationCondition = "normalService"
+	SituationConditionNoService                   SituationCondition = "noService"
+	SituationConditionOnTime                      SituationCondition = "onTime"
+	SituationConditionOperationTimeExtension      SituationCondition = "operationTimeExtension"
+	SituationConditionReplacementRide             SituationCondition = "replacementRide"
+	SituationConditionReplacementService          SituationCondition = "replacementService"
+	SituationConditionReplacementTransport        SituationCondition = "replacementTransport"
+	SituationConditionShortFormedService          SituationCondition = "shortFormedService"
+	SituationConditionShuttleService              SituationCondition = "shuttleService"
+	SituationConditionSpecialService              SituationCondition = "specialService"
+	SituationConditionSplittingTrain              SituationCondition = "splittingTrain"
+	SituationConditionStopCancelled               SituationCondition = "stopCancelled"
+	SituationConditionStopMove                    SituationCondition = "stopMoved"
+	SituationConditionStopOnDemand                SituationCondition = "stopOnDemand"
+	SituationConditionSubstitutedStop             SituationCondition = "substitutedStop"
+	SituationConditionTemporarilyNonStopping      SituationCondition = "temporarilyNonStopping"
+	SituationConditionTemporaryStopplace          SituationCondition = "temporaryStopplace"
+	SituationConditionTrainShortened              SituationCondition = "trainShortened"
+	SituationConditionTripCancellation            SituationCondition = "tripCancellation"
+	SituationConditionUndefinedServiceInformation SituationCondition = "undefinedServiceInformation"
+	SituationConditionUndefinedStatus             SituationCondition = "undefinedStatus"
+	SituationConditionUnknown                     SituationCondition = "unknown"
+	SituationConditionWagonOrderChanged           SituationCondition = "wagonOrderChanged"
+)
+
+func (condition *SituationCondition) FromString(c string) error {
+	switch SituationCondition(c) {
+	case SituationConditionAdditionalRide:
+		fallthrough
+	case SituationConditionAdditionalService:
+		fallthrough
+	case SituationContitionAdditionalStop:
+		fallthrough
+	case SituationConditionAltered:
+		fallthrough
+	case SituationConditionArrivesEarly:
+		fallthrough
+	case SituationConditionBoarding:
+		fallthrough
+	case SituationConditionCancelled:
+		fallthrough
+	case SituationConditionChangeOfPlatform:
+		fallthrough
+	case SituationConditionDelay:
+		fallthrough
+	case SituationConditionDelayed:
+		fallthrough
+	case SituationConditionDiscontinuedOperation:
+		fallthrough
+	case SituationConditionDisrupted:
+		fallthrough
+	case SituationConditionDisruption:
+		fallthrough
+	case SituationConditionDisturbanceRectified:
+		fallthrough
+	case SituationConditionDiverted:
+		fallthrough
+	case SituationConditionExtendedService:
+		fallthrough
+	case SituationConditionFullLengthService:
+		fallthrough
+	case SituationConditionGoToGate:
+		fallthrough
+	case SituationConditionIntermittentService:
+		fallthrough
+	case SituationConditionIrregularTraffic:
+		fallthrough
+	case SituationConditionLimitedOperation:
+		fallthrough
+	case SituationConditionLineCancellation:
+		fallthrough
+	case SituationConditionMajorDelays:
+		fallthrough
+	case SituationConditionMinorDelays:
+		fallthrough
+	case SituationConditionNormalService:
+		fallthrough
+	case SituationConditionNoService:
+		fallthrough
+	case SituationConditionOnTime:
+		fallthrough
+	case SituationConditionOperationTimeExtension:
+		fallthrough
+	case SituationConditionReplacementRide:
+		fallthrough
+	case SituationConditionReplacementService:
+		fallthrough
+	case SituationConditionReplacementTransport:
+		fallthrough
+	case SituationConditionShortFormedService:
+		fallthrough
+	case SituationConditionShuttleService:
+		fallthrough
+	case SituationConditionSpecialService:
+		fallthrough
+	case SituationConditionSplittingTrain:
+		fallthrough
+	case SituationConditionStopCancelled:
+		fallthrough
+	case SituationConditionStopMove:
+		fallthrough
+	case SituationConditionStopOnDemand:
+		fallthrough
+	case SituationConditionSubstitutedStop:
+		fallthrough
+	case SituationConditionTemporarilyNonStopping:
+		fallthrough
+	case SituationConditionTemporaryStopplace:
+		fallthrough
+	case SituationConditionTrainShortened:
+		fallthrough
+	case SituationConditionTripCancellation:
+		fallthrough
+	case SituationConditionUndefinedServiceInformation:
+		fallthrough
+	case SituationConditionUndefinedStatus:
+		fallthrough
+	case SituationConditionUnknown:
+		fallthrough
+	case SituationConditionWagonOrderChanged:
+		*condition = SituationCondition(c)
+		return nil
+	default:
+		return fmt.Errorf("invalid condition %s", c)
+	}
+}
