@@ -414,3 +414,55 @@ Feature: Support GTFS-RT feeds
     And this GTFS-RT response should contain a Trip Update with these attributes:
       | trip_id    | external:2345 |
       | route_id   | external:1234 |
+
+  Scenario: Retrieve Service Alerts
+    Given a Line exists with the following attributes:
+      | Name  | Test1              |
+      | Codes | "internal": "LINE1"    |
+    And a Line exists with the following attributes:
+      | Name  | Test2              |
+      | Codes | "internal": "LINE2" |
+    And a StopArea exists with the following attributes:
+      | Name  | Test1               |
+      | Codes | "internal": "STOP1" |
+    And a Situation exists with the following attributes:
+      | Codes                                                          | "internal" : "test"                           |
+      | RecordedAt                                                     | 2017-01-01T03:30:06+02:00                     |
+      | Version                                                        | 1                                             |
+      | Keywords                                                       | ["Commercial", "Test"]                        |
+      | ReportType                                                     | general                                       |
+      | ParticipantRef                                                 | "535"                                         |
+      | VersionedAt                                                    | 2017-01-01T01:02:03+02:00                     |
+      | Progress                                                       | published                                     |
+      | Reality                                                        | test                                          |
+      | ValidityPeriods[0]#StartTime                                   | 2017-01-01T01:30:06+02:00                     |
+      | ValidityPeriods[0]#EndTime                                     | 2017-01-01T20:30:06+02:00                     |
+      | PublicationWindows[0]#StartTime                                | 2017-09-01T01:00:00+02:00                     |
+      | PublicationWindows[0]#EndTime                                  | 2017-09-25T01:00:00+02:00                     |
+      | AlertCause                                                     | maintenanceWork                               |
+      | Severity                                                       | normal                                        |
+      | Summary[DefaultValue]                                          | carte abonnement                              |
+      | Description[DefaultValue]                                      | La nouvelle carte d'abonnement est disponible |
+      | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[StopArea=6ba7b814-9dad-11d1-3-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
+      | Affects[Line]                                                  | 6ba7b814-9dad-11d1-1-00c04fd430c8             |
+    And a Partner "test" exists with connectors [gtfs-rt-service-alerts-broadcaster] and the following settings:
+      | local_credential  | secret   |
+      | remote_code_space | internal |
+    When I send a GTFS-RT request to the Referential "test" with token "secret"
+    Then I should receive a GTFS-RT response
+    And this GTFS-RT response should contain an Alert with these attributes:
+      | cause_name          | MAINTENANCE                                   |
+      | severity_level_name | WARNING                                       |
+      | effect_name         | UNKNOWN_EFFECT                                |
+      | header_text_fr      | carte abonnement                              |
+      | description_text_fr | La nouvelle carte d'abonnement est disponible |
+    And this GTFS-RT response should contain an Alert with InformedEntity with these attributes:
+      | route_id | LINE1 |
+    And this GTFS-RT response should contain an Alert with InformedEntity with these attributes:
+      | stop_id  | STOP1 |
+      | route_id | LINE2 |
+    And an audit event should exist with these attributes:
+      | Protocol  | gtfs                                         |
+      | Direction | received                                     |
+      | Type      | trip-updates,vehicle-position,service-alerts |

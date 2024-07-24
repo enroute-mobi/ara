@@ -27,6 +27,17 @@ Then('this GTFS-RT response should contain a Trip Update with these attributes:'
   expect(@gtfs_response).to include(an_object_having_attributes(gtfs_attributes(attributes)))
 end
 
+Then('this GTFS-RT response should contain an Alert with these attributes:') do |attributes|
+  debug @gtfs_response.trip_updates.inspect
+
+  @gtfs_response = @gtfs_response.service_alerts
+  expect(@gtfs_response).to include(an_object_having_attributes(gtfs_attributes(attributes)))
+end
+
+Then('this GTFS-RT response should contain an Alert with InformedEntity with these attributes:') do |attributes|
+  expect(@gtfs_response.map(&:informed_entity).flatten).to include(an_object_having_attributes(gtfs_attributes(attributes)))
+end
+
 Then('this GTFS-RT response should not contain Vehicle Positions') do
   debug @gtfs_response.vehicle_positions.inspect
   expect(@gtfs_response.vehicle_positions).to be_empty

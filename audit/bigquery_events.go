@@ -34,10 +34,10 @@ const (
 	STOP_POINTS_DISCOVERY_REQUEST BigQueryMessageType = "StopPointsDiscoveryRequest"
 	VEHICLE_MONITORING_REQUEST    BigQueryMessageType = "VehicleMonitoringRequest"
 
-	GTFS_TRIP_UPDATES_VEHICLE_POSITION BigQueryMessageType = "trip-updates,vehicle-position"
-	GTFS_TRIP_UPDATES                  BigQueryMessageType = "trip-updates"
-	GTFS_VEHICLE_POSITION              BigQueryMessageType = "vehicle-position"
-	GTFS_REQUEST                       BigQueryMessageType = "GtfsRequest"
+	GTFS_TRIP_UPDATES_VEHICLE_POSITION_SERVICE_ALERTS BigQueryMessageType = "trip-updates,vehicle-position,service-alerts"
+	GTFS_TRIP_UPDATES                                 BigQueryMessageType = "trip-updates"
+	GTFS_VEHICLE_POSITION                             BigQueryMessageType = "vehicle-position"
+	GTFS_REQUEST                                      BigQueryMessageType = "GtfsRequest"
 
 	SUBSCRIPTION_TERMINATED_NOTIFICATION BigQueryMessageType = "SubscriptionTerminatedNotification"
 

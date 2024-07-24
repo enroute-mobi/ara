@@ -41,6 +41,27 @@ func (s *SituationSeverity) FromProto(value interface{}) error {
 	return nil
 }
 
+func (s SituationSeverity) ToProto(dest interface{}) error {
+	switch v := dest.(type) {
+	case *gtfs.Alert_SeverityLevel:
+		switch s {
+		case SituationSeverityUnknown:
+			*v = gtfs.Alert_UNKNOWN_SEVERITY
+		case SituationSeverityNoImpact:
+			*v = gtfs.Alert_INFO
+		case SituationSeverityNormal:
+			*v = gtfs.Alert_WARNING
+		case SituationSeveritySevere:
+			*v = gtfs.Alert_SEVERE
+		default:
+			*v = gtfs.Default_Alert_SeverityLevel
+		}
+	default:
+		return fmt.Errorf("unsupported destination %T", dest)
+	}
+	return nil
+}
+
 func (severity *SituationSeverity) FromString(s string) error {
 	switch SituationSeverity(s) {
 	case SituationSeverityNoImpact:
@@ -365,6 +386,44 @@ func (ac *SituationAlertCause) FromProto(value interface{}) error {
 
 	return nil
 }
+
+func (ac SituationAlertCause) ToProto(dest interface{}) error {
+	switch v := dest.(type) {
+	case *gtfs.Alert_Cause:
+		switch ac {
+		case SituationAlertCauseUnknown:
+			*v = gtfs.Alert_UNKNOWN_CAUSE
+		case SituationAlertCauseMiscellaneous:
+			*v = gtfs.Alert_OTHER_CAUSE
+		case SituationAlertCauseTechnicalproblem:
+			*v = gtfs.Alert_TECHNICAL_PROBLEM
+		case SituationAlertCauseIndustrialaction:
+			*v = gtfs.Alert_STRIKE
+		case SituationAlertCauseDemonstration:
+			*v = gtfs.Alert_DEMONSTRATION
+		case SituationAlertCauseAccident:
+			*v = gtfs.Alert_ACCIDENT
+		case SituationAlertCauseHoliday:
+			*v = gtfs.Alert_HOLIDAY
+		case SituationAlertCausePoorweather:
+			*v = gtfs.Alert_WEATHER
+		case SituationAlertCauseMaintenancework:
+			*v = gtfs.Alert_MAINTENANCE
+		case SituationAlertCauseConstructionwork:
+			*v = gtfs.Alert_CONSTRUCTION
+		case SituationAlertCausePoliceactivity:
+			*v = gtfs.Alert_POLICE_ACTIVITY
+		case SituationAlertCauseEmergencymedicalservices:
+			*v = gtfs.Alert_MEDICAL_EMERGENCY
+		default:
+			*v = gtfs.Default_Alert_Cause
+		}
+	default:
+		return fmt.Errorf("unsupported destination %T", dest)
+	}
+	return nil
+}
+
 func (alertCause *SituationAlertCause) FromString(s string) error {
 	switch SituationAlertCause(s) {
 	case SituationAlertCauseAccident:
@@ -1025,6 +1084,33 @@ func (c *SituationCondition) FromProto(value interface{}) error {
 		}
 	default:
 		return fmt.Errorf("unsupported value %T", value)
+	}
+	return nil
+}
+
+func (c SituationCondition) ToProto(dest interface{}) error {
+	switch v := dest.(type) {
+	case *gtfs.Alert_Effect:
+		switch c {
+		case SituationConditionNoService:
+			*v = gtfs.Alert_NO_SERVICE
+		case SituationConditionAltered:
+			*v = gtfs.Alert_REDUCED_SERVICE
+		case SituationConditionDisrupted:
+			*v = gtfs.Alert_SIGNIFICANT_DELAYS
+		case SituationConditionDiverted:
+			*v = gtfs.Alert_DETOUR
+		case SituationConditionAdditionalService:
+			*v = gtfs.Alert_ADDITIONAL_SERVICE
+		case SituationConditionUnknown:
+			*v = gtfs.Alert_UNKNOWN_EFFECT
+		case SituationConditionNormalService:
+			*v = gtfs.Alert_NO_EFFECT
+		default:
+			*v = gtfs.Default_Alert_Effect
+		}
+	default:
+		return fmt.Errorf("unsupported destination %T", dest)
 	}
 	return nil
 }

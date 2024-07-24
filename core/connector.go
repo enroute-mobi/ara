@@ -52,6 +52,7 @@ const (
 	TEST_VALIDATION_CONNECTOR                          = "test-validation-connector"
 	TEST_STARTABLE_CONNECTOR                           = "test-startable-connector-connector"
 	GTFS_RT_REQUEST_COLLECTOR                          = "gtfs-rt-request-collector"
+	GTFS_RT_SERVICE_ALERTS_BROADCASTER                 = "gtfs-rt-service-alerts-broadcaster"
 	GTFS_RT_TRIP_UPDATES_BROADCASTER                   = "gtfs-rt-trip-updates-broadcaster"
 	GTFS_RT_VEHICLE_POSITIONS_BROADCASTER              = "gtfs-rt-vehicle-positions-broadcaster"
 	GRAPHQL_SERVER                                     = "graphql-server"
@@ -169,6 +170,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &TestSIRIVMSubscriptionBroadcasterFactory{}
 	case GTFS_RT_REQUEST_COLLECTOR:
 		return &GtfsRequestCollectorFactory{}
+	case GTFS_RT_SERVICE_ALERTS_BROADCASTER:
+		return &ServiceAlertsBroadcasterFactory{}
 	case GTFS_RT_TRIP_UPDATES_BROADCASTER:
 		return &TripUpdatesBroadcasterFactory{}
 	case GTFS_RT_VEHICLE_POSITIONS_BROADCASTER:

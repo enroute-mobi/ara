@@ -9,6 +9,7 @@ import (
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/sym01/htmlsanitizer"
 )
@@ -681,6 +682,22 @@ func (t *SituationTranslatedString) FromProto(value interface{}) error {
 	return nil
 }
 
+func (t *SituationTranslatedString) ToProto(dest interface{}) error {
+	switch v := dest.(type) {
+	case *gtfs.TranslatedString_Translation:
+		if t.DefaultValue == "" {
+			return errors.New("empty default translation")
+		}
+		language := "fr"
+		v.Language = &language
+		v.Text = &t.DefaultValue
+	default:
+		return fmt.Errorf("unsupported destination %T", dest)
+	}
+
+	return nil
+}
+
 func (t *TimeRange) FromProto(value interface{}) error {
 	var timeRange TimeRange
 	switch v := value.(type) {
@@ -699,6 +716,23 @@ func (t *TimeRange) FromProto(value interface{}) error {
 	}
 
 	*t = timeRange
+	return nil
+}
+
+func (t *TimeRange) ToProto(dest interface{}) error {
+	switch v := dest.(type) {
+	case *gtfs.TimeRange:
+		if start := t.StartTime; !start.IsZero() {
+			startTime := uint64(start.Unix())
+			v.Start = &startTime
+		}
+		if end := t.EndTime; !end.IsZero() {
+			endTime := uint64(end.Unix())
+			v.End = &endTime
+		}
+	default:
+		return fmt.Errorf("unsupported value %T", dest)
+	}
 	return nil
 }
 
@@ -753,4 +787,77 @@ func AffectFromProto(value interface{}, remoteCodeSpace string, m Model) (Affect
 		return nil, nil, fmt.Errorf("invalide type: %T", value)
 	}
 	return nil, nil, errors.New("cannot find line/stopArea model from gtfs ")
+}
+
+func AffectToProto(a Affect, remoteCodeSpace string, m Model) ([]*gtfs.EntitySelector, *AffectRefs, error) {
+	collectedRefs := &AffectRefs{
+		MonitoringRefs: make(map[string]struct{}),
+		LineRefs:       make(map[string]struct{}),
+	}
+	var entities []*gtfs.EntitySelector
+
+	switch v := a.(type) {
+	case *AffectedLine:
+		line, ok := m.Lines().Find(v.LineId)
+		if !ok {
+			return nil, nil, fmt.Errorf("unknown lineId: %v", v.LineId)
+		}
+		lineCode, ok := line.Code(remoteCodeSpace)
+		if !ok {
+			return nil, nil, fmt.Errorf("lineId %v does not have right codeSpace %v", v.LineId, remoteCodeSpace)
+		}
+		var routeId *string
+		value := lineCode.Value()
+		routeId = &value
+
+		collectedRefs.LineRefs[lineCode.Value()] = struct{}{}
+		entities = append(entities, &gtfs.EntitySelector{RouteId: routeId})
+
+		return entities, collectedRefs, nil
+	case *AffectedStopArea:
+		sa, ok := m.StopAreas().Find(v.StopAreaId)
+		if !ok {
+			return nil, nil, fmt.Errorf("unknown stopAreaId: %v", v.StopAreaId)
+		}
+		saCode, ok := sa.Code(remoteCodeSpace)
+		if !ok {
+			return nil, nil, fmt.Errorf("stopId %v does not have right codeSpace %v", v.StopAreaId, remoteCodeSpace)
+		}
+
+		if len(v.LineIds) == 0 {
+			var stopId *string
+			value := saCode.Value()
+			stopId = &value
+
+			collectedRefs.MonitoringRefs[saCode.Value()] = struct{}{}
+			entities = append(entities, &gtfs.EntitySelector{StopId: stopId})
+			return entities, collectedRefs, nil
+		}
+		for i := range v.LineIds {
+			line, ok := m.Lines().Find(v.LineIds[i])
+			if !ok {
+				logger.Log.Debugf("unknown line id: %v", v.LineIds[i])
+				continue
+			}
+			lineCode, ok := line.Code(remoteCodeSpace)
+			if !ok {
+				logger.Log.Debugf("line id: %v does not have right codeSpace %v", v.LineIds[i], remoteCodeSpace)
+				continue
+			}
+			var stopId *string
+			saValue := saCode.Value()
+			stopId = &saValue
+
+			var lineId *string
+			lineValue := lineCode.Value()
+			lineId = &lineValue
+
+			e := &gtfs.EntitySelector{StopId: stopId, RouteId: lineId}
+			collectedRefs.LineRefs[lineCode.Value()] = struct{}{}
+			collectedRefs.MonitoringRefs[*stopId] = struct{}{}
+			entities = append(entities, e)
+		}
+		return entities, collectedRefs, nil
+	}
+	return nil, nil, fmt.Errorf("unsupported value: %T", a)
 }

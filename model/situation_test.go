@@ -1,12 +1,12 @@
 package model
 
 import (
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"encoding/json"
+
+	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
-
-	"bitbucket.org/enroute-mobi/ara/gtfs"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_Situation_Id(t *testing.T) {
@@ -492,4 +492,115 @@ func GetReferencesSlice(refs map[string]struct{}) []string {
 		i++
 	}
 	return refSlice
+}
+
+func Test_AffectToProto(t *testing.T) {
+	assert := assert.New(t)
+	model := NewTestMemoryModel()
+
+	stopArea := model.StopAreas().New()
+	code := NewCode("external", "A")
+	stopArea.SetCode(code)
+	stopArea.Save()
+	stopAreaValue := "A"
+
+	line := model.Lines().New()
+	code = NewCode("external", "1")
+	line.SetCode(code)
+	line.Save()
+	lineValue := "1"
+
+	wrongStopArea := model.StopAreas().New()
+	code = NewCode("WRONG", "B")
+	wrongStopArea.SetCode(code)
+	wrongStopArea.Save()
+
+	wrongLine := model.Lines().New()
+	wrongLine.SetCode(code)
+	wrongLine.Save()
+
+	var TestCases = []struct {
+		affect                Affect
+		remoteCodeSpace       string
+		valid                 bool
+		expectedStopId        *string
+		expectedRouteId       *string
+		expectedCollectedRefs *AffectRefs
+		message               string
+	}{
+		{
+			affect: &AffectedLine{
+				LineId: line.Id(),
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedStopId:  nil,
+			expectedRouteId: &lineValue,
+			message:         `AffectedLine with valid line should create RouteId`,
+		},
+		{
+			affect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedStopId:  &stopAreaValue,
+			expectedRouteId: nil,
+			message:         `AffectedStopArea with valid stopArea should create StopId`,
+		},
+		{
+			affect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+				LineIds:    []LineId{line.Id()},
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedStopId:  &stopAreaValue,
+			expectedRouteId: &lineValue,
+			message: `AffectedStopArea with valid StopArea and LineIds should
+create StopId and RouteId`,
+		},
+		{
+			affect: &AffectedStopArea{
+				StopAreaId: wrongStopArea.Id(),
+			},
+			remoteCodeSpace: "external",
+			valid:           false,
+			message:         `AffectedStopArea with unknown stopArea should be invalid`,
+		},
+		{
+			affect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+				LineIds:    []LineId{wrongLine.Id()},
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedStopId:  &stopAreaValue,
+			expectedRouteId: nil,
+			message: `AffectedStopArea with valid stopArea and unknwon line
+should create StopId only`,
+		},
+	}
+
+	for _, tt := range TestCases {
+		entitySelector, _, err := AffectToProto(tt.affect, tt.remoteCodeSpace, model)
+		if !tt.valid {
+			assert.Error(err)
+			continue
+		}
+
+		assert.Nil(err)
+		if tt.expectedStopId == nil {
+			assert.Nil(entitySelector[0].StopId)
+		}
+
+		if tt.expectedRouteId == nil {
+			assert.Nil(entitySelector[0].RouteId)
+		}
+
+		if tt.expectedRouteId != nil && tt.expectedStopId != nil {
+			assert.Equal(tt.expectedStopId, entitySelector[0].StopId)
+			assert.Equal(tt.expectedRouteId, entitySelector[0].RouteId)
+		}
+	}
 }
