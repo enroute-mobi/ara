@@ -537,7 +537,8 @@ func Test_AffectToProto(t *testing.T) {
 		valid                 bool
 		expectedStopId        *string
 		expectedRouteId       *string
-		expectedCollectedRefs *AffectRefs
+		expectedMonitoringRefs []string
+		expectedLineRefs 	[]string
 		message               string
 	}{
 		{
@@ -548,6 +549,8 @@ func Test_AffectToProto(t *testing.T) {
 			valid:           true,
 			expectedStopId:  nil,
 			expectedRouteId: &lineValue,
+			expectedMonitoringRefs: []string{},
+			expectedLineRefs: []string{"1"},
 			message:         `AffectedLine with valid line should create RouteId`,
 		},
 		{
@@ -558,6 +561,8 @@ func Test_AffectToProto(t *testing.T) {
 			valid:           true,
 			expectedStopId:  &stopAreaValue,
 			expectedRouteId: nil,
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs: []string{},
 			message:         `AffectedStopArea with valid stopArea should create StopId`,
 		},
 		{
@@ -569,6 +574,8 @@ func Test_AffectToProto(t *testing.T) {
 			valid:           true,
 			expectedStopId:  &stopAreaValue,
 			expectedRouteId: &lineValue,
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs: []string{"1"},
 			message: `AffectedStopArea with valid StopArea and LineIds should
 create StopId and RouteId`,
 		},
@@ -589,6 +596,8 @@ create StopId and RouteId`,
 			valid:           true,
 			expectedStopId:  &stopAreaValue,
 			expectedRouteId: nil,
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs: []string{},
 			message: `AffectedStopArea with valid stopArea and unknwon line
 should create StopId only`,
 		},
@@ -600,6 +609,8 @@ should create StopId only`,
 			valid:           true,
 			expectedStopId:  nil,
 			expectedRouteId: &lineValue,
+			expectedMonitoringRefs: []string{},
+			expectedLineRefs: []string{"1"},
 			message: `AffectedLine with valid line having a Referent
 should create RouteId with the Referent value`,
 		},
@@ -612,6 +623,8 @@ should create RouteId with the Referent value`,
 			valid:           true,
 			expectedStopId:  &stopAreaValue,
 			expectedRouteId: &lineValue,
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs: []string{"1"},
 			message: `AffectedStopArea with valid stopArea and line
 having a Referent should create StopId and RouteId with the Referent value`,
 		},
@@ -623,13 +636,15 @@ having a Referent should create StopId and RouteId with the Referent value`,
 			valid:           true,
 			expectedStopId:  &stopAreaValue,
 			expectedRouteId: nil,
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs: []string{},
 			message: `AffectedStopArea with valid stopArea
 having a Referent should create StopId with the Refefent value`,
 		},
 	}
 
 	for _, tt := range TestCases {
-		entitySelector, _, err := AffectToProto(tt.affect, tt.remoteCodeSpace, model)
+		entitySelector, broadcastedRefs, err := AffectToProto(tt.affect, tt.remoteCodeSpace, model)
 		if !tt.valid {
 			assert.Error(err)
 			continue
@@ -648,5 +663,8 @@ having a Referent should create StopId with the Refefent value`,
 			assert.Equal(tt.expectedStopId, entitySelector[0].StopId)
 			assert.Equal(tt.expectedRouteId, entitySelector[0].RouteId)
 		}
+
+		assert.Equal(tt.expectedMonitoringRefs, GetReferencesSlice(broadcastedRefs.MonitoringRefs))
+		assert.Equal(tt.expectedLineRefs, GetReferencesSlice(broadcastedRefs.LineRefs))
 	}
 }
