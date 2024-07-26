@@ -802,10 +802,12 @@ func AffectToProto(a Affect, remoteCodeSpace string, m Model) ([]*gtfs.EntitySel
 		if !ok {
 			return nil, nil, fmt.Errorf("unknown lineId: %v", v.LineId)
 		}
-		lineCode, ok := line.Code(remoteCodeSpace)
+
+		lineCode, ok := line.ReferentOrSelfCode(remoteCodeSpace)
 		if !ok {
 			return nil, nil, fmt.Errorf("lineId %v does not have right codeSpace %v", v.LineId, remoteCodeSpace)
 		}
+
 		var routeId *string
 		value := lineCode.Value()
 		routeId = &value
@@ -819,27 +821,19 @@ func AffectToProto(a Affect, remoteCodeSpace string, m Model) ([]*gtfs.EntitySel
 		if !ok {
 			return nil, nil, fmt.Errorf("unknown stopAreaId: %v", v.StopAreaId)
 		}
+
 		saCode, ok := sa.Code(remoteCodeSpace)
 		if !ok {
 			return nil, nil, fmt.Errorf("stopId %v does not have right codeSpace %v", v.StopAreaId, remoteCodeSpace)
 		}
 
-		if len(v.LineIds) == 0 {
-			var stopId *string
-			value := saCode.Value()
-			stopId = &value
-
-			collectedRefs.MonitoringRefs[saCode.Value()] = struct{}{}
-			entities = append(entities, &gtfs.EntitySelector{StopId: stopId})
-			return entities, collectedRefs, nil
-		}
 		for i := range v.LineIds {
 			line, ok := m.Lines().Find(v.LineIds[i])
 			if !ok {
 				logger.Log.Debugf("unknown line id: %v", v.LineIds[i])
 				continue
 			}
-			lineCode, ok := line.Code(remoteCodeSpace)
+			lineCode, ok := line.ReferentOrSelfCode(remoteCodeSpace)
 			if !ok {
 				logger.Log.Debugf("line id: %v does not have right codeSpace %v", v.LineIds[i], remoteCodeSpace)
 				continue
@@ -857,6 +851,12 @@ func AffectToProto(a Affect, remoteCodeSpace string, m Model) ([]*gtfs.EntitySel
 			collectedRefs.MonitoringRefs[*stopId] = struct{}{}
 			entities = append(entities, e)
 		}
+		var stopId *string
+		value := saCode.Value()
+		stopId = &value
+
+		collectedRefs.MonitoringRefs[saCode.Value()] = struct{}{}
+		entities = append(entities, &gtfs.EntitySelector{StopId: stopId})
 		return entities, collectedRefs, nil
 	}
 	return nil, nil, fmt.Errorf("unsupported value: %T", a)

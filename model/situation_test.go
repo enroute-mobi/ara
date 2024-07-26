@@ -510,6 +510,12 @@ func Test_AffectToProto(t *testing.T) {
 	line.Save()
 	lineValue := "1"
 
+	particularLine := model.Lines().New()
+	code = NewCode("external", "2")
+	particularLine.SetCode(code)
+	particularLine.ReferentId = line.Id()
+	particularLine.Save()
+
 	wrongStopArea := model.StopAreas().New()
 	code = NewCode("WRONG", "B")
 	wrongStopArea.SetCode(code)
@@ -579,6 +585,29 @@ create StopId and RouteId`,
 			expectedRouteId: nil,
 			message: `AffectedStopArea with valid stopArea and unknwon line
 should create StopId only`,
+		},
+		{
+			affect: &AffectedLine{
+				LineId: particularLine.Id(),
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedStopId:  nil,
+			expectedRouteId: &lineValue,
+			message: `AffectedLine with valid line having a Referent
+should create RouteId with the Referent value`,
+		},
+		{
+			affect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+				LineIds:    []LineId{particularLine.Id()},
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedStopId:  &stopAreaValue,
+			expectedRouteId: &lineValue,
+			message: `AffectedStopArea with valid stopArea and line
+having a Referent should create StopId and RouteId with the Referent value`,
 		},
 	}
 
