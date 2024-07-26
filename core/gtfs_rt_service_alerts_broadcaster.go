@@ -7,6 +7,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
+
+	"errors"
 )
 
 type ServiceAlertsBroadcaster struct {
@@ -63,6 +65,25 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 		}
 
 		alert := &gtfs.Alert{}
+
+		// InformedEntities
+		for _, affect := range situation.Affects {
+			entities, _, err := model.AffectToProto(affect, connector.remoteCodeSpace, connector.Partner().Model())
+			if err != nil {
+				logger.Log.Debugf("Error for affect: %v", err)
+			}
+			alert.InformedEntity = append(alert.InformedEntity, entities...)
+		}
+
+		if len(alert.InformedEntity) == 0 {
+			return nil, errors.New("no informed entities")
+		}
+
+		feedEntity := &gtfs.FeedEntity{
+			Id:    &situationNumber,
+			Alert: alert,
+		}
+		entities = append(entities, feedEntity)
 
 		// Periods
 		var ts []*gtfs.TimeRange
@@ -128,20 +149,6 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 			alert.DescriptionText = &translatedString
 		}
 
-		// InformedEntities
-		for _, affect := range situation.Affects {
-			entities, _, err := model.AffectToProto(affect, connector.remoteCodeSpace, connector.Partner().Model())
-			if err != nil {
-				logger.Log.Debugf("Error for affect: %v", err)
-			}
-			alert.InformedEntity = append(alert.InformedEntity, entities...)
-		}
-
-		feedEntity := &gtfs.FeedEntity{
-			Id:    &situationNumber,
-			Alert: alert,
-		}
-		entities = append(entities, feedEntity)
 	}
 
 	return
