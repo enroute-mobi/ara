@@ -822,7 +822,7 @@ func AffectToProto(a Affect, remoteCodeSpace string, m Model) ([]*gtfs.EntitySel
 			return nil, nil, fmt.Errorf("unknown stopAreaId: %v", v.StopAreaId)
 		}
 
-		saCode, ok := sa.Code(remoteCodeSpace)
+		saCode, ok := sa.ReferentOrSelfCode(remoteCodeSpace)
 		if !ok {
 			return nil, nil, fmt.Errorf("stopId %v does not have right codeSpace %v", v.StopAreaId, remoteCodeSpace)
 		}
