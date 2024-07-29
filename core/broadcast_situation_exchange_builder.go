@@ -99,8 +99,9 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 
 	for _, consequence := range situation.Consequences {
 		c := &siri.Consequence{
-			Periods:  consequence.Periods,
-			Severity: consequence.Severity,
+			Periods:   consequence.Periods,
+			Severity:  consequence.Severity,
+			Condition: consequence.Condition,
 		}
 		for _, affect := range consequence.Affects {
 			switch affect.GetType() {

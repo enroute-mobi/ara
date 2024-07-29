@@ -114,6 +114,7 @@ type XMLConsequence struct {
 	XMLStructure
 
 	periods        []*XMLPeriod
+	condition      string
 	severity       string
 	affects        []*XMLAffect
 	hasBlocking    bool
@@ -363,6 +364,13 @@ func (consequence *XMLConsequence) Periods() []*XMLPeriod {
 		consequence.periods = periods
 	}
 	return consequence.periods
+}
+
+func (consequence *XMLConsequence) Condition() string {
+	if consequence.condition == "" {
+		consequence.condition = consequence.findStringChildContent(siri_attributes.Condition)
+	}
+	return consequence.condition
 }
 
 func (consequence *XMLConsequence) Severity() string {

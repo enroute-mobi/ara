@@ -388,6 +388,7 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
                           <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
                         </siri:Period>
+                        <siri:Condition>changeOfPlatform</siri:Condition>
                         <siri:Severity>verySlight</siri:Severity>
                         <siri:Affects>
                           <siri:Networks>
@@ -499,6 +500,7 @@ Feature: Support SIRI Situation Exchange by request
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
       | Severity                                                                      | verySlight                        |
+      | Condition                                                                     | changeOfPlatform                  |
       | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1103,6 +1105,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
       | Severity                                                                      | verySlight                        |
+      | Condition                                                                     | changeOfPlatform                  |
       | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1236,6 +1239,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
                           <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
                           <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
                         </siri:Period>
+                        <siri:Condition>changeOfPlatform</siri:Condition>
                         <siri:Severity>verySlight</siri:Severity>
                         <siri:Affects>
                           <siri:Networks>

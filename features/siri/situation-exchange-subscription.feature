@@ -184,6 +184,7 @@ Feature: Support SIRI SituationExchange by subscription
                           <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
                           <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
                         </siri:Period>
+                        <siri:Condition>changeOfPlatform</siri:Condition>
                         <siri:Severity>verySlight</siri:Severity>
                         <siri:Affects>
                           <siri:Networks>
@@ -272,6 +273,7 @@ Feature: Support SIRI SituationExchange by subscription
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
       | Severity                                                                      | verySlight                        |
+      | Condition                                                                     | changeOfPlatform                  |
       | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
@@ -513,6 +515,11 @@ Feature: Support SIRI SituationExchange by subscription
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                    |
       | Description[DefaultValue]                                                          | An Another Very Long Message                 |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8            |
+    When the Situation "internal":"NINOXE:SituationExchange:01_1" is edited with a Consequence with the following attributes:
+      | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
+      | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
+      | Severity                                                                      | verySlight                        |
+      | Condition                                                                     | changeOfPlatform                  |
     And a StopArea exists with the following attributes:
       | Name              | Test                                    |
       | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
@@ -609,6 +616,16 @@ Feature: Support SIRI SituationExchange by subscription
                        </siri:AffectedNetwork>
                      </siri:Networks>
                    </siri:Affects>
+                    <siri:Consequences>
+                      <siri:Consequence>
+                        <siri:Period>
+                          <siri:StartTime>2023-09-18T05:30:59.000Z</siri:StartTime>
+                          <siri:EndTime>2023-09-18T08:00:54.000Z</siri:EndTime>
+                        </siri:Period>
+                        <siri:Condition>changeOfPlatform</siri:Condition>
+                        <siri:Severity>verySlight</siri:Severity>
+                      </siri:Consequence>
+                    </siri:Consequences>
                  </siri:PtSituationElement>
                </siri:Situations>
              </siri:SituationExchangeDelivery>

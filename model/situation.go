@@ -66,10 +66,11 @@ type Situation struct {
 }
 
 type Consequence struct {
-	Periods  []*TimeRange      `json:",omitempty"`
-	Severity SituationSeverity `json:",omitempty"`
-	Affects  []Affect          `json:",omitempty"`
-	Blocking *Blocking         `json:",omitempty"`
+	Periods   []*TimeRange       `json:",omitempty"`
+	Condition SituationCondition `json:",omitempty"`
+	Severity  SituationSeverity  `json:",omitempty"`
+	Affects   []Affect           `json:",omitempty"`
+	Blocking  *Blocking          `json:",omitempty"`
 }
 
 type Blocking struct {
