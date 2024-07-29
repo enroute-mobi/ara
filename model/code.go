@@ -83,6 +83,10 @@ func (code Code) HashValue() string {
 	return fmt.Sprintf("%x", hasher.Sum(nil))
 }
 
+func (code Code) IsEmpty() bool {
+	return code == Code{}
+}
+
 func (code Code) String() string {
 	return fmt.Sprintf("%s:%s", code.codeSpace, code.value)
 }

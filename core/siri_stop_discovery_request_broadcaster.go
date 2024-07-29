@@ -1,12 +1,15 @@
 package core
 
 import (
-	"sort"
-
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
+
+	"golang.org/x/exp/maps"
+	"slices"
+	"sort"
 )
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
@@ -36,14 +39,33 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 
 	annotedStopPointMap := make(map[string]struct{})
 
-	sas := connector.partner.Model().StopAreas().FindAll()
+	sas := connector.partner.Model().StopAreas().FindAllValues()
+
+	// Replace Particulars by Referent
+	referents := make(map[model.StopAreaId]model.StopArea)
+	sas = slices.DeleteFunc(sas, func(stopArea model.StopArea) bool {
+		referent, ok := stopArea.Referent()
+		if ok {
+			_, ok = referent.Code(connector.remoteCodeSpace)
+			return ok
+		}
+
+		referents[referent.Id()] = *referent
+		return false
+	})
+
+	sas = slices.Concat(sas, maps.Values(referents))
+
 	for i := range sas {
 		if sas[i].Name == "" || !sas[i].CollectedAlways {
 			continue
 		}
 
-		code, ok := sas[i].SPDCode(connector.remoteCodeSpace)
-		if !ok || code.Value() == "" {
+		code, ok := sas[i].Code(connector.remoteCodeSpace)
+		if !ok {
+			continue
+		}
+		if ok && code.Value() == "" {
 			continue
 		}
 
@@ -55,21 +77,42 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			Monitored:    true,
 			TimingPoint:  true,
 		}
+
 		lines := sas[i].Lines()
 		for i := range lines {
 			if lines[i].Origin() == string(connector.partner.Slug()) {
 				continue
 			}
-			code, ok := lines[i].DiscoveryCode(connector.remoteCodeSpace)
-			if !ok {
+			code := model.Code{}
+			referent, ok := lines[i].Referent()
+
+			if ok {
+				code, _ = referent.Code(connector.remoteCodeSpace)
+			}
+
+			if code.IsEmpty() {
+				code, _ = lines[i].Code(connector.remoteCodeSpace)
+			}
+
+			if code.IsEmpty() {
 				continue
 			}
+
 			annotedStopPoint.Lines = append(annotedStopPoint.Lines, code.Value())
 		}
+
+		annotedStopPoint.Lines = slices.Compact(annotedStopPoint.Lines)
+
 		if len(annotedStopPoint.Lines) == 0 && connector.partner.IgnoreStopWithoutLine() {
 			continue
 		}
+
+		sort.Slice(annotedStopPoint.Lines, func(i, j int) bool {
+			return annotedStopPoint.Lines[i] < annotedStopPoint.Lines[j]
+		})
+
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
+
 	}
 
 	sort.Sort(siri.SIRIAnnotatedStopPointByStopPointRef(response.AnnotatedStopPoints))
