@@ -56,8 +56,13 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		if ok {
 			gc = []core.GtfsConnector{c.(core.GtfsConnector)}
 		}
+	} else if resource == "service-alerts" {
+		c, ok = partner.Connector(core.GTFS_RT_SERVICE_ALERTS_BROADCASTER)
+		if ok {
+			gc = []core.GtfsConnector{c.(core.GtfsConnector)}
+		}
 	} else {
-		messageType = string(audit.GTFS_TRIP_UPDATES_VEHICLE_POSITION)
+		messageType = string(audit.GTFS_TRIP_UPDATES_VEHICLE_POSITION_SERVICE_ALERTS)
 		gc, ok = partner.GtfsConnectors()
 	}
 

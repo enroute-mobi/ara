@@ -248,7 +248,8 @@ func (partner *Partner) Start() {
 	to := partner.GtfsCacheTimeout()
 	partner.gtfsCache.Add("trip-updates", to, nil)
 	partner.gtfsCache.Add("vehicle-positions", to, nil)
-	partner.gtfsCache.Add("trip-updates,vehicle-position", to, nil)
+	partner.gtfsCache.Add("service-alerts", to, nil)
+	partner.gtfsCache.Add("trip-updates,vehicle-position,service-alerts", to, nil)
 }
 
 func (partner *Partner) Allow(ip string) bool {
@@ -483,7 +484,11 @@ func (partner *Partner) GtfsConnectors() (connectors []GtfsConnector, ok bool) {
 	if ok2 {
 		connectors = append(connectors, c.(GtfsConnector))
 	}
-	ok = ok1 || ok2
+	c, ok3 := partner.connectors[GTFS_RT_SERVICE_ALERTS_BROADCASTER]
+	if ok3 {
+		connectors = append(connectors, c.(GtfsConnector))
+	}
+	ok = ok1 || ok2 || ok3
 
 	return
 }
