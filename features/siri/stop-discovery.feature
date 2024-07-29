@@ -814,52 +814,58 @@ Feature: Support SIRI StopPointsDiscovery
   @ARA-1545 @siri-valid
   Scenario: Handle a SIRI StopPointsDiscovery request with StopArea ReferentId and Lines ReferentId
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
-      | local_credential  | test    |
-      | remote_code_space | stif    |
-      | local_url         | address |
+      | local_credential  | test     |
+      | remote_code_space | external |
+      | local_url         | address  |
+    And a Line exists with the following attributes:
+      | Name  | Line Referent 1             |
+      | Codes | "external":"Referent-1"  |
     And a Line exists with the following attributes:
       | Name       | Line 1                            |
-      | Codes      | "rdmantois":"Line::C00272:"       |
-      | ReferentId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Codes      | "internal":"Line-1"               |
+      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
     And a Line exists with the following attributes:
-      | Name  | Line Referent               |
-      | Codes | "stif":"STIF:Line::C00272:" |
+      | Name  | Line Referent 2         |
+      | Codes | "external":"Referent-2" |
     And a Line exists with the following attributes:
       | Name       | Line 2                            |
-      | Codes      | "rdmantois":"Line::C00273:"       |
-      | ReferentId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Codes      | "internal":"Line-2"               |
+      | ReferentId | 6ba7b814-9dad-11d1-4-00c04fd430c8 | # Line Referent 2
     And a Line exists with the following attributes:
-      | Name  | Line Referent               |
-      | Codes | "stif":"STIF:Line::C00273:" |
+      | Name       | Line 3                            |
+      | Codes      | "internal":"Line-3"               |
+      | ReferentId | 6ba7b814-9dad-11d1-4-00c04fd430c8 | # Line Referent 2
+    And a Line exists with the following attributes:
+      | Name  | Line 4                                   |
+      | Codes | "internal":"Line-4", "external":"Line-4" |
     And a StopArea exists with the following attributes:
       | Name  | Stop Referent                      |
-      | Codes | "stif": "STIF:StopPoint:BP:11:LOC" |
+      | Codes | "external": "Stop-Referent-1"  |
     And a StopArea exists with the following attributes:
-      | Name       | Stop 1                                    |
-      | Codes      | "rdmantois": "NINOXE:StopPoint:SP:22:LOC" |
-      | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]     |
-      | ReferentID | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Name       | Stop 1                                                                     |
+      | Codes      | "internal": "Stop-1"                                                       |
+      | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-7-00c04fd430c8"] | # Line 1, Line 4
+      | ReferentID | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          | # Stop Referent
     And a StopArea exists with the following attributes:
       | Name       | Stop 2                                                                     |
-      | Codes      | "rdmantois": "NINOXE:StopPoint:SP:44:LOC"                                  |
-      | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
-      | ReferentID | 6ba7b814-9dad-11d1-6-00c04fd430c8                                          |
+      | Codes      | "internal": "Stop-2"                                                       |
+      | Lines      | ["6ba7b814-9dad-11d1-5-00c04fd430c8", "6ba7b814-9dad-11d1-6-00c04fd430c8"] | # Line 2, Line 3
+      | ReferentID | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          | # Stop Referent
+    And a StopArea exists with the following attributes:
+      | Name  | Stop 3                                                                                                          |
+      | Codes | "internal": "Stop-3", "external": "Stop-3"                                                                      |
+      | Lines | ["6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-5-00c04fd430c8", "6ba7b814-9dad-11d1-7-00c04fd430c8"] | # Line 1, Line 2, Line 4
     When I send this SIRI request
       """
-      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
-            xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <Request>
               <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</ns2:MessageIdentifier>
             </Request>
-            <RequestExtension />
+            <RequestExtension/>
           </ns7:StopPointsDiscovery>
         </S:Body>
         </S:Envelope>
@@ -874,12 +880,23 @@ Feature: Support SIRI StopPointsDiscovery
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:Status>true</siri:Status>
               <siri:AnnotatedStopPointRef>
-                <siri:StopPointRef>STIF:StopPoint:BP:11:LOC</siri:StopPointRef>
+                <siri:StopPointRef>Stop-3</siri:StopPointRef>
+                <siri:Monitored>true</siri:Monitored>
+                <siri:StopName>Stop 3</siri:StopName>
+                <siri:Lines>
+                  <siri:LineRef>Line-4</siri:LineRef>
+                  <siri:LineRef>Referent-1</siri:LineRef>
+                  <siri:LineRef>Referent-2</siri:LineRef>
+                </siri:Lines>
+              </siri:AnnotatedStopPointRef>
+              <siri:AnnotatedStopPointRef>
+                <siri:StopPointRef>Stop-Referent-1</siri:StopPointRef>
                 <siri:Monitored>true</siri:Monitored>
                 <siri:StopName>Stop Referent</siri:StopName>
                 <siri:Lines>
-                  <siri:LineRef>STIF:Line::C00272:</siri:LineRef>
-                  <siri:LineRef>STIF:Line::C00273:</siri:LineRef>
+                  <siri:LineRef>Line-4</siri:LineRef>
+                  <siri:LineRef>Referent-1</siri:LineRef>
+                  <siri:LineRef>Referent-2</siri:LineRef>
                 </siri:Lines>
               </siri:AnnotatedStopPointRef>
             </Answer>
