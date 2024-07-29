@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -361,4 +362,134 @@ func Test_MemorySituations_Delete(t *testing.T) {
 	if ok {
 		t.Errorf("Deleted situation should not be findable")
 	}
+}
+
+func Test_AffectFromProto(t *testing.T) {
+	assert := assert.New(t)
+	model := NewTestMemoryModel()
+
+	stopArea := model.StopAreas().New()
+	code := NewCode("external", "A")
+	stopArea.SetCode(code)
+	stopArea.Save()
+	stopAreaA := "A"
+
+	line := model.Lines().New()
+	code = NewCode("external", "1")
+	line.SetCode(code)
+	line.Save()
+	lineValue := "1"
+
+	unknownModel := "WRONG"
+
+	var TestCases = []struct {
+		entity                 *gtfs.EntitySelector
+		remoteCodeSpace        string
+		valid                  bool
+		expectedAffect         Affect
+		expectedMonitoringRefs []string
+		expectedLineRefs       []string
+		message                string
+	}{
+		{
+			entity: &gtfs.EntitySelector{
+				StopId: &stopAreaA,
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedAffect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+			},
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs:       []string{},
+			message: `EntitySelector with only a StopId
+should create an affectedStopArea`,
+		},
+		{
+			entity: &gtfs.EntitySelector{
+				RouteId: &lineValue,
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedAffect: &AffectedLine{
+				LineId: line.Id(),
+			},
+			expectedMonitoringRefs: []string{},
+			expectedLineRefs:       []string{"1"},
+			message: `EntitySelector with only a LineId
+should create an affectedLine`,
+		},
+		{
+			entity: &gtfs.EntitySelector{
+				StopId:  &stopAreaA,
+				RouteId: &lineValue,
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedAffect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+				LineIds:    []LineId{line.Id()},
+			},
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs:       []string{"1"},
+			message: `EntitySelector with valid StopId and
+LineId should create an affectedStopArea with LineId in LineIds`,
+		},
+		{
+			entity: &gtfs.EntitySelector{
+				StopId:  &stopAreaA,
+				RouteId: &unknownModel,
+			},
+			remoteCodeSpace: "external",
+			valid:           true,
+			expectedAffect: &AffectedStopArea{
+				StopAreaId: stopArea.Id(),
+			},
+			expectedMonitoringRefs: []string{"A"},
+			expectedLineRefs:       []string{},
+			message: `EntitySelector with valid StopId and unknown
+LineId should create an affectedStopArea without LineIds`,
+		},
+		{
+			entity: &gtfs.EntitySelector{
+				StopId:  &unknownModel,
+				RouteId: &lineValue,
+			},
+			remoteCodeSpace: "external",
+			valid:           false,
+			expectedAffect:  nil,
+			message: `EntitySelector with unknow StopId should
+not create any affect`,
+		},
+		{
+			entity:          &gtfs.EntitySelector{},
+			remoteCodeSpace: "external",
+			valid:           false,
+			expectedAffect:  nil,
+			message: `EntitySelector empty should not create
+any affect`,
+		},
+	}
+
+	for _, tt := range TestCases {
+		affect, collectedRefs, err := AffectFromProto(tt.entity, tt.remoteCodeSpace, model)
+		if !tt.valid {
+			assert.Error(err)
+			continue
+		}
+		assert.Nil(err)
+		assert.Equalf(tt.expectedAffect, affect, tt.message)
+		assert.Equal(tt.expectedMonitoringRefs, GetReferencesSlice(collectedRefs.MonitoringRefs))
+		assert.Equal(tt.expectedLineRefs, GetReferencesSlice(collectedRefs.LineRefs))
+	}
+}
+
+func GetReferencesSlice(refs map[string]struct{}) []string {
+	refSlice := make([]string, len(refs))
+	i := 0
+	for ref := range refs {
+		refSlice[i] = ref
+		i++
+	}
+	return refSlice
 }

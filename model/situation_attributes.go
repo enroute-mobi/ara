@@ -1,7 +1,10 @@
 package model
 
 import (
+	"errors"
 	"fmt"
+
+	"bitbucket.org/enroute-mobi/ara/gtfs"
 )
 
 type SituationSeverity string
@@ -12,8 +15,31 @@ const (
 	SituationSeveritySlight     SituationSeverity = "slight"
 	SituationSeverityNormal     SituationSeverity = "normal"
 	SituationSeveritySevere     SituationSeverity = "severe"
+	SituationSeverityUndefinded SituationSeverity = "undefined"
+	SituationSeverityUnknown    SituationSeverity = "unknown"
 	SituationSeverityVerySevere SituationSeverity = "verySevere"
 )
+
+func (s *SituationSeverity) FromProto(value interface{}) error {
+	switch v := value.(type) {
+	case gtfs.Alert_SeverityLevel:
+		switch v {
+		case gtfs.Alert_UNKNOWN_SEVERITY:
+			*s = SituationSeverityUnknown
+		case gtfs.Alert_INFO:
+			*s = SituationSeverityNoImpact
+		case gtfs.Alert_WARNING:
+			*s = SituationSeverityNormal
+		case gtfs.Alert_SEVERE:
+			*s = SituationSeveritySevere
+		default:
+			return errors.New("invalid value")
+		}
+	default:
+		return fmt.Errorf("unsupported value %T", value)
+	}
+	return nil
+}
 
 func (severity *SituationSeverity) FromString(s string) error {
 	switch SituationSeverity(s) {
@@ -26,6 +52,10 @@ func (severity *SituationSeverity) FromString(s string) error {
 	case SituationSeverityNormal:
 		fallthrough
 	case SituationSeveritySevere:
+		fallthrough
+	case SituationSeverityUndefinded:
+		fallthrough
+	case SituationSeverityUnknown:
 		fallthrough
 	case SituationSeverityVerySevere:
 		*severity = SituationSeverity(s)
@@ -297,6 +327,44 @@ const (
 	SituationAlertCauseWorktorule                        SituationAlertCause = "workToRule"
 )
 
+func (ac *SituationAlertCause) FromProto(value interface{}) error {
+	switch v := value.(type) {
+	case gtfs.Alert_Cause:
+		switch v {
+		case gtfs.Alert_UNKNOWN_CAUSE:
+			*ac = SituationAlertCauseUnknown
+		case gtfs.Alert_OTHER_CAUSE:
+			*ac = SituationAlertCauseMiscellaneous
+		case gtfs.Alert_TECHNICAL_PROBLEM:
+			*ac = SituationAlertCauseTechnicalproblem
+		case gtfs.Alert_STRIKE:
+			*ac = SituationAlertCauseIndustrialaction
+		case gtfs.Alert_DEMONSTRATION:
+			*ac = SituationAlertCauseDemonstration
+		case gtfs.Alert_ACCIDENT:
+			*ac = SituationAlertCauseAccident
+		case gtfs.Alert_HOLIDAY:
+			*ac = SituationAlertCauseHoliday
+		case gtfs.Alert_WEATHER:
+			*ac = SituationAlertCausePoorweather
+		case gtfs.Alert_MAINTENANCE:
+			*ac = SituationAlertCauseMaintenancework
+		case gtfs.Alert_CONSTRUCTION:
+			*ac = SituationAlertCauseConstructionwork
+		case gtfs.Alert_POLICE_ACTIVITY:
+			*ac = SituationAlertCausePoliceactivity
+		case gtfs.Alert_MEDICAL_EMERGENCY:
+			*ac = SituationAlertCauseEmergencymedicalservices
+		default:
+			return errors.New("invalid value")
+		}
+	default:
+		return fmt.Errorf("unsupported value %T", value)
+
+	}
+
+	return nil
+}
 func (alertCause *SituationAlertCause) FromString(s string) error {
 	switch SituationAlertCause(s) {
 	case SituationAlertCauseAccident:
@@ -932,4 +1000,31 @@ func (condition *SituationCondition) FromString(c string) error {
 	default:
 		return fmt.Errorf("invalid condition %s", c)
 	}
+}
+
+func (c *SituationCondition) FromProto(value interface{}) error {
+	switch v := value.(type) {
+	case gtfs.Alert_Effect:
+		switch v {
+		case gtfs.Alert_NO_SERVICE:
+			*c = SituationConditionNoService
+		case gtfs.Alert_REDUCED_SERVICE:
+			*c = SituationConditionAltered
+		case gtfs.Alert_SIGNIFICANT_DELAYS:
+			*c = SituationConditionDisrupted
+		case gtfs.Alert_DETOUR:
+			*c = SituationConditionDiverted
+		case gtfs.Alert_ADDITIONAL_SERVICE:
+			*c = SituationConditionAdditionalService
+		case gtfs.Alert_STOP_MOVED:
+			*c = SituationConditionDiverted
+		case gtfs.Alert_NO_EFFECT:
+			*c = SituationConditionNormalService
+		default:
+			return errors.New("invalid value")
+		}
+	default:
+		return fmt.Errorf("unsupported value %T", value)
+	}
+	return nil
 }
