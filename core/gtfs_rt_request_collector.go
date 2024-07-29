@@ -172,6 +172,9 @@ func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, 
 	code := model.NewCode(connector.remoteCodeSpace, id)
 	event.SituationCode = code
 
+	// Internal tags
+	event.InternalTags = append(event.InternalTags, connector.Partner().CollectSituationsInternalTags()...)
+
 	// ValidityPeriods
 	var validityPeriods []*model.TimeRange
 	periods := a.GetActivePeriod()
