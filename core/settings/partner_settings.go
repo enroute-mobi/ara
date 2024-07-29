@@ -56,6 +56,8 @@ const (
 	BROADCAST_REWRITE_JOURNEY_PATTERN_REF                 = "broadcast.rewrite_journey_pattern_ref"
 	BROADCAST_SIRI_IGNORE_TERMINATE_SUBSCRIPTION_REQUESTS = "broadcast.siri.ignore_terminate_subscription_requests"
 	BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS              = "broadcast.siri.stop_monitoring.multiple_subscriptions"
+	BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY      = "broadcast.siri.stop_monitoring.maximum_resources_per_delivery"
+	BROADCAST_DEFAULT_SM_MAXIMUM_RESOURCES_PER_DELIVERY   = 50
 	BROADCAST_SITUATIONS_INTERNAL_TAGS                    = "broadcast.situations.internal_tags"
 	BROADCAST_SUBSCRIPTIONS_PERSISTENT                    = "broadcast.subscriptions.persistent"
 
@@ -117,6 +119,7 @@ type PartnerSettings struct {
 	collectFilteredSituations           bool
 	ignoreStopWithoutLine               bool
 	smMultipleDeliveriesPerNotify       bool
+	smMaxStopVisitPerDelivery           int
 	discoveryInterval                   time.Duration
 	cacheTimeouts                       sync.Map
 	siriDirectionTypeInbound            string
@@ -203,6 +206,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setCacheTimeouts(settings)
 	s.setSortPayloadForTest(settings)
 	s.setSmMultipleDeliveriesPerNotify(settings)
+	s.setMaxStopVisitPerDelivery(settings)
 
 	s.setVehicleRemoteCodeSpaceWithFallback(settings)
 	s.setVehicleJourneyRemoteCodeSpaceWithFallback(settings)
@@ -444,6 +448,18 @@ func (s *PartnerSettings) setSmMultipleDeliveriesPerNotify(settings map[string]s
 
 func (s *PartnerSettings) SmMultipleDeliveriesPerNotify() bool {
 	return s.smMultipleDeliveriesPerNotify
+}
+
+func (s *PartnerSettings) setMaxStopVisitPerDelivery(settings map[string]string) {
+	max, _ := strconv.Atoi(settings[BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY])
+	if max > BROADCAST_DEFAULT_SM_MAXIMUM_RESOURCES_PER_DELIVERY {
+		max = BROADCAST_DEFAULT_SM_MAXIMUM_RESOURCES_PER_DELIVERY
+	}
+	s.smMaxStopVisitPerDelivery = max
+}
+
+func (s *PartnerSettings) MaxStopVisitPerDelivery() int {
+	return s.smMaxStopVisitPerDelivery
 }
 
 func (s *PartnerSettings) setIgnoreTerminateSubscriptionsRequest(settings map[string]string) {

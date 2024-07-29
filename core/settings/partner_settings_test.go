@@ -760,3 +760,25 @@ func Test_SiriSoapEmptyResponseOnNotification_false(t *testing.T) {
 
 	assert.False(partnerSettings.SiriSoapEmptyResponseOnNotification())
 }
+
+func Test_MaxStopVisitPerDelivery_Above_50(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY: "60",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal(50, partnerSettings.MaxStopVisitPerDelivery(), "Should set MaxStopVisitPerDelivery at default 50")
+}
+
+func Test_MaxStopVisitPerDelivery_Below_50(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY: "10",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal(10, partnerSettings.MaxStopVisitPerDelivery())
+}
