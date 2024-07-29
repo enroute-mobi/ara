@@ -159,8 +159,10 @@ func (smb *SMBroadcaster) prepareSIRIStopMonitoringNotify() {
 			smb.addDeliveryToNotification(delivery, notification)
 		}
 	}
-	if smb.multipleDeliveries && len(smb.notification.Deliveries) != 0 {
-		smb.sendNotification(smb.notification)
+	if smb.multipleDeliveries && smb.notification != nil {
+		if len(smb.notification.Deliveries) != 0 {
+			smb.sendNotification(smb.notification)
+		}
 	}
 	smb.notification = nil
 }
