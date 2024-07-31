@@ -466,3 +466,50 @@ Feature: Support GTFS-RT feeds
       | Protocol  | gtfs                                         |
       | Direction | received                                     |
       | Type      | trip-updates,vehicle-position,service-alerts |
+
+  @ARA-1554
+  Scenario: Broadcast only ServiceAlert with matching internal tags
+    Given a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
+      | Version                      | 1                                 |
+      | ReportType                   | general                           |
+      | Progress                     | published                         |
+      | InternalTags                 | ["first","second"]                |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]    | Description Sample                |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    And a StopArea exists with the following attributes:
+      | Name  | Stop Area Sample     |
+      | Codes | "external": "sample" |
+    And a SIRI Partner "test" exists with connectors [gtfs-rt-service-alerts-broadcaster] and the following settings:
+      | local_credential                   | secret        |
+      | remote_code_space                  | external      |
+      | broadcast.situations.internal_tags | first,another |
+    When I send a GTFS-RT request to the Referential "test" with token "secret"
+    Then I should receive a GTFS-RT response
+
+  @ARA-1554
+  Scenario: Do NOT broadcast ServiceAlert with unmatching internal tags
+        Given a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
+      | Version                      | 1                                 |
+      | ReportType                   | general                           |
+      | Progress                     | published                         |
+      | InternalTags                 | ["wrong"]                         |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]    | Description Sample                |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    And a StopArea exists with the following attributes:
+      | Name  | Stop Area Sample     |
+      | Codes | "external": "sample" |
+    And a SIRI Partner "test" exists with connectors [gtfs-rt-service-alerts-broadcaster] and the following settings:
+      | local_credential                   | secret        |
+      | remote_code_space                  | external      |
+      | broadcast.situations.internal_tags | first,another |
+    When I send a GTFS-RT request to the Referential "test" with token "secret"
+    Then I should receive a GTFS-RT response
+    And this GTFS-RT response should have no entity

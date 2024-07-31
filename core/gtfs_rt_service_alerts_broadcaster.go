@@ -7,8 +7,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
-
 	"errors"
+	"slices"
 )
 
 type ServiceAlertsBroadcaster struct {
@@ -51,6 +51,9 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 	situations := connector.partner.Model().Situations().FindAll()
 
 	for _, situation := range situations {
+		if !connector.canBroadcast(situation) {
+			continue
+		}
 		var situationNumber string
 		code, present := situation.Code(connector.remoteCodeSpace)
 		if present {
@@ -68,11 +71,11 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 
 		// InformedEntities
 		for _, affect := range situation.Affects {
-			entities, _, err := model.AffectToProto(affect, connector.remoteCodeSpace, connector.Partner().Model())
+			informedEntities, _, err := model.AffectToProto(affect, connector.remoteCodeSpace, connector.Partner().Model())
 			if err != nil {
 				logger.Log.Debugf("Error for affect: %v", err)
 			}
-			alert.InformedEntity = append(alert.InformedEntity, entities...)
+			alert.InformedEntity = append(alert.InformedEntity, informedEntities...)
 		}
 
 		if len(alert.InformedEntity) == 0 {
@@ -80,10 +83,8 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 		}
 
 		feedEntity := &gtfs.FeedEntity{
-			Id:    &situationNumber,
-			Alert: alert,
+			Id: &situationNumber,
 		}
-		entities = append(entities, feedEntity)
 
 		// Periods
 		var ts []*gtfs.TimeRange
@@ -149,7 +150,23 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 			alert.DescriptionText = &translatedString
 		}
 
+		feedEntity.Alert = alert
+		entities = append(entities, feedEntity)
 	}
 
 	return
+}
+
+func (connector *ServiceAlertsBroadcaster) canBroadcast(situation model.Situation) bool {
+	tagsToBroadcast := connector.partner.BroadcastSituationsInternalTags()
+	if len(tagsToBroadcast) != 0 {
+		for _, tag := range situation.InternalTags {
+			if slices.Contains(tagsToBroadcast, tag) {
+				return true
+			}
+		}
+		return false
+	}
+
+	return true
 }
