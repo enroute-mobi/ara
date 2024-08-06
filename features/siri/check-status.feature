@@ -480,7 +480,4 @@ Feature: Support SIRI CheckStatus
   </S:Body>
 </S:Envelope>
       """
-    Then I should receive this SIRI response
-      """
-      Too many requests
-      """
+    Then I should receive a HTTP error 429

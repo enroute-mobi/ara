@@ -242,3 +242,7 @@ end
 Then (/^I send this SIRI ServiceDelivery$/) do |request|
   send_siri_request request
 end
+
+Then(/^I should receive a HTTP error (\d+)$/) do |code|
+  expect(@last_siri_response.code).to eq(code)
+end
