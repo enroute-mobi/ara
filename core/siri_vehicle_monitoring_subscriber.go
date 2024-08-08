@@ -7,10 +7,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"golang.org/x/exp/maps"
 )
 
 type SIRIVehicleMonitoringSubscriber interface {
@@ -32,11 +30,6 @@ type VehicleMonitoringSubscriber struct {
 
 type FakeVehicleMonitoringSubscriber struct {
 	VMSubscriber
-}
-
-type lineToRequest struct {
-	subID SubscriptionId
-	lID   model.Code
 }
 
 func NewFakeVehicleMonitoringSubscriber(connector *SIRIVehicleMonitoringSubscriptionCollector) SIRIVehicleMonitoringSubscriber {
@@ -88,28 +81,10 @@ func (subscriber *VehicleMonitoringSubscriber) Stop() {
 }
 
 func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest() {
-	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind(VehicleMonitoringCollect)
-	if len(subscriptions) == 0 {
-		logger.Log.Debugf("VehicleMonitoringSubscriber visit without VehicleMonitoringCollect subscriptions")
-		return
-	}
+	collectSubscriber := NewCollectSubcriber(subscriber.connector, VehicleMonitoringCollect)
+	subscriptionRequests := collectSubscriber.GetSubscriptionRequest()
 
-	linesList := []string{}
-
-	linesToRequest := make(map[string]*lineToRequest)
-	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByCodeCopy() {
-			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
-				linesToRequest[messageIdentifier] = &lineToRequest{
-					subID: subscription.id,
-					lID:   *(resource.Reference.Code),
-				}
-			}
-		}
-	}
-
-	if len(linesToRequest) == 0 {
+	if len(subscriptionRequests) == 0 {
 		return
 	}
 
@@ -123,27 +98,32 @@ func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest(
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
-	var subIDs []string
-	for messageIdentifier, requestedLines := range linesToRequest {
+	subIds := []string{}
+	linesToLog := []string{}
+	for subId, subscriptionRequest := range subscriptionRequests {
 		entry := &siri.SIRIVehicleMonitoringSubscriptionRequestEntry{
 			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-			SubscriptionIdentifier: string(requestedLines.subID),
+			SubscriptionIdentifier: string(subId),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
-		entry.MessageIdentifier = messageIdentifier
+		entry.MessageIdentifier = subscriptionRequest.requestMessageRef
 		entry.RequestTimestamp = subscriber.Clock().Now()
-		entry.LineRef = requestedLines.lID.Value()
-
-		linesList = append(linesList, entry.LineRef)
-		subIDs = append(subIDs, entry.SubscriptionIdentifier)
+		for _, m := range subscriptionRequest.modelsToRequest {
+			switch m.kind {
+			case "Line":
+				entry.LineRef = m.code.Value()
+			}
+		}
+		linesToLog = append(linesToLog, entry.LineRef)
+		subIds = append(subIds, string(subId))
 		siriVehicleMonitoringSubscriptionRequest.Entries = append(siriVehicleMonitoringSubscriptionRequest.Entries, entry)
 	}
 
 	message.RequestIdentifier = siriVehicleMonitoringSubscriptionRequest.MessageIdentifier
 	message.RequestRawMessage, _ = siriVehicleMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 	message.RequestSize = int64(len(message.RequestRawMessage))
-	message.Lines = linesList
-	message.SubscriptionIdentifiers = subIDs
+	message.Lines = linesToLog
+	message.SubscriptionIdentifiers = subIds
 
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.Partner().SIRIClient().VehicleMonitoringSubscription(siriVehicleMonitoringSubscriptionRequest)
@@ -152,7 +132,7 @@ func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest(
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		e := fmt.Sprintf("Error during VehicleMonitoringSubscriptionRequest: %v", err)
 
-		subscriber.incrementRetryCountFromMap(linesToRequest)
+		collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 
 		message.Status = "Error"
 		message.ErrorDetails = e
@@ -163,64 +143,13 @@ func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest(
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
-	for _, responseStatus := range response.ResponseStatus() {
-		var requestedLine *lineToRequest
-		var requestMessageRef string
-		var ok bool
+	collectSubscriber.HandleResponse(subscriptionRequests, message, response)
 
-		if len(linesToRequest) != 1 {
-			requestedLine, ok = linesToRequest[responseStatus.RequestMessageRef()]
-			if !ok {
-				logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
-				continue
-			}
-			requestMessageRef = responseStatus.RequestMessageRef()
-		} else { // Skip RequestMessageRef validation for single Subscription
-			requestMessageRef = maps.Keys(linesToRequest)[0]
-			requestedLine = linesToRequest[requestMessageRef]
-		}
-
-		delete(linesToRequest, requestMessageRef) // See #4691
-
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedLine.subID)
-		if !ok { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription %v", requestedLine.subID)
-			continue
-		}
-		resource := subscription.Resource(requestedLine.lID)
-		if resource == nil { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription resource %v", requestedLine.lID.String())
-			continue
-		}
-
-		if !responseStatus.Status() {
-			logger.Log.Debugf("Subscription status false for line %v: %v %v ", requestedLine.lID.Value(), responseStatus.ErrorType(), responseStatus.ErrorText())
-			resource.RetryCount++
-			message.Status = "Error"
-			continue
-		}
-		resource.Subscribed(subscriber.Clock().Now())
-		resource.RetryCount = 0
-	}
-	// Should not happen but see #4691
-	if len(linesToRequest) == 0 {
+	if len(subscriptionRequests) == 0 {
 		return
 	}
-	subscriber.incrementRetryCountFromMap(linesToRequest)
-}
 
-func (subscriber *VMSubscriber) incrementRetryCountFromMap(linesToRequest map[string]*lineToRequest) {
-	for _, requestedLines := range linesToRequest {
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedLines.subID)
-		if !ok { // Should never happen
-			continue
-		}
-		resource := subscription.Resource(requestedLines.lID)
-		if resource == nil { // Should never happen
-			continue
-		}
-		resource.RetryCount++
-	}
+	collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 }
 
 func (subscriber *VMSubscriber) newBQEvent() *audit.BigQueryMessage {
