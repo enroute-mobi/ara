@@ -63,6 +63,7 @@ type Connector interface {
 	uuid.UUIDInterface
 
 	Partner() *Partner
+	RemoteCodeSpace() string
 }
 
 type GtfsConnector interface {
@@ -79,6 +80,10 @@ type connector struct {
 
 func (c *connector) Partner() *Partner {
 	return c.partner
+}
+
+func (c *connector) RemoteCodeSpace() string {
+	return c.remoteCodeSpace
 }
 
 type ConnectorFactory interface {
