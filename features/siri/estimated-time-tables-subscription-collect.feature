@@ -7,19 +7,22 @@ Feature: Support SIRI EstimatedTimetable
   Scenario: EstimatedTimetable subscription collect should send EstimatedTimetableSubscriptionRequest to partner
    Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url            | http://localhost:8090 |
-      | remote_credential     | test                  |
-      | remote_code_space     | internal              |
-      | collect.include_lines | RLA_Bus:Line::05:LOC  |
-      | local_credential      | ara                   |
+      | remote_url            | http://localhost:8090                |
+      | remote_credential     | test                                 |
+      | remote_code_space     | internal                             |
+      | collect.include_lines | RLA_Bus:Line::05:LOC,RLA_TRAM::A:LOC |
+      | local_credential      | ara                                  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name  | Test 1                             |
       | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+    And a Line exists with the following attributes:
+      | Name  | Test 2                        |
+      | Codes | "internal": "RLA_TRAM::A:LOC" |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
-      | //siri:LineRef | RLA_Bus:Line::05:LOC |
+     | //siri:LineRef | ["RLA_Bus:Line::05:LOC", "RLA_TRAM::A:LOC"] |
 
   @ARA-1306
   Scenario: EstimatedTimetable subscription collect and partner CheckStatus is unavailable should not send EstimatedTimetableSubscriptionRequest to partner
@@ -160,7 +163,7 @@ Feature: Support SIRI EstimatedTimetable
       <SubscriptionRequestInfo>
   <siri:RequestTimestamp>2017-01-01T12:00:05.000Z</siri:RequestTimestamp>
   <siri:RequestorRef>test</siri:RequestorRef>
-  <siri:MessageIdentifier>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:MessageIdentifier>
+  <siri:MessageIdentifier>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:MessageIdentifier>
         <siri:ConsumerAddress>http://test</siri:ConsumerAddress>
       </SubscriptionRequestInfo>
       <Request>
