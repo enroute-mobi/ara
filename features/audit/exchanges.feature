@@ -107,7 +107,7 @@ Feature: Audit API exchanges
             <ns5:ResponseTimestamp>2017-01-01T12:00:00+01:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>{LastRequestMessageRef}</ns5:RequestMessageRef>
             <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns5:SubscriptionRef>
             <ns5:Status>true</ns5:Status>
             <ns5:ValidUntil>2017-01-02T12:00:00+01:00</ns5:ValidUntil>
         </ns5:ResponseStatus>

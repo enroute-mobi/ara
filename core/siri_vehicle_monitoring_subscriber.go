@@ -101,22 +101,23 @@ func (subscriber *VMSubscriber) prepareSIRIVehicleMonitoringSubscriptionRequest(
 	subIds := []string{}
 	linesToLog := []string{}
 	for subId, subscriptionRequest := range subscriptionRequests {
-		entry := &siri.SIRIVehicleMonitoringSubscriptionRequestEntry{
-			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-			SubscriptionIdentifier: string(subId),
-			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-		}
-		entry.MessageIdentifier = subscriptionRequest.requestMessageRef
-		entry.RequestTimestamp = subscriber.Clock().Now()
 		for _, m := range subscriptionRequest.modelsToRequest {
+			entry := &siri.SIRIVehicleMonitoringSubscriptionRequestEntry{
+				SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
+				SubscriptionIdentifier: string(subId),
+				InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
+			}
+			entry.MessageIdentifier = subscriptionRequest.requestMessageRef
+			entry.RequestTimestamp = subscriber.Clock().Now()
+
 			switch m.kind {
 			case "Line":
 				entry.LineRef = m.code.Value()
+				linesToLog = append(linesToLog, entry.LineRef)
+				subIds = append(subIds, string(subId))
 			}
+			siriVehicleMonitoringSubscriptionRequest.Entries = append(siriVehicleMonitoringSubscriptionRequest.Entries, entry)
 		}
-		linesToLog = append(linesToLog, entry.LineRef)
-		subIds = append(subIds, string(subId))
-		siriVehicleMonitoringSubscriptionRequest.Entries = append(siriVehicleMonitoringSubscriptionRequest.Entries, entry)
 	}
 
 	message.RequestIdentifier = siriVehicleMonitoringSubscriptionRequest.MessageIdentifier
