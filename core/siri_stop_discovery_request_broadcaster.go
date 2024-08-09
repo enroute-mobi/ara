@@ -79,6 +79,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		}
 
 		lines := sas[i].Lines()
+		stopAreaLines := make(map[string]struct{})
 		for i := range lines {
 			if lines[i].Origin() == string(connector.partner.Slug()) {
 				continue
@@ -97,11 +98,10 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			if code.IsEmpty() {
 				continue
 			}
+			stopAreaLines[code.Value()] = struct{}{}
 
-			annotedStopPoint.Lines = append(annotedStopPoint.Lines, code.Value())
 		}
-
-		annotedStopPoint.Lines = slices.Compact(annotedStopPoint.Lines)
+		annotedStopPoint.Lines = append(annotedStopPoint.Lines, maps.Keys(stopAreaLines)...)
 
 		if len(annotedStopPoint.Lines) == 0 && connector.partner.IgnoreStopWithoutLine() {
 			continue
