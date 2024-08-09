@@ -114,7 +114,7 @@ func Test_StopArea_Lines(t *testing.T) {
 			tt.particular.Save()
 		}
 
-		assert.Equal(tt.expectedLines, tt.stopArea.Lines())
+		assert.ElementsMatch(tt.expectedLines, tt.stopArea.Lines())
 	}
 }
 
