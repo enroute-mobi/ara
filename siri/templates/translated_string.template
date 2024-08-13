@@ -1,0 +1,5 @@
+{{ $tag := .Tag }}
+{{ if .DefaultValue }}<siri:{{ $tag }}>{{ .DefaultValue }}</siri:{{ $tag }}>{{ end }}
+{{ range $key, $value := .Translations }}
+                   <siri:{{ $tag }} xml:lang="{{ $key }}">{{ $value }}</siri:{{ $tag }}>
+                {{ end }}
