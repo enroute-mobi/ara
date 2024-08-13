@@ -98,24 +98,34 @@ func (builder *GeneralMessageUpdateEventBuilder) buildGeneralMessageUpdateEvent(
 func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFromMessages(messages []*sxml.XMLMessage, event *model.SituationUpdateEvent) {
 	sanitizer := htmlsanitizer.NewHTMLSanitizer()
 	for _, xmlMessage := range messages {
-		sanitizedMessageText, err := sanitizer.Sanitize([]byte(xmlMessage.MessageText()))
-		if err != nil {
-			logger.Log.Debugf("Cannot sanitize xml message: %v", err)
-			continue
+		messageTexts := make(map[string]string)
+		for lang, messageText := range xmlMessage.MessageTexts() {
+			sanitizedMessageText, err := sanitizer.Sanitize([]byte(messageText))
+			if err != nil {
+				logger.Log.Debugf("Cannot sanitize xml message: %v", err)
+				continue
+			}
+			messageTexts[lang] = string(sanitizedMessageText)
 		}
-		builder.buildSituationAndDescriptionFromMessage(xmlMessage.MessageType(), string(sanitizedMessageText), event)
+		builder.buildSummaryAndDescriptionFromMessage(xmlMessage.MessageType(), messageTexts, event)
 	}
 }
 
-func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFromMessage(messageType, messageText string, event *model.SituationUpdateEvent) {
+func (builder *GeneralMessageUpdateEventBuilder) buildSummaryAndDescriptionFromMessage(messageType string, messageTexts map[string]string, event *model.SituationUpdateEvent) {
 	switch messageType {
 	case "shortMessage":
-		event.Summary = &model.SituationTranslatedString{
-			DefaultValue: messageText,
+		var s model.SituationTranslatedString
+		if err := s.FromMap(messageTexts); err == nil {
+			event.Summary = &s
+		} else {
+			logger.Log.Debugf("%v", err)
 		}
 	default:
-		event.Description = &model.SituationTranslatedString{
-			DefaultValue: messageText,
+		var d model.SituationTranslatedString
+		if err := d.FromMap(messageTexts); err == nil {
+			event.Description = &d
+		} else {
+			logger.Log.Debugf("%v", err)
 		}
 	}
 }

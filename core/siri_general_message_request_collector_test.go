@@ -94,34 +94,22 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 func Test_SIRIGeneralMessageRequestCollector_RequestSituationUpdate(t *testing.T) {
 	assert := assert.New(t)
 	updateEvents := prepare_SIRIGeneralMessageRequestCollector(t, "testdata/generalmessage-response-soap.xml")
-	if updateEvents == nil {
-		t.Error("RequestSituationUpdate should not return nil")
-	}
+	assert.NotNil(updateEvents)
+	assert.Len(updateEvents, 2)
 
-	if len(updateEvents) != 2 {
-		t.Errorf("RequestSituationUpdate should have 2 SituationUpdateEvents, got: %v", len(updateEvents))
-	}
 	situationEvent, _ := updateEvents[0].(*model.SituationUpdateEvent)
 
-	if expected := clock.FAKE_CLOCK_INITIAL_DATE; situationEvent.CreatedAt != expected {
-		t.Errorf("Wrong Created_At for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.CreatedAt)
-	}
-	if expected, _ := time.Parse(time.RFC3339, "2017-03-29T03:30:06.000+02:00"); !situationEvent.RecordedAt.Equal(expected) {
-		t.Errorf("Wrong RecorderAt for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.RecordedAt)
-	}
+	assert.Equal(clock.FAKE_CLOCK_INITIAL_DATE, situationEvent.CreatedAt)
 
-	if expected := 1; situationEvent.Version != expected {
-		t.Errorf("Wrong Version for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.Version)
-	}
+	expectedRecordedAt, _ := time.Parse(time.RFC3339, "2017-03-29T03:30:06.000+02:00")
+	assert.Equal(expectedRecordedAt, situationEvent.RecordedAt)
 
+	assert.Equal(situationEvent.Version, 1)
 	assert.ElementsMatch([]string{"Commercial"}, situationEvent.Keywords)
 
 	expected, _ := time.Parse(time.RFC3339, "2017-03-29T20:30:06.000+02:00")
 	assert.Equal(expected, situationEvent.ValidityPeriods[0].EndTime)
 
-	if expected := "NINOXE:default"; situationEvent.ProducerRef != "NINOXE:default" {
-		t.Errorf("Wrong ProducerRef for situationEvent:\n expected: %v\n got: %v", expected, situationEvent.ProducerRef)
-	}
-
-	assert.Equal("Un deuxième message #etouais", situationEvent.Description.DefaultValue)
+	assert.Equal("NINOXE:default", situationEvent.ProducerRef)
+	assert.Equal("Un deuxième message #etouais", situationEvent.Description.Translations["FR"])
 }

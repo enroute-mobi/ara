@@ -111,7 +111,7 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 	assert.Equal("FRANCE", event.Format)
 	assert.ElementsMatch([]string{"Commercial"}, event.Keywords)
 	assert.Equal(model.ReportType("general"), event.ReportType)
-	assert.Equal("test", event.Description.DefaultValue)
+	assert.Equal("test", event.Description.Translations["FR"])
 	assert.Nil(event.Summary)
 
 	affects := event.Affects
@@ -162,43 +162,69 @@ func Test_setReportType(t *testing.T) {
 	assert.Equal(model.SituationReportTypeIncident, reportType)
 }
 
-func Test_buildSituationAndDescriptionFromMessage(t *testing.T) {
+func Test_buildSummaryAndDescriptionFromMessage(t *testing.T) {
 	assert := assert.New(t)
 	var TestCases = []struct {
 		summary             *model.SituationTranslatedString
 		messageType         string
-		messageText         string
+		messageTexts        map[string]string
 		expectedSummary     *model.SituationTranslatedString
 		expectedDescription *model.SituationTranslatedString
 		message             string
 	}{
 		{
-			summary:     nil,
-			messageType: "shortMessage",
-			messageText: "a short message",
+			summary:      nil,
+			messageType:  "shortMessage",
+			messageTexts: map[string]string{"": "a short message"},
 			expectedSummary: &model.SituationTranslatedString{
 				DefaultValue: "a short message",
+				Translations: make(map[string]string),
 			},
 			expectedDescription: nil,
-			message:             "should set summary for shortMessage type",
+			message:             "should set summary with DefaultValue for shortMessage type",
+		},
+		{
+			summary:      nil,
+			messageType:  "shortMessage",
+			messageTexts: map[string]string{"EN": "a short message"},
+			expectedSummary: &model.SituationTranslatedString{
+				Translations: map[string]string{"EN": "a short message"},
+			},
+			expectedDescription: nil,
+			message: `should set summary with Translation for shortMessage type
+when the language is defined`,
 		},
 		{
 			summary:         nil,
 			messageType:     "longMessage",
-			messageText:     "a long message",
+			messageTexts:    map[string]string{"": "a long message"},
 			expectedSummary: nil,
 			expectedDescription: &model.SituationTranslatedString{
 				DefaultValue: "a long message",
+				Translations: make(map[string]string),
 			},
-			message: "should set description for longMessage type",
+			message: "should set description with DefaultValue for longMessage type",
 		},
 		{
 			summary:         nil,
+			messageType:     "longMessage",
+			messageTexts:    map[string]string{"EN": "a long message"},
+			expectedSummary: nil,
+			expectedDescription: &model.SituationTranslatedString{
+				Translations: map[string]string{"EN": "a long message"},
+			},
+			message: `should set description with Translation for longMessage type
+when a language is defined`,
+		},
+
+		{
+			summary:         nil,
 			messageType:     "dummy",
-			messageText:     "A message with less than 160 characters and an emoji ⚠",
+			messageTexts:    map[string]string{"": "A message with less than 160 characters and an emoji ⚠"},
 			expectedSummary: nil,
 			expectedDescription: &model.SituationTranslatedString{
 				DefaultValue: "A message with less than 160 characters and an emoji ⚠",
+				Translations: make(map[string]string),
 			},
 			message: `for messageType other than shortMessage
 should set description`,
@@ -206,16 +232,17 @@ should set description`,
 		{
 			summary:     nil,
 			messageType: "dummy",
-			messageText: `Lorem ipsum dolor sit amet, consectetur adipiscing
+			messageTexts: map[string]string{"": `Lorem ipsum dolor sit amet, consectetur adipiscing
  elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`,
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`},
 			expectedSummary: nil,
 			expectedDescription: &model.SituationTranslatedString{
 				DefaultValue: `Lorem ipsum dolor sit amet, consectetur adipiscing
  elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`,
+				Translations: make(map[string]string),
 			},
 			message: `for messageType other than shortMessage/longMessage
 should set description if summary is not defined and text lenght > 160`,
@@ -224,13 +251,14 @@ should set description if summary is not defined and text lenght > 160`,
 			summary: &model.SituationTranslatedString{
 				DefaultValue: "An existing summary ...",
 			},
-			messageType: "textOnly",
-			messageText: "A message with less than 160 characters",
+			messageType:  "textOnly",
+			messageTexts: map[string]string{"": "A message with less than 160 characters"},
 			expectedSummary: &model.SituationTranslatedString{
 				DefaultValue: "An existing summary ...",
 			},
 			expectedDescription: &model.SituationTranslatedString{
 				DefaultValue: "A message with less than 160 characters",
+				Translations: make(map[string]string),
 			},
 			message: `When messageType is other than shortMessage
 and summary is already defined, should keep existing summary and create description`,
@@ -246,9 +274,9 @@ and summary is already defined, should keep existing summary and create descript
 			event.Summary = tt.summary
 		}
 
-		builder.buildSituationAndDescriptionFromMessage(
+		builder.buildSummaryAndDescriptionFromMessage(
 			tt.messageType,
-			tt.messageText,
+			tt.messageTexts,
 			event)
 		assert.Equal(tt.expectedSummary, event.Summary, tt.message)
 		assert.Equal(tt.expectedDescription, event.Description, tt.message)

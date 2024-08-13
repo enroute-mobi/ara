@@ -30,7 +30,7 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 				xsi:type="ns9:IDFGeneralMessageStructure">
 					<Message>
 						<MessageType>Je suis de type texte</MessageType>
-						<MessageText xml:lang="NL">Je suis un texte</MessageText>
+						<MessageText>Je suis un texte</MessageText>
 					</Message>
 					<LineSection>
 					  <FirstStop>NINOXE:StopPoint:SP:24:LOC</FirstStop>

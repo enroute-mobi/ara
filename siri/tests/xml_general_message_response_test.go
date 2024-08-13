@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"github.com/stretchr/testify/require"
 )
 
 func getXMLGeneralMessageResponse(t *testing.T) *sxml.XMLGeneralMessageResponse {
@@ -69,57 +70,24 @@ func Test_XMLGeneralMessage(t *testing.T) {
 }
 
 func checkGeneralMessagesEquivalence(s1 *sxml.XMLGeneralMessageResponse, s2 *sxml.XMLGeneralMessageResponse, t *testing.T) {
+	require := require.New(t)
 
-	if s1.Address() != s2.Address() {
-		t.Errorf("Wrong Address: \n got: %v\nwant: %v", s2.Address(), s1.Address())
-	}
-
-	if s1.ProducerRef() != s2.ProducerRef() {
-		t.Errorf("Wrong ProducerRef: \n got: %v\nwant: %v", s2.ProducerRef(), s1.ProducerRef())
-	}
-
-	if s1.ResponseMessageIdentifier() != s2.ResponseMessageIdentifier() {
-		t.Errorf("Wrong ResponseMessageIdentifier: \n got: %v\nwant: %v", s2.ResponseMessageIdentifier(), s1.ResponseMessageIdentifier())
-	}
-
-	if s1.Status() != s2.Status() {
-		t.Errorf("Wrong Status: \n got: %v\nwant: %v", s2.Status(), s1.Status())
-	}
-
-	if s1.ResponseTimestamp() != s2.ResponseTimestamp() {
-		t.Errorf("Wrong ResponseTimestamp: \n got: %v\nwant: %v", s2.ResponseTimestamp(), s1.ResponseTimestamp())
-	}
-
-	if len(s1.XMLGeneralMessages()) != len(s2.XMLGeneralMessages()) {
-		t.Errorf("Wrong XMLGeneralMessage: \n got: %v\nwant: %v", len(s2.XMLGeneralMessages()), len(s1.XMLGeneralMessages()))
-	}
+	require.Equal(s1.Address(), s2.Address())
+	require.Equal(s1.ProducerRef(), s2.ProducerRef())
+	require.Equal(s1.ResponseMessageIdentifier(), s2.ResponseMessageIdentifier())
+	require.Equal(s1.Status(), s2.Status())
+	require.Equal(s1.ResponseTimestamp(), s2.ResponseTimestamp())
+	require.Len(s1.XMLGeneralMessages(), len(s2.XMLGeneralMessages()))
 
 	expectedGM := s1.XMLGeneralMessages()[0]
 	gotGM := s2.XMLGeneralMessages()[0]
 
-	if expectedGM.RecordedAtTime() != gotGM.RecordedAtTime() {
-		t.Errorf("Wrong RecordedAtTime: \n got: %v\nwant: %v", gotGM.RecordedAtTime(), expectedGM.RecordedAtTime())
-	}
-
-	if expectedGM.ValidUntilTime() != gotGM.ValidUntilTime() {
-		t.Errorf("Wrong ValidUntilTime: \n got: %v\nwant: %v", gotGM.ValidUntilTime(), expectedGM.ValidUntilTime())
-	}
-
-	if expectedGM.InfoMessageVersion() != gotGM.InfoMessageVersion() {
-		t.Errorf("Wrong InfoMessageVersion: \n got: %v\nwant: %v", gotGM.InfoMessageVersion(), expectedGM.InfoMessageVersion())
-	}
-
-	if expectedGM.InfoMessageIdentifier() != gotGM.InfoMessageIdentifier() {
-		t.Errorf("Wrong InfoMessageIdentifier: \n got: %v\nwant: %v", gotGM.InfoMessageIdentifier(), expectedGM.InfoMessageIdentifier())
-	}
-
-	if expectedGM.FormatRef() != gotGM.FormatRef() {
-		t.Errorf("Wrong FormatRef: \n got: %v\nwant: %v", gotGM.FormatRef(), expectedGM.FormatRef())
-	}
-
-	if expectedGM.InfoChannelRef() != gotGM.InfoChannelRef() {
-		t.Errorf("Wrong InfoChannelRef: \n got: %v\n want: %v", gotGM.InfoChannelRef(), expectedGM.RecordedAtTime())
-	}
+	require.Equal(expectedGM.RecordedAtTime(), gotGM.RecordedAtTime())
+	require.Equal(expectedGM.ValidUntilTime(), gotGM.ValidUntilTime())
+	require.Equal(expectedGM.InfoMessageVersion(), gotGM.InfoMessageVersion())
+	require.Equal(expectedGM.InfoMessageIdentifier(), gotGM.InfoMessageIdentifier())
+	require.Equal(expectedGM.FormatRef(), gotGM.FormatRef())
+	require.Equal(expectedGM.InfoChannelRef(), gotGM.InfoChannelRef())
 
 	expectedContent := expectedGM.Content().(sxml.IDFGeneralMessageStructure)
 	gotContent := gotGM.Content().(sxml.IDFGeneralMessageStructure)
@@ -127,27 +95,13 @@ func checkGeneralMessagesEquivalence(s1 *sxml.XMLGeneralMessageResponse, s2 *sxm
 	expedtedMessages := expectedContent.Messages()[0]
 	gotMessages := gotContent.Messages()[0]
 
-	if expedtedMessages.MessageText() != gotMessages.MessageText() {
-		t.Errorf("Wrong Message Content: \n got: %v\nwant: %v", expedtedMessages.MessageText(), gotMessages.MessageText())
-	}
-
-	if expedtedMessages.NumberOfLines() != gotMessages.NumberOfLines() {
-		t.Errorf("Wrong Message NumberOfLines: \n got: %v\nwant: %v", expedtedMessages.NumberOfLines(), gotMessages.NumberOfLines())
-	}
+	require.Equal(expedtedMessages.MessageTexts(), gotMessages.MessageTexts())
+	require.Equal(expedtedMessages.NumberOfLines(), gotMessages.NumberOfLines())
 
 	expectedLineSection := expectedContent.LineSections()[0]
 	gotLineSection := gotContent.LineSections()[0]
 
-	if expectedLineSection.LineRef() != gotLineSection.LineRef() {
-		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.LineRef(), expectedLineSection.LineRef())
-	}
-
-	if expectedLineSection.FirstStop() != gotLineSection.FirstStop() {
-		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.FirstStop(), expectedLineSection.FirstStop())
-	}
-
-	if expectedLineSection.LastStop() != gotLineSection.LastStop() {
-		t.Errorf("Wrong MessageType: \n got: %v\nwant: %v", gotLineSection.LastStop(), expectedLineSection.LastStop())
-	}
-
+	require.Equal(expectedLineSection.LineRef(), gotLineSection.LineRef())
+	require.Equal(expectedLineSection.FirstStop(), gotLineSection.FirstStop())
+	require.Equal(expectedLineSection.LastStop(), gotLineSection.LastStop())
 }

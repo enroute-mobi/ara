@@ -229,11 +229,17 @@ Feature: Support SIRI GeneralMessage for Situation
                       <siri:LastStop>NINOXE:StopPoint:SP:26:LOC</siri:LastStop>
                       <siri:LineRef>1234</siri:LineRef>
                     </siri:LineSection>
-                    <Message>
-                      <MessageType>longMessage</MessageType>
-                      <MessageText xml:lang="NL">La nouvelle carte d'abonnement est disponible au points de vente du réseau</MessageText>
-                    </Message>
-                  </siri:Content>
+                    <siri:Message>
+                      <siri:MessageType>shortMessage</siri:MessageType>
+                      <siri:MessageText xml:lang='EN'>New pass Navigo</siri:MessageText>
+                      <siri:MessageText xml:lang='FR'>Nouveau pass Navigo</siri:MessageText>
+                   </siri:Message>
+                   <siri:Message>
+                      <siri:MessageType>textOnly</siri:MessageType>
+                      <siri:MessageText>La nouvelle carte d'abonnement est disponible</siri:MessageText>
+                      <siri:MessageText xml:lang='EN'>The new pass is available</siri:MessageText>
+                   </siri:Message>
+                   </siri:Content>
                 </siri:GeneralMessage>
                 <siri:GeneralMessage formatRef="FRANCE">
                   <siri:RecordedAtTime>2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
@@ -247,7 +253,7 @@ Feature: Support SIRI GeneralMessage for Situation
                     <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                     <Message>
                       <MessageType>longMessage</MessageType>
-                      <MessageText xml:lang="NL">carte d'abonnement</MessageText>
+                      <MessageText>carte d'abonnement</MessageText>
                     </Message>
                   </siri:Content>
                 </siri:GeneralMessage>
@@ -289,22 +295,25 @@ Feature: Support SIRI GeneralMessage for Situation
     When a minute has passed
     And the SIRI server has received a GeneralMessage request
     Then one Situation has the following attributes:
-      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1"                                  |
-      | RecordedAt                                                                         | 2017-03-29T03:30:06+02:00                                                  |
-      | Version                                                                            | 1                                                                          |
-      | Keywords                                                                           | ["Commercial"]                                                             |
-      | Progress                                                                           | published                                                                  |
-      | ProducerRef                                                                        | NINOXE:default                                                             |
-      | ValidityPeriods[0]#StartTime                                                       | 2017-03-29T03:30:06+02:00                                                  |
-      | ValidityPeriods[0]#EndTime                                                         | 2017-03-29T20:50:06+02:00                                                  |
-      | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                                          |
-      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-5-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[1]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-7-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                                               |
+      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1"     |
+      | RecordedAt                                                                         | 2017-03-29T03:30:06+02:00                     |
+      | Version                                                                            | 1                                             |
+      | Keywords                                                                           | ["Commercial"]                                |
+      | Progress                                                                           | published                                     |
+      | ProducerRef                                                                        | NINOXE:default                                |
+      | ValidityPeriods[0]#StartTime                                                       | 2017-03-29T03:30:06+02:00                     |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-03-29T20:50:06+02:00                     |
+      | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
+      | Description[Translations]#EN                                                       | The new pass is available                     |
+      | Summary[Translations]#FR                                                           | Nouveau pass Navigo                           |
+      | Summary[Translations]#EN                                                           | New pass Navigo                               |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[1]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop       | 6ba7b814-9dad-11d1-8-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                  |
     Then one Situation has the following attributes:
       | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
       | RecordedAt                   | 2017-03-29T03:30:06+02:00                 |

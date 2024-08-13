@@ -54,7 +54,7 @@ type IDFGeneralMessageStructure struct {
 type XMLMessage struct {
 	XMLStructure
 
-	messageText         string
+	messageTexts        map[string]string
 	messageType         string
 	numberOfLines       Int
 	numberOfCharPerLine Int
@@ -295,11 +295,14 @@ func (visit *IDFLineSectionStructure) LineRef() string {
 	return visit.lineRef
 }
 
-func (message *XMLMessage) MessageText() string {
-	if message.messageText == "" {
-		message.messageText = message.findStringChildContent(siri_attributes.MessageText)
+func (message *XMLMessage) MessageTexts() map[string]string {
+	if message.messageTexts == nil {
+		translations := FindTranslations(message.findNodes(siri_attributes.MessageText))
+		if translations != nil {
+			message.messageTexts = translations
+		}
 	}
-	return message.messageText
+	return message.messageTexts
 }
 
 func (message *XMLMessage) MessageType() string {
