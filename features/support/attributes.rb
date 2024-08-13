@@ -88,17 +88,26 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ /Description\[([^\]]+)\]/
-      name = $1
-      attributes["Description"] ||= {}
-      attributes["Description"][name] = value
-      attributes.delete key
-    end
-
-    if key =~ /Summary\[([^\]]+)\]/
-      name = $1
-      attributes["Summary"] ||= {}
-      attributes["Summary"][name] = value
+    # Transform
+    #  | KEY[DefaultValue]      | A value  |
+    #  | KEY[Translations]#FR   | un texte |
+    # into
+    # "KEY" => {"DefaultValue"=>"A value", "Translations"=> { "FR" => "un texte" } }
+    #
+    # With KEY either Summary or Description
+    if key =~ /(Summary|Description)\[(DefaultValue|Translations)\](#(\S+))?/
+      text_type = Regexp.last_match(1)
+      name = Regexp.last_match(2)
+      language = Regexp.last_match(4)
+      case name
+      when 'DefaultValue'
+        attributes[text_type] ||= {}
+        attributes[text_type][name] = value
+      when 'Translations'
+        attributes[text_type] ||= {}
+        attributes[text_type][name] ||= {}
+        attributes[text_type][name][language] = value
+      end
       attributes.delete key
     end
 

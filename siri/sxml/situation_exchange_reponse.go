@@ -41,8 +41,8 @@ type XMLPtSituationElement struct {
 	severity       string
 	reality        string
 	participantRef string
-	summary        string
-	description    string
+	summaries      map[string]string
+	descriptions   map[string]string
 
 	affects      []*XMLAffect
 	consequences []*XMLConsequence
@@ -197,18 +197,32 @@ func (delivery *XMLSituationExchangeDelivery) Situations() []*XMLPtSituationElem
 	return delivery.situations
 }
 
-func (s *XMLPtSituationElement) Summary() string {
-	if s.summary == "" {
-		s.summary = s.findStringChildContent(siri_attributes.Summary)
+func FindTranslations(nodes []XMLNode) map[string]string {
+	translations := make(map[string]string)
+	for _, node := range nodes {
+		translations[node.NativeNode().Attr("lang")] = node.NativeNode().Content()
 	}
-	return s.summary
+	return translations
 }
 
-func (s *XMLPtSituationElement) Description() string {
-	if s.description == "" {
-		s.description = s.findStringChildContent(siri_attributes.Description)
+func (s *XMLPtSituationElement) Summaries() map[string]string {
+	if s.summaries == nil {
+		translations := FindTranslations(s.findNodes(siri_attributes.Summary))
+		if translations != nil {
+			s.summaries = translations
+		}
 	}
-	return s.description
+	return s.summaries
+}
+
+func (s *XMLPtSituationElement) Descriptions() map[string]string {
+	if s.descriptions == nil {
+		translations := FindTranslations(s.findNodes(siri_attributes.Description))
+		if translations != nil {
+			s.descriptions = translations
+		}
+	}
+	return s.descriptions
 }
 
 func (s *XMLPtSituationElement) AlertCause() string {

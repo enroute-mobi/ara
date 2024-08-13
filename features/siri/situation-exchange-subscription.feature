@@ -110,7 +110,10 @@ Feature: Support SIRI SituationExchange by subscription
                     <siri:Severity>slight</siri:Severity>
                     <siri:ReportType>general</siri:ReportType>
                     <siri:Keywords>Commercial Test</siri:Keywords>
+                    <siri:Summary xml:lang="FR">Nouveau pass Navigo</siri:Summary>
+                    <siri:Summary xml:lang="EN">New pass Navigo</siri:Summary>
                     <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
+                    <siri:Description xml:lang="EN">The new pass is available</siri:Description>
                     <siri:Affects>
                       <siri:Networks>
                         <siri:AffectedNetwork>
@@ -249,6 +252,9 @@ Feature: Support SIRI SituationExchange by subscription
       | PublicationWindows[0]#EndTime                                                      | 2017-09-25T01:00:00+02:00                     |
       | AlertCause                                                                         | maintenanceWork                               |
       | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
+      | Description[Translations]#EN                                                       | The new pass is available                     |
+      | Summary[Translations]#FR                                                           | Nouveau pass Navigo                           |
+      | Summary[Translations]#EN                                                           | New pass Navigo                               |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop      | 6ba7b814-9dad-11d1-5-00c04fd430c8             |

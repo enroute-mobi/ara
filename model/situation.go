@@ -667,6 +667,21 @@ func (manager *MemorySituations) Delete(situation *Situation) bool {
 	return true
 }
 
+func (t *SituationTranslatedString) FromMap(translations map[string]string) error {
+	ts := SituationTranslatedString{Translations: make(map[string]string)}
+
+	for lang, text := range translations {
+		if lang == "" {
+			ts.DefaultValue = text
+			continue
+		}
+		ts.Translations[lang] = text
+	}
+
+	*t = ts
+	return nil
+}
+
 func (t *SituationTranslatedString) FromProto(value interface{}) error {
 	var ts SituationTranslatedString
 	switch v := value.(type) {
