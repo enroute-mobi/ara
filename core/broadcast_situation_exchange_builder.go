@@ -66,11 +66,21 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 	}
 
 	if situation.Description != nil {
-		ptSituationElement.Description = situation.Description.DefaultValue
+		d := &siri.SIRITranslatedString{
+			Tag: "Description",
+			SituationTranslatedString: *situation.Description,
+		}
+
+		ptSituationElement.Description = d
 	}
 
 	if situation.Summary != nil {
-		ptSituationElement.Summary = situation.Summary.DefaultValue
+		s := &siri.SIRITranslatedString{
+			Tag:                       "Summary",
+			SituationTranslatedString: *situation.Summary,
+		}
+
+		ptSituationElement.Summary = s
 	}
 
 	for _, affect := range situation.Affects {

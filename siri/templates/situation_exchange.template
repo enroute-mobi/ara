@@ -22,8 +22,8 @@
 				<siri:Severity>{{ .Severity }}</siri:Severity>{{ end }}{{ if .ReportType }}
 				<siri:ReportType>{{ .ReportType }}</siri:ReportType>{{ end }}{{ if .Keywords }}
 				<siri:Keywords>{{ .Keywords }}</siri:Keywords>{{ end }}{{ if .Summary }}
-				<siri:Summary>{{ .Summary}}</siri:Summary>{{ end }}{{ if .Description}}
-				<siri:Description>{{ .Description }}</siri:Description>{{ end }}{{ if .HasAffects }}
+				{{ .Summary.BuildTranslatedStringXML }}{{ end }}{{ if .Description }}
+				{{ .Description.BuildTranslatedStringXML }}{{ end }}{{ if .HasAffects }}
 					{{ .BuildSituationAffectsXML }}{{ end }}{{ if .Consequences }}
 				<siri:Consequences>{{ range .Consequences }}
 					<siri:Consequence>{{ if .Periods }}{{ range .Periods }}
