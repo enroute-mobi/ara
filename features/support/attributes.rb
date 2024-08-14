@@ -283,6 +283,24 @@ def has_attributes(response_array, attributes)
 end
 
 def gtfs_attributes(table)
-  attributes = table.rows_hash
+  attributes = table.rows_hash.dup
+
   attributes.each { |k, v| attributes[k] = eval("GTFS::Realtime::VehiclePosition::OccupancyStatus::#{v}") if k == "occupancy_status" }
+
+  attributes.dup.each do |key, value|
+    if key =~ /(header_text_translation|description_text_translation)\[([^\]]+)\]/
+
+      name = Regexp.last_match(1)
+      lang = JSON.parse(Regexp.last_match(2))
+      attributes[name] ||= {}
+      attributes[name][lang] = value
+
+
+      attributes.delete key
+    end
+
+
+  end
+
+  attributes
 end

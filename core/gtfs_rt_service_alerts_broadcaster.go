@@ -131,23 +131,19 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 		}
 
 		// HeaderText
-		var h gtfs.TranslatedString_Translation
+		var h gtfs.TranslatedString
 		if err := situation.Summary.ToProto(&h); err != nil {
 			logger.Log.Debugf("Error for summary: %v", err)
 		} else {
-			translatedString := gtfs.TranslatedString{}
-			translatedString.Translation = append(translatedString.Translation, &h)
-			alert.HeaderText = &translatedString
+			alert.HeaderText = &h
 		}
 
 		// DescriptionText
-		var d gtfs.TranslatedString_Translation
+		var d gtfs.TranslatedString
 		if err := situation.Description.ToProto(&d); err != nil {
 			logger.Log.Debugf("Error for description: %v", err)
 		} else {
-			translatedString := gtfs.TranslatedString{}
-			translatedString.Translation = append(translatedString.Translation, &d)
-			alert.DescriptionText = &translatedString
+			alert.DescriptionText = &d
 		}
 
 		feedEntity.Alert = alert

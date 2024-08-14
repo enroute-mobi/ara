@@ -703,19 +703,34 @@ func (t *SituationTranslatedString) FromProto(value interface{}) error {
 	return nil
 }
 
-func (t *SituationTranslatedString) ToProto(dest interface{}) error {
-	if t == nil {
+func (ts *SituationTranslatedString) ToProto(dest interface{}) error {
+	if ts == nil {
 		return errors.New("nil translatedString")
 	}
 
 	switch v := dest.(type) {
-	case *gtfs.TranslatedString_Translation:
-		if t.DefaultValue == "" {
-			return errors.New("empty default translation")
+	case *gtfs.TranslatedString:
+		translations := []*gtfs.TranslatedString_Translation{}
+		if ts.DefaultValue != "" {
+			var emptyLanguage string
+			gtfsTranslation := &gtfs.TranslatedString_Translation{
+				Language: &emptyLanguage,
+				Text:     &ts.DefaultValue,
+			}
+
+			translations = append(translations, gtfsTranslation)
 		}
-		language := "fr"
-		v.Language = &language
-		v.Text = &t.DefaultValue
+
+		for lang, text := range ts.Translations {
+			gtfsTranslation := &gtfs.TranslatedString_Translation{
+				Language: &lang,
+				Text: &text,
+			}
+
+			translations = append(translations, gtfsTranslation)
+		}
+
+		v.Translation = translations
 	default:
 		return fmt.Errorf("unsupported destination %T", dest)
 	}

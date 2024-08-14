@@ -441,8 +441,10 @@ Feature: Support GTFS-RT feeds
       | PublicationWindows[0]#EndTime                                  | 2017-09-25T01:00:00+02:00                     |
       | AlertCause                                                     | maintenanceWork                               |
       | Severity                                                       | normal                                        |
-      | Summary[DefaultValue]                                          | carte abonnement                              |
       | Description[DefaultValue]                                      | La nouvelle carte d'abonnement est disponible |
+      | Description[Translations]#EN                                   | The new pass is available                     |
+      | Summary[Translations]#FR                                       | Nouveau pass Navigo                           |
+      | Summary[Translations]#EN                                       | New pass Navigo                               |
       | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[StopArea=6ba7b814-9dad-11d1-3-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
       | Affects[Line]                                                  | 6ba7b814-9dad-11d1-1-00c04fd430c8             |
@@ -452,11 +454,13 @@ Feature: Support GTFS-RT feeds
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain an Alert with these attributes:
-      | cause_name          | MAINTENANCE                                   |
-      | severity_level_name | WARNING                                       |
-      | effect_name         | UNKNOWN_EFFECT                                |
-      | header_text_fr      | carte abonnement                              |
-      | description_text_fr | La nouvelle carte d'abonnement est disponible |
+      | cause_name                         | MAINTENANCE                                   |
+      | severity_level_name                | WARNING                                       |
+      | effect_name                        | UNKNOWN_EFFECT                                |
+      | header_text_translation["FR"]      | Nouveau pass Navigo                           |
+      | header_text_translation["EN"]      | New pass Navigo                               |
+      | description_text_translation[""]   | La nouvelle carte d'abonnement est disponible |
+      | description_text_translation["EN"] | The new pass is available                     |
     And this GTFS-RT response should contain an Alert with InformedEntity with these attributes:
       | route_id | LINE1 |
     And this GTFS-RT response should contain an Alert with InformedEntity with these attributes:
