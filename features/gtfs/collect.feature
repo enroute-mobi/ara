@@ -586,3 +586,79 @@ Feature: Collect realtime data via GTFS-RT feeds
       | Type      | GtfsRequest         |
       | StopAreas | ["94"]              |
       | Lines     | ["Tram:A", "Bus:A"] |
+
+    @ARA-1553
+    Scenario: Collect GTFS ServiceAlert with internal tags
+    Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
+      """
+        header {
+          gtfs_realtime_version: "2.0"
+          incrementality: 0
+          timestamp: 1284457468
+        }
+        entity {
+          id: "entity_id"
+          alert: {
+            active_period: {
+                start: 1677664800
+                end: 32503698000
+              }
+            informed_entity: {
+                route_id: "Tram:A"
+              }
+            informed_entity: {
+                route_id: "Bus:A"
+                stop_id: "94"
+              }
+            cause: 6
+            effect: 4
+            header_text: {
+              translation: {
+                  text: "Route Bus:A detour"
+                  language: "fr"
+                }
+            }
+            description_text: {
+              translation: {
+                  text: "Route Bus:A EASTBOUND is on detour between King at Claren"
+                  language: "en"
+                }
+              translation: {
+                  text: "Route Bus:A RETOUR effectue un détour entre King et Claren"
+                  language: "fr"
+                }
+            }
+            severity_level: 3
+          }
+        }
+      """
+    And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_code_space                | internal              |
+      | collect.situations.internal_tags | first,second          |
+    And a Line exists with the following attributes:
+      | Codes | "internal": "Tram:A" |
+    And a Line exists with the following attributes:
+      | Codes | "internal": "Bus:A" |
+    And a StopArea exists with the following attributes:
+      | Codes | "internal": "94" |
+    When a minute has passed
+    Then one Situation has the following attributes:
+      | Codes                                                          | "internal" : "entity_id"                                   |
+      | Origin                                                         | gtfs                                                       |
+      | InternalTags                                                   | ["first","second"]                                         |
+      | RecordedAt                                                     | 2017-01-01T12:01:00Z                                       |
+      | Version                                                        | 5542761353770188895                                        |
+      | VersionedAt                                                    | 2010-09-14T11:44:28+02:00                                  |
+      | Progress                                                       | published                                                  |
+      | ValidityPeriods[0]#EndTime                                     | 3000-01-01T06:00:00+01:00                                  |
+      | ValidityPeriods[0]#StartTime                                   | 2023-03-01T11:00:00+01:00                                  |
+      | AlertCause                                                     | accident                                                   |
+      | Severity                                                       | normal                                                     |
+      | Summary[DefaultValue]                                          | Route Bus:A detour                                         |
+      | Description[DefaultValue]                                      | Route Bus:A RETOUR effectue un détour entre King et Claren |
+      | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-4-00c04fd430c8                          |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-3-00c04fd430c8                          |
+      | Affects[Line]                                                  | 6ba7b814-9dad-11d1-2-00c04fd430c8                          |
+    And the Situation "internal":"entity_id" has a Consequence with the following attributes:
+      | Condition | diverted |

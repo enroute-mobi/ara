@@ -15,6 +15,10 @@ Then('I should not receive a GTFS-RT but an unauthorized client error status') d
   expect(@gtfs_response).to be_an_instance_of(Net::HTTPUnauthorized)
 end
 
+Then('this GTFS-RT response should have no entity') do
+  expect(@gtfs_response.entity).to be_empty
+end
+
 Then('this GTFS-RT response should contain a Vehicle Position with these attributes:') do |vehicle_position_attributes|
   debug @gtfs_response.vehicle_positions.inspect
   expect(@gtfs_response.vehicle_positions).to include(an_object_having_attributes(gtfs_attributes(vehicle_position_attributes)))
