@@ -683,6 +683,10 @@ func (t *SituationTranslatedString) FromProto(value interface{}) error {
 }
 
 func (t *SituationTranslatedString) ToProto(dest interface{}) error {
+	if t == nil {
+		return errors.New("nil translatedString")
+	}
+
 	switch v := dest.(type) {
 	case *gtfs.TranslatedString_Translation:
 		if t.DefaultValue == "" {
@@ -720,6 +724,10 @@ func (t *TimeRange) FromProto(value interface{}) error {
 }
 
 func (t *TimeRange) ToProto(dest interface{}) error {
+	if t == nil {
+		return errors.New("nil TimeRange")
+	}
+
 	switch v := dest.(type) {
 	case *gtfs.TimeRange:
 		if start := t.StartTime; !start.IsZero() {
