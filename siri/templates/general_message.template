@@ -15,9 +15,7 @@
 					</siri:LineSection>{{end}}{{range .Messages}}
 					<Message>{{if .Type}}
 						<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content }}
-						<MessageText>{{ .Content }}</MessageText>{{end}}{{if .NumberOfLines }}
-						<NumberOfLines>{{ .NumberOfLines }}</NumberOfLines>{{end}}{{if .NumberOfCharPerLine }}
-						<NumberOfCharPerLine>{{ .NumberOfCharPerLine }}</NumberOfCharPerLine>{{end}}
+						<MessageText>{{ .Content }}</MessageText>{{end}}
 					</Message>{{end}}
 				</siri:Content>
 			</siri:GeneralMessage>

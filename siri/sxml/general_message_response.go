@@ -54,10 +54,8 @@ type IDFGeneralMessageStructure struct {
 type XMLMessage struct {
 	XMLStructure
 
-	messageTexts        map[string]string
-	messageType         string
-	numberOfLines       Int
-	numberOfCharPerLine Int
+	messageTexts  map[string]string
+	messageType   string
 }
 
 type IDFLineSectionStructure struct {
@@ -310,18 +308,4 @@ func (message *XMLMessage) MessageType() string {
 		message.messageType = message.findStringChildContent(siri_attributes.MessageType)
 	}
 	return message.messageType
-}
-
-func (message *XMLMessage) NumberOfLines() int {
-	if !message.numberOfLines.Defined {
-		message.numberOfLines.SetValue(message.findIntChildContent(siri_attributes.NumberOfLines))
-	}
-	return message.numberOfLines.Value
-}
-
-func (message *XMLMessage) NumberOfCharPerLine() int {
-	if !message.numberOfCharPerLine.Defined {
-		message.numberOfCharPerLine.SetValue(message.findIntChildContent(siri_attributes.NumberOfCharPerLine))
-	}
-	return message.numberOfCharPerLine.Value
 }

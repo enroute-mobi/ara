@@ -96,7 +96,6 @@ func checkGeneralMessagesEquivalence(s1 *sxml.XMLGeneralMessageResponse, s2 *sxm
 	gotMessages := gotContent.Messages()[0]
 
 	require.Equal(expedtedMessages.MessageTexts(), gotMessages.MessageTexts())
-	require.Equal(expedtedMessages.NumberOfLines(), gotMessages.NumberOfLines())
 
 	expectedLineSection := expectedContent.LineSections()[0]
 	gotLineSection := gotContent.LineSections()[0]

@@ -16,13 +16,6 @@ import (
 
 type SituationId ModelId
 
-type Message struct {
-	Content             string `json:"MessageText,omitempty"`
-	Type                string `json:"MessageType,omitempty"`
-	NumberOfLines       int    `json:",omitempty"`
-	NumberOfCharPerLine int    `json:",omitempty"`
-}
-
 const (
 	SituationReportTypeGeneral  ReportType    = "general"
 	SituationReportTypeIncident ReportType    = "incident"
