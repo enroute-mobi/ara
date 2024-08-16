@@ -339,10 +339,10 @@ Feature: Support SIRI GeneralMessage by subscription
                    <siri:LineRef>1234</siri:LineRef>
                    <siri:DestinationRef>NINOXE:StopPoint:SP:12:LOC</siri:DestinationRef>
                    <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
-                   <Message>
-                     <MessageType>textOnly</MessageType>
-                     <MessageText>an ANOTHER very very very long message</MessageText>
-                   </Message>
+                   <siri:Message>
+                     <siri:MessageType>textOnly</siri:MessageType>
+                     <siri:MessageText>an ANOTHER very very very long message</siri:MessageText>
+                   </siri:Message>
                  </siri:Content>
                </siri:GeneralMessage>
              </siri:GeneralMessageDelivery>
@@ -487,10 +487,10 @@ Feature: Support SIRI GeneralMessage by subscription
                  <siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                                xsi:type="stif:IDFGeneralMessageStructure">
                    <siri:LineRef>1234</siri:LineRef>
-                   <Message>
-                     <MessageType>textOnly</MessageType>
-                     <MessageText>a very very very long message</MessageText>
-                   </Message>
+                   <siri:Message>
+                     <siri:MessageType>textOnly</siri:MessageType>
+                     <siri:MessageText>a very very very long message</siri:MessageText>
+                   </siri:Message>
                  </siri:Content>
                </siri:GeneralMessage>
              </siri:GeneralMessageDelivery>
@@ -1260,10 +1260,10 @@ Feature: Support SIRI GeneralMessage by subscription
                                xsi:type="stif:IDFGeneralMessageStructure">
                    <siri:LineRef>1234</siri:LineRef>
                    <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
-                   <Message>
-                     <MessageType>textOnly</MessageType>
-                     <MessageText>an ANOTHER very very very long message</MessageText>
-                   </Message>
+                   <siri:Message>
+                     <siri:MessageType>textOnly</siri:MessageType>
+                     <siri:MessageText>an ANOTHER very very very long message</siri:MessageText>
+                   </siri:Message>
                  </siri:Content>
                </siri:GeneralMessage>
              </siri:GeneralMessageDelivery>

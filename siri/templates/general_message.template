@@ -13,9 +13,9 @@
 						<siri:LastStop>{{ .LastStop }}</siri:LastStop>{{end}}{{if .LineRef }}
 						<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}
 					</siri:LineSection>{{end}}{{range .Messages}}
-					<Message>{{if .Type}}
-						<MessageType>{{ .Type }}</MessageType>{{end}}{{if .Content }}
-						<MessageText>{{ .Content }}</MessageText>{{end}}
-					</Message>{{end}}
+					<siri:Message>{{if .Type}}
+						<siri:MessageType>{{ .Type }}</siri:MessageType>{{end}}
+						{{ .BuildTranslatedStringXML }}
+					</siri:Message>{{end}}
 				</siri:Content>
 			</siri:GeneralMessage>

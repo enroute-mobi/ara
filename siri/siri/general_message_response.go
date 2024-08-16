@@ -63,8 +63,8 @@ type SIRILineSection struct {
 }
 
 type SIRIMessage struct {
-	Content       string
-	Type          string
+	SIRITranslatedString
+	Type    string
 }
 
 func (response *SIRIGeneralMessageResponse) BuildXML(envelopeType ...string) (string, error) {
