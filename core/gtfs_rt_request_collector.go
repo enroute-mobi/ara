@@ -229,7 +229,7 @@ func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, 
 	// Condition
 	var condition model.SituationCondition
 	if err := condition.FromProto(a.GetEffect()); err != nil {
-		logger.Log.Debugf("error in severity: %v", err)
+		logger.Log.Debugf("error in condition: %v", err)
 	} else {
 		consequence := &model.Consequence{
 			Condition: condition,
