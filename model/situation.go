@@ -683,11 +683,17 @@ func (t *SituationTranslatedString) FromMap(translations map[string]string) erro
 }
 
 func (t *SituationTranslatedString) FromProto(value interface{}) error {
-	var ts SituationTranslatedString
+	ts := SituationTranslatedString{Translations: make(map[string]string)}
+
 	switch v := value.(type) {
-	case *gtfs.TranslatedString_Translation:
-		if v.GetLanguage() == "fr" {
-			ts.DefaultValue = v.GetText()
+	case []*gtfs.TranslatedString_Translation:
+		for _, translation := range v {
+			if translation.GetLanguage() == "" {
+				ts.DefaultValue = translation.GetText()
+				continue
+			}
+
+			ts.Translations[translation.GetLanguage()] = translation.GetText()
 		}
 	default:
 		return fmt.Errorf("unsupported value %T", value)
