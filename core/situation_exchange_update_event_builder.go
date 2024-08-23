@@ -93,7 +93,7 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	}
 
 	// Summary
-	var s model.SituationTranslatedString
+	var s model.TranslatedString
 	if err := s.FromMap(xmlSituation.Summaries()); err == nil {
 		situationEvent.Summary = &s
 	} else {
@@ -101,7 +101,7 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	}
 
 	// Description
-	var d model.SituationTranslatedString
+	var d model.TranslatedString
 	if err := d.FromMap(xmlSituation.Descriptions()); err == nil {
 		situationEvent.Description = &d
 	} else {

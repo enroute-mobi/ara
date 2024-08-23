@@ -114,14 +114,14 @@ func (builder *GeneralMessageUpdateEventBuilder) buildSituationAndDescriptionFro
 func (builder *GeneralMessageUpdateEventBuilder) buildSummaryAndDescriptionFromMessage(messageType string, messageTexts map[string]string, event *model.SituationUpdateEvent) {
 	switch messageType {
 	case "shortMessage":
-		var s model.SituationTranslatedString
+		var s model.TranslatedString
 		if err := s.FromMap(messageTexts); err == nil {
 			event.Summary = &s
 		} else {
 			logger.Log.Debugf("%v", err)
 		}
 	default:
-		var d model.SituationTranslatedString
+		var d model.TranslatedString
 		if err := d.FromMap(messageTexts); err == nil {
 			event.Description = &d
 		} else {

@@ -24,8 +24,8 @@ type SituationUpdateEvent struct {
 	Severity           SituationSeverity
 	ReportType         ReportType
 	Version            int
-	Summary            *SituationTranslatedString
-	Description        *SituationTranslatedString
+	Summary            *TranslatedString
+	Description        *TranslatedString
 	Affects            []Affect
 	Consequences       []*Consequence
 }

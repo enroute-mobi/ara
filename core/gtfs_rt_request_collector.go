@@ -190,7 +190,7 @@ func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, 
 	event.ValidityPeriods = validityPeriods
 
 	// Summary
-	var s model.SituationTranslatedString
+	var s model.TranslatedString
 	headerTexts := a.GetHeaderText().GetTranslation()
 	if err := s.FromProto(headerTexts); err != nil {
 		logger.Log.Debugf("cannot convert Proto HeaderText: %v", err)
@@ -199,7 +199,7 @@ func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, 
 	}
 
 	// Description
-	var d model.SituationTranslatedString
+	var d model.TranslatedString
 	descriptionTexts := a.GetDescriptionText().GetTranslation()
 	if err := d.FromProto(descriptionTexts); err != nil {
 		logger.Log.Debugf("cannot convert Proto TranslatedString: %v", err)

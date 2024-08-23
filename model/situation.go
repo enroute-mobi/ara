@@ -26,7 +26,7 @@ const (
 type ReportType string
 type SituationType string
 
-type SituationTranslatedString struct {
+type TranslatedString struct {
 	DefaultValue string            `json:",omitempty"`
 	Translations map[string]string `json:",omitempty"`
 }
@@ -44,18 +44,18 @@ type Situation struct {
 	ValidityPeriods    []*TimeRange
 	PublicationWindows []*TimeRange
 
-	Progress       SituationProgress          `json:",omitempty"`
-	Severity       SituationSeverity          `json:",omitempty"`
-	Keywords       []string                   `json:",omitempty"`
-	ReportType     ReportType                 `json:",omitempty"`
-	AlertCause     SituationAlertCause        `json:",omitempty"`
-	Reality        SituationReality           `json:",omitempty"`
-	ProducerRef    string                     `json:",omitempty"`
-	Format         string                     `json:",omitempty"`
-	InternalTags   []string                   `json:",omitempty"`
-	ParticipantRef string                     `json:",omitempty"`
-	Summary        *SituationTranslatedString `json:",omitempty"`
-	Description    *SituationTranslatedString `json:",omitempty"`
+	Progress       SituationProgress   `json:",omitempty"`
+	Severity       SituationSeverity   `json:",omitempty"`
+	Keywords       []string            `json:",omitempty"`
+	ReportType     ReportType          `json:",omitempty"`
+	AlertCause     SituationAlertCause `json:",omitempty"`
+	Reality        SituationReality    `json:",omitempty"`
+	ProducerRef    string              `json:",omitempty"`
+	Format         string              `json:",omitempty"`
+	InternalTags   []string            `json:",omitempty"`
+	ParticipantRef string              `json:",omitempty"`
+	Summary        *TranslatedString   `json:",omitempty"`
+	Description    *TranslatedString   `json:",omitempty"`
 
 	Affects      []Affect       `json:",omitempty"`
 	Consequences []*Consequence `json:",omitempty"`
@@ -411,18 +411,18 @@ type APISituation struct {
 	ValidityPeriods    []*TimeRange `json:",omitempty"`
 	PublicationWindows []*TimeRange `json:",omitempty"`
 
-	Progress       SituationProgress          `json:",omitempty"`
-	Severity       SituationSeverity          `json:",omitempty"`
-	Reality        SituationReality           `json:",omitempty"`
-	Keywords       []string                   `json:",omitempty"`
-	ReportType     ReportType                 `json:",omitempty"`
-	AlertCause     SituationAlertCause        `json:",omitempty"`
-	ProducerRef    string                     `json:",omitempty"`
-	Format         string                     `json:",omitempty"`
-	InternalTags   []string                   `json:",omitempty"`
-	ParticipantRef string                     `json:",omitempty"`
-	Summary        *SituationTranslatedString `json:",omitempty"`
-	Description    *SituationTranslatedString `json:",omitempty"`
+	Progress       SituationProgress   `json:",omitempty"`
+	Severity       SituationSeverity   `json:",omitempty"`
+	Reality        SituationReality    `json:",omitempty"`
+	Keywords       []string            `json:",omitempty"`
+	ReportType     ReportType          `json:",omitempty"`
+	AlertCause     SituationAlertCause `json:",omitempty"`
+	ProducerRef    string              `json:",omitempty"`
+	Format         string              `json:",omitempty"`
+	InternalTags   []string            `json:",omitempty"`
+	ParticipantRef string              `json:",omitempty"`
+	Summary        *TranslatedString   `json:",omitempty"`
+	Description    *TranslatedString   `json:",omitempty"`
 
 	Affects      []Affect       `json:",omitempty"`
 	Consequences []*Consequence `json:",omitempty"`
@@ -660,8 +660,8 @@ func (manager *MemorySituations) Delete(situation *Situation) bool {
 	return true
 }
 
-func (t *SituationTranslatedString) FromMap(translations map[string]string) error {
-	ts := SituationTranslatedString{Translations: make(map[string]string)}
+func (t *TranslatedString) FromMap(translations map[string]string) error {
+	ts := TranslatedString{Translations: make(map[string]string)}
 
 	for lang, text := range translations {
 		if lang == "" {
@@ -675,8 +675,8 @@ func (t *SituationTranslatedString) FromMap(translations map[string]string) erro
 	return nil
 }
 
-func (t *SituationTranslatedString) FromProto(value interface{}) error {
-	ts := SituationTranslatedString{Translations: make(map[string]string)}
+func (t *TranslatedString) FromProto(value interface{}) error {
+	ts := TranslatedString{Translations: make(map[string]string)}
 
 	switch v := value.(type) {
 	case []*gtfs.TranslatedString_Translation:
@@ -696,7 +696,7 @@ func (t *SituationTranslatedString) FromProto(value interface{}) error {
 	return nil
 }
 
-func (ts *SituationTranslatedString) ToProto(dest interface{}) error {
+func (ts *TranslatedString) ToProto(dest interface{}) error {
 	if ts == nil {
 		return errors.New("nil translatedString")
 	}

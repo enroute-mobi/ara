@@ -104,7 +104,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	if situation.Description != nil {
 		d := &siri.SIRITranslatedString{
 			Tag:                       "Description",
-			SituationTranslatedString: *situation.Description,
+			TranslatedString: *situation.Description,
 		}
 
 		ptSituationElement.Description = d
@@ -113,7 +113,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	if situation.Summary != nil {
 		s := &siri.SIRITranslatedString{
 			Tag: "Summary",
-			SituationTranslatedString: *situation.Summary,
+			TranslatedString: *situation.Summary,
 		}
 
 		ptSituationElement.Summary = s

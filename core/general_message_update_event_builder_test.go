@@ -165,18 +165,18 @@ func Test_setReportType(t *testing.T) {
 func Test_buildSummaryAndDescriptionFromMessage(t *testing.T) {
 	assert := assert.New(t)
 	var TestCases = []struct {
-		summary             *model.SituationTranslatedString
+		summary             *model.TranslatedString
 		messageType         string
 		messageTexts        map[string]string
-		expectedSummary     *model.SituationTranslatedString
-		expectedDescription *model.SituationTranslatedString
+		expectedSummary     *model.TranslatedString
+		expectedDescription *model.TranslatedString
 		message             string
 	}{
 		{
 			summary:      nil,
 			messageType:  "shortMessage",
 			messageTexts: map[string]string{"": "a short message"},
-			expectedSummary: &model.SituationTranslatedString{
+			expectedSummary: &model.TranslatedString{
 				DefaultValue: "a short message",
 				Translations: make(map[string]string),
 			},
@@ -187,7 +187,7 @@ func Test_buildSummaryAndDescriptionFromMessage(t *testing.T) {
 			summary:      nil,
 			messageType:  "shortMessage",
 			messageTexts: map[string]string{"EN": "a short message"},
-			expectedSummary: &model.SituationTranslatedString{
+			expectedSummary: &model.TranslatedString{
 				Translations: map[string]string{"EN": "a short message"},
 			},
 			expectedDescription: nil,
@@ -199,7 +199,7 @@ when the language is defined`,
 			messageType:     "longMessage",
 			messageTexts:    map[string]string{"": "a long message"},
 			expectedSummary: nil,
-			expectedDescription: &model.SituationTranslatedString{
+			expectedDescription: &model.TranslatedString{
 				DefaultValue: "a long message",
 				Translations: make(map[string]string),
 			},
@@ -210,7 +210,7 @@ when the language is defined`,
 			messageType:     "longMessage",
 			messageTexts:    map[string]string{"EN": "a long message"},
 			expectedSummary: nil,
-			expectedDescription: &model.SituationTranslatedString{
+			expectedDescription: &model.TranslatedString{
 				Translations: map[string]string{"EN": "a long message"},
 			},
 			message: `should set description with Translation for longMessage type
@@ -222,7 +222,7 @@ when a language is defined`,
 			messageType:     "dummy",
 			messageTexts:    map[string]string{"": "A message with less than 160 characters and an emoji ⚠"},
 			expectedSummary: nil,
-			expectedDescription: &model.SituationTranslatedString{
+			expectedDescription: &model.TranslatedString{
 				DefaultValue: "A message with less than 160 characters and an emoji ⚠",
 				Translations: make(map[string]string),
 			},
@@ -237,7 +237,7 @@ should set description`,
  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`},
 			expectedSummary: nil,
-			expectedDescription: &model.SituationTranslatedString{
+			expectedDescription: &model.TranslatedString{
 				DefaultValue: `Lorem ipsum dolor sit amet, consectetur adipiscing
  elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
  veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
@@ -248,15 +248,15 @@ Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore`,
 should set description if summary is not defined and text lenght > 160`,
 		},
 		{
-			summary: &model.SituationTranslatedString{
+			summary: &model.TranslatedString{
 				DefaultValue: "An existing summary ...",
 			},
 			messageType:  "textOnly",
 			messageTexts: map[string]string{"": "A message with less than 160 characters"},
-			expectedSummary: &model.SituationTranslatedString{
+			expectedSummary: &model.TranslatedString{
 				DefaultValue: "An existing summary ...",
 			},
-			expectedDescription: &model.SituationTranslatedString{
+			expectedDescription: &model.TranslatedString{
 				DefaultValue: "A message with less than 160 characters",
 				Translations: make(map[string]string),
 			},

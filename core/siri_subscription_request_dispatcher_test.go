@@ -456,7 +456,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
 
-	situation.Description = &model.SituationTranslatedString{
+	situation.Description = &model.TranslatedString{
 		DefaultValue: "Le content",
 	}
 	situation.SetCode(code3)

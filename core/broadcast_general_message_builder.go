@@ -141,7 +141,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	if situation.Summary != nil {
 		sts := siri.SIRITranslatedString{
 			Tag:                       "MessageText",
-			SituationTranslatedString: *situation.Summary,
+			TranslatedString: *situation.Summary,
 		}
 
 		siriMessage := &siri.SIRIMessage{
@@ -155,7 +155,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 	if situation.Description != nil {
 		sts := siri.SIRITranslatedString{
 			Tag:                       "MessageText",
-			SituationTranslatedString: *situation.Description,
+			TranslatedString: *situation.Description,
 		}
 		siriMessage := &siri.SIRIMessage{
 			Type:                 "textOnly",

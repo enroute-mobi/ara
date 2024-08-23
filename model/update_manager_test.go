@@ -597,7 +597,7 @@ func completeEvent(code Code, testTime time.Time) (event *SituationUpdateEvent) 
 		Keywords:        []string{"channel"},
 	}
 
-	summary := &SituationTranslatedString{
+	summary := &TranslatedString{
 		DefaultValue: "Message Text",
 	}
 
@@ -608,7 +608,7 @@ func completeEvent(code Code, testTime time.Time) (event *SituationUpdateEvent) 
 }
 
 func checkSituation(situation Situation, code Code, testTime time.Time) bool {
-	summary := &SituationTranslatedString{
+	summary := &TranslatedString{
 		DefaultValue: "Message Text",
 	}
 

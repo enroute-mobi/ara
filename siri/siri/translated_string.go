@@ -10,7 +10,7 @@ import (
 
 type SIRITranslatedString struct {
 	Tag string
-	model.SituationTranslatedString
+	model.TranslatedString
 }
 
 func (t *SIRITranslatedString) BuildTranslatedStringXML() (string, error) {
