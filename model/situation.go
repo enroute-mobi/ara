@@ -676,60 +676,45 @@ func NewTranslatedStringFromMap(translations map[string]string) *TranslatedStrin
 	return ts
 }
 
-func (t *TranslatedString) FromProto(value interface{}) error {
-	ts := TranslatedString{Translations: make(map[string]string)}
-
-	switch v := value.(type) {
-	case []*gtfs.TranslatedString_Translation:
-		for _, translation := range v {
-			if translation.GetLanguage() == "" {
-				ts.DefaultValue = translation.GetText()
-				continue
-			}
-
-			ts.Translations[translation.GetLanguage()] = translation.GetText()
-		}
-	default:
-		return fmt.Errorf("unsupported value %T", value)
+func NewTranslatedStringFromProto(value []*gtfs.TranslatedString_Translation) *TranslatedString {
+	ts := &TranslatedString{
+		Translations: make(map[string]string),
 	}
 
-	*t = ts
-	return nil
+	for _, translation := range value {
+		if translation.GetLanguage() == "" {
+			ts.DefaultValue = translation.GetText()
+			continue
+		}
+
+		ts.Translations[translation.GetLanguage()] = translation.GetText()
+	}
+
+	return ts
 }
 
-func (ts *TranslatedString) ToProto(dest interface{}) error {
-	if ts == nil {
-		return errors.New("nil translatedString")
-	}
-
-	switch v := dest.(type) {
-	case *gtfs.TranslatedString:
-		translations := []*gtfs.TranslatedString_Translation{}
-		if ts.DefaultValue != "" {
-			var emptyLanguage string
-			gtfsTranslation := &gtfs.TranslatedString_Translation{
-				Language: &emptyLanguage,
-				Text:     &ts.DefaultValue,
-			}
-
-			translations = append(translations, gtfsTranslation)
+func (ts *TranslatedString) ToProto(dest *gtfs.TranslatedString) {
+	translations := []*gtfs.TranslatedString_Translation{}
+	if ts.DefaultValue != "" {
+		var emptyLanguage string
+		gtfsTranslation := &gtfs.TranslatedString_Translation{
+			Language: &emptyLanguage,
+			Text:     &ts.DefaultValue,
 		}
 
-		for lang, text := range ts.Translations {
-			gtfsTranslation := &gtfs.TranslatedString_Translation{
-				Language: &lang,
-				Text: &text,
-			}
-
-			translations = append(translations, gtfsTranslation)
-		}
-
-		v.Translation = translations
-	default:
-		return fmt.Errorf("unsupported destination %T", dest)
+		translations = append(translations, gtfsTranslation)
 	}
 
-	return nil
+	for lang, text := range ts.Translations {
+		gtfsTranslation := &gtfs.TranslatedString_Translation{
+			Language: &lang,
+			Text:     &text,
+		}
+
+		translations = append(translations, gtfsTranslation)
+	}
+
+	dest.Translation = translations
 }
 
 func (t *TimeRange) FromProto(value interface{}) error {

@@ -1,14 +1,15 @@
 package core
 
 import (
+	"errors"
+	"slices"
+
 	"bitbucket.org/enroute-mobi/ara/cache"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"errors"
-	"slices"
 )
 
 type ServiceAlertsBroadcaster struct {
@@ -131,20 +132,19 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 		}
 
 		// HeaderText
-		var h gtfs.TranslatedString
-		if err := situation.Summary.ToProto(&h); err != nil {
-			logger.Log.Debugf("Error for summary: %v", err)
-		} else {
+		if situation.Summary != nil {
+			var h gtfs.TranslatedString
+			situation.Summary.ToProto(&h)
 			alert.HeaderText = &h
 		}
 
 		// DescriptionText
+		if situation.Description != nil {
 		var d gtfs.TranslatedString
-		if err := situation.Description.ToProto(&d); err != nil {
-			logger.Log.Debugf("Error for description: %v", err)
-		} else {
-			alert.DescriptionText = &d
+		situation.Description.ToProto(&d)
+		alert.DescriptionText = &d
 		}
+
 
 		feedEntity.Alert = alert
 		entities = append(entities, feedEntity)
