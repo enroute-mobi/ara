@@ -578,7 +578,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
             <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:SubscriptionRef>
             <ns5:Status>true</ns5:Status>
             <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
         </ns5:ResponseStatus>
@@ -677,7 +677,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>Ara:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns5:RequestMessageRef>
             <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
-            <ns5:SubscriptionRef>SubscriptionIdentifier</ns5:SubscriptionRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8SubscriptionIdentifier</ns5:SubscriptionRef>
             <ns5:Status>true</ns5:Status>
             <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
         </ns5:ResponseStatus>
@@ -705,6 +705,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | ReferenceArray[1] | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
     When a minute has passed
+    And a minute has passed
     Then the SIRI server should have received a SubscriptionRequest request with 2 "StopMonitoringRequest"
 
   Scenario: 3737 - Manage a MonitoredStopVisitCancellation

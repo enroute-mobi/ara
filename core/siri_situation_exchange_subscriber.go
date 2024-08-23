@@ -1,14 +1,13 @@
 package core
 
 import (
-	"fmt"
-	"time"
-
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"fmt"
+	"time"
 )
 
 type SIRISituationExchangeSubscriber interface {
@@ -65,31 +64,10 @@ func (subscriber *SituationExchangeSubscriber) Stop() {
 }
 
 func (subscriber *SXSubscriber) prepareSIRISituationExchangeSubscriptionRequest() {
-	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind(SituationExchangeCollect)
-	if len(subscriptions) == 0 {
-		logger.Log.Debugf("SituationExchangeSubscriber visit without SituationExchangeCollect subscriptions")
-		return
-	}
+	collectSubscriber := NewCollectSubcriber(subscriber.connector, SituationExchangeCollect)
+	subscriptionRequests := collectSubscriber.GetSubscriptionRequest()
 
-	lineRefList := []string{}
-	stopPointRefList := []string{}
-
-	resourcesToRequest := make(map[string]*resourceToRequest)
-	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByCodeCopy() {
-			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
-				messageIdentifier := subscriber.connector.Partner().NewMessageIdentifier()
-				logger.Log.Debugf("send request for subscription with id : %v", subscription.id)
-				resourcesToRequest[messageIdentifier] = &resourceToRequest{
-					subId: subscription.id,
-					code:  *(resource.Reference.Code),
-					kind:  resource.Reference.Type,
-				}
-			}
-		}
-	}
-
-	if len(resourcesToRequest) == 0 {
+	if len(subscriptionRequests) == 0 {
 		return
 	}
 
@@ -103,34 +81,39 @@ func (subscriber *SXSubscriber) prepareSIRISituationExchangeSubscriptionRequest(
 		RequestTimestamp:  subscriber.Clock().Now(),
 	}
 
-	var subIDs []string
-	for messageIdentifier, requestedResource := range resourcesToRequest {
-		entry := &siri.SIRISituationExchangeSubscriptionRequestEntry{
-			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-			SubscriptionIdentifier: string(requestedResource.subId),
-			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-		}
-		entry.MessageIdentifier = messageIdentifier
-		entry.RequestTimestamp = subscriber.Clock().Now()
-		subIDs = append(subIDs, entry.SubscriptionIdentifier)
-		switch requestedResource.kind {
-		case "Line":
-			entry.LineRef = []string{requestedResource.code.Value()}
-			lineRefList = append(lineRefList, requestedResource.code.Value())
-		case "StopArea":
-			entry.StopPointRef = []string{requestedResource.code.Value()}
-			stopPointRefList = append(stopPointRefList, requestedResource.code.Value())
-		}
+	subIds := []string{}
+	linesToLog := []string{}
+	stopAreasToLog := []string{}
+	for subId, subscriptionRequest := range subscriptionRequests {
+		for _, m := range subscriptionRequest.modelsToRequest {
+			entry := &siri.SIRISituationExchangeSubscriptionRequestEntry{
+				SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
+				SubscriptionIdentifier: string(subId),
+				InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
+			}
+			entry.MessageIdentifier = subscriptionRequest.requestMessageRef
+			entry.RequestTimestamp = subscriber.Clock().Now()
 
-		sxRequest.Entries = append(sxRequest.Entries, entry)
+			switch m.kind {
+			case "Line":
+				entry.LineRef = append(entry.LineRef, m.code.Value())
+			case "StopArea":
+				entry.StopPointRef = append(entry.StopPointRef, m.code.Value())
+			}
+
+			linesToLog = append(linesToLog, entry.LineRef...)
+			stopAreasToLog = append(stopAreasToLog, entry.StopPointRef...)
+			sxRequest.Entries = append(sxRequest.Entries, entry)
+		}
+		subIds = append(subIds, string(subId))
 	}
 
 	message.RequestIdentifier = sxRequest.MessageIdentifier
 	message.RequestRawMessage, _ = sxRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 	message.RequestSize = int64(len(message.RequestRawMessage))
-	message.StopAreas = stopPointRefList
-	message.Lines = lineRefList
-	message.SubscriptionIdentifiers = subIDs
+	message.StopAreas = stopAreasToLog
+	message.Lines = linesToLog
+	message.SubscriptionIdentifiers = subIds
 
 	startTime := subscriber.Clock().Now()
 	response, err := subscriber.connector.Partner().SIRIClient().SituationExchangeSubscription(sxRequest)
@@ -138,7 +121,7 @@ func (subscriber *SXSubscriber) prepareSIRISituationExchangeSubscriptionRequest(
 	if err != nil {
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		e := fmt.Sprintf("Error during SituationExchangeSubscriptionRequest: %v", err)
-		subscriber.incrementRetryCountFromMap(resourcesToRequest)
+		collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 
 		message.Status = "Error"
 		message.ErrorDetails = e
@@ -147,59 +130,15 @@ func (subscriber *SXSubscriber) prepareSIRISituationExchangeSubscriptionRequest(
 
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
-	for _, responseStatus := range response.ResponseStatus() {
-		requestedResource, ok := resourcesToRequest[responseStatus.RequestMessageRef()]
-		if !ok {
-			logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
-			continue
-		}
-		delete(resourcesToRequest, responseStatus.RequestMessageRef()) // See #4691
+	collectSubscriber.HandleResponse(subscriptionRequests, message, response)
 
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedResource.subId)
-		if !ok { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription %v", requestedResource.subId)
-			continue
-		}
-		resource := subscription.Resource(requestedResource.code)
-		if resource == nil { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription resource %v", requestedResource.code.String())
-			continue
-		}
-
-		if !responseStatus.Status() {
-			logger.Log.Debugf("Subscription status false for %v %v: %v %v ",
-				requestedResource.kind,
-				requestedResource.code.Value(),
-				responseStatus.ErrorType(),
-				responseStatus.ErrorText(),
-			)
-			resource.RetryCount++
-			message.Status = "Error"
-			continue
-		}
-		resource.Subscribed(subscriber.Clock().Now())
-		resource.RetryCount = 0
-	}
-	// Should not happen but see #4691
-	if len(resourcesToRequest) == 0 {
+	if len(subscriptionRequests) == 0 {
 		return
 	}
-	subscriber.incrementRetryCountFromMap(resourcesToRequest)
-}
 
-func (subscriber *SXSubscriber) incrementRetryCountFromMap(resourcesToRequest map[string]*resourceToRequest) {
-	for _, requestedResource := range resourcesToRequest {
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(requestedResource.subId)
-		if !ok { // Should never happen
-			continue
-		}
-		resource := subscription.Resource(requestedResource.code)
-		if resource == nil { // Should never happen
-			continue
-		}
-		resource.RetryCount++
-	}
+	collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 }
 
 func (subscriber *SXSubscriber) newBQEvent() *audit.BigQueryMessage {

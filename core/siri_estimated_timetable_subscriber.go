@@ -1,16 +1,13 @@
 package core
 
 import (
-	"fmt"
-	"time"
-
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"golang.org/x/exp/maps"
+	"fmt"
+	"time"
 )
 
 type SIRIEstimatedTimetableSubscriber interface {
@@ -67,31 +64,10 @@ func (subscriber *EstimatedTimetableSubscriber) Stop() {
 }
 
 func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionRequest() {
-	subscriptions := subscriber.connector.partner.Subscriptions().FindSubscriptionsByKind(EstimatedTimetableCollect)
-	if len(subscriptions) == 0 {
-		logger.Log.Debugf("EstimatedTimetableSubscriber visit without EstimatedTimetableCollect subscriptions")
-		return
-	}
+	collectSubscriber := NewCollectSubcriber(subscriber.connector, EstimatedTimetableCollect)
+	subscriptionRequests := collectSubscriber.GetSubscriptionRequest()
 
-	linesToLog := []string{}
-	requestMessageRefToSub := make(map[string]string)
-	subToRequestMessageRef := make(map[string]string)
-
-	linesToRequest := make(map[string][]string)
-	for _, subscription := range subscriptions {
-		for _, resource := range subscription.ResourcesByCodeCopy() {
-			if resource.SubscribedAt().IsZero() && resource.RetryCount <= 10 {
-				mid := subscriber.connector.Partner().NewMessageIdentifier()
-				if len(linesToRequest[string(subscription.id)]) == 0 {
-					requestMessageRefToSub[mid] = string(subscription.id)
-					subToRequestMessageRef[string(subscription.id)] = mid
-				}
-				linesToRequest[string(subscription.id)] = append(linesToRequest[string(subscription.id)], resource.Reference.Code.Value())
-			}
-		}
-	}
-
-	if len(linesToRequest) == 0 {
+	if len(subscriptionRequests) == 0 {
 		return
 	}
 
@@ -106,19 +82,24 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 		SortPayloadForTest: subscriber.connector.Partner().SortPaylodForTest(),
 	}
 
-	var subIds []string
-	for subscription, requestedLines := range linesToRequest {
+	subIds := []string{}
+	linesToLog := []string{}
+	for subId, subscriptionRequest := range subscriptionRequests {
 		entry := &siri.SIRIEstimatedTimetableSubscriptionRequestEntry{
 			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-			SubscriptionIdentifier: subscription,
+			SubscriptionIdentifier: string(subId),
 			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 		}
-		entry.MessageIdentifier = subToRequestMessageRef[subscription]
+		entry.MessageIdentifier = subscriptionRequest.requestMessageRef
 		entry.RequestTimestamp = subscriber.Clock().Now()
-		entry.Lines = requestedLines
-
+		for _, m := range subscriptionRequest.modelsToRequest {
+			switch m.kind {
+			case "Line":
+				entry.Lines = append(entry.Lines, m.code.Value())
+			}
+		}
 		linesToLog = append(linesToLog, entry.Lines...)
-		subIds = append(subIds, subscription)
+		subIds = append(subIds, string(subId))
 		siriEstimatedTimetableSubscriptionRequest.Entries = append(siriEstimatedTimetableSubscriptionRequest.Entries, entry)
 	}
 
@@ -135,7 +116,7 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 		logger.Log.Debugf("Error while subscribing: %v", err)
 		e := fmt.Sprintf("Error during EstimatedTimetableSubscriptionRequest: %v", err)
 
-		subscriber.incrementRetryCountFromMap(linesToRequest)
+		collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 
 		message.Status = "Error"
 		message.ErrorDetails = e
@@ -146,71 +127,13 @@ func (subscriber *ETTSubscriber) prepareSIRIEstimatedTimetableSubscriptionReques
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 
-	for _, responseStatus := range response.ResponseStatus() {
-		var subId string
-		var ok bool
+	collectSubscriber.HandleResponse(subscriptionRequests, message, response)
 
-		if len(requestMessageRefToSub) != 1 {
-			subId, ok = requestMessageRefToSub[responseStatus.RequestMessageRef()]
-			if !ok {
-				logger.Log.Debugf("ResponseStatus RequestMessageRef unknown: %v", responseStatus.RequestMessageRef())
-				continue
-			}
-		} else { // Skip RequestMessageRef validation for single Subscription
-			subId = maps.Values(requestMessageRefToSub)[0]
-		}
-
-		_, ok = linesToRequest[subId]
-		if !ok { // Should never happen
-			logger.Log.Debugf("Error in ETT Subscription Collector, no lines to request for subscription %v", subId)
-			continue
-		}
-
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(SubscriptionId(subId))
-		if !ok { // Should never happen
-			logger.Log.Debugf("Response for unknown subscription %v", subId)
-			continue
-		}
-		for _, line := range linesToRequest[subId] {
-			resource := subscription.Resource(model.NewCode(subscriber.connector.remoteCodeSpace, line))
-			if resource == nil { // Should never happen
-				logger.Log.Debugf("Response for unknown subscription resource %v", line)
-				continue
-			}
-
-			if !responseStatus.Status() {
-				logger.Log.Debugf("Subscription status false for line %v: %v %v ", line, responseStatus.ErrorType(), responseStatus.ErrorText())
-				resource.RetryCount++
-				message.Status = "Error"
-				continue
-			}
-			resource.Subscribed(subscriber.Clock().Now())
-			resource.RetryCount = 0
-		}
-		delete(linesToRequest, subId) // See #4691
-	}
-	// Should not happen but see #4691
-	if len(linesToRequest) == 0 {
+	if len(subscriptionRequests) == 0 {
 		return
 	}
-	subscriber.incrementRetryCountFromMap(linesToRequest)
-}
 
-func (subscriber *ETTSubscriber) incrementRetryCountFromMap(linesToRequest map[string][]string) {
-	for subId, requestedLines := range linesToRequest {
-		subscription, ok := subscriber.connector.partner.Subscriptions().Find(SubscriptionId(subId))
-		if !ok { // Should never happen
-			continue
-		}
-		for _, l := range requestedLines {
-			resource := subscription.Resource(model.NewCode(subscriber.connector.remoteCodeSpace, l))
-			if resource == nil { // Should never happen
-				continue
-			}
-			resource.RetryCount++
-
-		}
-	}
+	collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 }
 
 func (subscriber *ETTSubscriber) newBQEvent() *audit.BigQueryMessage {
