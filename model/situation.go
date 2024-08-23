@@ -660,8 +660,10 @@ func (manager *MemorySituations) Delete(situation *Situation) bool {
 	return true
 }
 
-func (t *TranslatedString) FromMap(translations map[string]string) error {
-	ts := TranslatedString{Translations: make(map[string]string)}
+func NewTranslatedStringFromMap(translations map[string]string) *TranslatedString {
+	ts := &TranslatedString{
+		Translations: make(map[string]string),
+	}
 
 	for lang, text := range translations {
 		if lang == "" {
@@ -671,8 +673,7 @@ func (t *TranslatedString) FromMap(translations map[string]string) error {
 		ts.Translations[lang] = text
 	}
 
-	*t = ts
-	return nil
+	return ts
 }
 
 func (t *TranslatedString) FromProto(value interface{}) error {
