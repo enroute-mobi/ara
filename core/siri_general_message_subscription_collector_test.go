@@ -10,9 +10,14 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	request := &sxml.XMLSubscriptionRequest{}
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -22,9 +27,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 		body, _ := io.ReadAll(r.Body)
 		var err error
 		request, err = sxml.NewXMLSubscriptionRequestFromContent(body)
-		if err != nil {
-			t.Fatalf("%v", err)
-		}
+		require.NoError(err)
 	}))
 	defer ts.Close()
 
@@ -55,19 +58,25 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	line.SetCode(lineCode)
 	partners.Model().Lines().Save(line)
 
+	line2 := partners.Model().Lines().New()
+	lineCode2 := model.NewCode("test_kind", "line value2")
+	line2.SetCode(lineCode2)
+	partners.Model().Lines().Save(line2)
+
 	connector := NewSIRIGeneralMessageSubscriptionCollector(partner)
 	connector.SetGeneralMessageSubscriber(NewFakeGeneralMessageSubscriber(connector))
 
 	connector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode)
+	connector.RequestSituationUpdate(SITUATION_UPDATE_REQUEST_LINE, lineCode2)
+
 	connector.Start()
 
-	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
-		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
-	}
-
-	if len(request.XMLSubscriptionGMEntries()) != 1 {
-		t.Errorf("Wrong XMLSubscriptionEntries:\n got: %v\nwant: 1", len(request.XMLSubscriptionGMEntries()))
-	}
+	assert.Equal("http://example.com/test/siri", request.ConsumerAddress())
+	assert.Len(request.XMLSubscriptionGMEntries(), 1)
+	assert.ElementsMatch(
+	   request.XMLSubscriptionGMEntries()[0].LineRef(),
+		[]string{"line value", "line value2"},
+	)
 }
 
 func Test_SIRIGeneralMessageDeleteSubscriptionRequest(t *testing.T) {
