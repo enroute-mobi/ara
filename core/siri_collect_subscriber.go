@@ -33,7 +33,7 @@ func (cs *CollectSubscriber) GetSubscriptionRequest() map[SubscriptionId]*subscr
 	subscriptionRequests := make(map[SubscriptionId]*subscriptionRequest)
 	subscriptions := cs.connector.Partner().Subscriptions().FindSubscriptionsByKind(cs.name)
 	if len(subscriptions) == 0 {
-		logger.Log.Debugf("%v"+"Subscriber visit without"+"%v "+"Collect subscriptions", cs.name, cs.name)
+		logger.Log.Debugf("%v"+"Subscriber visit without "+"%v "+"subscriptions", cs.name, cs.name)
 		return nil
 	}
 
