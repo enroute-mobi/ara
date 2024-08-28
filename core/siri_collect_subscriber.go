@@ -103,9 +103,17 @@ func (cs *CollectSubscriber) HandleResponse(subscriptionRequests map[Subscriptio
 
 		for _, modelToRequest := range subscriptionRequest.modelsToRequest {
 			modelValue := modelToRequest.code.Value()
-			resource := subscription.Resource(model.NewCode(cs.connector.RemoteCodeSpace(), modelToRequest.code.Value()))
+			var resource *SubscribedResource
+
+			switch modelToRequest.code.String() {
+			case "SituationExchangeCollect:all", "GeneralMessageCollect:all":
+				resource = subscription.Resource(modelToRequest.code)
+			default:
+				resource = subscription.Resource(model.NewCode(cs.connector.RemoteCodeSpace(), modelValue))
+			}
+
 			if resource == nil { // Should never happen
-				logger.Log.Debugf("%v"+"Subscriber Response for unknown subscription resource %v", cs.name, modelValue)
+				logger.Log.Debugf("%v"+"Subscriber Response for unknown subscription resource %v", cs.name, modelToRequest.code.String())
 				continue
 			}
 
