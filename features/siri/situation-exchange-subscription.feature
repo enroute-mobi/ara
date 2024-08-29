@@ -5,44 +5,7 @@ Feature: Support SIRI SituationExchange by subscription
 
   @ARA-1450 @siri-valid
   Scenario: Manage a SX Subscription
-    Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
-       """
-   <?xml version='1.0' encoding='utf-8'?>
-   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
-   <S:Body>
-     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-       <SubscriptionAnswerInfo
-         xmlns:ns2="http://www.ifopt.org.uk/acsb"
-         xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-         xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-         xmlns:ns5="http://www.siri.org.uk/siri"
-         xmlns:ns6="http://wsdl.siri.org.uk/siri">
-         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
-         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
-         <ns5:RequestMessageRef>6ba7b814-9dad-11d1-10-00c04fd430c8</ns5:RequestMessageRef>
-       </SubscriptionAnswerInfo>
-       <Answer
-         xmlns:ns2="http://www.ifopt.org.uk/acsb"
-         xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-         xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-         xmlns:ns5="http://www.siri.org.uk/siri"
-         xmlns:ns6="http://wsdl.siri.org.uk/siri">
-         <ns5:ResponseStatus>
-             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
-             <ns5:RequestMessageRef>{LastRequestMessageRef}</ns5:RequestMessageRef>
-             <ns5:SubscriberRef>NINOXE:default</ns5:SubscriberRef>
-             <ns5:SubscriptionRef>6ba7b814-9dad-11d1-a-00c04fd430c8</ns5:SubscriptionRef>
-             <ns5:Status>true</ns5:Status>
-             <ns5:ValidUntil>2016-09-22T08:01:20.227+02:00</ns5:ValidUntil>
-         </ns5:ResponseStatus>
-         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
-       </Answer>
-       <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
-     </ns1:SubscribeResponse>
-   </S:Body>
-   </S:Envelope>
-   """
+    Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
         | remote_url                       | http://localhost:8090 |
         | remote_credential                | test                  |
@@ -69,6 +32,9 @@ Feature: Support SIRI SituationExchange by subscription
     And a StopArea exists with the following attributes:
       | Name  | Test 3533                            |
       | Codes | "internal": "STIF:StopPoint:Q:3533:" |
+    And a Subscription exist with the following attributes:
+      | Kind              | SituationExchangeCollect          |
+      | ReferenceArray[0] | "SituationExchangeCollect": "all" |
     And a minute has passed
     When I send this SIRI request
       """
@@ -84,7 +50,7 @@ Feature: Support SIRI SituationExchange by subscription
             <Notification>
               <siri:SituationExchangeDelivery>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
-                <siri:SubscriptionRef>6ba7b814-9dad-11d1-a-00c04fd430c8</siri:SubscriptionRef>
+                <siri:SubscriptionRef>6ba7b814-9dad-11d1-9-00c04fd430c8</siri:SubscriptionRef>
                 <siri:Status>true</siri:Status>
                 <siri:Situations>
                 <siri:PtSituationElement>

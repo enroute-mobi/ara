@@ -203,10 +203,14 @@ def model_attributes(table)
       attributes["References"] ||= []
 
       values = value.split(',')
+
       attributes["References"][$1.to_i] = {
-        "Type" => values[0],
         "Code" => JSON.parse("{ #{values[1]} }")
       }
+
+      if values.size > 1
+        attributes["References"][$1.to_i]["Type"] = values[0]
+      end
 
       attributes.delete key
     end
