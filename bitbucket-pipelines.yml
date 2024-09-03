@@ -68,6 +68,7 @@ pipelines:
           runs-on:
             - self.hosted
             - env.interne
+            - deploy
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
@@ -89,6 +90,7 @@ pipelines:
           runs-on:
             - self.hosted
             - env.interne
+            - deploy
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
@@ -110,6 +112,7 @@ pipelines:
           runs-on:
             - self.hosted
             - env.production
+            - deploy
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
