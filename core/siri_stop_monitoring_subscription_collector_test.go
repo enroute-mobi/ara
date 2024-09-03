@@ -13,6 +13,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/jbowtie/gokogiri/xml"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t *testing.T) {
@@ -73,7 +74,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 }
 
 func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
-
+	assert := assert.New(t)
 	response, err := os.Open("testdata/stopmonitoringsubscription-response-soap.xml")
 	if err != nil {
 		t.Fatal(err)
@@ -111,11 +112,20 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	stopAreaUpdateRequest := NewStopAreaUpdateRequest(stopArea.Id())
 	connector.SetStopMonitoringSubscriber(NewFakeStopMonitoringSubscriber(connector))
 	connector.RequestStopAreaUpdate(stopAreaUpdateRequest)
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 
-	if subscription.ResourcesLen() != 1 {
-		t.Errorf("Response should have 1 ressource but got %v\n", subscription.ResourcesLen())
-	}
+	subscriptions := connector.partner.Subscriptions().FindAll()
+	assert.Len(subscriptions, 1)
+	assert.Equal(subscriptions[0].ResourcesLen(), 1)
+
+	subscriptionResource := subscriptions[0].UniqueResource()
+	assert.NotNil(subscriptionResource)
+	assert.Equal(subscriptionResource.Reference.Type, "StopArea")
+	assert.Equal(subscriptionResource.Reference.Code.String(), "test_kind:value")
+
+	// Adding a new subscription
+	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
+	assert.Len(connector.partner.Subscriptions().FindAll(), 2)
+	assert.Equal(subscription.ResourcesLen(), 0)
 }
 
 func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
@@ -170,13 +180,13 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	connector.RequestStopAreaUpdate(stopAreaUpdateEvent)
 	connector.stopMonitoringSubscriber.Start()
 
-	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
-
 	if expected := "http://example.com/test/siri"; request.ConsumerAddress() != expected {
 		t.Errorf("Wrong ConsumerAddress:\n got: %v\nwant: %v", request.ConsumerAddress(), expected)
 	}
 
+	subscription := connector.partner.Subscriptions().FindAll()[0]
 	expectedUuid := fmt.Sprintf("%v", subscription.Id())
+
 	if request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier() != expectedUuid {
 		t.Errorf("Wrong SubscriptionIdentifier:\n got: %v\nwant: %v", request.XMLSubscriptionSMEntries()[0].SubscriptionIdentifier(), expectedUuid)
 	}

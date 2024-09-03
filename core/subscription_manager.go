@@ -191,6 +191,10 @@ func (manager *MemorySubscriptions) FindByResourceId(id, kind string) []*Subscri
 }
 
 func (manager *MemorySubscriptions) FindOrCreateByKind(kind string) *Subscription {
+	if (kind == StopMonitoringCollect) || (kind == VehicleMonitoringCollect) {
+		return manager.New(kind)
+	}
+
 	maxResource := manager.partner.SubscriptionMaximumResources()
 	if maxResource == 1 {
 		return manager.New(kind)
