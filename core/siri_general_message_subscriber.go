@@ -102,15 +102,14 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 	linesToLog := []string{}
 	stopAreasToLog := []string{}
 	for subId, subscriptionRequest := range subscriptionRequests {
+		entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
+			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
+			SubscriptionIdentifier: string(subId),
+			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
+		}
+		entry.MessageIdentifier = subscriptionRequest.requestMessageRef
+		entry.RequestTimestamp = subscriber.Clock().Now()
 		for _, m := range subscriptionRequest.modelsToRequest {
-			entry := &siri.SIRIGeneralMessageSubscriptionRequestEntry{
-				SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-				SubscriptionIdentifier: string(subId),
-				InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-			}
-			entry.MessageIdentifier = subscriptionRequest.requestMessageRef
-			entry.RequestTimestamp = subscriber.Clock().Now()
-
 			switch m.kind {
 			case "Line":
 				entry.LineRef = append(entry.LineRef, m.code.Value())
@@ -121,12 +120,11 @@ func (subscriber *GMSubscriber) prepareSIRIGeneralMessageSubscriptionRequest() {
 			if subscriber.connector.Partner().GeneralMessageRequestVersion22() {
 				entry.XsdInWsdl = true
 			}
-
-			linesToLog = append(linesToLog, entry.LineRef...)
-			stopAreasToLog = append(stopAreasToLog, entry.StopPointRef...)
-			gmRequest.Entries = append(gmRequest.Entries, entry)
-
 		}
+
+		linesToLog = append(linesToLog, entry.LineRef...)
+		stopAreasToLog = append(stopAreasToLog, entry.StopPointRef...)
+		gmRequest.Entries = append(gmRequest.Entries, entry)
 		subIds = append(subIds, string(subId))
 	}
 

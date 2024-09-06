@@ -1,13 +1,14 @@
 package core
 
 import (
+	"fmt"
+	"time"
+
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"fmt"
-	"time"
 )
 
 type SIRISituationExchangeSubscriber interface {
@@ -26,6 +27,22 @@ type SituationExchangeSubscriber struct {
 
 	stop chan struct{}
 }
+
+type FakeSituationExchangeSubscriber struct {
+	SXSubscriber
+}
+
+func NewFakeSituationExchangeSubscriber(connector *SIRISituationExchangeSubscriptionCollector) SIRISituationExchangeSubscriber {
+	subscriber := &FakeSituationExchangeSubscriber{}
+	subscriber.connector = connector
+	return subscriber
+}
+
+func (subscriber *FakeSituationExchangeSubscriber) Start() {
+	subscriber.prepareSIRISituationExchangeSubscriptionRequest()
+}
+
+func (subscriber *FakeSituationExchangeSubscriber) Stop() {}
 
 func NewSIRISituationExchangeSubscriber(connector *SIRISituationExchangeSubscriptionCollector) SIRISituationExchangeSubscriber {
 	subscriber := &SituationExchangeSubscriber{}
@@ -85,26 +102,25 @@ func (subscriber *SXSubscriber) prepareSIRISituationExchangeSubscriptionRequest(
 	linesToLog := []string{}
 	stopAreasToLog := []string{}
 	for subId, subscriptionRequest := range subscriptionRequests {
+		entry := &siri.SIRISituationExchangeSubscriptionRequestEntry{
+			SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
+			SubscriptionIdentifier: string(subId),
+			InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
+		}
+		entry.MessageIdentifier = subscriptionRequest.requestMessageRef
+		entry.RequestTimestamp = subscriber.Clock().Now()
 		for _, m := range subscriptionRequest.modelsToRequest {
-			entry := &siri.SIRISituationExchangeSubscriptionRequestEntry{
-				SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-				SubscriptionIdentifier: string(subId),
-				InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-			}
-			entry.MessageIdentifier = subscriptionRequest.requestMessageRef
-			entry.RequestTimestamp = subscriber.Clock().Now()
-
 			switch m.kind {
 			case "Line":
 				entry.LineRef = append(entry.LineRef, m.code.Value())
 			case "StopArea":
 				entry.StopPointRef = append(entry.StopPointRef, m.code.Value())
 			}
-
-			linesToLog = append(linesToLog, entry.LineRef...)
-			stopAreasToLog = append(stopAreasToLog, entry.StopPointRef...)
-			sxRequest.Entries = append(sxRequest.Entries, entry)
 		}
+
+		linesToLog = append(linesToLog, entry.LineRef...)
+		stopAreasToLog = append(stopAreasToLog, entry.StopPointRef...)
+		sxRequest.Entries = append(sxRequest.Entries, entry)
 		subIds = append(subIds, string(subId))
 	}
 
