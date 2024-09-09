@@ -573,8 +573,9 @@ Feature: Collect realtime data via GTFS-RT feeds
       | ValidityPeriods[0]#StartTime                                   | 2023-03-01T11:00:00+01:00                                  |
       | AlertCause                                                     | accident                                                   |
       | Severity                                                       | normal                                                     |
-      | Summary[DefaultValue]                                          | Route Bus:A detour                                         |
-      | Description[DefaultValue]                                      | Route Bus:A RETOUR effectue un détour entre King et Claren |
+      | Summary[Translations]#fr                                       | Route Bus:A detour                                         |
+      | Description[Translations]#fr                                   | Route Bus:A RETOUR effectue un détour entre King et Claren |
+      | Description[Translations]#en                                   | Route Bus:A EASTBOUND is on detour between King at Claren  |
       | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-4-00c04fd430c8                          |
       | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-3-00c04fd430c8                          |
       | Affects[Line]                                                  | 6ba7b814-9dad-11d1-2-00c04fd430c8                          |
@@ -655,8 +656,9 @@ Feature: Collect realtime data via GTFS-RT feeds
       | ValidityPeriods[0]#StartTime                                   | 2023-03-01T11:00:00+01:00                                  |
       | AlertCause                                                     | accident                                                   |
       | Severity                                                       | normal                                                     |
-      | Summary[DefaultValue]                                          | Route Bus:A detour                                         |
-      | Description[DefaultValue]                                      | Route Bus:A RETOUR effectue un détour entre King et Claren |
+      | Summary[Translations]#fr                                       | Route Bus:A detour                                         |
+      | Description[Translations]#fr                                   | Route Bus:A RETOUR effectue un détour entre King et Claren |
+      | Description[Translations]#en                                   | Route Bus:A EASTBOUND is on detour between King at Claren  |
       | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-4-00c04fd430c8                          |
       | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-3-00c04fd430c8                          |
       | Affects[Line]                                                  | 6ba7b814-9dad-11d1-2-00c04fd430c8                          |

@@ -26,10 +26,10 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 		Origin: "test",
 	}
 
-	situation.Description = &SituationTranslatedString{
+	situation.Description = &TranslatedString{
 		DefaultValue: "Joyeux Noel",
 	}
-	situation.Summary = &SituationTranslatedString{
+	situation.Summary = &TranslatedString{
 		DefaultValue: "Noel",
 	}
 
@@ -122,10 +122,10 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 		NewCode("hastus", "sqypis"),
 	}
 
-	expectedSmmary := &SituationTranslatedString{
+	expectedSmmary := &TranslatedString{
 		DefaultValue: "Noel",
 	}
-	expectedDescription := &SituationTranslatedString{
+	expectedDescription := &TranslatedString{
 		DefaultValue: "Joyeux Noel",
 	}
 
@@ -224,7 +224,7 @@ func Test_Validate_Empty_Summary(t *testing.T) {
 	assert := assert.New(t)
 	situations := NewMemorySituations()
 	situation := situations.New()
-	situation.Summary = &SituationTranslatedString{
+	situation.Summary = &TranslatedString{
 		DefaultValue: "",
 	}
 	apiSituation := situation.Definition()
@@ -249,7 +249,7 @@ func Test_Validate_Sanitize_Summary(t *testing.T) {
 	assert := assert.New(t)
 	situations := NewMemorySituations()
 	situation := situations.New()
-	situation.Summary = &SituationTranslatedString{
+	situation.Summary = &TranslatedString{
 		DefaultValue: "<script>alert('Boo!');</script>",
 	}
 	apiSituation := situation.Definition()
@@ -261,7 +261,7 @@ func Test_Validate_Sanitize_Description(t *testing.T) {
 	assert := assert.New(t)
 	situations := NewMemorySituations()
 	situation := situations.New()
-	situation.Description = &SituationTranslatedString{
+	situation.Description = &TranslatedString{
 		DefaultValue: "<script>alert('Boo!');</script>",
 	}
 	apiSituation := situation.Definition()

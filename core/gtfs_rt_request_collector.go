@@ -12,8 +12,9 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"golang.org/x/exp/maps"
 	"time"
+
+	"golang.org/x/exp/maps"
 )
 
 type GtfsRequestCollectorFactory struct{}
@@ -189,26 +190,14 @@ func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, 
 	event.ValidityPeriods = validityPeriods
 
 	// Summary
-	var s model.SituationTranslatedString
 	headerTexts := a.GetHeaderText().GetTranslation()
-	for _, text := range headerTexts {
-		if err := s.FromProto(text); err != nil {
-			logger.Log.Debugf("cannot convert Proto TranslatedString: %v", err)
-			continue
-		}
-	}
-	event.Summary = &s
+	s := model.NewTranslatedStringFromProto(headerTexts)
+	event.Summary = s
 
 	// Description
-	var d model.SituationTranslatedString
 	descriptionTexts := a.GetDescriptionText().GetTranslation()
-	for _, text := range descriptionTexts {
-		if err := d.FromProto(text); err != nil {
-			logger.Log.Debugf("cannot convert Proto TranslatedString: %v", err)
-			continue
-		}
-	}
-	event.Description = &d
+	d := model.NewTranslatedStringFromProto(descriptionTexts)
+	event.Description = d
 
 	// AlertCause
 	var alertCause model.SituationAlertCause

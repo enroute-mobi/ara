@@ -84,8 +84,6 @@ const (
 	Order                       = "Order"
 	VisitNumber                 = "VisitNumber"
 	InfoMessageVersion          = "InfoMessageVersion"
-	NumberOfLines               = "NumberOfLines"
-	NumberOfCharPerLine         = "NumberOfCharPerLine"
 	Version                     = "Version"
 	MaximumStopVisits           = "MaximumStopVisits"
 	PreviewInterval             = "PreviewInterval"

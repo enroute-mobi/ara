@@ -54,10 +54,8 @@ type IDFGeneralMessageStructure struct {
 type XMLMessage struct {
 	XMLStructure
 
-	messageText         string
-	messageType         string
-	numberOfLines       Int
-	numberOfCharPerLine Int
+	messageTexts  map[string]string
+	messageType   string
 }
 
 type IDFLineSectionStructure struct {
@@ -295,11 +293,14 @@ func (visit *IDFLineSectionStructure) LineRef() string {
 	return visit.lineRef
 }
 
-func (message *XMLMessage) MessageText() string {
-	if message.messageText == "" {
-		message.messageText = message.findStringChildContent(siri_attributes.MessageText)
+func (message *XMLMessage) MessageTexts() map[string]string {
+	if message.messageTexts == nil {
+		translations := FindTranslations(message.findNodes(siri_attributes.MessageText))
+		if translations != nil {
+			message.messageTexts = translations
+		}
 	}
-	return message.messageText
+	return message.messageTexts
 }
 
 func (message *XMLMessage) MessageType() string {
@@ -307,18 +308,4 @@ func (message *XMLMessage) MessageType() string {
 		message.messageType = message.findStringChildContent(siri_attributes.MessageType)
 	}
 	return message.messageType
-}
-
-func (message *XMLMessage) NumberOfLines() int {
-	if !message.numberOfLines.Defined {
-		message.numberOfLines.SetValue(message.findIntChildContent(siri_attributes.NumberOfLines))
-	}
-	return message.numberOfLines.Value
-}
-
-func (message *XMLMessage) NumberOfCharPerLine() int {
-	if !message.numberOfCharPerLine.Defined {
-		message.numberOfCharPerLine.SetValue(message.findIntChildContent(siri_attributes.NumberOfCharPerLine))
-	}
-	return message.numberOfCharPerLine.Value
 }

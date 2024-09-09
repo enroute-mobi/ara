@@ -49,8 +49,8 @@ type SIRIPtSituationElement struct {
 	Severity           model.SituationSeverity
 	Reality            model.SituationReality
 	ParticipantRef     string
-	Summary            string
-	Description        string
+	Summary            *SIRITranslatedString
+	Description        *SIRITranslatedString
 
 	HasAffects bool
 	SIRIAffects

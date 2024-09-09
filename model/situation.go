@@ -16,13 +16,6 @@ import (
 
 type SituationId ModelId
 
-type Message struct {
-	Content             string `json:"MessageText,omitempty"`
-	Type                string `json:"MessageType,omitempty"`
-	NumberOfLines       int    `json:",omitempty"`
-	NumberOfCharPerLine int    `json:",omitempty"`
-}
-
 const (
 	SituationReportTypeGeneral  ReportType    = "general"
 	SituationReportTypeIncident ReportType    = "incident"
@@ -33,7 +26,7 @@ const (
 type ReportType string
 type SituationType string
 
-type SituationTranslatedString struct {
+type TranslatedString struct {
 	DefaultValue string            `json:",omitempty"`
 	Translations map[string]string `json:",omitempty"`
 }
@@ -51,18 +44,18 @@ type Situation struct {
 	ValidityPeriods    []*TimeRange
 	PublicationWindows []*TimeRange
 
-	Progress       SituationProgress          `json:",omitempty"`
-	Severity       SituationSeverity          `json:",omitempty"`
-	Keywords       []string                   `json:",omitempty"`
-	ReportType     ReportType                 `json:",omitempty"`
-	AlertCause     SituationAlertCause        `json:",omitempty"`
-	Reality        SituationReality           `json:",omitempty"`
-	ProducerRef    string                     `json:",omitempty"`
-	Format         string                     `json:",omitempty"`
-	InternalTags   []string                   `json:",omitempty"`
-	ParticipantRef string                     `json:",omitempty"`
-	Summary        *SituationTranslatedString `json:",omitempty"`
-	Description    *SituationTranslatedString `json:",omitempty"`
+	Progress       SituationProgress   `json:",omitempty"`
+	Severity       SituationSeverity   `json:",omitempty"`
+	Keywords       []string            `json:",omitempty"`
+	ReportType     ReportType          `json:",omitempty"`
+	AlertCause     SituationAlertCause `json:",omitempty"`
+	Reality        SituationReality    `json:",omitempty"`
+	ProducerRef    string              `json:",omitempty"`
+	Format         string              `json:",omitempty"`
+	InternalTags   []string            `json:",omitempty"`
+	ParticipantRef string              `json:",omitempty"`
+	Summary        *TranslatedString   `json:",omitempty"`
+	Description    *TranslatedString   `json:",omitempty"`
 
 	Affects      []Affect       `json:",omitempty"`
 	Consequences []*Consequence `json:",omitempty"`
@@ -418,18 +411,18 @@ type APISituation struct {
 	ValidityPeriods    []*TimeRange `json:",omitempty"`
 	PublicationWindows []*TimeRange `json:",omitempty"`
 
-	Progress       SituationProgress          `json:",omitempty"`
-	Severity       SituationSeverity          `json:",omitempty"`
-	Reality        SituationReality           `json:",omitempty"`
-	Keywords       []string                   `json:",omitempty"`
-	ReportType     ReportType                 `json:",omitempty"`
-	AlertCause     SituationAlertCause        `json:",omitempty"`
-	ProducerRef    string                     `json:",omitempty"`
-	Format         string                     `json:",omitempty"`
-	InternalTags   []string                   `json:",omitempty"`
-	ParticipantRef string                     `json:",omitempty"`
-	Summary        *SituationTranslatedString `json:",omitempty"`
-	Description    *SituationTranslatedString `json:",omitempty"`
+	Progress       SituationProgress   `json:",omitempty"`
+	Severity       SituationSeverity   `json:",omitempty"`
+	Reality        SituationReality    `json:",omitempty"`
+	Keywords       []string            `json:",omitempty"`
+	ReportType     ReportType          `json:",omitempty"`
+	AlertCause     SituationAlertCause `json:",omitempty"`
+	ProducerRef    string              `json:",omitempty"`
+	Format         string              `json:",omitempty"`
+	InternalTags   []string            `json:",omitempty"`
+	ParticipantRef string              `json:",omitempty"`
+	Summary        *TranslatedString   `json:",omitempty"`
+	Description    *TranslatedString   `json:",omitempty"`
 
 	Affects      []Affect       `json:",omitempty"`
 	Consequences []*Consequence `json:",omitempty"`
@@ -667,39 +660,61 @@ func (manager *MemorySituations) Delete(situation *Situation) bool {
 	return true
 }
 
-func (t *SituationTranslatedString) FromProto(value interface{}) error {
-	var ts SituationTranslatedString
-	switch v := value.(type) {
-	case *gtfs.TranslatedString_Translation:
-		if v.GetLanguage() == "fr" {
-			ts.DefaultValue = v.GetText()
-		}
-	default:
-		return fmt.Errorf("unsupported value %T", value)
+func NewTranslatedStringFromMap(translations map[string]string) *TranslatedString {
+	ts := &TranslatedString{
+		Translations: make(map[string]string),
 	}
 
-	*t = ts
-	return nil
+	for lang, text := range translations {
+		if lang == "" {
+			ts.DefaultValue = text
+			continue
+		}
+		ts.Translations[lang] = text
+	}
+
+	return ts
 }
 
-func (t *SituationTranslatedString) ToProto(dest interface{}) error {
-	if t == nil {
-		return errors.New("nil translatedString")
+func NewTranslatedStringFromProto(value []*gtfs.TranslatedString_Translation) *TranslatedString {
+	ts := &TranslatedString{
+		Translations: make(map[string]string),
 	}
 
-	switch v := dest.(type) {
-	case *gtfs.TranslatedString_Translation:
-		if t.DefaultValue == "" {
-			return errors.New("empty default translation")
+	for _, translation := range value {
+		if translation.GetLanguage() == "" {
+			ts.DefaultValue = translation.GetText()
+			continue
 		}
-		language := "fr"
-		v.Language = &language
-		v.Text = &t.DefaultValue
-	default:
-		return fmt.Errorf("unsupported destination %T", dest)
+
+		ts.Translations[translation.GetLanguage()] = translation.GetText()
 	}
 
-	return nil
+	return ts
+}
+
+func (ts *TranslatedString) ToProto(dest *gtfs.TranslatedString) {
+	translations := []*gtfs.TranslatedString_Translation{}
+	if ts.DefaultValue != "" {
+		var emptyLanguage string
+		gtfsTranslation := &gtfs.TranslatedString_Translation{
+			Language: &emptyLanguage,
+			Text:     &ts.DefaultValue,
+		}
+
+		translations = append(translations, gtfsTranslation)
+	}
+
+	for lang, text := range ts.Translations {
+		gtfsTranslation := &gtfs.TranslatedString_Translation{
+			Language: &lang,
+			Text:     &text,
+		}
+
+		translations = append(translations, gtfsTranslation)
+	}
+
+	dest.Translation = translations
 }
 
 func (t *TimeRange) FromProto(value interface{}) error {

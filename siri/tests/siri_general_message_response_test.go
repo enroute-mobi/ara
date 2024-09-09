@@ -29,8 +29,8 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				xsi:type="ns9:IDFGeneralMessageStructure">
 					<Message>
-						<MessageType>Je suis de type texte</MessageType>
-						<MessageText xml:lang="NL">Je suis un texte</MessageText>
+						<MessageType>shortMessage</MessageType>
+						<MessageText>Je suis un texte</MessageText>
 					</Message>
 					<LineSection>
 					  <FirstStop>NINOXE:StopPoint:SP:24:LOC</FirstStop>
@@ -70,7 +70,11 @@ func Test_SIRIGeneralMessageResponse_BuildXML(t *testing.T) {
 	request.RequestMessageRef = "ref"
 
 	request.GeneralMessages = []*siri.SIRIGeneralMessage{gM}
-	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, &siri.SIRIMessage{Content: "Je suis un texte", Type: "Un Type"})
+	message := &siri.SIRIMessage{Type: "shortMessage"}
+	message.DefaultValue = "Je suis un texte"
+	message.Tag = "MessageText"
+
+	request.GeneralMessages[0].Messages = append(request.GeneralMessages[0].Messages, message)
 	request.GeneralMessages[0].InfoMessageVersion = 1
 	request.GeneralMessages[0].InfoChannelRef = "Chan"
 	request.GeneralMessages[0].FormatRef = "STIF-IDF"
