@@ -83,6 +83,7 @@ func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	situation.Format = event.Format
 	situation.Affects = event.Affects
 	situation.Consequences = event.Consequences
+	situation.PublishToWebAction = event.PublishToWebAction
 
 	// Default is AfterCreate
 	var h hook

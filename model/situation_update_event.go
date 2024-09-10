@@ -28,6 +28,7 @@ type SituationUpdateEvent struct {
 	Description        *TranslatedString
 	Affects            []Affect
 	Consequences       []*Consequence
+	PublishToWebAction *PublishToWebAction
 }
 
 func (ue *SituationUpdateEvent) EventKind() EventKind {

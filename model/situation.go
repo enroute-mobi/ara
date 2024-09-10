@@ -57,8 +57,28 @@ type Situation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects      []Affect       `json:",omitempty"`
-	Consequences []*Consequence `json:",omitempty"`
+	Affects            []Affect            `json:",omitempty"`
+	Consequences       []*Consequence      `json:",omitempty"`
+	PublishToWebAction *PublishToWebAction `json:",omitempty"`
+}
+
+type ActionData struct {
+	Name       string            `json:",omitempty"`
+	ActionType string            `json:",omitempty"`
+	Value      string            `json:",omitempty"`
+	Prompt     *TranslatedString `json:",omitempty"`
+}
+
+type PublishToWebAction struct {
+	ActionData `json:"ActionData,omitempty"`
+
+	ActionStatus       SituationActionStatus `json:",omitempty"`
+	Description        *TranslatedString     `json:",omitempty"`
+	PublicationWindows []*TimeRange          `json:",omitempty"`
+	Incident           *bool                 `json:",omitempty"`
+	HomePage           *bool                 `json:",omitempty"`
+	Ticker             *bool                 `json:",omitempty"`
+	SocialNetworks     []string              `json:",omitempty"`
 }
 
 type Consequence struct {

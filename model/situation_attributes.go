@@ -1114,3 +1114,24 @@ func (c SituationCondition) ToProto(dest interface{}) error {
 	}
 	return nil
 }
+
+type SituationActionStatus string
+
+const (
+	SituationActionStatusOpen		SituationActionStatus = "open"
+	SituationActionStatusPublished 	SituationActionStatus = "published"
+	SituationActionStatusClosed    	SituationActionStatus = "closed"
+)
+
+func (as *SituationActionStatus) FromString(s string) error {
+	switch SituationActionStatus(s) {
+	case SituationActionStatusOpen:
+		fallthrough
+	case SituationActionStatusPublished:
+		fallthrough
+	case SituationActionStatusClosed:
+		*as = SituationActionStatus(s)
+		return nil
+	}
+	return fmt.Errorf("invalid action status %s", s)
+}

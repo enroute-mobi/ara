@@ -142,7 +142,68 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setConsequence(situationEvent, consequence)
 	}
 
+	if xmlPublishToWeb := xmlSituation.PublishToWebAction(); xmlPublishToWeb != nil {
+		builder.setPublishToWebAction(situationEvent, xmlPublishToWeb)
+	}
+
 	event.Situations = append(event.Situations, situationEvent)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situationEvent *model.SituationUpdateEvent, xmlPublishToWeb *sxml.XMLPublishToWebAction) {
+	pa := &model.PublishToWebAction{}
+
+	actionData := &model.ActionData{}
+	builder.setActionData(xmlPublishToWeb.ActionData(), actionData)
+	pa.ActionData = *actionData
+
+	var actionStatus model.SituationActionStatus
+	if err := actionStatus.FromString(xmlPublishToWeb.ActionStatus()); err == nil {
+		pa.ActionStatus = actionStatus
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	d := model.NewTranslatedStringFromMap(xmlPublishToWeb.Descriptions())
+	pa.Description = d
+
+	for _, publicationWindow := range xmlPublishToWeb.PublicationWindows() {
+		window := &model.TimeRange{
+			StartTime: publicationWindow.StartTime(),
+			EndTime:   publicationWindow.EndTime(),
+		}
+
+		pa.PublicationWindows = append(
+			pa.PublicationWindows,
+			window)
+	}
+
+	if xmlPublishToWeb.Incident() != nil {
+		pa.Incident = xmlPublishToWeb.Incident()
+	}
+
+	if xmlPublishToWeb.HomePage() != nil {
+		pa.HomePage = xmlPublishToWeb.HomePage()
+	}
+
+	if xmlPublishToWeb.Ticker() != nil {
+		pa.Ticker = xmlPublishToWeb.Ticker()
+	}
+
+	if len(xmlPublishToWeb.SocialNetworks()) != 0 {
+		pa.SocialNetworks = xmlPublishToWeb.SocialNetworks()
+	}
+
+	situationEvent.PublishToWebAction = pa
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setActionData(xmlCommon *sxml.XMLActionData, common *model.ActionData) {
+	common.Name = xmlCommon.Name()
+	common.ActionType = xmlCommon.Type()
+	common.Value = xmlCommon.Value()
+
+	// Prompt
+	p := model.NewTranslatedStringFromMap(xmlCommon.Prompt())
+	common.Prompt = p
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {

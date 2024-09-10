@@ -44,8 +44,42 @@ type XMLPtSituationElement struct {
 	summaries      map[string]string
 	descriptions   map[string]string
 
-	affects      []*XMLAffect
-	consequences []*XMLConsequence
+	affects            []*XMLAffect
+	consequences       []*XMLConsequence
+	publishToWebAction *XMLPublishToWebAction
+}
+
+type XMLActionData struct {
+	XMLStructure
+
+	name       string
+	actionType string
+	value      string
+	prompt     map[string]string
+}
+
+type XMLPublishToWebAction struct {
+	XMLActionData
+
+	actionStatus       string
+	descriptions       map[string]string
+	publicationWindows []*XMLPeriod
+	incident           *bool
+	homepage           *bool
+	ticker             *bool
+	socialNetworks     []string
+}
+
+func NewXMLActionData(node XMLNode) *XMLActionData {
+	xmlActionData := &XMLActionData{}
+	xmlActionData.node = node
+	return xmlActionData
+}
+
+func NewXMLPublishToWebAction(node XMLNode) *XMLPublishToWebAction {
+	xmlPublishToWebAction := &XMLPublishToWebAction{}
+	xmlPublishToWebAction.node = node
+	return xmlPublishToWebAction
 }
 
 type XMLPeriod struct {
@@ -217,7 +251,7 @@ func (s *XMLPtSituationElement) Summaries() map[string]string {
 
 func (s *XMLPtSituationElement) Descriptions() map[string]string {
 	if s.descriptions == nil {
-		translations := FindTranslations(s.findNodes(siri_attributes.Description))
+		translations := FindTranslations(s.findDirectChildrenNodes((siri_attributes.Description)))
 		if translations != nil {
 			s.descriptions = translations
 		}
@@ -562,4 +596,129 @@ func (asp *XMLAffectedStopPoint) LineRefs() []string {
 		}
 	}
 	return asp.lineRefs
+}
+
+func (visit *XMLPtSituationElement) PublishToWebAction() *XMLPublishToWebAction {
+	if visit.publishToWebAction == nil {
+		nodes := visit.findNodes("PublishToWebAction")
+		if nodes != nil {
+			wa := NewXMLPublishToWebAction(nodes[0])
+			visit.publishToWebAction = wa
+		}
+	}
+	return visit.publishToWebAction
+}
+
+func (c *XMLActionData) Name() string {
+	if c.name == "" {
+		name := c.findStringChildContent("Name")
+		c.name = name
+	}
+	return c.name
+}
+
+func (c *XMLActionData) Type() string {
+	if c.actionType == "" {
+		actionType := c.findStringChildContent("Type")
+		c.actionType = actionType
+	}
+	return c.actionType
+}
+
+func (c *XMLActionData) Value() string {
+	if c.value == "" {
+		value := c.findStringChildContent("Value")
+		c.value = value
+	}
+	return c.value
+}
+
+func (c *XMLActionData) Prompt() map[string]string {
+	if c.prompt == nil {
+		translations := FindTranslations(c.findNodes("Prompt"))
+		if translations != nil {
+			c.prompt = translations
+		}
+	}
+	return c.prompt
+}
+
+func (wa *XMLPublishToWebAction) ActionData() *XMLActionData {
+	if nodes := wa.findNodes("ActionData"); nodes != nil {
+		actionData := NewXMLActionData(nodes[0])
+		if actionData != nil {
+			return actionData
+		}
+	}
+	return nil
+}
+
+func (c *XMLPublishToWebAction) ActionStatus() string {
+	if c.actionStatus == "" {
+		actionStatus := c.findStringChildContent("ActionStatus")
+		c.actionStatus = actionStatus
+	}
+	return c.actionStatus
+}
+
+func (c *XMLPublishToWebAction) Descriptions() map[string]string {
+	if c.descriptions == nil {
+		translations := FindTranslations(c.findDirectChildrenNodes(siri_attributes.Description))
+		if translations != nil {
+			c.descriptions = translations
+		}
+	}
+	return c.descriptions
+}
+
+func (c *XMLPublishToWebAction) PublicationWindows() []*XMLPeriod {
+	if c.publicationWindows == nil {
+		publicationWindows := []*XMLPeriod{}
+		nodes := c.findNodes(siri_attributes.PublicationWindow)
+		for _, node := range nodes {
+			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
+		}
+		c.publicationWindows = publicationWindows
+	}
+	return c.publicationWindows
+}
+
+func (wa *XMLPublishToWebAction) Incident() *bool {
+	if wa.incident == nil {
+		if wa.findNode("Incident") != nil {
+			incident := wa.findBoolChildContent("Incident")
+			wa.incident = &incident
+		}
+	}
+	return wa.incident
+}
+
+func (wa *XMLPublishToWebAction) HomePage() *bool {
+	if wa.homepage == nil {
+		if wa.findNode("HomePage") != nil {
+			homepage := wa.findBoolChildContent("HomePage")
+			wa.homepage = &homepage
+		}
+	}
+	return wa.homepage
+}
+
+func (wa *XMLPublishToWebAction) Ticker() *bool {
+	if wa.ticker == nil {
+		if wa.findNode("Ticker") != nil {
+			ticker := wa.findBoolChildContent("Ticker")
+			wa.ticker = &ticker
+		}
+	}
+	return wa.ticker
+}
+
+func (wa *XMLPublishToWebAction) SocialNetworks() []string {
+	if len(wa.socialNetworks) == 0 {
+		socialNetworks := wa.findNodes("SocialNetwork")
+		for _, network := range socialNetworks {
+			wa.socialNetworks = append(wa.socialNetworks, strings.TrimSpace(network.NativeNode().Content()))
+		}
+	}
+	return wa.socialNetworks
 }

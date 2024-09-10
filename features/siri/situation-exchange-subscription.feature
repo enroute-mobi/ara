@@ -191,6 +191,27 @@ Feature: Support SIRI SituationExchange by subscription
                         </siri:Blocking>
                       </siri:Consequence>
                     </siri:Consequences>
+                    <siri:PublishingActions>
+                      <siri:PublishToWebAction>
+                        <siri:ActionStatus>published</siri:ActionStatus>
+                        <siri:Description xml:lang="NO">Toget vil bytte togmateriell på Dovre. Du må dessverre bytte tog på denne stasjonen.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>DataName</siri:Name>
+                          <siri:Type>dummy</siri:Type>
+                          <siri:Value>dummy1</siri:Value>
+                          <siri:Prompt xml:lang="NO">Toget vil bytte togmateriell på Dovre.</siri:Prompt>
+                          <siri:Prompt xml:lang="EN">You must change trains at Dovre. We apologize for the inconvenience.</siri:Prompt>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:Incidents>true</siri:Incidents>
+                        <siri:HomePage>true</siri:HomePage>
+                        <siri:Ticker>false</siri:Ticker>
+                        <siri:SocialNetwork>facebook.com</siri:SocialNetwork>
+                      </siri:PublishToWebAction>
+                    </siri:PublishingActions>
                 </siri:PtSituationElement>
                 </siri:Situations>
               </siri:SituationExchangeDelivery>
@@ -254,6 +275,20 @@ Feature: Support SIRI SituationExchange by subscription
       | Blocking[RealTime]                                                            | true                              |
       | Affects[StopArea=6ba7b814-9dad-11d1-2-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Affects[StopArea=6ba7b814-9dad-11d1-3-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+    And the Situation "internal":"test2" has a PublishToWebAction with the following attributes:
+      | ActionStatus                    | published                                                                            |
+      | HomePage                        | true                                                                                 |
+      | Ticker                          | false                                                                                |
+      | SocialNetworks                  | ["facebook.com"]                                                                     |
+      | Description[Translations]#NO    | Toget vil bytte togmateriell på Dovre. Du må dessverre bytte tog på denne stasjonen. |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                 |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                 |
+    And this PublishToWebAction has an ActionData with the following attributes:
+      | Name                    | DataName                                                             |
+      | ActionType              | dummy                                                                |
+      | Value                   | dummy1                                                               |
+      | Prompt[Translations]#NO | Toget vil bytte togmateriell på Dovre.                               |
+      | Prompt[Translations]#EN | You must change trains at Dovre. We apologize for the inconvenience. |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                                                                             |
       | Direction | received                                                                                                         |
