@@ -79,7 +79,7 @@ type PublishActionCommon struct {
 type PublishToWebAction struct {
 	PublishActionCommon
 
-	Incident       *bool    `json:",omitempty"`
+	Incidents      *bool    `json:",omitempty"`
 	HomePage       *bool    `json:",omitempty"`
 	Ticker         *bool    `json:",omitempty"`
 	SocialNetworks []string `json:",omitempty"`
@@ -88,8 +88,8 @@ type PublishToWebAction struct {
 type PublishToMobileAction struct {
 	PublishActionCommon
 
-	Incident           *bool        `json:",omitempty"`
-	HomePage           *bool        `json:",omitempty"`
+	Incidents *bool `json:",omitempty"`
+	HomePage *bool `json:",omitempty"`
 }
 
 type Consequence struct {

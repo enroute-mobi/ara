@@ -294,6 +294,7 @@ Feature: Support SIRI SituationExchange by subscription
       | Affects[StopArea=6ba7b814-9dad-11d1-3-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And the Situation "internal":"test2" has a PublishToWebAction with the following attributes:
       | ActionStatus                    | published                                                                            |
+      | Incidents                       | true                                                                                 |
       | HomePage                        | true                                                                                 |
       | Ticker                          | false                                                                                |
       | SocialNetworks                  | ["facebook.com"]                                                                     |
@@ -308,6 +309,7 @@ Feature: Support SIRI SituationExchange by subscription
       | Prompt[Translations]#EN | You must change trains at Dovre. We apologize for the inconvenience. |
     And the Situation "internal":"test2" has a PublishToMobileAction with the following attributes:
       | ActionStatus                    | open                                                                                         |
+      | Incidents                       | false                                                                                        |
       | HomePage                        | true                                                                                         |
       | Description[Translations]#DE    | Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen. |
       | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                         |

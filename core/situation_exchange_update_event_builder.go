@@ -181,8 +181,8 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(sit
 			window)
 	}
 
-	if xmlPublishToMobile.Incident() != nil {
-		ma.Incident = xmlPublishToMobile.Incident()
+	if xmlPublishToMobile.Incidents() != nil {
+		ma.Incidents = xmlPublishToMobile.Incidents()
 	}
 
 	if xmlPublishToMobile.HomePage() != nil {
@@ -220,8 +220,8 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situat
 			window)
 	}
 
-	if xmlPublishToWeb.Incident() != nil {
-		pa.Incident = xmlPublishToWeb.Incident()
+	if xmlPublishToWeb.Incidents() != nil {
+		pa.Incidents = xmlPublishToWeb.Incidents()
 	}
 
 	if xmlPublishToWeb.HomePage() != nil {

@@ -702,10 +702,10 @@ func (c *XMLPublishToWebAction) PublicationWindows() []*XMLPeriod {
 	return c.publicationWindows
 }
 
-func (wa *XMLPublishToWebAction) Incident() *bool {
+func (wa *XMLPublishToWebAction) Incidents() *bool {
 	if wa.incident == nil {
-		if wa.findNode("Incident") != nil {
-			incident := wa.findBoolChildContent("Incident")
+		if wa.findNode("Incidents") != nil {
+			incident := wa.findBoolChildContent("Incidents")
 			wa.incident = &incident
 		}
 	}
@@ -793,10 +793,10 @@ func (c *XMLPublishToMobileAction) PublicationWindows() []*XMLPeriod {
 	return c.publicationWindows
 }
 
-func (wa *XMLPublishToMobileAction) Incident() *bool {
+func (wa *XMLPublishToMobileAction) Incidents() *bool {
 	if wa.incident == nil {
-		if wa.findNode("Incident") != nil {
-			incident := wa.findBoolChildContent("Incident")
+		if wa.findNode("Incidents") != nil {
+			incident := wa.findBoolChildContent("Incidents")
 			wa.incident = &incident
 		}
 	}
