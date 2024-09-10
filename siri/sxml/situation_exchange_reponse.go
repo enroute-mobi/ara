@@ -44,9 +44,10 @@ type XMLPtSituationElement struct {
 	summaries      map[string]string
 	descriptions   map[string]string
 
-	affects            []*XMLAffect
-	consequences       []*XMLConsequence
-	publishToWebAction *XMLPublishToWebAction
+	affects               []*XMLAffect
+	consequences          []*XMLConsequence
+	publishToWebAction    *XMLPublishToWebAction
+	publishToMobileAction *XMLPublishToMobileAction
 }
 
 type XMLActionData struct {
@@ -58,16 +59,28 @@ type XMLActionData struct {
 	prompt     map[string]string
 }
 
-type XMLPublishToWebAction struct {
+type XMLCommonPublishingAction struct {
 	XMLActionData
 
 	actionStatus       string
 	descriptions       map[string]string
 	publicationWindows []*XMLPeriod
+}
+type XMLPublishToWebAction struct {
+	XMLCommonPublishingAction
+
+	incident       *bool
+	homepage       *bool
+	ticker         *bool
+	socialNetworks []string
+}
+
+type XMLPublishToMobileAction struct {
+	XMLCommonPublishingAction
+
+	publicationWindows []*XMLPeriod
 	incident           *bool
 	homepage           *bool
-	ticker             *bool
-	socialNetworks     []string
 }
 
 func NewXMLActionData(node XMLNode) *XMLActionData {
@@ -80,6 +93,12 @@ func NewXMLPublishToWebAction(node XMLNode) *XMLPublishToWebAction {
 	xmlPublishToWebAction := &XMLPublishToWebAction{}
 	xmlPublishToWebAction.node = node
 	return xmlPublishToWebAction
+}
+
+func NewXMLPublishToMobileAction(node XMLNode) *XMLPublishToMobileAction {
+	xmlPublishToMobileAction := &XMLPublishToMobileAction{}
+	xmlPublishToMobileAction.node = node
+	return xmlPublishToMobileAction
 }
 
 type XMLPeriod struct {
@@ -721,4 +740,75 @@ func (wa *XMLPublishToWebAction) SocialNetworks() []string {
 		}
 	}
 	return wa.socialNetworks
+}
+
+func (visit *XMLPtSituationElement) PublishToMobileAction() *XMLPublishToMobileAction {
+	if visit.publishToMobileAction == nil {
+		nodes := visit.findNodes("PublishToMobileAction")
+		if nodes != nil {
+			ma := NewXMLPublishToMobileAction(nodes[0])
+			visit.publishToMobileAction = ma
+		}
+	}
+	return visit.publishToMobileAction
+}
+
+func (c *XMLPublishToMobileAction) ActionStatus() string {
+	if c.actionStatus == "" {
+		actionStatus := c.findStringChildContent("ActionStatus")
+		c.actionStatus = actionStatus
+	}
+	return c.actionStatus
+}
+
+func (ma *XMLPublishToMobileAction) ActionData() *XMLActionData {
+	if nodes := ma.findNodes("ActionData"); nodes != nil {
+		actionData := NewXMLActionData(nodes[0])
+		if actionData != nil {
+			return actionData
+		}
+	}
+	return nil
+}
+
+func (c *XMLPublishToMobileAction) Descriptions() map[string]string {
+	if c.descriptions == nil {
+		translations := FindTranslations(c.findDirectChildrenNodes(siri_attributes.Description))
+		if translations != nil {
+			c.descriptions = translations
+		}
+	}
+	return c.descriptions
+}
+
+func (c *XMLPublishToMobileAction) PublicationWindows() []*XMLPeriod {
+	if c.publicationWindows == nil {
+		publicationWindows := []*XMLPeriod{}
+		nodes := c.findNodes(siri_attributes.PublicationWindow)
+		for _, node := range nodes {
+			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
+		}
+		c.publicationWindows = publicationWindows
+	}
+	return c.publicationWindows
+}
+
+func (wa *XMLPublishToMobileAction) Incident() *bool {
+	if wa.incident == nil {
+		if wa.findNode("Incident") != nil {
+			incident := wa.findBoolChildContent("Incident")
+			wa.incident = &incident
+		}
+	}
+	return wa.incident
+}
+
+func (wa *XMLPublishToMobileAction) HomePage() *bool {
+	if wa.homepage == nil {
+		if wa.findNode("HomePage") != nil {
+			homepage := wa.findBoolChildContent("HomePage")
+			wa.homepage = &homepage
+		}
+	}
+	return wa.homepage
 }

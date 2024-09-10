@@ -455,6 +455,23 @@ Feature: Support SIRI Situation Exchange by request
                         <siri:Ticker>false</siri:Ticker>
                         <siri:SocialNetwork>facebook.com</siri:SocialNetwork>
                       </siri:PublishToWebAction>
+                      <siri:PublishToMobileAction>
+                        <siri:ActionStatus>open</siri:ActionStatus>
+                        <siri:Description xml:lang="DE">Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherDataName</siri:Name>
+                          <siri:Type>dummy2</siri:Type>
+                          <siri:Value>dummy3</siri:Value>
+                          <siri:Prompt xml:lang="DE">Der Zug wird in Dovre das Zugmaterial wechseln.</siri:Prompt>
+                          <siri:Prompt xml:lang="HU">A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.</siri:Prompt>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:Incidents>false</siri:Incidents>
+                        <siri:HomePage>true</siri:HomePage>
+                      </siri:PublishToMobileAction>
                     </siri:PublishingActions>
                 </siri:PtSituationElement>
                 </siri:Situations>
@@ -556,6 +573,18 @@ Feature: Support SIRI Situation Exchange by request
       | Value                   | dummy1                                                               |
       | Prompt[Translations]#NO | Toget vil bytte togmateriell på Dovre.                               |
       | Prompt[Translations]#EN | You must change trains at Dovre. We apologize for the inconvenience. |
+    And the Situation "external":"test2" has a PublishToMobileAction with the following attributes:
+      | ActionStatus                    | open                                                                                         |
+      | HomePage                        | true                                                                                         |
+      | Description[Translations]#DE    | Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen. |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                         |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                         |
+    And this PublishToMobileAction has an ActionData with the following attributes:
+      | Name                    | AnotherDataName                                                                        |
+      | ActionType              | dummy2                                                                                 |
+      | Value                   | dummy3                                                                                 |
+      | Prompt[Translations]#DE | Der Zug wird in Dovre das Zugmaterial wechseln.                                        |
+      | Prompt[Translations]#HU | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni. |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                                                                             |
       | Direction | sent                                                                                                             |

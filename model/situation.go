@@ -57,9 +57,10 @@ type Situation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects            []Affect            `json:",omitempty"`
-	Consequences       []*Consequence      `json:",omitempty"`
-	PublishToWebAction *PublishToWebAction `json:",omitempty"`
+	Affects               []Affect               `json:",omitempty"`
+	Consequences          []*Consequence         `json:",omitempty"`
+	PublishToWebAction    *PublishToWebAction    `json:",omitempty"`
+	PublishToMobileAction *PublishToMobileAction `json:",omitempty"`
 }
 
 type ActionData struct {
@@ -69,16 +70,26 @@ type ActionData struct {
 	Prompt     *TranslatedString `json:",omitempty"`
 }
 
-type PublishToWebAction struct {
-	ActionData `json:"ActionData,omitempty"`
-
+type PublishActionCommon struct {
+	ActionData         `json:"ActionData,omitempty"`
 	ActionStatus       SituationActionStatus `json:",omitempty"`
 	Description        *TranslatedString     `json:",omitempty"`
 	PublicationWindows []*TimeRange          `json:",omitempty"`
-	Incident           *bool                 `json:",omitempty"`
-	HomePage           *bool                 `json:",omitempty"`
-	Ticker             *bool                 `json:",omitempty"`
-	SocialNetworks     []string              `json:",omitempty"`
+}
+type PublishToWebAction struct {
+	PublishActionCommon
+
+	Incident       *bool    `json:",omitempty"`
+	HomePage       *bool    `json:",omitempty"`
+	Ticker         *bool    `json:",omitempty"`
+	SocialNetworks []string `json:",omitempty"`
+}
+
+type PublishToMobileAction struct {
+	PublishActionCommon
+
+	Incident           *bool        `json:",omitempty"`
+	HomePage           *bool        `json:",omitempty"`
 }
 
 type Consequence struct {

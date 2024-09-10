@@ -146,7 +146,50 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setPublishToWebAction(situationEvent, xmlPublishToWeb)
 	}
 
+	if xmlPublishToMobile := xmlSituation.PublishToMobileAction(); xmlPublishToMobile != nil {
+		builder.setPublishToMobileAction(situationEvent, xmlPublishToMobile)
+	}
+
 	event.Situations = append(event.Situations, situationEvent)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(situationEvent *model.SituationUpdateEvent, xmlPublishToMobile *sxml.XMLPublishToMobileAction) {
+	ma := &model.PublishToMobileAction{}
+
+	actionData := &model.ActionData{}
+	builder.setActionData(xmlPublishToMobile.ActionData(), actionData)
+	ma.ActionData = *actionData
+
+	var actionStatus model.SituationActionStatus
+	if err := actionStatus.FromString(xmlPublishToMobile.ActionStatus()); err == nil {
+		ma.ActionStatus = actionStatus
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	d := model.NewTranslatedStringFromMap(xmlPublishToMobile.Descriptions())
+	ma.Description = d
+
+	for _, publicationWindow := range xmlPublishToMobile.PublicationWindows() {
+		window := &model.TimeRange{
+			StartTime: publicationWindow.StartTime(),
+			EndTime:   publicationWindow.EndTime(),
+		}
+
+		ma.PublicationWindows = append(
+			ma.PublicationWindows,
+			window)
+	}
+
+	if xmlPublishToMobile.Incident() != nil {
+		ma.Incident = xmlPublishToMobile.Incident()
+	}
+
+	if xmlPublishToMobile.HomePage() != nil {
+		ma.HomePage = xmlPublishToMobile.HomePage()
+	}
+
+	situationEvent.PublishToMobileAction = ma
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situationEvent *model.SituationUpdateEvent, xmlPublishToWeb *sxml.XMLPublishToWebAction) {

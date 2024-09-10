@@ -98,15 +98,18 @@ Then(/^the Situation "([^"]+)":"([^"]+)" has a Consequence with the following at
   expect(expectedSituation['Consequences']).to include(model_attributes(attributes))
 end
 
-Then(/^the Situation "([^"]+)":"([^"]+)" has a PublishToWebAction with the following attributes:$/) do |kind, code, attributes|
+Then(/^the Situation "([^"]+)":"([^"]+)" has a (\S+)Action with the following attributes:$/) do |kind, code, publish_to, attributes|
   response = RestClient.get situations_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
   responseArray = JSON.parse(response.body)
   expectedSituation = responseArray.find{|a| a["Codes"][kind] == code }
 
-  @publish_to_web_action = expectedSituation['PublishToWebAction']
-  expect(@publish_to_web_action).to include(model_attributes(attributes))
+  action = "@#{publish_to.underscore}_action"
+  instance_variable_set(action, expectedSituation["#{publish_to}Action"])
+
+  expect(expectedSituation["#{publish_to}Action"]).to include(model_attributes(attributes))
 end
 
-Then(/^this PublishToWebAction has an ActionData with the following attributes:$/) do |attributes|
-  expect(@publish_to_web_action['ActionData']).to include(model_attributes(attributes))
+Then(/^this (\S+)Action has an ActionData with the following attributes:$/) do |publish_to, attributes|
+  action = instance_variable_get("@#{publish_to.underscore}_action")
+  expect(action['ActionData']).to include(model_attributes(attributes))
 end

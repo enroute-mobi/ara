@@ -29,6 +29,7 @@ type SituationUpdateEvent struct {
 	Affects            []Affect
 	Consequences       []*Consequence
 	PublishToWebAction *PublishToWebAction
+	PublishToMobileAction *PublishToMobileAction
 }
 
 func (ue *SituationUpdateEvent) EventKind() EventKind {
