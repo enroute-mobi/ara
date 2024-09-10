@@ -30,6 +30,7 @@ type SituationUpdateEvent struct {
 	Consequences       []*Consequence
 	PublishToWebAction *PublishToWebAction
 	PublishToMobileAction *PublishToMobileAction
+	PublishToDisplayAction *PublishToDisplayAction
 }
 
 func (ue *SituationUpdateEvent) EventKind() EventKind {

@@ -61,6 +61,7 @@ type Situation struct {
 	Consequences          []*Consequence         `json:",omitempty"`
 	PublishToWebAction    *PublishToWebAction    `json:",omitempty"`
 	PublishToMobileAction *PublishToMobileAction `json:",omitempty"`
+	PublishToDisplayAction *PublishToDisplayAction `json:",omitempty"`
 }
 
 type ActionData struct {
@@ -89,7 +90,14 @@ type PublishToMobileAction struct {
 	PublishActionCommon
 
 	Incidents *bool `json:",omitempty"`
-	HomePage *bool `json:",omitempty"`
+	HomePage  *bool `json:",omitempty"`
+}
+
+type PublishToDisplayAction struct {
+	PublishActionCommon
+
+	OnPlace *bool `json:",omitempty"`
+	OnBoard *bool `json:",omitempty"`
 }
 
 type Consequence struct {

@@ -150,7 +150,50 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setPublishToMobileAction(situationEvent, xmlPublishToMobile)
 	}
 
+	if xmlPublishToDisplay := xmlSituation.PublishToDisplayAction(); xmlPublishToDisplay != nil {
+		builder.setPublishToDisplayAction(situationEvent, xmlPublishToDisplay)
+	}
+
 	event.Situations = append(event.Situations, situationEvent)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToDisplayAction(situationEvent *model.SituationUpdateEvent, xmlPublishToDisplay *sxml.XMLPublishToDisplayAction) {
+	da := &model.PublishToDisplayAction{}
+
+	actionData := &model.ActionData{}
+	builder.setActionData(xmlPublishToDisplay.ActionData(), actionData)
+	da.ActionData = *actionData
+
+	var actionStatus model.SituationActionStatus
+	if err := actionStatus.FromString(xmlPublishToDisplay.ActionStatus()); err == nil {
+		da.ActionStatus = actionStatus
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	d := model.NewTranslatedStringFromMap(xmlPublishToDisplay.Descriptions())
+	da.Description = d
+
+	for _, publicationWindow := range xmlPublishToDisplay.PublicationWindows() {
+		window := &model.TimeRange{
+			StartTime: publicationWindow.StartTime(),
+			EndTime:   publicationWindow.EndTime(),
+		}
+
+		da.PublicationWindows = append(
+			da.PublicationWindows,
+			window)
+	}
+
+	if xmlPublishToDisplay.OnBoard() != nil {
+		da.OnBoard = xmlPublishToDisplay.OnBoard()
+	}
+
+	if xmlPublishToDisplay.OnPlace() != nil {
+		da.OnPlace = xmlPublishToDisplay.OnPlace()
+	}
+
+	situationEvent.PublishToDisplayAction = da
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(situationEvent *model.SituationUpdateEvent, xmlPublishToMobile *sxml.XMLPublishToMobileAction) {

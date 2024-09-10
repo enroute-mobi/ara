@@ -472,6 +472,23 @@ Feature: Support SIRI Situation Exchange by request
                         <siri:Incidents>false</siri:Incidents>
                         <siri:HomePage>true</siri:HomePage>
                       </siri:PublishToMobileAction>
+                      <siri:PublishToDisplayAction>
+                        <siri:ActionStatus>closed</siri:ActionStatus>
+                        <siri:Description xml:lang="ES">El tren cambiará su material en Dovre. Lamentablemente tienes que hacer transbordo en esta estación.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>NewDataName</siri:Name>
+                          <siri:Type>dummy4</siri:Type>
+                          <siri:Value>dummy5</siri:Value>
+                          <siri:Prompt xml:lang="PL">Pociąg zmieni materiał składowy w Dovre.</siri:Prompt>
+                          <siri:Prompt xml:lang="BG">Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара.</siri:Prompt>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:OnPlace>true</siri:OnPlace>
+                        <siri:OnBoard>false</siri:OnBoard>
+                      </siri:PublishToDisplayAction>
                     </siri:PublishingActions>
                 </siri:PtSituationElement>
                 </siri:Situations>
@@ -587,6 +604,19 @@ Feature: Support SIRI Situation Exchange by request
       | Value                   | dummy3                                                                                 |
       | Prompt[Translations]#DE | Der Zug wird in Dovre das Zugmaterial wechseln.                                        |
       | Prompt[Translations]#HU | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni. |
+    And the Situation "external":"test2" has a PublishToDisplayAction with the following attributes:
+      | ActionStatus                    | closed                                                                                               |
+      | OnBoard                         | false                                                                                                |
+      | OnPlace                         | true                                                                                                 |
+      | Description[Translations]#ES    | El tren cambiará su material en Dovre. Lamentablemente tienes que hacer transbordo en esta estación. |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                                 |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                                 |
+    And this PublishToDisplayAction has an ActionData with the following attributes:
+      | Name                    | NewDataName                                                                             |
+      | ActionType              | dummy4                                                                                  |
+      | Value                   | dummy5                                                                                  |
+      | Prompt[Translations]#PL | Pociąg zmieni materiał składowy w Dovre.                                                |
+      | Prompt[Translations]#BG | Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара. |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                                                                             |
       | Direction | sent                                                                                                             |

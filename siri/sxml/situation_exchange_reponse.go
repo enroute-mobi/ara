@@ -44,10 +44,11 @@ type XMLPtSituationElement struct {
 	summaries      map[string]string
 	descriptions   map[string]string
 
-	affects               []*XMLAffect
-	consequences          []*XMLConsequence
-	publishToWebAction    *XMLPublishToWebAction
-	publishToMobileAction *XMLPublishToMobileAction
+	affects                []*XMLAffect
+	consequences           []*XMLConsequence
+	publishToWebAction     *XMLPublishToWebAction
+	publishToMobileAction  *XMLPublishToMobileAction
+	publishToDisplayAction *XMLPublishToDisplayAction
 }
 
 type XMLActionData struct {
@@ -83,6 +84,13 @@ type XMLPublishToMobileAction struct {
 	homepage           *bool
 }
 
+type XMLPublishToDisplayAction struct {
+	XMLCommonPublishingAction
+
+	onPlace *bool
+	onBoard *bool
+}
+
 func NewXMLActionData(node XMLNode) *XMLActionData {
 	xmlActionData := &XMLActionData{}
 	xmlActionData.node = node
@@ -99,6 +107,12 @@ func NewXMLPublishToMobileAction(node XMLNode) *XMLPublishToMobileAction {
 	xmlPublishToMobileAction := &XMLPublishToMobileAction{}
 	xmlPublishToMobileAction.node = node
 	return xmlPublishToMobileAction
+}
+
+func NewXMLPublishToDisplayAction(node XMLNode) *XMLPublishToDisplayAction {
+	xmlPublishToDisplayAction := &XMLPublishToDisplayAction{}
+	xmlPublishToDisplayAction.node = node
+	return xmlPublishToDisplayAction
 }
 
 type XMLPeriod struct {
@@ -811,4 +825,75 @@ func (wa *XMLPublishToMobileAction) HomePage() *bool {
 		}
 	}
 	return wa.homepage
+}
+
+func (visit *XMLPtSituationElement) PublishToDisplayAction() *XMLPublishToDisplayAction {
+	if visit.publishToDisplayAction == nil {
+		nodes := visit.findNodes("PublishToDisplayAction")
+		if nodes != nil {
+			da := NewXMLPublishToDisplayAction(nodes[0])
+			visit.publishToDisplayAction = da
+		}
+	}
+	return visit.publishToDisplayAction
+}
+
+func (da *XMLPublishToDisplayAction) ActionStatus() string {
+	if da.actionStatus == "" {
+		actionStatus := da.findStringChildContent("ActionStatus")
+		da.actionStatus = actionStatus
+	}
+	return da.actionStatus
+}
+
+func (da *XMLPublishToDisplayAction) ActionData() *XMLActionData {
+	if nodes := da.findNodes("ActionData"); nodes != nil {
+		actionData := NewXMLActionData(nodes[0])
+		if actionData != nil {
+			return actionData
+		}
+	}
+	return nil
+}
+
+func (da *XMLPublishToDisplayAction) Descriptions() map[string]string {
+	if da.descriptions == nil {
+		translations := FindTranslations(da.findDirectChildrenNodes(siri_attributes.Description))
+		if translations != nil {
+			da.descriptions = translations
+		}
+	}
+	return da.descriptions
+}
+
+func (da *XMLPublishToDisplayAction) PublicationWindows() []*XMLPeriod {
+	if da.publicationWindows == nil {
+		publicationWindows := []*XMLPeriod{}
+		nodes := da.findNodes(siri_attributes.PublicationWindow)
+		for _, node := range nodes {
+			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
+		}
+		da.publicationWindows = publicationWindows
+	}
+	return da.publicationWindows
+}
+
+func (da *XMLPublishToDisplayAction) OnPlace() *bool {
+	if da.onPlace == nil {
+		if da.findNode("OnPlace") != nil {
+			onPlace := da.findBoolChildContent("OnPlace")
+			da.onPlace = &onPlace
+		}
+	}
+	return da.onPlace
+}
+
+func (da *XMLPublishToDisplayAction) OnBoard() *bool {
+	if da.onBoard == nil {
+		if da.findNode("OnBoard") != nil {
+			onBoard := da.findBoolChildContent("OnBoard")
+			da.onBoard = &onBoard
+		}
+	}
+	return da.onBoard
 }
