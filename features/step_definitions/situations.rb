@@ -111,5 +111,10 @@ end
 
 Then(/^this (\S+)Action has an ActionData with the following attributes:$/) do |publish_to, attributes|
   action = instance_variable_get("@#{publish_to.underscore}_action")
-  expect(action['ActionData']).to include(model_attributes(attributes))
+  @action_data = action['ActionData']
+  expect(@action_data).to include(model_attributes(attributes))
+end
+
+Then(/^this ActionData has a PublishAtScope with the following attributes:$/) do |attributes|
+  expect(@action_data['PublishAtScope']).to include(model_attributes(attributes))
 end

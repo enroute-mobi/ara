@@ -445,6 +445,18 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:Value>dummy1</siri:Value>
                           <siri:Prompt xml:lang="NO">Toget vil bytte togmateriell på Dovre.</siri:Prompt>
                           <siri:Prompt xml:lang="EN">You must change trains at Dovre. We apologize for the inconvenience.</siri:Prompt>
+                          <siri:PublishAtScope>
+                          <siri:ScopeType>line</siri:ScopeType>
+                          <siri:Affects>
+                            <siri:Networks>
+                              <siri:AffectedNetwork>
+                                <siri:AffectedLine>
+                                  <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                </siri:AffectedLine>
+                              </siri:AffectedNetwork>
+                            </siri:Networks>
+                          </siri:Affects>
+                          </siri:PublishAtScope>
                         </siri:ActionData>
                         <siri:PublicationWindow>
                           <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
@@ -464,6 +476,24 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:Value>dummy3</siri:Value>
                           <siri:Prompt xml:lang="DE">Der Zug wird in Dovre das Zugmaterial wechseln.</siri:Prompt>
                           <siri:Prompt xml:lang="HU">A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>stopPlace</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:StopPoints>
+                                <siri:AffectedStopPoint>
+                                  <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                                  <siri:Lines>
+                                      <siri:AffectedLine>
+                                        <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                      </siri:AffectedLine>
+                                      <siri:AffectedLine>
+                                        <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                      </siri:AffectedLine>
+                                  </siri:Lines>
+                                </siri:AffectedStopPoint>
+                              </siri:StopPoints>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
                         </siri:ActionData>
                         <siri:PublicationWindow>
                           <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
@@ -481,6 +511,18 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:Value>dummy5</siri:Value>
                           <siri:Prompt xml:lang="PL">Pociąg zmieni materiał składowy w Dovre.</siri:Prompt>
                           <siri:Prompt xml:lang="BG">Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>general</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:Networks>
+                                <siri:AffectedNetwork>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                </siri:AffectedNetwork>
+                              </siri:Networks>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
                         </siri:ActionData>
                         <siri:PublicationWindow>
                           <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
@@ -591,6 +633,9 @@ Feature: Support SIRI Situation Exchange by request
       | Value                   | dummy1                                                               |
       | Prompt[Translations]#NO | Toget vil bytte togmateriell på Dovre.                               |
       | Prompt[Translations]#EN | You must change trains at Dovre. We apologize for the inconvenience. |
+    And this ActionData has a PublishAtScope with the following attributes:
+      | ScopeType     | line                              |
+      | Affects[Line] | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And the Situation "external":"test2" has a PublishToMobileAction with the following attributes:
       | ActionStatus                    | open                                                                                         |
       | Incidents                       | false                                                                                        |
@@ -604,6 +649,11 @@ Feature: Support SIRI Situation Exchange by request
       | Value                   | dummy3                                                                                 |
       | Prompt[Translations]#DE | Der Zug wird in Dovre das Zugmaterial wechseln.                                        |
       | Prompt[Translations]#HU | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni. |
+    And this ActionData has a PublishAtScope with the following attributes:
+      | ScopeType                                                      | stopPlace                         |
+      | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Affects[StopArea=6ba7b814-9dad-11d1-2-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[StopArea=6ba7b814-9dad-11d1-3-00c04fd430c8]/LineIds[1] | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And the Situation "external":"test2" has a PublishToDisplayAction with the following attributes:
       | ActionStatus                    | closed                                                                                               |
       | OnBoard                         | false                                                                                                |
@@ -617,6 +667,9 @@ Feature: Support SIRI Situation Exchange by request
       | Value                   | dummy5                                                                                  |
       | Prompt[Translations]#PL | Pociąg zmieni materiał składowy w Dovre.                                                |
       | Prompt[Translations]#BG | Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара. |
+    And this ActionData has a PublishAtScope with the following attributes:
+      | ScopeType                                                      | general                           |
+      | Affects[Line]                                                  | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                                                                             |
       | Direction | sent                                                                                                             |

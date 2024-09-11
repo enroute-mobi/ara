@@ -58,6 +58,8 @@ type XMLActionData struct {
 	actionType string
 	value      string
 	prompt     map[string]string
+	scopeType  string
+	affects    []*XMLAffect
 }
 
 type XMLCommonPublishingAction struct {
@@ -896,4 +898,24 @@ func (da *XMLPublishToDisplayAction) OnBoard() *bool {
 		}
 	}
 	return da.onBoard
+}
+
+func (ad *XMLActionData) ScopeType() string {
+	if ad.scopeType == "" {
+		scopeType := ad.findStringChildContent("ScopeType")
+		ad.scopeType = scopeType
+	}
+	return ad.scopeType
+}
+
+func (ad *XMLActionData) Affects() []*XMLAffect {
+	if ad.affects == nil {
+		affects := []*XMLAffect{}
+		nodes := ad.findNodes("Affects")
+		for _, node := range nodes {
+			affects = append(affects, NewXMLAffect(node))
+		}
+		ad.affects = affects
+	}
+	return ad.affects
 }

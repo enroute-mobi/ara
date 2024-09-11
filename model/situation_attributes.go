@@ -1135,3 +1135,42 @@ func (as *SituationActionStatus) FromString(s string) error {
 	}
 	return fmt.Errorf("invalid action status %s", s)
 }
+
+type SituationScopeType string
+
+const (
+	SituationScopeTypeGeneral        SituationScopeType = "general"
+	SituationScopeTypeOperator       SituationScopeType = "operator"
+	SituationScopeTypeNetwork        SituationScopeType = "network"
+	SituationScopeTypeRoute          SituationScopeType = "route"
+	SituationScopeTypeLine           SituationScopeType = "line"
+	SituationScopeTypePlace          SituationScopeType = "place"
+	SituationScopeTypeStopPlace      SituationScopeType = "stopPlace"
+	SituationScopeTypeStopPoint      SituationScopeType = "stopPoint"
+	SituationScopeTypeVehicleJourney SituationScopeType = "VehicleJourney"
+)
+
+func (sc *SituationScopeType) FromString(s string) error {
+	switch SituationScopeType(s) {
+	case SituationScopeTypeGeneral:
+		fallthrough
+	case SituationScopeTypeOperator:
+		fallthrough
+	case SituationScopeTypeNetwork:
+		fallthrough
+	case SituationScopeTypeRoute:
+		fallthrough
+	case SituationScopeTypeLine:
+		fallthrough
+	case SituationScopeTypePlace:
+		fallthrough
+	case SituationScopeTypeStopPlace:
+		fallthrough
+	case SituationScopeTypeStopPoint:
+		fallthrough
+	case SituationScopeTypeVehicleJourney:
+		*sc = SituationScopeType(s)
+		return nil
+	}
+	return fmt.Errorf("invalid scope type %s", s)
+}

@@ -290,6 +290,32 @@ func (builder *SituationExchangeUpdateEventBuilder) setActionData(xmlCommon *sxm
 	// Prompt
 	p := model.NewTranslatedStringFromMap(xmlCommon.Prompt())
 	common.Prompt = p
+
+	// publishedAtScope
+	publishAtScope := &model.PublishAtScope{}
+
+	// scopeType
+	var scopeType model.SituationScopeType
+	if err := scopeType.FromString(xmlCommon.ScopeType()); err == nil {
+		publishAtScope.ScopeType = scopeType
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	// affects
+	for _, affect := range xmlCommon.Affects() {
+		affectedModels := builder.buildAffect(affect)
+		for _, affectedLine := range affectedModels.affectedLines {
+			publishAtScope.Affects = append(publishAtScope.Affects, affectedLine)
+		}
+		for _, affectedStopAreas := range affectedModels.affectedStopAreas {
+			publishAtScope.Affects = append(publishAtScope.Affects, affectedStopAreas)
+		}
+	}
+
+	if publishAtScope.Affects != nil {
+		common.PublishAtScope = publishAtScope
+	}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {

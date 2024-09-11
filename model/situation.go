@@ -57,10 +57,10 @@ type Situation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects               []Affect               `json:",omitempty"`
-	Consequences          []*Consequence         `json:",omitempty"`
-	PublishToWebAction    *PublishToWebAction    `json:",omitempty"`
-	PublishToMobileAction *PublishToMobileAction `json:",omitempty"`
+	Affects                []Affect                `json:",omitempty"`
+	Consequences           []*Consequence          `json:",omitempty"`
+	PublishToWebAction     *PublishToWebAction     `json:",omitempty"`
+	PublishToMobileAction  *PublishToMobileAction  `json:",omitempty"`
 	PublishToDisplayAction *PublishToDisplayAction `json:",omitempty"`
 }
 
@@ -69,6 +69,7 @@ type ActionData struct {
 	ActionType string            `json:",omitempty"`
 	Value      string            `json:",omitempty"`
 	Prompt     *TranslatedString `json:",omitempty"`
+	PublishAtScope     *PublishAtScope `json:",omitempty"`
 }
 
 type PublishActionCommon struct {
@@ -77,6 +78,12 @@ type PublishActionCommon struct {
 	Description        *TranslatedString     `json:",omitempty"`
 	PublicationWindows []*TimeRange          `json:",omitempty"`
 }
+
+type PublishAtScope struct {
+	ScopeType SituationScopeType
+	Affects   []Affect
+}
+
 type PublishToWebAction struct {
 	PublishActionCommon
 
