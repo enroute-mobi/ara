@@ -360,15 +360,13 @@ Feature: Support SIRI SituationExchange by subscription
       | Description[Translations]#NO    | Toget vil bytte togmateriell på Dovre. Du må dessverre bytte tog på denne stasjonen. |
       | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                 |
       | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                 |
-    And this PublishToWebAction has an ActionData with the following attributes:
-      | Name                      | DataName                                                             |
-      | ActionType                | dummy                                                                |
-      | Value                     | dummy1                                                               |
-      | Prompt[Translations]#NO   | Toget vil bytte togmateriell på Dovre.                               |
-      | Prompt[Translations]#EN   | You must change trains at Dovre. We apologize for the inconvenience. |
-    And this ActionData has a PublishAtScope with the following attributes:
-      | ScopeType     | line                              |
-      | Affects[Line] | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Name                            | DataName                                                                             |
+      | ActionType                      | dummy                                                                                |
+      | Value                           | dummy1                                                                               |
+      | Prompt[Translations]#NO         | Toget vil bytte togmateriell på Dovre.                                               |
+      | Prompt[Translations]#EN         | You must change trains at Dovre. We apologize for the inconvenience.                 |
+      | ScopeType                       | line                                                                                 |
+      | Affects[Line]                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                    |
     And the Situation "internal":"test2" has a PublishToMobileAction with the following attributes:
       | ActionStatus                    | open                                                                                         |
       | Incidents                       | false                                                                                        |
@@ -376,13 +374,11 @@ Feature: Support SIRI SituationExchange by subscription
       | Description[Translations]#DE    | Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen. |
       | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                         |
       | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                         |
-    And this PublishToMobileAction has an ActionData with the following attributes:
       | Name                    | AnotherDataName                                                                        |
       | ActionType              | dummy2                                                                                 |
       | Value                   | dummy3                                                                                 |
       | Prompt[Translations]#DE | Der Zug wird in Dovre das Zugmaterial wechseln.                                        |
       | Prompt[Translations]#HU | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni. |
-    And this ActionData has a PublishAtScope with the following attributes:
       | ScopeType                                                      | stopPlace                         |
       | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Affects[StopArea=6ba7b814-9dad-11d1-5-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
@@ -394,13 +390,11 @@ Feature: Support SIRI SituationExchange by subscription
       | Description[Translations]#ES    | El tren cambiará su material en Dovre. Lamentablemente tienes que hacer transbordo en esta estación. |
       | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                                 |
       | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                                 |
-    And this PublishToDisplayAction has an ActionData with the following attributes:
       | Name                    | NewDataName                                                                             |
       | ActionType              | dummy4                                                                                  |
       | Value                   | dummy5                                                                                  |
       | Prompt[Translations]#PL | Pociąg zmieni materiał składowy w Dovre.                                                |
       | Prompt[Translations]#BG | Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара. |
-    And this ActionData has a PublishAtScope with the following attributes:
       | ScopeType     | general                           |
       | Affects[Line] | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And an audit event should exist with these attributes:

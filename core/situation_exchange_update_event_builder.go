@@ -157,33 +157,62 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 	event.Situations = append(event.Situations, situationEvent)
 }
 
-func (builder *SituationExchangeUpdateEventBuilder) setPublishToDisplayAction(situationEvent *model.SituationUpdateEvent, xmlPublishToDisplay *sxml.XMLPublishToDisplayAction) {
-	da := &model.PublishToDisplayAction{}
+func (builder *SituationExchangeUpdateEventBuilder) setPublishActionCommon(xmlCommon sxml.XMLCommonPublishingAction) (actionCommon model.ActionCommon) {
+	actionCommon.Name = xmlCommon.Name()
+	actionCommon.ActionType = xmlCommon.Type()
+	actionCommon.Value = xmlCommon.Value()
 
-	actionData := &model.ActionData{}
-	builder.setActionData(xmlPublishToDisplay.ActionData(), actionData)
-	da.ActionData = *actionData
+	// Prompt
+	actionCommon.Prompt = model.NewTranslatedStringFromMap(xmlCommon.Prompt())
 
-	var actionStatus model.SituationActionStatus
-	if err := actionStatus.FromString(xmlPublishToDisplay.ActionStatus()); err == nil {
-		da.ActionStatus = actionStatus
+	// scopeType
+	var scopeType model.SituationScopeType
+	if err := scopeType.FromString(xmlCommon.ScopeType()); err == nil {
+		actionCommon.ScopeType = scopeType
 	} else {
 		logger.Log.Debugf("%v", err)
 	}
 
-	d := model.NewTranslatedStringFromMap(xmlPublishToDisplay.Descriptions())
-	da.Description = d
+	// affects
+	for _, affect := range xmlCommon.Affects() {
+		affectedModels := builder.buildAffect(affect)
+		for _, affectedLine := range affectedModels.affectedLines {
+			actionCommon.Affects = append(actionCommon.Affects, affectedLine)
+		}
+		for _, affectedStopAreas := range affectedModels.affectedStopAreas {
+			actionCommon.Affects = append(actionCommon.Affects, affectedStopAreas)
+		}
+	}
 
-	for _, publicationWindow := range xmlPublishToDisplay.PublicationWindows() {
+	// ActionStatus
+	var actionStatus model.SituationActionStatus
+	if err := actionStatus.FromString(xmlCommon.ActionStatus()); err == nil {
+		actionCommon.ActionStatus = actionStatus
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+	// Description
+	d := model.NewTranslatedStringFromMap(xmlCommon.Descriptions())
+	actionCommon.Description = d
+
+	// PublicationWindows
+	for _, publicationWindow := range xmlCommon.PublicationWindows() {
 		window := &model.TimeRange{
 			StartTime: publicationWindow.StartTime(),
 			EndTime:   publicationWindow.EndTime(),
 		}
 
-		da.PublicationWindows = append(
-			da.PublicationWindows,
+		actionCommon.PublicationWindows = append(
+			actionCommon.PublicationWindows,
 			window)
 	}
+	return
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToDisplayAction(situationEvent *model.SituationUpdateEvent, xmlPublishToDisplay *sxml.XMLPublishToDisplayAction) {
+	da := &model.PublishToDisplayAction{}
+
+	da.ActionCommon = builder.setPublishActionCommon(xmlPublishToDisplay.XMLCommonPublishingAction)
 
 	if xmlPublishToDisplay.OnBoard() != nil {
 		da.OnBoard = xmlPublishToDisplay.OnBoard()
@@ -199,30 +228,7 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToDisplayAction(si
 func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(situationEvent *model.SituationUpdateEvent, xmlPublishToMobile *sxml.XMLPublishToMobileAction) {
 	ma := &model.PublishToMobileAction{}
 
-	actionData := &model.ActionData{}
-	builder.setActionData(xmlPublishToMobile.ActionData(), actionData)
-	ma.ActionData = *actionData
-
-	var actionStatus model.SituationActionStatus
-	if err := actionStatus.FromString(xmlPublishToMobile.ActionStatus()); err == nil {
-		ma.ActionStatus = actionStatus
-	} else {
-		logger.Log.Debugf("%v", err)
-	}
-
-	d := model.NewTranslatedStringFromMap(xmlPublishToMobile.Descriptions())
-	ma.Description = d
-
-	for _, publicationWindow := range xmlPublishToMobile.PublicationWindows() {
-		window := &model.TimeRange{
-			StartTime: publicationWindow.StartTime(),
-			EndTime:   publicationWindow.EndTime(),
-		}
-
-		ma.PublicationWindows = append(
-			ma.PublicationWindows,
-			window)
-	}
+	ma.ActionCommon = builder.setPublishActionCommon(xmlPublishToMobile.XMLCommonPublishingAction)
 
 	if xmlPublishToMobile.Incidents() != nil {
 		ma.Incidents = xmlPublishToMobile.Incidents()
@@ -238,30 +244,7 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(sit
 func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situationEvent *model.SituationUpdateEvent, xmlPublishToWeb *sxml.XMLPublishToWebAction) {
 	pa := &model.PublishToWebAction{}
 
-	actionData := &model.ActionData{}
-	builder.setActionData(xmlPublishToWeb.ActionData(), actionData)
-	pa.ActionData = *actionData
-
-	var actionStatus model.SituationActionStatus
-	if err := actionStatus.FromString(xmlPublishToWeb.ActionStatus()); err == nil {
-		pa.ActionStatus = actionStatus
-	} else {
-		logger.Log.Debugf("%v", err)
-	}
-
-	d := model.NewTranslatedStringFromMap(xmlPublishToWeb.Descriptions())
-	pa.Description = d
-
-	for _, publicationWindow := range xmlPublishToWeb.PublicationWindows() {
-		window := &model.TimeRange{
-			StartTime: publicationWindow.StartTime(),
-			EndTime:   publicationWindow.EndTime(),
-		}
-
-		pa.PublicationWindows = append(
-			pa.PublicationWindows,
-			window)
-	}
+	pa.ActionCommon = builder.setPublishActionCommon(xmlPublishToWeb.XMLCommonPublishingAction)
 
 	if xmlPublishToWeb.Incidents() != nil {
 		pa.Incidents = xmlPublishToWeb.Incidents()
@@ -280,42 +263,6 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situat
 	}
 
 	situationEvent.PublishToWebAction = pa
-}
-
-func (builder *SituationExchangeUpdateEventBuilder) setActionData(xmlCommon *sxml.XMLActionData, common *model.ActionData) {
-	common.Name = xmlCommon.Name()
-	common.ActionType = xmlCommon.Type()
-	common.Value = xmlCommon.Value()
-
-	// Prompt
-	p := model.NewTranslatedStringFromMap(xmlCommon.Prompt())
-	common.Prompt = p
-
-	// publishedAtScope
-	publishAtScope := &model.PublishAtScope{}
-
-	// scopeType
-	var scopeType model.SituationScopeType
-	if err := scopeType.FromString(xmlCommon.ScopeType()); err == nil {
-		publishAtScope.ScopeType = scopeType
-	} else {
-		logger.Log.Debugf("%v", err)
-	}
-
-	// affects
-	for _, affect := range xmlCommon.Affects() {
-		affectedModels := builder.buildAffect(affect)
-		for _, affectedLine := range affectedModels.affectedLines {
-			publishAtScope.Affects = append(publishAtScope.Affects, affectedLine)
-		}
-		for _, affectedStopAreas := range affectedModels.affectedStopAreas {
-			publishAtScope.Affects = append(publishAtScope.Affects, affectedStopAreas)
-		}
-	}
-
-	if publishAtScope.Affects != nil {
-		common.PublishAtScope = publishAtScope
-	}
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {

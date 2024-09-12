@@ -69,23 +69,22 @@ type ActionData struct {
 	ActionType string            `json:",omitempty"`
 	Value      string            `json:",omitempty"`
 	Prompt     *TranslatedString `json:",omitempty"`
-	PublishAtScope     *PublishAtScope `json:",omitempty"`
 }
 
-type PublishActionCommon struct {
-	ActionData         `json:"ActionData,omitempty"`
+type ActionCommon struct {
+	Name               string            `json:",omitempty"`
+	ActionType         string            `json:",omitempty"`
+	Value              string            `json:",omitempty"`
+	Prompt             *TranslatedString `json:",omitempty"`
+	ScopeType          SituationScopeType
+	Affects            []Affect
 	ActionStatus       SituationActionStatus `json:",omitempty"`
 	Description        *TranslatedString     `json:",omitempty"`
 	PublicationWindows []*TimeRange          `json:",omitempty"`
 }
 
-type PublishAtScope struct {
-	ScopeType SituationScopeType
-	Affects   []Affect
-}
-
 type PublishToWebAction struct {
-	PublishActionCommon
+	ActionCommon
 
 	Incidents      *bool    `json:",omitempty"`
 	HomePage       *bool    `json:",omitempty"`
@@ -94,14 +93,14 @@ type PublishToWebAction struct {
 }
 
 type PublishToMobileAction struct {
-	PublishActionCommon
+	ActionCommon
 
 	Incidents *bool `json:",omitempty"`
 	HomePage  *bool `json:",omitempty"`
 }
 
 type PublishToDisplayAction struct {
-	PublishActionCommon
+	ActionCommon
 
 	OnPlace *bool `json:",omitempty"`
 	OnBoard *bool `json:",omitempty"`

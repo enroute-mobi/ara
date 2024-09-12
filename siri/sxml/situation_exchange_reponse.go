@@ -81,9 +81,8 @@ type XMLPublishToWebAction struct {
 type XMLPublishToMobileAction struct {
 	XMLCommonPublishingAction
 
-	publicationWindows []*XMLPeriod
-	incident           *bool
-	homepage           *bool
+	incident *bool
+	homepage *bool
 }
 
 type XMLPublishToDisplayAction struct {
@@ -688,36 +687,6 @@ func (wa *XMLPublishToWebAction) ActionData() *XMLActionData {
 	return nil
 }
 
-func (c *XMLPublishToWebAction) ActionStatus() string {
-	if c.actionStatus == "" {
-		actionStatus := c.findStringChildContent("ActionStatus")
-		c.actionStatus = actionStatus
-	}
-	return c.actionStatus
-}
-
-func (c *XMLPublishToWebAction) Descriptions() map[string]string {
-	if c.descriptions == nil {
-		translations := FindTranslations(c.findDirectChildrenNodes(siri_attributes.Description))
-		if translations != nil {
-			c.descriptions = translations
-		}
-	}
-	return c.descriptions
-}
-
-func (c *XMLPublishToWebAction) PublicationWindows() []*XMLPeriod {
-	if c.publicationWindows == nil {
-		publicationWindows := []*XMLPeriod{}
-		nodes := c.findNodes(siri_attributes.PublicationWindow)
-		for _, node := range nodes {
-			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
-		}
-		c.publicationWindows = publicationWindows
-	}
-	return c.publicationWindows
-}
-
 func (wa *XMLPublishToWebAction) Incidents() *bool {
 	if wa.incident == nil {
 		if wa.findNode("Incidents") != nil {
@@ -769,14 +738,6 @@ func (visit *XMLPtSituationElement) PublishToMobileAction() *XMLPublishToMobileA
 	return visit.publishToMobileAction
 }
 
-func (c *XMLPublishToMobileAction) ActionStatus() string {
-	if c.actionStatus == "" {
-		actionStatus := c.findStringChildContent("ActionStatus")
-		c.actionStatus = actionStatus
-	}
-	return c.actionStatus
-}
-
 func (ma *XMLPublishToMobileAction) ActionData() *XMLActionData {
 	if nodes := ma.findNodes("ActionData"); nodes != nil {
 		actionData := NewXMLActionData(nodes[0])
@@ -785,28 +746,6 @@ func (ma *XMLPublishToMobileAction) ActionData() *XMLActionData {
 		}
 	}
 	return nil
-}
-
-func (c *XMLPublishToMobileAction) Descriptions() map[string]string {
-	if c.descriptions == nil {
-		translations := FindTranslations(c.findDirectChildrenNodes(siri_attributes.Description))
-		if translations != nil {
-			c.descriptions = translations
-		}
-	}
-	return c.descriptions
-}
-
-func (c *XMLPublishToMobileAction) PublicationWindows() []*XMLPeriod {
-	if c.publicationWindows == nil {
-		publicationWindows := []*XMLPeriod{}
-		nodes := c.findNodes(siri_attributes.PublicationWindow)
-		for _, node := range nodes {
-			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
-		}
-		c.publicationWindows = publicationWindows
-	}
-	return c.publicationWindows
 }
 
 func (wa *XMLPublishToMobileAction) Incidents() *bool {
@@ -840,14 +779,6 @@ func (visit *XMLPtSituationElement) PublishToDisplayAction() *XMLPublishToDispla
 	return visit.publishToDisplayAction
 }
 
-func (da *XMLPublishToDisplayAction) ActionStatus() string {
-	if da.actionStatus == "" {
-		actionStatus := da.findStringChildContent("ActionStatus")
-		da.actionStatus = actionStatus
-	}
-	return da.actionStatus
-}
-
 func (da *XMLPublishToDisplayAction) ActionData() *XMLActionData {
 	if nodes := da.findNodes("ActionData"); nodes != nil {
 		actionData := NewXMLActionData(nodes[0])
@@ -856,28 +787,6 @@ func (da *XMLPublishToDisplayAction) ActionData() *XMLActionData {
 		}
 	}
 	return nil
-}
-
-func (da *XMLPublishToDisplayAction) Descriptions() map[string]string {
-	if da.descriptions == nil {
-		translations := FindTranslations(da.findDirectChildrenNodes(siri_attributes.Description))
-		if translations != nil {
-			da.descriptions = translations
-		}
-	}
-	return da.descriptions
-}
-
-func (da *XMLPublishToDisplayAction) PublicationWindows() []*XMLPeriod {
-	if da.publicationWindows == nil {
-		publicationWindows := []*XMLPeriod{}
-		nodes := da.findNodes(siri_attributes.PublicationWindow)
-		for _, node := range nodes {
-			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
-		}
-		da.publicationWindows = publicationWindows
-	}
-	return da.publicationWindows
 }
 
 func (da *XMLPublishToDisplayAction) OnPlace() *bool {
@@ -918,4 +827,34 @@ func (ad *XMLActionData) Affects() []*XMLAffect {
 		ad.affects = affects
 	}
 	return ad.affects
+}
+
+func (c *XMLCommonPublishingAction) ActionStatus() string {
+	if c.actionStatus == "" {
+		actionStatus := c.findStringChildContent("ActionStatus")
+		c.actionStatus = actionStatus
+	}
+	return c.actionStatus
+}
+
+func (c *XMLCommonPublishingAction) Descriptions() map[string]string {
+	if c.descriptions == nil {
+		translations := FindTranslations(c.findDirectChildrenNodes(siri_attributes.Description))
+		if translations != nil {
+			c.descriptions = translations
+		}
+	}
+	return c.descriptions
+}
+
+func (c *XMLCommonPublishingAction) PublicationWindows() []*XMLPeriod {
+	if c.publicationWindows == nil {
+		publicationWindows := []*XMLPeriod{}
+		nodes := c.findNodes(siri_attributes.PublicationWindow)
+		for _, node := range nodes {
+			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
+		}
+		c.publicationWindows = publicationWindows
+	}
+	return c.publicationWindows
 }
