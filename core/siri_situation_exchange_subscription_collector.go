@@ -60,7 +60,7 @@ func (connector *SIRISituationExchangeSubscriptionCollector) Start() {
 }
 
 func (connector *SIRISituationExchangeSubscriptionCollector) RequestAllSituationsUpdate() {
-	obj := model.NewCode("SituationExchangeCollect", "all")
+	obj := model.NewCode(SituationExchangeCollect, "all")
 	connector.RequestSituationUpdate("all", obj)
 }
 
