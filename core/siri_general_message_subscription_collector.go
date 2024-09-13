@@ -60,7 +60,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) Start() {
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) RequestAllSituationsUpdate() {
-	obj := model.NewCode("generalMessageCollect", "all")
+	obj := model.NewCode(GeneralMessageCollect, "all")
 	connector.RequestSituationUpdate("all", obj)
 }
 

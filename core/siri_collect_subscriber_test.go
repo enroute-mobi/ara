@@ -202,7 +202,7 @@ func Test_HandleResponse_GoodResponse_With_GeneralMessageCollect_all(t *testing.
 	subscriber, subscription, responseTemplate := testSetup()
 
 	// Create and add Resource to Subscription
-	obj := model.NewCode("GeneralMessageCollect", "all")
+	obj := model.NewCode(GeneralMessageCollect, "all")
 	reference := model.Reference{
 		Code: &obj,
 	}
@@ -239,7 +239,7 @@ func Test_HandleResponse_GoodResponse_With_SituationExchangeCollect_all(t *testi
 	subscriber, subscription, responseTemplate := testSetup()
 
 	// Create and add Resource to Subscription
-	obj := model.NewCode("SituationExchangeCollect", "all")
+	obj := model.NewCode(SituationExchangeCollect, "all")
 	reference := model.Reference{
 		Code: &obj,
 	}
