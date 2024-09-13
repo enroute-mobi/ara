@@ -103,5 +103,5 @@ Then(/^the Situation "([^"]+)":"([^"]+)" has a (\S+)Action with the following at
   responseArray = JSON.parse(response.body)
   expectedSituation = responseArray.find{|a| a["Codes"][kind] == code }
 
-  expect(expectedSituation["#{publish_to}Action"]).to include(model_attributes(attributes))
+  expect(expectedSituation["#{publish_to}Actions"]).to include(model_attributes(attributes))
 end

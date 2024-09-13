@@ -142,15 +142,15 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setConsequence(situationEvent, consequence)
 	}
 
-	if xmlPublishToWeb := xmlSituation.PublishToWebAction(); xmlPublishToWeb != nil {
+	for _, xmlPublishToWeb := range xmlSituation.PublishToWebActions() {
 		builder.setPublishToWebAction(situationEvent, xmlPublishToWeb)
 	}
 
-	if xmlPublishToMobile := xmlSituation.PublishToMobileAction(); xmlPublishToMobile != nil {
+	for _, xmlPublishToMobile := range xmlSituation.PublishToMobileActions() {
 		builder.setPublishToMobileAction(situationEvent, xmlPublishToMobile)
 	}
 
-	if xmlPublishToDisplay := xmlSituation.PublishToDisplayAction(); xmlPublishToDisplay != nil {
+	for _, xmlPublishToDisplay := range xmlSituation.PublishToDisplayActions() {
 		builder.setPublishToDisplayAction(situationEvent, xmlPublishToDisplay)
 	}
 
@@ -222,7 +222,7 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToDisplayAction(si
 		da.OnPlace = xmlPublishToDisplay.OnPlace()
 	}
 
-	situationEvent.PublishToDisplayAction = da
+	situationEvent.PublishToDisplayActions = append(situationEvent.PublishToDisplayActions, da)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(situationEvent *model.SituationUpdateEvent, xmlPublishToMobile *sxml.XMLPublishToMobileAction) {
@@ -238,7 +238,7 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(sit
 		ma.HomePage = xmlPublishToMobile.HomePage()
 	}
 
-	situationEvent.PublishToMobileAction = ma
+	situationEvent.PublishToMobileActions = append(situationEvent.PublishToMobileActions, ma)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situationEvent *model.SituationUpdateEvent, xmlPublishToWeb *sxml.XMLPublishToWebAction) {
@@ -262,7 +262,7 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situat
 		pa.SocialNetworks = xmlPublishToWeb.SocialNetworks()
 	}
 
-	situationEvent.PublishToWebAction = pa
+	situationEvent.PublishToWebActions = append(situationEvent.PublishToWebActions, pa)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {

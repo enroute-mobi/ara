@@ -44,11 +44,11 @@ type XMLPtSituationElement struct {
 	summaries      map[string]string
 	descriptions   map[string]string
 
-	affects                []*XMLAffect
-	consequences           []*XMLConsequence
-	publishToWebAction     *XMLPublishToWebAction
-	publishToMobileAction  *XMLPublishToMobileAction
-	publishToDisplayAction *XMLPublishToDisplayAction
+	affects                 []*XMLAffect
+	consequences            []*XMLConsequence
+	publishToWebActions     []*XMLPublishToWebAction
+	publishToMobileActions  []*XMLPublishToMobileAction
+	publishToDisplayActions []*XMLPublishToDisplayAction
 }
 
 type XMLActionData struct {
@@ -632,15 +632,14 @@ func (asp *XMLAffectedStopPoint) LineRefs() []string {
 	return asp.lineRefs
 }
 
-func (visit *XMLPtSituationElement) PublishToWebAction() *XMLPublishToWebAction {
-	if visit.publishToWebAction == nil {
+func (visit *XMLPtSituationElement) PublishToWebActions() []*XMLPublishToWebAction {
+	if len(visit.publishToWebActions) == 0 {
 		nodes := visit.findNodes("PublishToWebAction")
-		if nodes != nil {
-			wa := NewXMLPublishToWebAction(nodes[0])
-			visit.publishToWebAction = wa
+		for _, publishToWebAction := range nodes {
+			visit.publishToWebActions = append(visit.publishToWebActions, NewXMLPublishToWebAction(publishToWebAction))
 		}
 	}
-	return visit.publishToWebAction
+	return visit.publishToWebActions
 }
 
 func (c *XMLActionData) Name() string {
@@ -727,15 +726,14 @@ func (wa *XMLPublishToWebAction) SocialNetworks() []string {
 	return wa.socialNetworks
 }
 
-func (visit *XMLPtSituationElement) PublishToMobileAction() *XMLPublishToMobileAction {
-	if visit.publishToMobileAction == nil {
+func (visit *XMLPtSituationElement) PublishToMobileActions() []*XMLPublishToMobileAction {
+	if len(visit.publishToMobileActions) == 0 {
 		nodes := visit.findNodes("PublishToMobileAction")
-		if nodes != nil {
-			ma := NewXMLPublishToMobileAction(nodes[0])
-			visit.publishToMobileAction = ma
+		for _, publishToMobileAction := range nodes {
+			visit.publishToMobileActions = append(visit.publishToMobileActions, NewXMLPublishToMobileAction(publishToMobileAction))
 		}
 	}
-	return visit.publishToMobileAction
+	return visit.publishToMobileActions
 }
 
 func (ma *XMLPublishToMobileAction) ActionData() *XMLActionData {
@@ -768,15 +766,14 @@ func (wa *XMLPublishToMobileAction) HomePage() *bool {
 	return wa.homepage
 }
 
-func (visit *XMLPtSituationElement) PublishToDisplayAction() *XMLPublishToDisplayAction {
-	if visit.publishToDisplayAction == nil {
+func (visit *XMLPtSituationElement) PublishToDisplayActions() []*XMLPublishToDisplayAction {
+		if len(visit.publishToDisplayActions) == 0 {
 		nodes := visit.findNodes("PublishToDisplayAction")
-		if nodes != nil {
-			da := NewXMLPublishToDisplayAction(nodes[0])
-			visit.publishToDisplayAction = da
+		for _, publishToDisplay := range nodes {
+			visit.publishToDisplayActions = append(visit.publishToDisplayActions, NewXMLPublishToDisplayAction(publishToDisplay))
 		}
 	}
-	return visit.publishToDisplayAction
+	return visit.publishToDisplayActions
 }
 
 func (da *XMLPublishToDisplayAction) ActionData() *XMLActionData {

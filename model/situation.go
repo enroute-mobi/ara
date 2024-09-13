@@ -59,9 +59,9 @@ type Situation struct {
 
 	Affects                []Affect                `json:",omitempty"`
 	Consequences           []*Consequence          `json:",omitempty"`
-	PublishToWebAction     *PublishToWebAction     `json:",omitempty"`
-	PublishToMobileAction  *PublishToMobileAction  `json:",omitempty"`
-	PublishToDisplayAction *PublishToDisplayAction `json:",omitempty"`
+	PublishToWebActions     []*PublishToWebAction   `json:",omitempty"`
+	PublishToMobileActions  []*PublishToMobileAction  `json:",omitempty"`
+	PublishToDisplayActions []*PublishToDisplayAction `json:",omitempty"`
 }
 
 type ActionData struct {

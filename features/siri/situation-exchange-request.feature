@@ -503,6 +503,35 @@ Feature: Support SIRI Situation Exchange by request
                         <siri:HomePage>true</siri:HomePage>
                       </siri:PublishToMobileAction>
                       <siri:PublishToDisplayAction>
+                        <siri:ActionStatus>open</siri:ActionStatus>
+                        <siri:Description xml:lang="IS">Lestin mun skipta um efni í Dovre. Því miður þarftu að flytja á þessari stöð.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherNewDataName</siri:Name>
+                          <siri:Type>dummy6</siri:Type>
+                          <siri:Value>dummy7</siri:Value>
+                          <siri:Prompt xml:lang="DK">Toget skifter materialet på Dovre.</siri:Prompt>
+                          <siri:Prompt xml:lang="FI">Juna vaihtaa junamateriaalia Dovressa. Valitettavasti sinun täytyy vaihtaa tällä asemalla.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>network</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:Networks>
+                                <siri:AffectedNetwork>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                </siri:AffectedNetwork>
+                              </siri:Networks>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:OnPlace>false</siri:OnPlace>
+                        <siri:OnBoard>true</siri:OnBoard>
+                      </siri:PublishToDisplayAction>
+                      <siri:PublishToDisplayAction>
                         <siri:ActionStatus>closed</siri:ActionStatus>
                         <siri:Description xml:lang="ES">El tren cambiará su material en Dovre. Lamentablemente tienes que hacer transbordo en esta estación.</siri:Description>
                         <siri:ActionData>
@@ -664,6 +693,20 @@ Feature: Support SIRI Situation Exchange by request
       | Prompt[Translations]#BG         | Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара.              |
       | ScopeType                       | general                                                                                              |
       | Affects[Line]                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                                    |
+    And the Situation "external":"test2" has a PublishToDisplayAction with the following attributes:
+      | ActionStatus                    | open                                                                                       |
+      | OnBoard                         | true                                                                                       |
+      | OnPlace                         | false                                                                                      |
+      | Description[Translations]#IS    | Lestin mun skipta um efni í Dovre. Því miður þarftu að flytja á þessari stöð.              |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                       |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                       |
+      | Name                            | AnotherNewDataName                                                                         |
+      | ActionType                      | dummy6                                                                                     |
+      | Value                           | dummy7                                                                                     |
+      | Prompt[Translations]#DK         | Toget skifter materialet på Dovre.                                                         |
+      | Prompt[Translations]#FI         | Juna vaihtaa junamateriaalia Dovressa. Valitettavasti sinun täytyy vaihtaa tällä asemalla. |
+      | ScopeType                       | network                                                                                    |
+      | Affects[Line]                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                          |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                                                                             |
       | Direction | sent                                                                                                             |
