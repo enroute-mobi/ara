@@ -155,7 +155,22 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 		ptSituationElement.PublishToWebActions = append(ptSituationElement.PublishToWebActions, wa)
 	}
 
-	if len(ptSituationElement.PublishToWebActions) != 0 {
+	for _, publishToMobileAction := range situation.PublishToMobileActions {
+		ma := &siri.PublishToMobileAction{}
+
+		if publishToMobileAction.Incidents != nil {
+			ma.Incidents = *publishToMobileAction.Incidents
+		}
+
+		if publishToMobileAction.HomePage != nil {
+			ma.HomePage = *publishToMobileAction.HomePage
+		}
+
+		builder.buildActionCommon(publishToMobileAction.ActionCommon, &ma.SIRIPublishActionCommon, delivery)
+		ptSituationElement.PublishToMobileActions = append(ptSituationElement.PublishToMobileActions, ma)
+	}
+
+	if len(ptSituationElement.PublishToWebActions) != 0 || len(ptSituationElement.PublishToMobileActions) != 0{
 		ptSituationElement.HasPublishingActions = true
 	}
 

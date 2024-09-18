@@ -652,6 +652,9 @@ Feature: Support SIRI SituationExchange by subscription
       | Name              | Test              |
       | Codes             | "internal":"1234" |
       | CollectSituations | true              |
+    And a Line exists with the following attributes:
+      | Codes | "internal": "NINOXE:Line:BP:LOC" |
+      | Name  | Ligne BP Metro                   |
     And a Situation exists with the following attributes:
       | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1"     |
       | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
@@ -666,8 +669,8 @@ Feature: Support SIRI SituationExchange by subscription
       | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | Description[DefaultValue]                                                          | a very very very long message                 |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-8-00c04fd430c8             |
     And a Situation exists with the following attributes:
       | Codes                        | "internal" : "NINOXE:SituationExchange:01_1" |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00                    |
@@ -698,6 +701,22 @@ Feature: Support SIRI SituationExchange by subscription
       | Prompt[Translations]#EN         | You must change trains at Dovre. We apologize for the inconvenience.                 |
       | ScopeType                       | line                                                                                 |
       | Affects[Line]                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                    |
+    And the Situation "internal":"NINOXE:SituationExchange:01_1" is edited with a PublishToMobileAction with the following attributes:
+      | ActionStatus                                                   | open                                                                                         |
+      | Incidents                                                      | false                                                                                        |
+      | HomePage                                                       | true                                                                                         |
+      | Description[Translations]#DE                                   | Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen. |
+      | PublicationWindows[0]#StartTime                                | 2017-12-01T09:00:00Z                                                                         |
+      | PublicationWindows[0]#EndTime                                  | 2017-12-09T17:00:00Z                                                                         |
+      | Name                                                           | AnotherDataName                                                                              |
+      | ActionType                                                     | dummy2                                                                                       |
+      | Value                                                          | dummy3                                                                                       |
+      | Prompt[Translations]#DE                                        | Der Zug wird in Dovre das Zugmaterial wechseln.                                              |
+      | Prompt[Translations]#HU                                        | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.       |
+      | ScopeType                                                      | stopPlace                                                                                    |
+      | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-7-00c04fd430c8                                                            |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                            |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1] | 6ba7b814-9dad-11d1-4-00c04fd430c8                                                            |
     And a StopArea exists with the following attributes:
       | Name              | Test                                    |
       | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
@@ -707,13 +726,13 @@ Feature: Support SIRI SituationExchange by subscription
       | Codes             | "internal":"NINOXE:StopPoint:SP:12:LOC" |
       | CollectSituations | true                                    |
     And 10 seconds have passed
-    When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
+    When the Situation "6ba7b814-9dad-11d1-5-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                   | 2017-01-01T03:50:06+02:00              |
       | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00              |
       | ValidityPeriods[0]#EndTime   | 2017-10-24T20:30:06+02:00              |
       | Description[DefaultValue]    | an ANOTHER very very very long message |
       | Version                      | 2                                      |
-    When the Situation "6ba7b814-9dad-11d1-5-00c04fd430c8" is edited with the following attributes:
+    When the Situation "6ba7b814-9dad-11d1-6-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                   | 2017-01-01T03:50:06+02:00                   |
       | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00                   |
       | ValidityPeriods[0]#EndTime   | 2017-10-24T20:30:06+02:00                   |
@@ -729,7 +748,7 @@ Feature: Support SIRI SituationExchange by subscription
            <ServiceDeliveryInfo>
              <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
              <siri:ProducerRef>test</siri:ProducerRef>
-             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
            </ServiceDeliveryInfo>
            <Notification>
              <siri:SituationExchangeDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
@@ -838,6 +857,40 @@ Feature: Support SIRI SituationExchange by subscription
                         <siri:HomePage>true</siri:HomePage>
                         <siri:SocialNetwork>facebook.com</siri:SocialNetwork>
                       </siri:PublishToWebAction>
+                      <siri:PublishToMobileAction>
+                        <siri:ActionStatus>open</siri:ActionStatus>
+                        <siri:Description xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherDataName</siri:Name>
+                          <siri:Type>dummy2</siri:Type>
+                          <siri:Value>dummy3</siri:Value>
+                          <siri:Prompt xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln.</siri:Prompt>
+                          <siri:Prompt xml:lang='HU'>A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>stopPlace</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:StopPoints>
+                                <siri:AffectedStopPoint>
+                                  <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                                  <siri:Lines>
+                                    <siri:AffectedLine>
+                                      <siri:LineRef>1234</siri:LineRef>
+                                    </siri:AffectedLine>
+                                    <siri:AffectedLine>
+                                      <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                    </siri:AffectedLine>
+                                  </siri:Lines>
+                                </siri:AffectedStopPoint>
+                              </siri:StopPoints>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:HomePage>true</siri:HomePage>
+                      </siri:PublishToMobileAction>
                     </siri:PublishingActions>
                  </siri:PtSituationElement>
                </siri:Situations>

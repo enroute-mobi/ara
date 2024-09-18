@@ -35,13 +35,13 @@ When(/^the Situation "([^"]+)":"([^"]+)" is edited with a Consequence with the f
   RestClient.put situation_path(situation_id), situation.to_json, {:Authorization => "Token token=#{$token}"}
 end
 
-When(/^the Situation "([^"]+)":"([^"]+)" is edited with a PublishToWebAction with the following attributes:$/) do |kind, code, attributes|
+When(/^the Situation "([^"]+)":"([^"]+)" is edited with a (\S+)Action with the following attributes:$/) do |kind, code, publish_to, attributes|
   response = RestClient.get situations_path, { content_type: :json, :Authorization => "Token token=#{$token}" }
   situation = JSON.parse(response.body).find { |a| a['Codes'][kind] == code }
   situation_id = situation['Id']
 
-  situation['PublishToWebActions'] ||= []
-  situation['PublishToWebActions'] << model_attributes(attributes)
+  situation["#{publish_to}Actions"] ||= []
+  situation["#{publish_to}Actions"] << model_attributes(attributes)
 
   situation['IgnoreValidation'] = true
 

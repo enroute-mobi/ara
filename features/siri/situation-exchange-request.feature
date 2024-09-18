@@ -60,6 +60,22 @@ Feature: Support SIRI Situation Exchange by request
       | Prompt[Translations]#HU         | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni. |
       | ScopeType                       | line                                                                                   |
       | Affects[Line]                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                      |
+    And the Situation "external":"test" is edited with a PublishToMobileAction with the following attributes:
+      | ActionStatus                                                   | open                                                                                         |
+      | Incidents                                                      | false                                                                                        |
+      | HomePage                                                       | true                                                                                         |
+      | Description[Translations]#DE                                   | Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen. |
+      | PublicationWindows[0]#StartTime                                | 2017-12-01T09:00:00Z                                                                         |
+      | PublicationWindows[0]#EndTime                                  | 2017-12-09T17:00:00Z                                                                         |
+      | Name                                                           | AnotherDataName                                                                              |
+      | ActionType                                                     | dummy2                                                                                       |
+      | Value                                                          | dummy3                                                                                       |
+      | Prompt[Translations]#DE                                        | Der Zug wird in Dovre das Zugmaterial wechseln.                                              |
+      | Prompt[Translations]#HU                                        | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.       |
+      | ScopeType                                                      | stopPlace                                                                                    |
+      | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-4-00c04fd430c8                                                            |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                            |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1] | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                            |
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
@@ -256,6 +272,40 @@ Feature: Support SIRI Situation Exchange by request
                         <siri:HomePage>true</siri:HomePage>
                         <siri:SocialNetwork>facebook.com</siri:SocialNetwork>
                       </siri:PublishToWebAction>
+                      <siri:PublishToMobileAction>
+                        <siri:ActionStatus>open</siri:ActionStatus>
+                        <siri:Description xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherDataName</siri:Name>
+                          <siri:Type>dummy2</siri:Type>
+                          <siri:Value>dummy3</siri:Value>
+                          <siri:Prompt xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln.</siri:Prompt>
+                          <siri:Prompt xml:lang='HU'>A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>stopPlace</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:StopPoints>
+                                <siri:AffectedStopPoint>
+                                  <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                                  <siri:Lines>
+                                    <siri:AffectedLine>
+                                      <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                    </siri:AffectedLine>
+                                    <siri:AffectedLine>
+                                      <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                    </siri:AffectedLine>
+                                  </siri:Lines>
+                                </siri:AffectedStopPoint>
+                              </siri:StopPoints>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:HomePage>true</siri:HomePage>
+                      </siri:PublishToMobileAction>
                     </siri:PublishingActions>
                   </siri:PtSituationElement>
                 </siri:Situations>
