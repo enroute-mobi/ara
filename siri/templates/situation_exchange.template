@@ -39,5 +39,18 @@
 							<siri:RealTime>{{ .Blocking.RealTime }}</siri:RealTime>{{ end }}
 						</siri:Blocking>{{ end }}
 					</siri:Consequence>{{ end }}
-				</siri:Consequences>{{ end }}
+				</siri:Consequences>{{ end }}{{ if .HasPublishingActions }}
+				<siri:PublishingActions>{{ range .PublishToWebActions }}
+					<siri:PublishToWebAction>
+					{{ .BuildPublishActionCommonXML }}{{ if .PublicationWindows }}{{ range .PublicationWindows }}
+					<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
+						<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+						<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+					</siri:PublicationWindow>{{ end }}{{ end }}{{ if .Incidents }}
+					<siri:Incidents>{{ .Incidents }}</siri:Incidents>{{ end }}{{ if .HomePage }}
+					<siri:HomePage>{{ .HomePage }}</siri:HomePage>{{ end }}{{ if .Ticker }}
+					<siri:Ticker>{{ .Ticker }}</siri:Ticker>{{ end }}{{ range .SocialNetworks }}
+						<siri:SocialNetwork>{{ . }}</siri:SocialNetwork>{{ end }}
+				</siri:PublishToWebAction>{{ end }}
+			</siri:PublishingActions>{{ end }}
 			</siri:PtSituationElement>

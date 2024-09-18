@@ -103,7 +103,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 
 	if situation.Description != nil {
 		d := &siri.SIRITranslatedString{
-			Tag:                       "Description",
+			Tag:              "Description",
 			TranslatedString: *situation.Description,
 		}
 
@@ -112,7 +112,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 
 	if situation.Summary != nil {
 		s := &siri.SIRITranslatedString{
-			Tag: "Summary",
+			Tag:              "Summary",
 			TranslatedString: *situation.Summary,
 		}
 
@@ -122,7 +122,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	for _, affect := range situation.Affects {
 		switch affect.GetType() {
 		case model.SituationTypeStopArea:
-			affectedStopArea, ok := connector.buildAffectedStopArea(affect, ptSituationElement, delivery)
+			affectedStopArea, ok := connector.buildAffectedStopArea(affect, delivery)
 			if ok {
 				ptSituationElement.AffectedStopPoints = append(
 					ptSituationElement.AffectedStopPoints,
@@ -130,7 +130,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 				)
 			}
 		case model.SituationTypeLine:
-			affectedLine, ok := connector.buildAffectedLine(affect, ptSituationElement, delivery)
+			affectedLine, ok := connector.buildAffectedLine(affect, delivery)
 			if ok {
 				ptSituationElement.AffectedLines = append(
 					ptSituationElement.AffectedLines,
@@ -152,12 +152,12 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		for _, affect := range consequence.Affects {
 			switch affect.GetType() {
 			case model.SituationTypeStopArea:
-				affectedStopArea, ok := connector.buildAffectedStopArea(affect, ptSituationElement, delivery)
+				affectedStopArea, ok := connector.buildAffectedStopArea(affect, delivery)
 				if ok {
 					c.AffectedStopPoints = append(c.AffectedStopPoints, affectedStopArea)
 				}
 			case model.SituationTypeLine:
-				affectedLine, ok := connector.buildAffectedLine(affect, ptSituationElement, delivery)
+				affectedLine, ok := connector.buildAffectedLine(affect, delivery)
 				if ok {
 					c.AffectedLines = append(c.AffectedLines, affectedLine)
 				}
@@ -174,10 +174,75 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ptSituationElement.Consequences = append(ptSituationElement.Consequences, c)
 	}
 
+	for _, publishToWebAction := range situation.PublishToWebActions {
+		wa := &siri.PublishToWebAction{}
+
+		if publishToWebAction.Incidents != nil {
+			wa.Incidents = *publishToWebAction.Incidents
+		}
+
+		if publishToWebAction.HomePage != nil {
+			wa.HomePage = *publishToWebAction.HomePage
+		}
+
+		wa.SocialNetworks = append(wa.SocialNetworks, publishToWebAction.SocialNetworks...)
+
+		connector.buildActionCommon(publishToWebAction.ActionCommon, &wa.SIRIPublishActionCommon, delivery)
+		ptSituationElement.PublishToWebActions = append(ptSituationElement.PublishToWebActions, wa)
+	}
+
+	if len(ptSituationElement.PublishToWebActions) != 0 {
+		ptSituationElement.HasPublishingActions = true
+	}
+
 	delivery.Situations = append(delivery.Situations, ptSituationElement)
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) (*siri.AffectedStopPoint, bool) {
+func (connector *SIRISituationExchangeRequestBroadcaster) buildActionCommon(actionCommon model.ActionCommon, siriActionCommon *siri.SIRIPublishActionCommon, delivery *siri.SIRISituationExchangeDelivery) {
+	siriActionCommon.Name = actionCommon.Name
+	siriActionCommon.ActionType = actionCommon.ActionType
+	siriActionCommon.Value = actionCommon.Value
+	siriActionCommon.ScopeType = actionCommon.ScopeType
+	siriActionCommon.ActionStatus = actionCommon.ActionStatus
+	siriActionCommon.PublicationWindows = actionCommon.PublicationWindows
+
+	if actionCommon.Prompt != nil {
+		p := &siri.SIRITranslatedString{
+			Tag:              "Prompt",
+			TranslatedString: *actionCommon.Prompt,
+		}
+		siriActionCommon.Prompt = p
+	}
+
+	if actionCommon.Description != nil {
+		d := &siri.SIRITranslatedString{
+			Tag:              "Description",
+			TranslatedString: *actionCommon.Description,
+		}
+		siriActionCommon.Description = d
+	}
+
+	for _, affect := range actionCommon.Affects {
+		switch affect.GetType() {
+		case model.SituationTypeStopArea:
+			affectedStopArea, ok := connector.buildAffectedStopArea(affect, delivery)
+			if ok {
+				siriActionCommon.AffectedStopPoints = append(siriActionCommon.AffectedStopPoints, affectedStopArea)
+			}
+		case model.SituationTypeLine:
+			affectedLine, ok := connector.buildAffectedLine(affect, delivery)
+			if ok {
+				siriActionCommon.AffectedLines = append(siriActionCommon.AffectedLines, affectedLine)
+			}
+		}
+	}
+
+	if siriActionCommon.AffectedLines != nil || siriActionCommon.AffectedStopPoints != nil {
+		siriActionCommon.HasAffects = true
+	}
+}
+
+func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(affect model.Affect, delivery *siri.SIRISituationExchangeDelivery) (*siri.AffectedStopPoint, bool) {
 	affect, _ = affect.(*model.AffectedStopArea)
 
 	affectedStopAreaRef, ok := connector.resolveStopAreaRef(model.StopAreaId(affect.GetId()))
@@ -207,7 +272,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(
 	return affectedStopPoint, true
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affect model.Affect, ptSituationElement *siri.SIRIPtSituationElement, delivery *siri.SIRISituationExchangeDelivery) (*siri.AffectedLine, bool) {
+func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedLine(affect model.Affect, delivery *siri.SIRISituationExchangeDelivery) (*siri.AffectedLine, bool) {
 	affect, _ = affect.(*model.AffectedLine)
 	line, ok := connector.partner.Model().Lines().Find(model.LineId(affect.GetId()))
 	if !ok {

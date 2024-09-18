@@ -56,6 +56,18 @@ type SIRIPtSituationElement struct {
 	SIRIAffects
 
 	Consequences []*Consequence
+
+	HasPublishingActions bool
+	PublishToWebActions []*PublishToWebAction
+}
+
+type PublishToWebAction struct {
+	SIRIPublishActionCommon
+
+	Incidents      bool
+	HomePage       bool
+	Ticker         bool
+	SocialNetworks []string
 }
 
 type SIRIAffects struct {

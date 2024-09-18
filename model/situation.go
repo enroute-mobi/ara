@@ -72,12 +72,12 @@ type ActionData struct {
 }
 
 type ActionCommon struct {
-	Name               string            `json:",omitempty"`
-	ActionType         string            `json:",omitempty"`
-	Value              string            `json:",omitempty"`
-	Prompt             *TranslatedString `json:",omitempty"`
-	ScopeType          SituationScopeType
-	Affects            []Affect
+	Name               string                `json:",omitempty"`
+	ActionType         string                `json:",omitempty"`
+	Value              string                `json:",omitempty"`
+	Prompt             *TranslatedString     `json:",omitempty"`
+	ScopeType          SituationScopeType    `json:",omitempty"`
+	Affects            Affects               `json:",omitempty"`
 	ActionStatus       SituationActionStatus `json:",omitempty"`
 	Description        *TranslatedString     `json:",omitempty"`
 	PublicationWindows []*TimeRange          `json:",omitempty"`
@@ -442,8 +442,9 @@ type APISituation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects             Affects               `json:",omitempty"`
-	Consequences        []*Consequence        `json:",omitempty"`
+	Affects             Affects             `json:",omitempty"`
+	Consequences        []*Consequence      `json:",omitempty"`
+	PublishToWebActions []*PublishToWebAction `json:",omitempty"`
 
 	Errors e.Errors `json:"Errors,omitempty"`
 
@@ -512,29 +513,30 @@ func (apiSituation *APISituation) Validate() bool {
 
 func (situation *Situation) Definition() *APISituation {
 	apiSituation := &APISituation{
-		Id:                 situation.Id(),
-		Affects:            []Affect{},
-		AlertCause:         situation.AlertCause,
-		Consequences:       []*Consequence{},
-		Description:        situation.Description,
-		Errors:             e.NewErrors(),
-		Format:             situation.Format,
-		InternalTags:       situation.InternalTags,
-		Keywords:           situation.Keywords,
-		Origin:             situation.Origin,
-		ParticipantRef:     situation.ParticipantRef,
-		ProducerRef:        situation.ProducerRef,
-		Progress:           situation.Progress,
-		PublicationWindows: situation.PublicationWindows,
-		Reality:            situation.Reality,
-		RecordedAt:         situation.RecordedAt,
-		ReportType:         situation.ReportType,
-		Severity:           situation.Severity,
-		Summary:            situation.Summary,
-		ValidityPeriods:    situation.ValidityPeriods,
-		Version:            situation.Version,
-		VersionedAt:        situation.VersionedAt,
-		IgnoreValidation:   false,
+		Id:                  situation.Id(),
+		Affects:             []Affect{},
+		AlertCause:          situation.AlertCause,
+		Consequences:        []*Consequence{},
+		Description:         situation.Description,
+		Errors:              e.NewErrors(),
+		Format:              situation.Format,
+		InternalTags:        situation.InternalTags,
+		Keywords:            situation.Keywords,
+		Origin:              situation.Origin,
+		ParticipantRef:      situation.ParticipantRef,
+		PublishToWebActions: []*PublishToWebAction{},
+		ProducerRef:         situation.ProducerRef,
+		Progress:            situation.Progress,
+		PublicationWindows:  situation.PublicationWindows,
+		Reality:             situation.Reality,
+		RecordedAt:          situation.RecordedAt,
+		ReportType:          situation.ReportType,
+		Severity:            situation.Severity,
+		Summary:             situation.Summary,
+		ValidityPeriods:     situation.ValidityPeriods,
+		Version:             situation.Version,
+		VersionedAt:         situation.VersionedAt,
+		IgnoreValidation:    false,
 	}
 
 	apiSituation.codes = make(Codes)
@@ -551,6 +553,7 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 	situation.Keywords = apiSituation.Keywords
 	situation.Origin = apiSituation.Origin
 	situation.ParticipantRef = apiSituation.ParticipantRef
+	situation.PublishToWebActions = apiSituation.PublishToWebActions
 	situation.ProducerRef = apiSituation.ProducerRef
 	situation.Progress = apiSituation.Progress
 	situation.PublicationWindows = apiSituation.PublicationWindows
