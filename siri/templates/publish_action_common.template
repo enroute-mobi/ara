@@ -10,4 +10,8 @@
 						<siri:ScopeType>{{ .ScopeType }}</siri:ScopeType>{{ end }}{{ if .HasAffects }}
 						{{ .BuildSituationAffectsXML }}{{ end }}
 					</siri:PublishAtScope>
-				</siri:ActionData>
+				</siri:ActionData>{{ if .PublicationWindows }}{{ range .PublicationWindows }}
+				<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
+					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+				</siri:PublicationWindow>{{ end }}{{ end }}
