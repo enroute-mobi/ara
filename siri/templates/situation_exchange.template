@@ -60,6 +60,15 @@
 					</siri:PublicationWindow>{{ end }}{{ end }}{{ if .Incidents }}
 					<siri:Incidents>{{ .Incidents }}</siri:Incidents>{{ end }}{{ if .HomePage }}
 					<siri:HomePage>{{ .HomePage }}</siri:HomePage>{{ end }}
-				</siri:PublishToMobileAction>{{ end }}
+				</siri:PublishToMobileAction>{{ end }}{{ range .PublishToDisplayActions }}
+				<siri:PublishToDisplayAction>
+					{{ .BuildPublishActionCommonXML }}{{ if .PublicationWindows }}{{ range .PublicationWindows }}
+					<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
+						<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+						<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+					</siri:PublicationWindow>{{ end }}{{ end }}{{ if .OnPlace }}
+					<siri:OnPlace>{{ .OnPlace }}</siri:OnPlace>{{ end }}{{ if .OnBoard }}
+					<siri:OnBoard>{{ .OnBoard }}</siri:OnBoard>{{ end }}
+				</siri:PublishToDisplayAction>{{ end }}
 			</siri:PublishingActions>{{ end }}
 			</siri:PtSituationElement>

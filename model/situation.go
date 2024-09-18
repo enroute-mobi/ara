@@ -442,10 +442,11 @@ type APISituation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects                Affects                  `json:",omitempty"`
-	Consequences           []*Consequence           `json:",omitempty"`
-	PublishToWebActions    []*PublishToWebAction    `json:",omitempty"`
-	PublishToMobileActions []*PublishToMobileAction `json:",omitempty"`
+	Affects                 Affects                   `json:",omitempty"`
+	Consequences            []*Consequence            `json:",omitempty"`
+	PublishToWebActions     []*PublishToWebAction     `json:",omitempty"`
+	PublishToMobileActions  []*PublishToMobileAction  `json:",omitempty"`
+	PublishToDisplayActions []*PublishToDisplayAction `json:",omitempty"`
 
 	Errors e.Errors `json:"Errors,omitempty"`
 
@@ -527,6 +528,7 @@ func (situation *Situation) Definition() *APISituation {
 		ParticipantRef:         situation.ParticipantRef,
 		PublishToWebActions:    []*PublishToWebAction{},
 		PublishToMobileActions: []*PublishToMobileAction{},
+		PublishToDisplayActions: []*PublishToDisplayAction{},
 		ProducerRef:            situation.ProducerRef,
 		Progress:               situation.Progress,
 		PublicationWindows:     situation.PublicationWindows,
@@ -557,6 +559,7 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 	situation.ParticipantRef = apiSituation.ParticipantRef
 	situation.PublishToWebActions = apiSituation.PublishToWebActions
 	situation.PublishToMobileActions = apiSituation.PublishToMobileActions
+	situation.PublishToDisplayActions = apiSituation.PublishToDisplayActions
 	situation.ProducerRef = apiSituation.ProducerRef
 	situation.Progress = apiSituation.Progress
 	situation.PublicationWindows = apiSituation.PublicationWindows

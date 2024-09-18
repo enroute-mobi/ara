@@ -206,7 +206,19 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ptSituationElement.PublishToMobileActions = append(ptSituationElement.PublishToMobileActions, ma)
 	}
 
-	if len(ptSituationElement.PublishToWebActions) != 0 || len(ptSituationElement.PublishToMobileActions) != 0 {
+	for _, publishToDisplayAction := range situation.PublishToDisplayActions {
+		da := &siri.PublishToDisplayAction{}
+
+		da.OnBoard = publishToDisplayAction.OnBoard
+		da.OnPlace = publishToDisplayAction.OnPlace
+
+		connector.buildActionCommon(publishToDisplayAction.ActionCommon, &da.SIRIPublishActionCommon, delivery)
+		ptSituationElement.PublishToDisplayActions = append(ptSituationElement.PublishToDisplayActions, da)
+	}
+
+	if len(ptSituationElement.PublishToWebActions) != 0 ||
+		len(ptSituationElement.PublishToMobileActions) != 0 ||
+		len(ptSituationElement.PublishToDisplayActions) != 0 {
 		ptSituationElement.HasPublishingActions = true
 	}
 
