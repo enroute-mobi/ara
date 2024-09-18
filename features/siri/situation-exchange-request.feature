@@ -333,6 +333,7 @@ Feature: Support SIRI Situation Exchange by request
                           <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
                           <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
                         </siri:PublicationWindow>
+                        <siri:Incidents>false</siri:Incidents>
                         <siri:HomePage>true</siri:HomePage>
                       </siri:PublishToMobileAction>
                       <siri:PublishToDisplayAction>

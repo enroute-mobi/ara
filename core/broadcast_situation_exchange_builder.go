@@ -141,13 +141,8 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 	for _, publishToWebAction := range situation.PublishToWebActions {
 		wa := &siri.PublishToWebAction{}
 
-		if publishToWebAction.Incidents != nil {
-			wa.Incidents = *publishToWebAction.Incidents
-		}
-
-		if publishToWebAction.HomePage != nil {
-			wa.HomePage = *publishToWebAction.HomePage
-		}
+		wa.Incidents = publishToWebAction.Incidents
+		wa.HomePage = publishToWebAction.HomePage
 
 		wa.SocialNetworks = append(wa.SocialNetworks, publishToWebAction.SocialNetworks...)
 
@@ -158,13 +153,8 @@ func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situati
 	for _, publishToMobileAction := range situation.PublishToMobileActions {
 		ma := &siri.PublishToMobileAction{}
 
-		if publishToMobileAction.Incidents != nil {
-			ma.Incidents = *publishToMobileAction.Incidents
-		}
-
-		if publishToMobileAction.HomePage != nil {
-			ma.HomePage = *publishToMobileAction.HomePage
-		}
+		ma.Incidents = publishToMobileAction.Incidents
+		ma.HomePage = publishToMobileAction.HomePage
 
 		builder.buildActionCommon(publishToMobileAction.ActionCommon, &ma.SIRIPublishActionCommon, delivery)
 		ptSituationElement.PublishToMobileActions = append(ptSituationElement.PublishToMobileActions, ma)

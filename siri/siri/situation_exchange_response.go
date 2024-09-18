@@ -57,26 +57,26 @@ type SIRIPtSituationElement struct {
 
 	Consequences []*Consequence
 
-	HasPublishingActions            bool
-	PublishToWebActions             []*PublishToWebAction
-	PublishToMobileActions          []*PublishToMobileAction
+	HasPublishingActions    bool
+	PublishToWebActions     []*PublishToWebAction
+	PublishToMobileActions  []*PublishToMobileAction
 	PublishToDisplayActions []*PublishToDisplayAction
 }
 
 type PublishToWebAction struct {
 	SIRIPublishActionCommon
 
-	Incidents      bool
-	HomePage       bool
-	Ticker         bool
+	Incidents      *bool
+	HomePage       *bool
+	Ticker         *bool
 	SocialNetworks []string
 }
 
 type PublishToMobileAction struct {
 	SIRIPublishActionCommon
 
-	Incidents bool
-	HomePage  bool
+	Incidents *bool
+	HomePage  *bool
 }
 
 type PublishToDisplayAction struct {
