@@ -57,9 +57,9 @@ type Situation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects                []Affect                `json:",omitempty"`
-	Consequences           []*Consequence          `json:",omitempty"`
-	PublishToWebActions     []*PublishToWebAction   `json:",omitempty"`
+	Affects                 Affects                   `json:",omitempty"`
+	Consequences            []*Consequence            `json:",omitempty"`
+	PublishToWebActions     []*PublishToWebAction     `json:",omitempty"`
 	PublishToMobileActions  []*PublishToMobileAction  `json:",omitempty"`
 	PublishToDisplayActions []*PublishToDisplayAction `json:",omitempty"`
 }
@@ -110,7 +110,7 @@ type Consequence struct {
 	Periods   []*TimeRange       `json:",omitempty"`
 	Condition SituationCondition `json:",omitempty"`
 	Severity  SituationSeverity  `json:",omitempty"`
-	Affects   []Affect           `json:",omitempty"`
+	Affects   Affects            `json:",omitempty"`
 	Blocking  *Blocking          `json:",omitempty"`
 }
 
@@ -124,6 +124,8 @@ type Affect interface {
 	GetType() SituationType
 	GetId() ModelId
 }
+
+type Affects []Affect
 
 type AffectedStopArea struct {
 	StopAreaId StopAreaId `json:",omitempty"`
@@ -198,39 +200,31 @@ func (situation *Situation) Save() (ok bool) {
 	return
 }
 
-func (c *Consequence) UnmarshalJSON(data []byte) error {
-	type Alias Consequence
-
-	aux := &struct {
-		Affects []json.RawMessage
-		*Alias
-	}{
-		Alias: (*Alias)(c),
-	}
-
-	err := json.Unmarshal(data, aux)
+func (affects *Affects) UnmarshalJSON(data []byte) error {
+	var raw []json.RawMessage
+	err := json.Unmarshal(data, &raw)
 	if err != nil {
 		return err
 	}
-	if aux.Affects != nil {
-		for _, v := range aux.Affects {
-			var affectedSubtype = struct {
-				Type SituationType
-			}{}
-			err = json.Unmarshal(v, &affectedSubtype)
-			if err != nil {
-				return err
-			}
-			switch affectedSubtype.Type {
-			case "StopArea":
-				a := NewAffectedStopArea()
-				json.Unmarshal(v, a)
-				c.Affects = append(c.Affects, a)
-			case "Line":
-				l := NewAffectedLine()
-				json.Unmarshal(v, l)
-				c.Affects = append(c.Affects, l)
-			}
+
+	*affects = make(Affects, len(raw))
+	for i, v := range raw {
+		var affectedSubtype = struct {
+			Type SituationType
+		}{}
+		err = json.Unmarshal(v, &affectedSubtype)
+		if err != nil {
+			return err
+		}
+		switch affectedSubtype.Type {
+		case SituationTypeStopArea:
+			a := NewAffectedStopArea()
+			json.Unmarshal(v, a)
+			(*affects)[i] = a
+		case SituationTypeLine:
+			l := NewAffectedLine()
+			json.Unmarshal(v, l)
+			(*affects)[i] = l
 		}
 	}
 	return nil
@@ -260,8 +254,7 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 	type Alias APISituation
 
 	aux := &struct {
-		Codes   map[string]string
-		Affects []json.RawMessage
+		Codes map[string]string
 		*Alias
 	}{
 		Alias: (*Alias)(situation),
@@ -271,27 +264,7 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	if aux.Affects != nil {
-		for _, v := range aux.Affects {
-			var affectedSubtype = struct {
-				Type SituationType
-			}{}
-			err = json.Unmarshal(v, &affectedSubtype)
-			if err != nil {
-				return err
-			}
-			switch affectedSubtype.Type {
-			case "StopArea":
-				a := NewAffectedStopArea()
-				json.Unmarshal(v, a)
-				situation.Affects = append(situation.Affects, a)
-			case "Line":
-				l := NewAffectedLine()
-				json.Unmarshal(v, l)
-				situation.Affects = append(situation.Affects, l)
-			}
-		}
-	}
+
 	if aux.Codes != nil {
 		situation.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
@@ -469,8 +442,8 @@ type APISituation struct {
 	Summary        *TranslatedString   `json:",omitempty"`
 	Description    *TranslatedString   `json:",omitempty"`
 
-	Affects      []Affect       `json:",omitempty"`
-	Consequences []*Consequence `json:",omitempty"`
+	Affects             Affects               `json:",omitempty"`
+	Consequences        []*Consequence        `json:",omitempty"`
 
 	Errors e.Errors `json:"Errors,omitempty"`
 
