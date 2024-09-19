@@ -17,7 +17,8 @@ type SIRIPublishActionCommon struct {
 	ActionType         string                `json:",omitempty"`
 	Value              string                `json:",omitempty"`
 	Prompt             *SIRITranslatedString `json:",omitempty"`
-	ScopeType          model.SituationScopeType
+	HasPublishAtScope bool
+	ScopeType          model.SituationScopeType `json:",omitempty"`
 	ActionStatus       model.SituationActionStatus `json:",omitempty"`
 	Description        *SIRITranslatedString       `json:",omitempty"`
 	PublicationWindows []*model.TimeRange          `json:",omitempty"`

@@ -257,6 +257,10 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildActionCommon(acti
 	if siriActionCommon.AffectedLines != nil || siriActionCommon.AffectedStopPoints != nil {
 		siriActionCommon.HasAffects = true
 	}
+
+		if siriActionCommon.ScopeType != "" && siriActionCommon.HasAffects {
+		siriActionCommon.HasPublishAtScope = true
+	}
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) buildAffectedStopArea(affect model.Affect, delivery *siri.SIRISituationExchangeDelivery) (*siri.AffectedStopPoint, bool) {
