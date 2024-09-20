@@ -119,28 +119,10 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ptSituationElement.Summary = s
 	}
 
-	for _, affect := range situation.Affects {
-		switch affect.GetType() {
-		case model.SituationTypeStopArea:
-			affectedStopArea, ok := connector.buildAffectedStopArea(affect, delivery)
-			if ok {
-				ptSituationElement.AffectedStopPoints = append(
-					ptSituationElement.AffectedStopPoints,
-					affectedStopArea,
-				)
-			}
-		case model.SituationTypeLine:
-			affectedLine, ok := connector.buildAffectedLine(affect, delivery)
-			if ok {
-				ptSituationElement.AffectedLines = append(
-					ptSituationElement.AffectedLines,
-					affectedLine,
-				)
-			}
-		}
-		if ptSituationElement.AffectedLines != nil || ptSituationElement.AffectedStopPoints != nil {
-			ptSituationElement.HasAffects = true
-		}
+	connector.buildAffects(situation.Affects, &ptSituationElement.SIRIAffects, delivery)
+
+	if ptSituationElement.AffectedLines != nil || ptSituationElement.AffectedStopPoints != nil || ptSituationElement.AffectedAllLines {
+		ptSituationElement.HasAffects = true
 	}
 
 	for _, consequence := range situation.Consequences {
@@ -149,22 +131,10 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 			Severity:  consequence.Severity,
 			Condition: consequence.Condition,
 		}
-		for _, affect := range consequence.Affects {
-			switch affect.GetType() {
-			case model.SituationTypeStopArea:
-				affectedStopArea, ok := connector.buildAffectedStopArea(affect, delivery)
-				if ok {
-					c.AffectedStopPoints = append(c.AffectedStopPoints, affectedStopArea)
-				}
-			case model.SituationTypeLine:
-				affectedLine, ok := connector.buildAffectedLine(affect, delivery)
-				if ok {
-					c.AffectedLines = append(c.AffectedLines, affectedLine)
-				}
-			}
-		}
 
-		if c.AffectedLines != nil || c.AffectedStopPoints != nil {
+		connector.buildAffects(consequence.Affects, &c.SIRIAffects, delivery)
+
+		if c.AffectedLines != nil || c.AffectedStopPoints != nil || c.AffectedAllLines {
 			c.HasAffects = true
 		}
 		if consequence.Blocking != nil {
@@ -239,27 +209,33 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildActionCommon(acti
 		siriActionCommon.Description = d
 	}
 
-	for _, affect := range actionCommon.Affects {
+	connector.buildAffects(actionCommon.Affects, &siriActionCommon.SIRIAffects, delivery)
+
+	if siriActionCommon.AffectedLines != nil || siriActionCommon.AffectedStopPoints != nil || siriActionCommon.AffectedAllLines {
+		siriActionCommon.HasAffects = true
+	}
+
+	if siriActionCommon.ScopeType != "" && siriActionCommon.HasAffects {
+		siriActionCommon.HasPublishAtScope = true
+	}
+}
+
+func (connector *SIRISituationExchangeRequestBroadcaster) buildAffects(affects model.Affects, siriAffects *siri.SIRIAffects, delivery *siri.SIRISituationExchangeDelivery) {
+	for _, affect := range affects {
 		switch affect.GetType() {
 		case model.SituationTypeStopArea:
 			affectedStopArea, ok := connector.buildAffectedStopArea(affect, delivery)
 			if ok {
-				siriActionCommon.AffectedStopPoints = append(siriActionCommon.AffectedStopPoints, affectedStopArea)
+				siriAffects.AffectedStopPoints = append(siriAffects.AffectedStopPoints, affectedStopArea)
 			}
 		case model.SituationTypeLine:
 			affectedLine, ok := connector.buildAffectedLine(affect, delivery)
 			if ok {
-				siriActionCommon.AffectedLines = append(siriActionCommon.AffectedLines, affectedLine)
+				siriAffects.AffectedLines = append(siriAffects.AffectedLines, affectedLine)
 			}
+		case model.SituationTypeAllLines:
+			siriAffects.AffectedAllLines = true
 		}
-	}
-
-	if siriActionCommon.AffectedLines != nil || siriActionCommon.AffectedStopPoints != nil {
-		siriActionCommon.HasAffects = true
-	}
-
-		if siriActionCommon.ScopeType != "" && siriActionCommon.HasAffects {
-		siriActionCommon.HasPublishAtScope = true
 	}
 }
 

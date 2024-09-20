@@ -87,6 +87,7 @@ type PublishToDisplayAction struct {
 }
 
 type SIRIAffects struct {
+	AffectedAllLines   bool
 	AffectedLines      []*AffectedLine
 	AffectedStopPoints []*AffectedStopPoint
 }

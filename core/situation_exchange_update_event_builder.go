@@ -21,6 +21,7 @@ type SituationExchangeUpdateEventBuilder struct {
 }
 
 type affectedModels struct {
+	affectedAllLines  *model.AffectedAllLines
 	affectedLines     map[model.LineId]*model.AffectedLine
 	affectedStopAreas map[model.StopAreaId]*model.AffectedStopArea
 }
@@ -128,8 +129,12 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 			situationEvent.PublicationWindows,
 			window)
 	}
+
 	for _, affect := range xmlSituation.Affects() {
 		affectedModels := builder.buildAffect(affect)
+		if affectedModels.affectedAllLines != nil {
+			situationEvent.Affects = append(situationEvent.Affects, affectedModels.affectedAllLines)
+		}
 		for _, affectedLine := range affectedModels.affectedLines {
 			situationEvent.Affects = append(situationEvent.Affects, affectedLine)
 		}
@@ -176,6 +181,9 @@ func (builder *SituationExchangeUpdateEventBuilder) setPublishActionCommon(xmlCo
 	// affects
 	for _, affect := range xmlCommon.Affects() {
 		affectedModels := builder.buildAffect(affect)
+		if affectedModels.affectedAllLines != nil {
+			actionCommon.Affects = append(actionCommon.Affects, affectedModels.affectedAllLines)
+		}
 		for _, affectedLine := range affectedModels.affectedLines {
 			actionCommon.Affects = append(actionCommon.Affects, affectedLine)
 		}
@@ -291,6 +299,9 @@ func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEven
 
 	for _, affect := range xmlConsequence.Affects() {
 		affectedModels := builder.buildAffect(affect)
+		if affectedModels.affectedAllLines != nil {
+			consequence.Affects = append(consequence.Affects, affectedModels.affectedAllLines)
+		}
 		for _, affectedLine := range affectedModels.affectedLines {
 			consequence.Affects = append(consequence.Affects, affectedLine)
 		}
@@ -427,6 +438,10 @@ func (builder *SituationExchangeUpdateEventBuilder) buildAffect(xmlAffect *sxml.
 	}
 
 	for _, xmlAffectedNetwork := range xmlAffect.AffectedNetworks() {
+		if xmlAffectedNetwork.AllLines() {
+			models.affectedAllLines = model.NewAffectedAllLines()
+			continue
+		}
 		for _, lineRef := range xmlAffectedNetwork.LineRefs() {
 			builder.buildAffectedLine(lineRef, models.affectedLines)
 		}
