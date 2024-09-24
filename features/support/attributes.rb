@@ -94,8 +94,8 @@ def model_attributes(table)
     # into
     # "KEY" => {"DefaultValue"=>"A value", "Translations"=> { "FR" => "un texte" } }
     #
-    # With KEY either Summary or Description
-    if key =~ /(Summary|Description)\[(DefaultValue|Translations)\](#(\S+))?/
+    # With KEY either Summary, Description or Prompt
+    if key =~ /(Summary|Description|Prompt)\[(DefaultValue|Translations)\](#(\S+))?/
       text_type = Regexp.last_match(1)
       name = Regexp.last_match(2)
       language = Regexp.last_match(4)

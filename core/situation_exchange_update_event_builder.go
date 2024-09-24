@@ -142,7 +142,127 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setConsequence(situationEvent, consequence)
 	}
 
+	for _, xmlPublishToWeb := range xmlSituation.PublishToWebActions() {
+		builder.setPublishToWebAction(situationEvent, xmlPublishToWeb)
+	}
+
+	for _, xmlPublishToMobile := range xmlSituation.PublishToMobileActions() {
+		builder.setPublishToMobileAction(situationEvent, xmlPublishToMobile)
+	}
+
+	for _, xmlPublishToDisplay := range xmlSituation.PublishToDisplayActions() {
+		builder.setPublishToDisplayAction(situationEvent, xmlPublishToDisplay)
+	}
+
 	event.Situations = append(event.Situations, situationEvent)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishActionCommon(xmlCommon sxml.XMLCommonPublishingAction) (actionCommon model.ActionCommon) {
+	actionCommon.Name = xmlCommon.Name()
+	actionCommon.ActionType = xmlCommon.Type()
+	actionCommon.Value = xmlCommon.Value()
+
+	// Prompt
+	actionCommon.Prompt = model.NewTranslatedStringFromMap(xmlCommon.Prompt())
+
+	// scopeType
+	var scopeType model.SituationScopeType
+	if err := scopeType.FromString(xmlCommon.ScopeType()); err == nil {
+		actionCommon.ScopeType = scopeType
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	// affects
+	for _, affect := range xmlCommon.Affects() {
+		affectedModels := builder.buildAffect(affect)
+		for _, affectedLine := range affectedModels.affectedLines {
+			actionCommon.Affects = append(actionCommon.Affects, affectedLine)
+		}
+		for _, affectedStopAreas := range affectedModels.affectedStopAreas {
+			actionCommon.Affects = append(actionCommon.Affects, affectedStopAreas)
+		}
+	}
+
+	// ActionStatus
+	var actionStatus model.SituationActionStatus
+	if err := actionStatus.FromString(xmlCommon.ActionStatus()); err == nil {
+		actionCommon.ActionStatus = actionStatus
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+	// Description
+	d := model.NewTranslatedStringFromMap(xmlCommon.Descriptions())
+	actionCommon.Description = d
+
+	// PublicationWindows
+	for _, publicationWindow := range xmlCommon.PublicationWindows() {
+		window := &model.TimeRange{
+			StartTime: publicationWindow.StartTime(),
+			EndTime:   publicationWindow.EndTime(),
+		}
+
+		actionCommon.PublicationWindows = append(
+			actionCommon.PublicationWindows,
+			window)
+	}
+	return
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToDisplayAction(situationEvent *model.SituationUpdateEvent, xmlPublishToDisplay *sxml.XMLPublishToDisplayAction) {
+	da := &model.PublishToDisplayAction{}
+
+	da.ActionCommon = builder.setPublishActionCommon(xmlPublishToDisplay.XMLCommonPublishingAction)
+
+	if xmlPublishToDisplay.OnBoard() != nil {
+		da.OnBoard = xmlPublishToDisplay.OnBoard()
+	}
+
+	if xmlPublishToDisplay.OnPlace() != nil {
+		da.OnPlace = xmlPublishToDisplay.OnPlace()
+	}
+
+	situationEvent.PublishToDisplayActions = append(situationEvent.PublishToDisplayActions, da)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToMobileAction(situationEvent *model.SituationUpdateEvent, xmlPublishToMobile *sxml.XMLPublishToMobileAction) {
+	ma := &model.PublishToMobileAction{}
+
+	ma.ActionCommon = builder.setPublishActionCommon(xmlPublishToMobile.XMLCommonPublishingAction)
+
+	if xmlPublishToMobile.Incidents() != nil {
+		ma.Incidents = xmlPublishToMobile.Incidents()
+	}
+
+	if xmlPublishToMobile.HomePage() != nil {
+		ma.HomePage = xmlPublishToMobile.HomePage()
+	}
+
+	situationEvent.PublishToMobileActions = append(situationEvent.PublishToMobileActions, ma)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setPublishToWebAction(situationEvent *model.SituationUpdateEvent, xmlPublishToWeb *sxml.XMLPublishToWebAction) {
+	pa := &model.PublishToWebAction{}
+
+	pa.ActionCommon = builder.setPublishActionCommon(xmlPublishToWeb.XMLCommonPublishingAction)
+
+	if xmlPublishToWeb.Incidents() != nil {
+		pa.Incidents = xmlPublishToWeb.Incidents()
+	}
+
+	if xmlPublishToWeb.HomePage() != nil {
+		pa.HomePage = xmlPublishToWeb.HomePage()
+	}
+
+	if xmlPublishToWeb.Ticker() != nil {
+		pa.Ticker = xmlPublishToWeb.Ticker()
+	}
+
+	if len(xmlPublishToWeb.SocialNetworks()) != 0 {
+		pa.SocialNetworks = xmlPublishToWeb.SocialNetworks()
+	}
+
+	situationEvent.PublishToWebActions = append(situationEvent.PublishToWebActions, pa)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setConsequence(situationEvent *model.SituationUpdateEvent, xmlConsequence *sxml.XMLConsequence) {

@@ -58,6 +58,9 @@ end
 Then(/^one Situation(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
   response = RestClient.get situations_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}" }
   response_array = JSON.parse(response.body)
+  response_array.map! do |resp|
+    resp.delete_if { |k, _| k == 'Consequences' }
+  end
 
   called_method = has_attributes(response_array, attributes)
 
@@ -93,4 +96,12 @@ Then(/^the Situation "([^"]+)":"([^"]+)" has a Consequence with the following at
   expectedSituation = responseArray.find{|a| a["Codes"][kind] == code }
 
   expect(expectedSituation['Consequences']).to include(model_attributes(attributes))
+end
+
+Then(/^the Situation "([^"]+)":"([^"]+)" has a (\S+)Action with the following attributes:$/) do |kind, code, publish_to, attributes|
+  response = RestClient.get situations_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  responseArray = JSON.parse(response.body)
+  expectedSituation = responseArray.find{|a| a["Codes"][kind] == code }
+
+  expect(expectedSituation["#{publish_to}Actions"]).to include(model_attributes(attributes))
 end

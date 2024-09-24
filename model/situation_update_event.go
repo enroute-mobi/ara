@@ -5,29 +5,32 @@ import "time"
 type SituationUpdateRequestId string
 
 type SituationUpdateEvent struct {
-	CreatedAt          time.Time
-	RecordedAt         time.Time
-	SituationCode      Code
-	id                 SituationUpdateRequestId
-	Origin             string
-	Format             string
-	ProducerRef        string
-	ParticipantRef     string
-	VersionedAt        time.Time
-	ValidityPeriods    []*TimeRange
-	PublicationWindows []*TimeRange
-	Keywords           []string
-	InternalTags       []string
-	AlertCause         SituationAlertCause
-	Progress           SituationProgress
-	Reality            SituationReality
-	Severity           SituationSeverity
-	ReportType         ReportType
-	Version            int
-	Summary            *TranslatedString
-	Description        *TranslatedString
-	Affects            []Affect
-	Consequences       []*Consequence
+	CreatedAt              time.Time
+	RecordedAt             time.Time
+	SituationCode          Code
+	id                     SituationUpdateRequestId
+	Origin                 string
+	Format                 string
+	ProducerRef            string
+	ParticipantRef         string
+	VersionedAt            time.Time
+	ValidityPeriods        []*TimeRange
+	PublicationWindows     []*TimeRange
+	Keywords               []string
+	InternalTags           []string
+	AlertCause             SituationAlertCause
+	Progress               SituationProgress
+	Reality                SituationReality
+	Severity               SituationSeverity
+	ReportType             ReportType
+	Version                int
+	Summary                *TranslatedString
+	Description            *TranslatedString
+	Affects                []Affect
+	Consequences           []*Consequence
+	PublishToWebActions     []*PublishToWebAction
+	PublishToMobileActions  []*PublishToMobileAction
+	PublishToDisplayActions []*PublishToDisplayAction
 }
 
 func (ue *SituationUpdateEvent) EventKind() EventKind {
