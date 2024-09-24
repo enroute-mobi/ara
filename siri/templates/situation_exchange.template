@@ -39,5 +39,24 @@
 							<siri:RealTime>{{ .Blocking.RealTime }}</siri:RealTime>{{ end }}
 						</siri:Blocking>{{ end }}
 					</siri:Consequence>{{ end }}
-				</siri:Consequences>{{ end }}
+				</siri:Consequences>{{ end }}{{ if .HasPublishingActions }}
+				<siri:PublishingActions>{{ range .PublishToWebActions }}
+					<siri:PublishToWebAction>
+					{{ .BuildPublishActionCommonXML }}{{ if .Incidents }}
+					<siri:Incidents>{{ .Incidents }}</siri:Incidents>{{ end }}{{ if .HomePage }}
+					<siri:HomePage>{{ .HomePage }}</siri:HomePage>{{ end }}{{ if .Ticker }}
+					<siri:Ticker>{{ .Ticker }}</siri:Ticker>{{ end }}{{ range .SocialNetworks }}
+						<siri:SocialNetwork>{{ . }}</siri:SocialNetwork>{{ end }}
+				</siri:PublishToWebAction>{{ end }}{{ range .PublishToMobileActions }}
+				<siri:PublishToMobileAction>
+					{{ .BuildPublishActionCommonXML }}{{ if .Incidents }}
+					<siri:Incidents>{{ .Incidents }}</siri:Incidents>{{ end }}{{ if .HomePage }}
+					<siri:HomePage>{{ .HomePage }}</siri:HomePage>{{ end }}
+				</siri:PublishToMobileAction>{{ end }}{{ range .PublishToDisplayActions }}
+				<siri:PublishToDisplayAction>
+					{{ .BuildPublishActionCommonXML }}{{ if .OnPlace }}
+					<siri:OnPlace>{{ .OnPlace }}</siri:OnPlace>{{ end }}{{ if .OnBoard }}
+					<siri:OnBoard>{{ .OnBoard }}</siri:OnBoard>{{ end }}
+				</siri:PublishToDisplayAction>{{ end }}
+			</siri:PublishingActions>{{ end }}
 			</siri:PtSituationElement>

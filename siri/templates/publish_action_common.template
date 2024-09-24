@@ -1,0 +1,17 @@
+{{ if .ActionStatus }}
+				<siri:ActionStatus>{{ .ActionStatus }}</siri:ActionStatus>{{ end }}{{ if .Description }}
+				{{ .Description.BuildTranslatedStringXML }}{{ end }}
+				<siri:ActionData>{{ if .Name }}
+					<siri:Name>{{ .Name }}</siri:Name>{{ end }}{{ if .ActionType }}
+					<siri:Type>{{ .ActionType }}</siri:Type>{{ end }}{{ if .Value }}
+					<siri:Value>{{ .Value }}</siri:Value>{{ end }}{{ if .Prompt }}
+					{{ .Prompt.BuildTranslatedStringXML }}{{ end }}{{ if .HasPublishAtScope }}
+					<siri:PublishAtScope>{{ if .ScopeType }}
+						<siri:ScopeType>{{ .ScopeType }}</siri:ScopeType>{{ end }}{{ if .HasAffects }}
+						{{ .BuildSituationAffectsXML }}{{ end }}
+					</siri:PublishAtScope>{{ end }}
+				</siri:ActionData>{{ if .PublicationWindows }}{{ range .PublicationWindows }}
+				<siri:PublicationWindow>{{ if not .StartTime.IsZero }}
+					<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ if not .EndTime.IsZero }}
+					<siri:EndTime>{{ .EndTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:EndTime>{{ end }}
+				</siri:PublicationWindow>{{ end }}{{ end }}

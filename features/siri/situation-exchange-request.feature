@@ -24,29 +24,93 @@ Feature: Support SIRI Situation Exchange by request
       | Description[Translations]#EN                                                       | The new pass is available                     |
       | Summary[Translations]#FR                                                           | Nouveau pass Navigo                           |
       | Summary[Translations]#EN                                                           | New pass Navigo                               |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId     | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId    | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStopId     | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStopId    | 6ba7b814-9dad-11d1-4-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/RouteRef         | Route:66:LOC                                  |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]   | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]   | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]   | 6ba7b814-9dad-11d1-6-00c04fd430c8             |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]   | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
     When the Situation "external":"test" is edited with a Consequence with the following attributes:
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
       | Severity                                                                      | verySlight                        |
       | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
-      | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Affects[StopArea]                                                             | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Blocking[JourneyPlanner]                                                      | true                              |
       | Blocking[RealTime]                                                            | true                              |
       | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+    When the Situation "external":"test" is edited with a PublishToWebAction with the following attributes:
+      | ActionStatus                    | published                                                                              |
+      | Incidents                       | true                                                                                   |
+      | HomePage                        | true                                                                                   |
+      | Ticker                          | false                                                                                  |
+      | SocialNetworks                  | ["facebook.com"]                                                                       |
+      | Description[Translations]#NO    | Toget vil bytte togmateriell på Dovre. Du må dessverre bytte tog på denne stasjonen.   |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                   |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                   |
+      | Name                            | AnotherDataName                                                                        |
+      | ActionType                      | dummy2                                                                                 |
+      | Value                           | dummy3                                                                                 |
+      | Prompt[Translations]#DE         | Der Zug wird in Dovre das Zugmaterial wechseln.                                        |
+      | Prompt[Translations]#HU         | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni. |
+      | ScopeType                       | line                                                                                   |
+      | Affects[Line]                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                      |
+    And the Situation "external":"test" is edited with a PublishToMobileAction with the following attributes:
+      | ActionStatus                                                   | open                                                                                         |
+      | Incidents                                                      | false                                                                                        |
+      | HomePage                                                       | true                                                                                         |
+      | Description[Translations]#DE                                   | Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen. |
+      | PublicationWindows[0]#StartTime                                | 2017-12-01T09:00:00Z                                                                         |
+      | PublicationWindows[0]#EndTime                                  | 2017-12-09T17:00:00Z                                                                         |
+      | Name                                                           | AnotherDataName                                                                              |
+      | ActionType                                                     | dummy2                                                                                       |
+      | Value                                                          | dummy3                                                                                       |
+      | Prompt[Translations]#DE                                        | Der Zug wird in Dovre das Zugmaterial wechseln.                                              |
+      | Prompt[Translations]#HU                                        | A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.       |
+      | ScopeType                                                      | stopPlace                                                                                    |
+      | Affects[StopArea]                                              | 6ba7b814-9dad-11d1-4-00c04fd430c8                                                            |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[0] | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                            |
+      | Affects[StopArea=6ba7b814-9dad-11d1-4-00c04fd430c8]/LineIds[1] | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                            |
+    And the Situation "external":"test" is edited with a PublishToDisplayAction with the following attributes:
+      | ActionStatus                    | closed                                                                                               |
+      | OnBoard                         | false                                                                                                |
+      | OnPlace                         | true                                                                                                 |
+      | Description[Translations]#ES    | El tren cambiará su material en Dovre. Lamentablemente tienes que hacer transbordo en esta estación. |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                                 |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                                 |
+      | Name                            | NewDataName                                                                                          |
+      | ActionType                      | dummy4                                                                                               |
+      | Value                           | dummy5                                                                                               |
+      | Prompt[Translations]#PL         | Pociąg zmieni materiał składowy w Dovre.                                                             |
+      | Prompt[Translations]#BG         | Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара.              |
+      | ScopeType                       | general                                                                                              |
+      | Affects[Line]                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                                    |
+    And the Situation "external":"test" is edited with a PublishToDisplayAction with the following attributes:
+      | ActionStatus                    | open                                                                                       |
+      | OnBoard                         | true                                                                                       |
+      | OnPlace                         | false                                                                                      |
+      | Description[Translations]#IS    | Lestin mun skipta um efni í Dovre. Því miður þarftu að flytja á þessari stöð.              |
+      | PublicationWindows[0]#StartTime | 2017-12-01T09:00:00Z                                                                       |
+      | PublicationWindows[0]#EndTime   | 2017-12-09T17:00:00Z                                                                       |
+      | Name                            | AnotherNewDataName                                                                         |
+      | ActionType                      | dummy6                                                                                     |
+      | Value                           | dummy7                                                                                     |
+      | Prompt[Translations]#DK         | Toget skifter materialet på Dovre.                                                         |
+      | Prompt[Translations]#FI         | Juna vaihtaa junamateriaalia Dovressa. Valitettavasti sinun täytyy vaihtaa tällä asemalla. |
+      | ScopeType                       | network                                                                                    |
+      | Affects[Line]                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                          |
+    And show me ara situations
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |
+    And a Line exists with the following attributes:
+      | Codes | "external": "NINOXE:Line:BP:LOC" |
+      | Name  | Ligne BP Metro                   |
     And a StopArea exists with the following attributes:
       | Name  | Test                                     |
       | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
@@ -89,7 +153,7 @@ Feature: Support SIRI Situation Exchange by request
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Ara</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
@@ -193,6 +257,9 @@ Feature: Support SIRI Situation Exchange by request
                                 <siri:AffectedLine>
                                   <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                                 </siri:AffectedLine>
+                                <siri:AffectedLine>
+                                  <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                </siri:AffectedLine>
                               </siri:Lines>
                             </siri:AffectedStopPoint>
                           </siri:StopPoints>
@@ -203,7 +270,132 @@ Feature: Support SIRI Situation Exchange by request
                         </siri:Blocking>
                       </siri:Consequence>
                     </siri:Consequences>
-                </siri:PtSituationElement>
+                    <siri:PublishingActions>
+                      <siri:PublishToWebAction>
+                        <siri:ActionStatus>published</siri:ActionStatus>
+                        <siri:Description xml:lang='NO'>Toget vil bytte togmateriell på Dovre. Du må dessverre bytte tog på denne stasjonen.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherDataName</siri:Name>
+                          <siri:Type>dummy2</siri:Type>
+                          <siri:Value>dummy3</siri:Value>
+                          <siri:Prompt xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln.</siri:Prompt>
+                          <siri:Prompt xml:lang='HU'>A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>line</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:Networks>
+                                <siri:AffectedNetwork>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                </siri:AffectedNetwork>
+                              </siri:Networks>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:Incidents>true</siri:Incidents>
+                        <siri:HomePage>true</siri:HomePage>
+                        <siri:SocialNetwork>facebook.com</siri:SocialNetwork>
+                      </siri:PublishToWebAction>
+                      <siri:PublishToMobileAction>
+                        <siri:ActionStatus>open</siri:ActionStatus>
+                        <siri:Description xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln. Leider muss man an diesem Bahnhof umsteigen.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherDataName</siri:Name>
+                          <siri:Type>dummy2</siri:Type>
+                          <siri:Value>dummy3</siri:Value>
+                          <siri:Prompt xml:lang='DE'>Der Zug wird in Dovre das Zugmaterial wechseln.</siri:Prompt>
+                          <siri:Prompt xml:lang='HU'>A vonat Dovre-ban módosítja a vonat anyagát. Sajnos ezen az állomáson át kell szállni.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>stopPlace</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:StopPoints>
+                                <siri:AffectedStopPoint>
+                                  <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                                  <siri:Lines>
+                                    <siri:AffectedLine>
+                                      <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                    </siri:AffectedLine>
+                                    <siri:AffectedLine>
+                                      <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                    </siri:AffectedLine>
+                                  </siri:Lines>
+                                </siri:AffectedStopPoint>
+                              </siri:StopPoints>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:Incidents>false</siri:Incidents>
+                        <siri:HomePage>true</siri:HomePage>
+                      </siri:PublishToMobileAction>
+                      <siri:PublishToDisplayAction>
+                        <siri:ActionStatus>closed</siri:ActionStatus>
+                        <siri:Description xml:lang='ES'>El tren cambiará su material en Dovre. Lamentablemente tienes que hacer transbordo en esta estación.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>NewDataName</siri:Name>
+                          <siri:Type>dummy4</siri:Type>
+                          <siri:Value>dummy5</siri:Value>
+                          <siri:Prompt xml:lang='BG'>Влакът променя материала на влака в Dovre. За съжаление трябва да сменяте на тази гара.</siri:Prompt>
+                          <siri:Prompt xml:lang='PL'>Pociąg zmieni materiał składowy w Dovre.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>general</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:Networks>
+                                <siri:AffectedNetwork>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:BP:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                </siri:AffectedNetwork>
+                              </siri:Networks>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:OnPlace>true</siri:OnPlace>
+                        <siri:OnBoard>false</siri:OnBoard>
+                      </siri:PublishToDisplayAction>
+                      <siri:PublishToDisplayAction>
+                        <siri:ActionStatus>open</siri:ActionStatus>
+                        <siri:Description xml:lang='IS'>Lestin mun skipta um efni í Dovre. Því miður þarftu að flytja á þessari stöð.</siri:Description>
+                        <siri:ActionData>
+                          <siri:Name>AnotherNewDataName</siri:Name>
+                          <siri:Type>dummy6</siri:Type>
+                          <siri:Value>dummy7</siri:Value>
+                          <siri:Prompt xml:lang='DK'>Toget skifter materialet på Dovre.</siri:Prompt>
+                          <siri:Prompt xml:lang='FI'>Juna vaihtaa junamateriaalia Dovressa. Valitettavasti sinun täytyy vaihtaa tällä asemalla.</siri:Prompt>
+                          <siri:PublishAtScope>
+                            <siri:ScopeType>network</siri:ScopeType>
+                            <siri:Affects>
+                              <siri:Networks>
+                                <siri:AffectedNetwork>
+                                  <siri:AffectedLine>
+                                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                                  </siri:AffectedLine>
+                                </siri:AffectedNetwork>
+                              </siri:Networks>
+                            </siri:Affects>
+                          </siri:PublishAtScope>
+                        </siri:ActionData>
+                        <siri:PublicationWindow>
+                          <siri:StartTime>2017-12-01T09:00:00.000Z</siri:StartTime>
+                          <siri:EndTime>2017-12-09T17:00:00.000Z</siri:EndTime>
+                        </siri:PublicationWindow>
+                        <siri:OnPlace>false</siri:OnPlace>
+                        <siri:OnBoard>true</siri:OnBoard>
+                      </siri:PublishToDisplayAction>
+                    </siri:PublishingActions>
+                  </siri:PtSituationElement>
                 </siri:Situations>
               </siri:SituationExchangeDelivery>
             </Answer>
@@ -218,7 +410,7 @@ Feature: Support SIRI Situation Exchange by request
       | Status    | OK                                                           |
       | Type      | SituationExchangeRequest                                     |
       | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
-      | Lines     | ["NINOXE:Line:3:LOC"]                                        |
+      | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                      |
 
   @siri-valid @ARA-1342
   Scenario: Handle a SIRI SituationExchange request without any situation
