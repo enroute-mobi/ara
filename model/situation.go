@@ -21,6 +21,7 @@ const (
 	SituationReportTypeIncident ReportType    = "incident"
 	SituationTypeLine           SituationType = "Line"
 	SituationTypeStopArea       SituationType = "StopArea"
+	SituationTypeAllLines       SituationType = "AllLines"
 )
 
 type ReportType string
@@ -144,6 +145,20 @@ func NewAffectedStopArea() *AffectedStopArea {
 	return &AffectedStopArea{}
 }
 
+type AffectedAllLines struct{}
+
+func (a AffectedAllLines) GetId() ModelId {
+	return ModelId("")
+}
+
+func (a AffectedAllLines) GetType() SituationType {
+	return SituationTypeAllLines
+}
+
+func NewAffectedAllLines() *AffectedAllLines {
+	return &AffectedAllLines{}
+}
+
 type AffectedLine struct {
 	LineId               LineId                 `json:",omitempty"`
 	AffectedDestinations []*AffectedDestination `json:",omitempty"`
@@ -225,6 +240,10 @@ func (affects *Affects) UnmarshalJSON(data []byte) error {
 			l := NewAffectedLine()
 			json.Unmarshal(v, l)
 			(*affects)[i] = l
+		case SituationTypeAllLines:
+			all := NewAffectedAllLines()
+			json.Unmarshal(v, all)
+			(*affects)[i] = all
 		}
 	}
 	return nil
@@ -292,6 +311,19 @@ func (affect AffectedLine) MarshalJSON() ([]byte, error) {
 		Alias
 	}{
 		Type:  SituationTypeLine,
+		Alias: (Alias)(affect),
+	}
+
+	return json.Marshal(&aux)
+}
+
+func (affect AffectedAllLines) MarshalJSON() ([]byte, error) {
+		type Alias AffectedAllLines
+	aux := struct {
+		Type SituationType
+		Alias
+	}{
+		Type:  SituationTypeAllLines,
 		Alias: (Alias)(affect),
 	}
 

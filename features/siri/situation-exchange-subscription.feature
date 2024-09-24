@@ -448,6 +448,94 @@ Feature: Support SIRI SituationExchange by subscription
       | StopAreas | ["STIF:StopPoint:Q:3534:", "STIF:StopPoint:Q:3533:", "NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
       | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                                                      |
 
+  @siri-valid @ARA-1582
+  Scenario: Manage a SX Subscription with All affected Lines
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | local_credential                 | NINOXE:default        |
+      | remote_code_space                | external              |
+      | collect.include_lines            | NINOXE:Line::3:LOC    |
+      | collect.situations.internal_tags | first,second          |
+    And 30 seconds have passed
+    And a Line exists with the following attributes:
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                   |
+    And a StopArea exists with the following attributes:
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Subscription exist with the following attributes:
+      | Kind              | SituationExchangeCollect          |
+      | ReferenceArray[0] | "SituationExchangeCollect": "all" |
+    And a minute has passed
+    When I send this SIRI request
+      """
+     <?xml version='1.0' encoding='utf-8'?>
+     <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+       <S:Body>
+          <sw:NotifySituationExchange xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:SituationExchangeDelivery>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:SubscriptionRef>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:Situations>
+                <siri:PtSituationElement>
+                    <siri:CreationTime>2017-01-01T03:30:06.000+02:00</siri:CreationTime>
+                    <siri:SituationNumber>test</siri:SituationNumber>
+                    <siri:Version>1</siri:Version>
+                    <siri:Source>
+                      <siri:SourceType>directReport</siri:SourceType>
+                    </siri:Source>
+                    <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
+                    <siri:Progress>published</siri:Progress>
+                     <siri:ValidityPeriod>
+                      <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-01-01T20:30:06.000+02:00</siri:EndTime>
+                    </siri:ValidityPeriod>
+                    <siri:AlertCause>maintenanceWork</siri:AlertCause>
+                    <siri:Summary xml:lang="FR">Nouveau pass Navigo</siri:Summary>
+                    <siri:Description xml:lang="EN">The new pass is available</siri:Description>
+                    <siri:Affects>
+                      <siri:Networks>
+                        <siri:AffectedNetwork>
+                          <siri:AllLines/>
+                        </siri:AffectedNetwork>
+                      </siri:Networks>
+                      <siri:StopPoints>
+                        <siri:AffectedStopPoint>
+                          <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        </siri:AffectedStopPoint>
+                      </siri:StopPoints>
+                    </siri:Affects>
+                </siri:PtSituationElement>
+                </siri:Situations>
+              </siri:SituationExchangeDelivery>
+            </Notification>
+            <SiriExtension/>
+          </sw:NotifySituationExchange>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then one Situation has the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T01:02:03+02:00         |
+      | Version                      | 1                                 |
+      | VersionedAt                  | 2017-01-01T01:02:03+02:00         |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | AlertCause                   | maintenanceWork                   |
+      | Description[Translations]#EN | The new pass is available         |
+      | Summary[Translations]#FR     | Nouveau pass Navigo               |
+      | Affects[AllLines]            |                                   |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+
   @ARA-1450
   Scenario: Send DeleteSubscriptionRequests for wrong Subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
@@ -996,6 +1084,108 @@ Feature: Support SIRI SituationExchange by subscription
       | SubscriptionIdentifiers | ["externalId"]                                               |
       | StopAreas               | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
       | Lines                   | ["1234", "NINOXE:Line:BP:LOC"]                               |
+
+  @ARA-1582 @siri-valid
+  Scenario: Brodcast a SituationExchange Notification after modification of a Situation having All affected Lines
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-situation-exchange-subscription-broadcaster] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | external              |
+    And a Subscription exist with the following attributes:
+      | Kind              | SituationExchangeBroadcast                  |
+      | ExternalId        | externalId                                  |
+      | SubscriberRef     | subscriber                                  |
+      | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
+    And a Line exists with the following attributes:
+      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name  | Ligne 3 Metro                   |
+    And a StopArea exists with the following attributes:
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+    And a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T01:02:03+02:00         |
+      | Version                      | 1                                 |
+      | VersionedAt                  | 2017-01-01T01:02:03+02:00         |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | AlertCause                   | maintenanceWork                   |
+      | Description[Translations]#EN | The new pass is available         |
+      | Summary[Translations]#FR     | Nouveau pass Navigo               |
+      | Affects[AllLines]            |                                   |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+    And 10 seconds have passed
+    When the Situation "6ba7b814-9dad-11d1-5-00c04fd430c8" is edited with the following attributes:
+      | RecordedAt                   | 2017-01-01T03:50:06+02:00              |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00              |
+      | ValidityPeriods[0]#EndTime   | 2017-10-24T20:30:06+02:00              |
+      | Description[DefaultValue]    | an ANOTHER very very very long message |
+      | Version                      | 2                                      |
+    And 15 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifySituationExchange xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>test</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:Situations>
+                  <siri:PtSituationElement>
+                    <siri:CreationTime>2017-01-01T03:50:06.000+02:00</siri:CreationTime>
+                    <siri:SituationNumber>test</siri:SituationNumber>
+                    <siri:Version>2</siri:Version>
+                    <siri:Source>
+                      <siri:SourceType>directReport</siri:SourceType>
+                    </siri:Source>
+                    <siri:VersionedAtTime>2017-01-01T01:02:03.000+02:00</siri:VersionedAtTime>
+                    <siri:ValidityPeriod>
+                      <siri:StartTime>2017-01-01T01:30:06.000+02:00</siri:StartTime>
+                      <siri:EndTime>2017-10-24T20:30:06.000+02:00</siri:EndTime>
+                    </siri:ValidityPeriod>
+                    <siri:AlertCause>maintenanceWork</siri:AlertCause>
+                    <siri:Summary xml:lang='FR'>Nouveau pass Navigo</siri:Summary>
+                    <siri:Description>an ANOTHER very very very long message</siri:Description>
+                    <siri:Description xml:lang='EN'>The new pass is available</siri:Description>
+                    <siri:Affects>
+                      <siri:Networks>
+                        <siri:AffectedNetwork>
+                          <siri:AllLines/>
+                        </siri:AffectedNetwork>
+                      </siri:Networks>
+                      <siri:StopPoints>
+                        <siri:AffectedStopPoint>
+                          <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        </siri:AffectedStopPoint>
+                      </siri:StopPoints>
+                    </siri:Affects>
+                  </siri:PtSituationElement>
+                </siri:Situations>
+              </siri:SituationExchangeDelivery>
+            </Notification>
+            <SiriExtension/>
+          </sw:NotifySituationExchange>
+        </S:Body>
+      </S:Envelope>
+      """
+    And an audit event should exist with these attributes:
+      | Protocol                | siri                           |
+      | Direction               | sent                           |
+      | Status                  | OK                             |
+      | Type                    | NotifySituationExchange        |
+      | SubscriptionIdentifiers | ["externalId"]                 |
+      | StopAreas               | ["NINOXE:StopPoint:SP:24:LOC"] |
 
   @ARA-1451 @siri-valid
   Scenario: Handle SituationExchange subscription request to an unknowm line

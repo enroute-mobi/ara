@@ -146,6 +146,7 @@ func NewXMLAffectedRoute(node XMLNode) *XMLAffectedRoute {
 type XMLAffectedNetwork struct {
 	XMLStructure
 
+	allLines             Bool
 	lineRefs             []string
 	affectedSections     []*XMLAffectedSection
 	affectedDestinations []string
@@ -523,6 +524,16 @@ func (a *XMLAffect) AffectedNetworks() []*XMLAffectedNetwork {
 		}
 	}
 	return a.affectedNetworks
+}
+
+func (an *XMLAffectedNetwork) AllLines() bool {
+	if !an.allLines.Defined {
+		node := an.findNode("AllLines")
+		if node != nil {
+			an.allLines.SetValue(true)
+		}
+	}
+	return an.allLines.Value
 }
 
 func (an *XMLAffectedNetwork) LineRefs() []string {

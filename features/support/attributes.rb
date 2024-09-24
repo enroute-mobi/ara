@@ -184,6 +184,8 @@ def model_attributes(table)
           'Type' => attribute,
           "#{attribute}Id" => value
         }
+      when 'AllLines'
+        attributes['Affects'] << { 'Type' => attribute }
       else
         model, id = attribute.split('=')
         attributes['Affects'].map do |affect|

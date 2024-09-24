@@ -1,4 +1,9 @@
-<siri:Affects>{{ if .AffectedLines }}
+<siri:Affects>{{ if .AffectedAllLines }}
+					<siri:Networks>
+						<siri:AffectedNetwork>
+							<siri:AllLines/>
+						</siri:AffectedNetwork>
+					</siri:Networks>{{ end }}{{ if .AffectedLines }}
 					<siri:Networks>
 						<siri:AffectedNetwork>{{ range .AffectedLines }}
 							<siri:AffectedLine>
