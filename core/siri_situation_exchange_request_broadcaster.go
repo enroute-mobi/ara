@@ -182,7 +182,26 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 		ptSituationElement.HasPublishingActions = true
 	}
 
+	for _, infoLink := range situation.InfoLinks {
+		connector.buildInfoLink(ptSituationElement, infoLink)
+	}
+
 	delivery.Situations = append(delivery.Situations, ptSituationElement)
+}
+
+func (connector *SIRISituationExchangeRequestBroadcaster) buildInfoLink(ptSituationElement *siri.SIRIPtSituationElement, infoLink *model.InfoLink) {
+	link := &siri.InfoLink{
+		Uri:         infoLink.Uri,
+		Label:       infoLink.Label,
+		ImageRef:    infoLink.ImageRef,
+		LinkContent: infoLink.LinkContent,
+	}
+
+	ptSituationElement.InfoLinks = append(ptSituationElement.InfoLinks, link)
+
+	if len(ptSituationElement.InfoLinks) != 0 {
+		ptSituationElement.HasInfoLinks = true
+	}
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) buildActionCommon(actionCommon model.ActionCommon, siriActionCommon *siri.SIRIPublishActionCommon, delivery *siri.SIRISituationExchangeDelivery) {

@@ -80,6 +80,16 @@ Feature: Support SIRI SituationExchange by subscription
                     <siri:Summary xml:lang="EN">New pass Navigo</siri:Summary>
                     <siri:Description>La nouvelle carte d'abonnement est disponible</siri:Description>
                     <siri:Description xml:lang="EN">The new pass is available</siri:Description>
+                    <siri:InfoLinks>
+                      <siri:InfoLink>
+                        <siri:Uri>http://example.com</siri:Uri>
+                        <siri:Label>Label Sample</siri:Label>
+                        <siri:Image>
+                          <siri:ImageRef>http://www.example.com/image.png</siri:ImageRef>
+                        </siri:Image>
+                        <siri:LinkContent>relatedSite</siri:LinkContent>
+                      </siri:InfoLink>
+                    </siri:InfoLinks>
                     <siri:Affects>
                       <siri:Networks>
                         <siri:AffectedNetwork>
@@ -356,6 +366,11 @@ Feature: Support SIRI SituationExchange by subscription
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[0]   | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedRoutes[0]/StopAreaIds[1]   | 6ba7b814-9dad-11d1-8-00c04fd430c8             |
       | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8             |
+    And the Situation "internal":"test" has an InfoLink with the following attributes:
+      | Uri         | http://example.com               |
+      | Label       | Label Sample                     |
+      | ImageRef    | http://www.example.com/image.png |
+      | LinkContent | relatedSite                      |
     Then one Situation has the following attributes:
       | Codes                        | "internal" : "test2"              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
@@ -768,6 +783,16 @@ Feature: Support SIRI SituationExchange by subscription
       | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00                    |
       | Description[DefaultValue]    | An Another Very Long Message                 |
       | Affects[Line]                | 6ba7b814-9dad-11d1-3-00c04fd430c8            |
+    When the Situation "internal":"NINOXE:SituationExchange:01_1" is edited with an InfoLink with the following attributes:
+      | Uri         | http://example.com               |
+      | Label       | Label Sample                     |
+      | ImageRef    | http://www.example.com/image.png |
+      | LinkContent | relatedSite                      |
+    When the Situation "internal":"NINOXE:SituationExchange:01_1" is edited with an InfoLink with the following attributes:
+      | Uri         | http://anotherexample.com               |
+      | Label       | another Label Sambple                   |
+      | ImageRef    | http://www.example.com/t2_line_info.pdf |
+      | LinkContent | advice                                  |
     When the Situation "internal":"NINOXE:SituationExchange:01_1" is edited with a Consequence with the following attributes:
       | Periods[0]#StartTime                                                          | 2023-09-18T05:30:59Z              |
       | Periods[0]#EndTime                                                            | 2023-09-18T08:00:54Z              |
@@ -923,6 +948,24 @@ Feature: Support SIRI SituationExchange by subscription
                    <siri:UndefinedReason/>
                    <siri:Keywords>test</siri:Keywords>
                    <siri:Description>a SUPER ANOTHER very very very long message</siri:Description>
+                    <siri:InfoLinks>
+                     <siri:InfoLink>
+                       <siri:Uri>http://example.com</siri:Uri>
+                       <siri:Label>Label Sample</siri:Label>
+                       <siri:Image>
+                         <siri:ImageRef>http://www.example.com/image.png</siri:ImageRef>
+                       </siri:Image>
+                       <siri:LinkContent>relatedSite</siri:LinkContent>
+                     </siri:InfoLink>
+                     <siri:InfoLink>
+                       <siri:Uri>http://anotherexample.com</siri:Uri>
+                       <siri:Label>another Label Sambple</siri:Label>
+                       <siri:Image>
+                         <siri:ImageRef>http://www.example.com/t2_line_info.pdf</siri:ImageRef>
+                       </siri:Image>
+                       <siri:LinkContent>advice</siri:LinkContent>
+                     </siri:InfoLink>
+                   </siri:InfoLinks>
                    <siri:Affects>
                      <siri:Networks>
                        <siri:AffectedNetwork>

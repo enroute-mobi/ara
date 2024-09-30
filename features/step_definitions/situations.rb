@@ -118,3 +118,23 @@ Then(/^the Situation "([^"]+)":"([^"]+)" has a (\S+)Action with the following at
 
   expect(expectedSituation["#{publish_to}Actions"]).to include(model_attributes(attributes))
 end
+
+Then(/^the Situation "([^"]+)":"([^"]+)" has an InfoLink with the following attributes:$/) do |kind, code, attributes|
+  response = RestClient.get situations_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  responseArray = JSON.parse(response.body)
+  expectedSituation = responseArray.find{|a| a["Codes"][kind] == code }
+
+  expect(expectedSituation['InfoLinks']).to include(model_attributes(attributes))
+end
+
+When(/^the Situation "([^"]+)":"([^"]+)" is edited with an InfoLink with the following attributes:$/) do |kind, code, attributes|
+  response = RestClient.get situations_path, { content_type: :json, :Authorization => "Token token=#{$token}" }
+  situation = JSON.parse(response.body).find { |a| a['Codes'][kind] == code }
+  situation_id = situation['Id']
+
+  situation['InfoLinks'] ||= []
+
+  situation['InfoLinks'] << model_attributes(attributes)
+  situation['IgnoreValidation'] = true
+  RestClient.put situation_path(situation_id), situation.to_json, {:Authorization => "Token token=#{$token}"}
+end

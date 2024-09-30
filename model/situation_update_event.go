@@ -31,6 +31,7 @@ type SituationUpdateEvent struct {
 	PublishToWebActions     []*PublishToWebAction
 	PublishToMobileActions  []*PublishToMobileAction
 	PublishToDisplayActions []*PublishToDisplayAction
+	InfoLinks []*InfoLink
 }
 
 func (ue *SituationUpdateEvent) EventKind() EventKind {

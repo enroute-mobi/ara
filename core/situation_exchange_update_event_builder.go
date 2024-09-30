@@ -159,7 +159,28 @@ func (builder *SituationExchangeUpdateEventBuilder) buildSituationExchangeUpdate
 		builder.setPublishToDisplayAction(situationEvent, xmlPublishToDisplay)
 	}
 
+	for _, xmlInfoLink := range xmlSituation.InfoLinks() {
+		builder.setInfoLink(situationEvent, xmlInfoLink)
+
+	}
 	event.Situations = append(event.Situations, situationEvent)
+}
+
+func (builder *SituationExchangeUpdateEventBuilder) setInfoLink(situationEvent *model.SituationUpdateEvent, xmlInfoLink *sxml.XMLInfoLink) {
+	var infoLink model.InfoLink
+
+	infoLink.Uri = xmlInfoLink.Uri()
+	infoLink.Label = xmlInfoLink.Label()
+	infoLink.ImageRef = xmlInfoLink.ImageRef()
+
+	var linkContent model.SituationLinkContent
+	if err := linkContent.FromString(xmlInfoLink.LinkContent()); err == nil {
+		infoLink.LinkContent = string(linkContent)
+	} else {
+		logger.Log.Debugf("%v", err)
+	}
+
+	situationEvent.InfoLinks = append(situationEvent.InfoLinks, &infoLink)
 }
 
 func (builder *SituationExchangeUpdateEventBuilder) setPublishActionCommon(xmlCommon sxml.XMLCommonPublishingAction) (actionCommon model.ActionCommon) {

@@ -23,7 +23,18 @@
 				<siri:ReportType>{{ .ReportType }}</siri:ReportType>{{ end }}{{ if .Keywords }}
 				<siri:Keywords>{{ .Keywords }}</siri:Keywords>{{ end }}{{ if .Summary }}
 				{{ .Summary.BuildTranslatedStringXML }}{{ end }}{{ if .Description }}
-				{{ .Description.BuildTranslatedStringXML }}{{ end }}{{ if .HasAffects }}
+				{{ .Description.BuildTranslatedStringXML }}{{ end }}{{ if .HasInfoLinks}}
+					<siri:InfoLinks>{{ range .InfoLinks }}
+						<siri:InfoLink>{{ if .Uri }}
+							<siri:Uri>{{ .Uri }}</siri:Uri>{{ end }}{{ if .Label }}
+							<siri:Label>{{ .Label }}</siri:Label>{{ end }}{{ if .ImageRef }}
+							<siri:Image>
+								<siri:ImageRef>{{ .ImageRef }}</siri:ImageRef>
+							</siri:Image>{{ end }}{{ if .LinkContent }}
+							<siri:LinkContent>{{ .LinkContent }}</siri:LinkContent>{{ end }}
+						</siri:InfoLink>{{ end }}
+					</siri:InfoLinks>{{ end }}
+				{{ if .HasAffects }}
 					{{ .BuildSituationAffectsXML }}{{ end }}{{ if .Consequences }}
 				<siri:Consequences>{{ range .Consequences }}
 					<siri:Consequence>{{ if .Periods }}{{ range .Periods }}
