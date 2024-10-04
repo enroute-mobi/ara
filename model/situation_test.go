@@ -286,6 +286,23 @@ func Test_Validate_ValidityPeriods_Without_StartTime(t *testing.T) {
 
 	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("ValidityPeriods"))
 }
+
+func Test_Validate_InfoLinks_With_Empty_Uri(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+
+	infoLink := &InfoLink{
+		Uri: "",
+	}
+	situation.InfoLinks = append(situation.InfoLinks, infoLink)
+
+	apiSituation := situation.Definition()
+	apiSituation.Validate()
+
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("InfoLinks"))
+}
+
 func Test_MemorySituations_New(t *testing.T) {
 	situations := NewMemorySituations()
 
