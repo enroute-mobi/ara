@@ -150,6 +150,11 @@ func (connector *SIRIVehicleMonitoringRequestCollector) logSIRIVehicleMonitoring
 }
 
 func logXMLVehicleMonitoringResponse(message *audit.BigQueryMessage, response *sxml.XMLVehicleMonitoringResponse) {
+	for _, delivery := range response.VehicleMonitoringDeliveries() {
+		if !delivery.Status() {
+			message.Status = "Error"
+		}
+	}
 	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))

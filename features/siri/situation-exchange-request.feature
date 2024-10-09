@@ -1848,3 +1848,46 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Type      | SituationExchangeRequest                                     |
       | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
       | Lines     | ["NINOXE:Line:3:LOC"]                                        |
+
+  @siri-valid @ARA-1591
+  Scenario: SituationExchangeDelivery with Status false for one Delivery is logged as an Error status in BigQuery
+    Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetSituationExchangeResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>6ba7b814-9dad-11d1-6-00c04fd430c8</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:SituationExchangeDelivery>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
+                <siri:Status>false</siri:Status>
+                <siri:ErrorCondition>
+                  <siri:AllowedResourceUsageExceededError>
+                    <siri:ErrorText>too many requets</siri:ErrorText>
+                  </siri:AllowedResourceUsageExceededError>
+                </siri:ErrorCondition>
+              </siri:SituationExchangeDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetSituationExchangeResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "ineo" exists with connectors [siri-check-status-client, siri-situation-exchange-request-collector] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ineo                  |
+      | remote_code_space | external              |
+    And a minute has passed
+    When a minute has passed
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                     |
+      | Direction | sent                     |
+      | Status    | Error                    |
+      | Type      | SituationExchangeRequest |

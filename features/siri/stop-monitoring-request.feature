@@ -3217,3 +3217,91 @@ Feature: Support SIRI StopMonitoring by request
       </S:Body>
       </S:Envelope>
       """
+
+  @siri-valid @ARA-1591
+  Scenario: StopMonitoringDelivery with Status false for one Delivery is logged as an Error status in BigQuery
+    Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+      <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
+      <ServiceDeliveryInfo>
+        <siri:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</siri:ResponseTimestamp>
+        <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+        <siri:Address>http://appli.chouette.mobi/siri_france/siri</siri:Address>
+        <siri:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26</siri:ResponseMessageIdentifier>
+        <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <siri:StopMonitoringDelivery>
+          <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
+          <siri:Status>false</siri:Status>
+          <siri:ErrorCondition>
+            <siri:AllowedResourceUsageExceededError>
+              <siri:ErrorText>too many requets</siri:ErrorText>
+            </siri:AllowedResourceUsageExceededError>
+          </siri:ErrorCondition>
+        </siri:StopMonitoringDelivery>
+      </Answer>
+      <AnswerExtension/>
+      </sw:GetStopMonitoringResponse>
+      </S:Body>
+      </S:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url                 | http://localhost:8090      |
+      | remote_credential          | test                       |
+      | remote_code_space          | internal                   |
+      | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name  | Test 1                                   |
+      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+    When a minute has passed
+    And the SIRI server has received a GetStopMonitoring request
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                  |
+      | Direction          | sent                  |
+      | Status             | Error                 |
+      | Type               | StopMonitoringRequest |
+
+  @ARA-1591
+  Scenario: Lite StopMonitoringDelivery with Status false for one Delivery is logged as an Error status in BigQuery
+    Given a lite SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+      {
+      "Siri": {
+      "ServiceDelivery": {
+        "ResponseTimestamp": "2023-06-02T11:16:11.127Z",
+        "ProducerRef": "IVTR_HET",
+        "ResponseMessageIdentifier": "IVTR_HET:ResponseMessage:9bd2199f-2685-4f37-9a60-177312447a38:LOC:",
+        "StopMonitoringDelivery": [
+          {
+              "ResponseTimestamp": "2023-06-02T11:16:11.249Z",
+              "Version": "2.0",
+              "Status": "false"
+              }
+            ]
+          }
+        ]
+      }
+      """
+    And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
+      | remote_url                       | http://localhost:8090   |
+      | remote_credential                | test                    |
+      | remote_code_space                | internal                |
+      | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
+      | collect.subscriptions.persistent | true                    |
+      | local_credential                 | toto                    |
+      | collect.persistent               | true                    |
+    And a minute has passed
+    And a StopArea exists with the following attributes:
+      | Name  | Test 1                                |
+      | Codes | "internal": "STIF:StopPoint:Q:41178:" |
+    When a minute has passed
+    And an audit event should exist with these attributes:
+      | Protocol           | siri                  |
+      | Direction          | sent                  |
+      | Status             | Error                 |
+      | Type               | StopMonitoringRequest |

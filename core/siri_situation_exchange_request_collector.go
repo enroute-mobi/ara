@@ -120,12 +120,13 @@ func (connector *SIRISituationExchangeRequestCollector) logSIRISituationExchange
 }
 
 func logXMLSituationExchangeResponse(message *audit.BigQueryMessage, response *sxml.XMLSituationExchangeResponse) {
-	message.ResponseIdentifier = response.ResponseMessageIdentifier()
-
-	if !response.Status() {
-		message.Status = "Error"
-		message.ErrorDetails = response.ErrorString()
+	for _, delivery := range response.SituationExchangeDeliveries() {
+		if !delivery.Status() {
+			message.Status = "Error"
+		}
 	}
+
+	message.ResponseIdentifier = response.ResponseMessageIdentifier()
 	message.ResponseRawMessage = response.RawXML()
 	message.ResponseSize = int64(len(message.ResponseRawMessage))
 }
