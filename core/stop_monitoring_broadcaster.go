@@ -64,6 +64,7 @@ func (smb *StopMonitoringBroadcaster) Start() {
 	logger.Log.Debugf("Start StopMonitoringBroadcaster")
 
 	smb.multipleDeliveries = smb.connector.Partner().SmMultipleDeliveriesPerNotify()
+	smb.maxPerDelivery = smb.connector.Partner().MaxStopVisitPerDelivery()
 	smb.stop = make(chan struct{})
 	go smb.run()
 }
