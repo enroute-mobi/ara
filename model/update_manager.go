@@ -86,6 +86,7 @@ func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	situation.PublishToWebActions = event.PublishToWebActions
 	situation.PublishToMobileActions = event.PublishToMobileActions
 	situation.PublishToDisplayActions = event.PublishToDisplayActions
+	situation.InfoLinks = event.InfoLinks
 
 	// Default is AfterCreate
 	var h hook

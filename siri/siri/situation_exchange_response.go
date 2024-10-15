@@ -61,6 +61,16 @@ type SIRIPtSituationElement struct {
 	PublishToWebActions     []*PublishToWebAction
 	PublishToMobileActions  []*PublishToMobileAction
 	PublishToDisplayActions []*PublishToDisplayAction
+
+	HasInfoLinks bool
+	InfoLinks    []*InfoLink
+}
+
+type InfoLink struct {
+	Uri         string
+	Label       string
+	ImageRef    string
+	LinkContent string
 }
 
 type PublishToWebAction struct {

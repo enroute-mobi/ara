@@ -63,6 +63,7 @@ type Situation struct {
 	PublishToWebActions     []*PublishToWebAction     `json:",omitempty"`
 	PublishToMobileActions  []*PublishToMobileAction  `json:",omitempty"`
 	PublishToDisplayActions []*PublishToDisplayAction `json:",omitempty"`
+	InfoLinks               []*InfoLink               `json:",omitempty"`
 }
 
 type ActionData struct {
@@ -107,6 +108,12 @@ type PublishToDisplayAction struct {
 	OnBoard *bool `json:",omitempty"`
 }
 
+type InfoLink struct {
+	Uri         string
+	Label       string
+	ImageRef    string
+	LinkContent string
+}
 type Consequence struct {
 	Periods   []*TimeRange       `json:",omitempty"`
 	Condition SituationCondition `json:",omitempty"`
@@ -479,6 +486,7 @@ type APISituation struct {
 	PublishToWebActions     []*PublishToWebAction     `json:",omitempty"`
 	PublishToMobileActions  []*PublishToMobileAction  `json:",omitempty"`
 	PublishToDisplayActions []*PublishToDisplayAction `json:",omitempty"`
+	InfoLinks               []*InfoLink               `json:",omitempty"`
 
 	Errors e.Errors `json:"Errors,omitempty"`
 
@@ -547,32 +555,33 @@ func (apiSituation *APISituation) Validate() bool {
 
 func (situation *Situation) Definition() *APISituation {
 	apiSituation := &APISituation{
-		Id:                     situation.Id(),
-		Affects:                []Affect{},
-		AlertCause:             situation.AlertCause,
-		Consequences:           []*Consequence{},
-		Description:            situation.Description,
-		Errors:                 e.NewErrors(),
-		Format:                 situation.Format,
-		InternalTags:           situation.InternalTags,
-		Keywords:               situation.Keywords,
-		Origin:                 situation.Origin,
-		ParticipantRef:         situation.ParticipantRef,
-		PublishToWebActions:    []*PublishToWebAction{},
-		PublishToMobileActions: []*PublishToMobileAction{},
+		Id:                      situation.Id(),
+		Affects:                 []Affect{},
+		AlertCause:              situation.AlertCause,
+		Consequences:            []*Consequence{},
+		Description:             situation.Description,
+		Errors:                  e.NewErrors(),
+		Format:                  situation.Format,
+		InternalTags:            situation.InternalTags,
+		InfoLinks:               []*InfoLink{},
+		Keywords:                situation.Keywords,
+		Origin:                  situation.Origin,
+		ParticipantRef:          situation.ParticipantRef,
+		PublishToWebActions:     []*PublishToWebAction{},
+		PublishToMobileActions:  []*PublishToMobileAction{},
 		PublishToDisplayActions: []*PublishToDisplayAction{},
-		ProducerRef:            situation.ProducerRef,
-		Progress:               situation.Progress,
-		PublicationWindows:     situation.PublicationWindows,
-		Reality:                situation.Reality,
-		RecordedAt:             situation.RecordedAt,
-		ReportType:             situation.ReportType,
-		Severity:               situation.Severity,
-		Summary:                situation.Summary,
-		ValidityPeriods:        situation.ValidityPeriods,
-		Version:                situation.Version,
-		VersionedAt:            situation.VersionedAt,
-		IgnoreValidation:       false,
+		ProducerRef:             situation.ProducerRef,
+		Progress:                situation.Progress,
+		PublicationWindows:      situation.PublicationWindows,
+		Reality:                 situation.Reality,
+		RecordedAt:              situation.RecordedAt,
+		ReportType:              situation.ReportType,
+		Severity:                situation.Severity,
+		Summary:                 situation.Summary,
+		ValidityPeriods:         situation.ValidityPeriods,
+		Version:                 situation.Version,
+		VersionedAt:             situation.VersionedAt,
+		IgnoreValidation:        false,
 	}
 
 	apiSituation.codes = make(Codes)
@@ -586,6 +595,7 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 	situation.Description = apiSituation.Description
 	situation.Format = apiSituation.Format
 	situation.InternalTags = apiSituation.InternalTags
+	situation.InfoLinks = apiSituation.InfoLinks
 	situation.Keywords = apiSituation.Keywords
 	situation.Origin = apiSituation.Origin
 	situation.ParticipantRef = apiSituation.ParticipantRef

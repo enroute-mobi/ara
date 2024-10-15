@@ -1118,9 +1118,9 @@ func (c SituationCondition) ToProto(dest interface{}) error {
 type SituationActionStatus string
 
 const (
-	SituationActionStatusOpen		SituationActionStatus = "open"
-	SituationActionStatusPublished 	SituationActionStatus = "published"
-	SituationActionStatusClosed    	SituationActionStatus = "closed"
+	SituationActionStatusOpen      SituationActionStatus = "open"
+	SituationActionStatusPublished SituationActionStatus = "published"
+	SituationActionStatusClosed    SituationActionStatus = "closed"
 )
 
 func (as *SituationActionStatus) FromString(s string) error {
@@ -1173,4 +1173,31 @@ func (sc *SituationScopeType) FromString(s string) error {
 		return nil
 	}
 	return fmt.Errorf("invalid scope type %s", s)
+}
+
+type SituationLinkContent string
+
+const (
+	SituationLinkContentAdvice      SituationLinkContent = "advice"
+	SituationLinkContentDetails     SituationLinkContent = "details"
+	SituationLinkContentOther       SituationLinkContent = "other"
+	SituationLinkContentRelatedSite SituationLinkContent = "relatedSite"
+	SituationLinkContentTimetable   SituationLinkContent = "timetable"
+)
+
+func (lc *SituationLinkContent) FromString(s string) error {
+	switch SituationLinkContent(s) {
+	case SituationLinkContentAdvice:
+		fallthrough
+	case SituationLinkContentDetails:
+		fallthrough
+	case SituationLinkContentOther:
+		fallthrough
+	case SituationLinkContentRelatedSite:
+		fallthrough
+	case SituationLinkContentTimetable:
+		*lc = SituationLinkContent(s)
+		return nil
+	}
+	return fmt.Errorf("invalid link content %s", s)
 }

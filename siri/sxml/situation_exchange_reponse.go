@@ -49,6 +49,7 @@ type XMLPtSituationElement struct {
 	publishToWebActions     []*XMLPublishToWebAction
 	publishToMobileActions  []*XMLPublishToMobileAction
 	publishToDisplayActions []*XMLPublishToDisplayAction
+	infoLinks               []*XMLInfoLink
 }
 
 type XMLActionData struct {
@@ -90,6 +91,21 @@ type XMLPublishToDisplayAction struct {
 
 	onPlace *bool
 	onBoard *bool
+}
+
+type XMLInfoLink struct {
+	XMLStructure
+
+	uri         string
+	label       string
+	imageRef    string
+	linkContent string
+}
+
+func NewXMLInfoLink(node XMLNode) *XMLInfoLink {
+	xmlInfoLink := &XMLInfoLink{}
+	xmlInfoLink.node = node
+	return xmlInfoLink
 }
 
 func NewXMLActionData(node XMLNode) *XMLActionData {
@@ -865,4 +881,46 @@ func (c *XMLCommonPublishingAction) PublicationWindows() []*XMLPeriod {
 		c.publicationWindows = publicationWindows
 	}
 	return c.publicationWindows
+}
+
+func (visit *XMLPtSituationElement) InfoLinks() []*XMLInfoLink {
+	if len(visit.infoLinks) == 0 {
+		nodes := visit.findNodes("InfoLinks")
+		for _, infoLink := range nodes {
+			visit.infoLinks = append(visit.infoLinks, NewXMLInfoLink(infoLink))
+		}
+	}
+	return visit.infoLinks
+}
+
+func (i *XMLInfoLink) Uri() string {
+	if i.uri == "" {
+		uri := i.findStringChildContent("Uri")
+		i.uri = uri
+	}
+	return i.uri
+}
+
+func (i *XMLInfoLink) Label() string {
+	if i.label == "" {
+		label := i.findStringChildContent("Label")
+		i.label = label
+	}
+	return i.label
+}
+
+func (i *XMLInfoLink) ImageRef() string {
+	if i.imageRef == "" {
+		imageRef := i.findStringChildContent("ImageRef")
+		i.imageRef = imageRef
+	}
+	return i.imageRef
+}
+
+func (i *XMLInfoLink) LinkContent() string {
+	if i.linkContent == "" {
+		linkContent := i.findStringChildContent("LinkContent")
+		i.linkContent = linkContent
+	}
+	return i.linkContent
 }
