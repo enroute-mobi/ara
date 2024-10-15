@@ -2186,3 +2186,48 @@ Feature: Support SIRI VehicleMonitoring by request
         | RequestIdentifier | Test:1234::LOC                           |
         | Lines             | ["Test:Line:3:LOC"]                      |
         | VehicleJourneys   | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |
+
+  @siri-valid @ARA-1591
+  Scenario: VehicleMonitoringDelivery with Status false for one Delivery is logged as an Error status in BigQuery
+    Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
+      """
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
+      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
+        <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
+        <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
+        <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+          <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
+          <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
+          <ns5:Status>false</ns5:Status>
+          <ns5:ErrorCondition>
+            <ns5:AllowedResourceUsageExceededError>
+              <ns5:ErrorText>too many requets</ns5:ErrorText>
+            </ns5:AllowedResourceUsageExceededError>
+          </ns5:ErrorCondition>
+        </ns5:VehicleMonitoringDelivery>
+      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+  </soap:Body>
+</soap:Envelope>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_code_space     | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Name  | Test 1                             |
+      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+    When a minute has passed
+    And the SIRI server has received a GetVehicleMonitoring request
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                     |
+      | Direction | sent                     |
+      | Status    | Error                    |
+      | Type      | VehicleMonitoringRequest |
