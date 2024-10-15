@@ -1,3 +1,4 @@
+//lint:file-ignore SA1019 Ignore file_gtfs_realtime_proto_msgTypes[XX].Exporter deprecated
 // Copyright 2015 The GTFS Specifications Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
