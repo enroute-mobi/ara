@@ -550,6 +550,15 @@ func (apiSituation *APISituation) Validate() bool {
 		apiSituation.Errors.Add("Affects", e.ERROR_BLANK)
 	}
 
+	if len(apiSituation.InfoLinks) != 0 {
+		for i := range apiSituation.InfoLinks {
+			if apiSituation.InfoLinks[i].Uri == "" {
+				apiSituation.Errors.Add("InfoLinks", e.ERROR_BLANK)
+				break
+			}
+		}
+	}
+
 	return len(apiSituation.Errors) == 0
 }
 
@@ -563,7 +572,7 @@ func (situation *Situation) Definition() *APISituation {
 		Errors:                  e.NewErrors(),
 		Format:                  situation.Format,
 		InternalTags:            situation.InternalTags,
-		InfoLinks:               []*InfoLink{},
+		InfoLinks:               situation.InfoLinks,
 		Keywords:                situation.Keywords,
 		Origin:                  situation.Origin,
 		ParticipantRef:          situation.ParticipantRef,
