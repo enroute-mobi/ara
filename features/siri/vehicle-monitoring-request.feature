@@ -317,6 +317,201 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]            |
         | ErrorDetails      | Line Test:Line:3:LOC not found |
 
+  @siri-valid @ARA-1590
+  Scenario: Handle a SIRI VehicleMonitoring request with Referent Line with Fallback on vehicle remote codeSpace (RatpCap case)
+    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
+      | local_credential                                                           | test                |
+      | remote_code_space                                                          | internal            |
+      | siri-vehicle-monitoring-request-broadcaster.vehicle_remote_code_space      | rdmantois, rdbievre |
+    Given a Line exists with the following attributes:
+      | Codes | "internal": "Referent-1" |
+      | Name  | Line Referent 1          |
+    # 6ba7b814-9dad-11d1-2-00c04fd430c8
+    And a Line exists with the following attributes:
+      | Codes      | "rdbievre": "Line-1"              |
+      | Name       | Ligne 1                           |
+      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
+      # 6ba7b814-9dad-11d1-3-00c04fd430c8
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                                                                    |
+      | Codes                    | "rdbievre": "bievre-VehicleJourney", "internal": "STIF:bievre-VehicleJourney" |
+      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                             |
+      | Monitored                | true                                                                          |
+      | Attribute[DirectionName] | Direction Name                                                                |
+    # 6ba7b814-9dad-11d1-4-00c04fd430c8
+    And a Vehicle exists with the following attributes:
+      | Codes            | "rdbievre": "bievre-Vehicle"      |
+      | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 123                               |
+      | Occupancy        | seatsAvailable                    |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | DriverRef        | "1233"                            |
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
+    # 6ba7b814-9dad-11d1-5-00c04fd430c8
+    And a StopArea exists with the following attributes:
+      | Codes      | "internal": "Stop-1"              |
+      | Name       | Stop 1                            |
+      | ReferentId | 6ba7b814-9dad-11d1-b-00c04fd430c8 | # Stop Referent
+    # 6ba7b814-9dad-11d1-6-00c04fd430c8
+    And a StopVisit exists with the following attributes:
+      | Codes                         | "internal": "bievre-VehicleJourney-bievre-Vehicle" |
+      | PassageOrder                  | 4                                                  |
+      | VehicleAtStop                 | false                                              |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8                  |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                  |
+      | VehicleAtStop                 | false                                              |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                 |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                           |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                           |
+      | ArrivalStatus                 | delayed                                            |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                           |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                           |
+      | DepartureStatus               | delayed                                            |
+      | Attribute[DestinationDisplay] | Pouet-pouet                                        |
+    # 6ba7b814-9dad-11d1-7-00c04fd430c8
+    And a Line exists with the following attributes:
+      | Codes      | "rdmantois": "Line-2"             |
+      | Name       | Line 2                            |
+      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
+    # 6ba7b814-9dad-11d1-8-00c04fd430c8
+    And a VehicleJourney exists with the following attributes:
+      | Name                     | Passage 32                                                                        |
+      | Codes                    | "rdmantois": "mantois-VehicleJourney", "internal": "STIF:mantois-VehicleJourney"  |
+      | LineId                   | 6ba7b814-9dad-11d1-8-00c04fd430c8                                                 |
+      | Monitored                | true                                                                              |
+      | Attribute[DirectionName] | Another Direction Name                                                            |
+    # 6ba7b814-9dad-11d1-9-00c04fd430c8
+    And a Vehicle exists with the following attributes:
+      | Codes            | "rdmantois": "mantois-Vehicle"    |
+      | LineId           | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | Longitude        | 3.232                             |
+      | Latitude         | 8.329                             |
+      | Bearing          | 355                               |
+      | Occupancy        | fewSeatsAvailable                 |
+      | RecordedAtTime   | 2017-01-01T14:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T15:00:00.000Z          |
+      | DriverRef        | "567"                             |
+    # 6ba7b814-9dad-11d1-a-00c04fd430c8
+    And a StopArea exists with the following attributes:
+      | Codes | "internal": "Stop-Referent-1" |
+      | Name  | Stop Referent                 |
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>test</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+              <siri:LineRef>Referent-1</siri:LineRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+    """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+          <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+          <siri:ProducerRef>Ara</siri:ProducerRef>
+          <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+          <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+        <Answer>
+          <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+            <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+          <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+          <siri:Status>true</siri:Status>
+          <siri:VehicleActivity>
+            <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+            <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+            <siri:VehicleMonitoringRef>bievre-Vehicle</siri:VehicleMonitoringRef>
+            <siri:MonitoredVehicleJourney>
+              <siri:LineRef>Referent-1</siri:LineRef>
+              <siri:FramedVehicleJourneyRef>
+                <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                <siri:DatedVehicleJourneyRef>STIF:bievre-VehicleJourney</siri:DatedVehicleJourneyRef>
+              </siri:FramedVehicleJourneyRef>
+              <siri:PublishedLineName>Line Referent 1</siri:PublishedLineName>
+              <siri:DirectionName>Direction Name</siri:DirectionName>
+              <siri:Monitored>true</siri:Monitored>
+              <siri:VehicleLocation>
+                <siri:Longitude>1.234</siri:Longitude>
+                <siri:Latitude>5.678</siri:Latitude>
+              </siri:VehicleLocation>
+              <siri:Bearing>123</siri:Bearing>
+              <siri:Occupancy>seatsAvailable</siri:Occupancy>
+              <siri:DriverRef>1233</siri:DriverRef>
+              <siri:MonitoredCall>
+                <siri:StopPointRef>Stop-1</siri:StopPointRef>
+                <siri:Order>4</siri:Order>
+                <siri:StopPointName>Stop 1</siri:StopPointName>
+                <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
+                <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
+                <siri:ExpectedArrivalTime>2017-01-01T15:02:00.000Z</siri:ExpectedArrivalTime>
+                <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
+                <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
+                <siri:ExpectedDepartureTime>2017-01-01T15:01:00.000Z</siri:ExpectedDepartureTime>
+                <siri:DepartureStatus>delayed</siri:DepartureStatus>
+              </siri:MonitoredCall>
+            </siri:MonitoredVehicleJourney>
+          </siri:VehicleActivity>
+          <siri:VehicleActivity>
+            <siri:RecordedAtTime>2017-01-01T14:00:00.000Z</siri:RecordedAtTime>
+            <siri:ValidUntilTime>2017-01-01T15:00:00.000Z</siri:ValidUntilTime>
+            <siri:VehicleMonitoringRef>mantois-Vehicle</siri:VehicleMonitoringRef>
+            <siri:MonitoredVehicleJourney>
+              <siri:LineRef>Referent-1</siri:LineRef>
+              <siri:FramedVehicleJourneyRef>
+                <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                <siri:DatedVehicleJourneyRef>STIF:mantois-VehicleJourney</siri:DatedVehicleJourneyRef>
+              </siri:FramedVehicleJourneyRef>
+              <siri:PublishedLineName>Line Referent 1</siri:PublishedLineName>
+              <siri:DirectionName>Another Direction Name</siri:DirectionName>
+              <siri:Monitored>true</siri:Monitored>
+              <siri:VehicleLocation>
+                <siri:Longitude>3.232</siri:Longitude>
+                <siri:Latitude>8.329</siri:Latitude>
+              </siri:VehicleLocation>
+              <siri:Bearing>355</siri:Bearing>
+              <siri:Occupancy>fewSeatsAvailable</siri:Occupancy>
+              <siri:DriverRef>567</siri:DriverRef>
+            </siri:MonitoredVehicleJourney>
+          </siri:VehicleActivity>
+          </siri:VehicleMonitoringDelivery>
+        </Answer>
+        <AnswerExtension/>
+          </sw:GetVehicleMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+    """
+    Then an audit event should exist with these attributes:
+      | Type              | VehicleMonitoringRequest                                      |
+      | Protocol          | siri                                                          |
+      | Direction         | received                                                      |
+      | Status            | OK                                                            |
+      | Partner           | test                                                          |
+      | Vehicles          | ["bievre-Vehicle", "mantois-Vehicle"]                         |
+      | RequestIdentifier | Test:1234::LOC                                                |
+      | Lines             | ["Referent-1"]                                                |
+      | VehicleJourneys   | ["STIF:bievre-VehicleJourney", "STIF:mantois-VehicleJourney"] |
+
   @siri-valid @ARA-1234
   Scenario: Send all the vehicles in respond to a SIRI VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:

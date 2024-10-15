@@ -55,7 +55,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	siriLiteResponse.Siri.ServiceDelivery.VehicleMonitoringDelivery = response
 
 	code := model.NewCode(connector.remoteCodeSpace, lineRef)
-	line, ok := connector.partner.Model().Lines().FindByCode(code)
+	requestedLine, ok := connector.partner.Model().Lines().FindByCode(code)
 	if !ok {
 		response.ErrorCondition = &siri.ErrorCondition{
 			ErrorType: "InvalidDataReferencesError",
@@ -72,81 +72,87 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(ur
 	vehicleJourneyRefs := make(map[string]struct{})
 	lineRefs := make(map[string]struct{})
 
-	vs := connector.partner.Model().Vehicles().FindByLineId(line.Id())
-	for i := range vs {
-		vehicleId, ok := vs[i].CodeWithFallback(connector.vehicleRemoteCodeSpaces)
-		if !ok {
-			continue
-		}
+	lineIds := connector.partner.Model().Lines().FindFamily(requestedLine.Id())
 
-		vj := vs[i].VehicleJourney()
-		if vj == nil {
-			continue
-		}
-		dvj, ok := connector.datedVehicleJourneyRef(vj)
-		if !ok {
-			continue
-		}
-
-		activity := siri.NewSiriLiteVehicleActivity()
-		activity.RecordedAtTime = vs[i].RecordedAtTime
-		activity.ValidUntilTime = vs[i].ValidUntilTime
-		activity.VehicleMonitoringRef = vehicleId.Value()
-		activity.MonitoredVehicleJourney.LineRef = lineRef
-		activity.MonitoredVehicleJourney.PublishedLineName = line.Name
-		activity.MonitoredVehicleJourney.DirectionName = vj.Attributes[siri_attributes.DirectionName]
-		activity.MonitoredVehicleJourney.OriginName = vj.OriginName
-		activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
-		activity.MonitoredVehicleJourney.Monitored = vj.Monitored
-		activity.MonitoredVehicleJourney.Bearing = vs[i].Bearing
-		activity.MonitoredVehicleJourney.DriverRef = vs[i].DriverRef
-
-		refs := vj.References.Copy()
-		activity.MonitoredVehicleJourney.OriginRef = connector.handleRef("OriginRef", vj.Origin, refs)
-		activity.MonitoredVehicleJourney.DestinationRef = connector.handleRef("DestinationRef", vj.Origin, refs)
-
-		if vs[i].NextStopVisitId != model.StopVisitId("") {
-			nextStopVisit, ok := connector.Partner().Model().StopVisits().Find(vs[i].NextStopVisitId)
-			if ok {
-				stopArea, stopAreaCode, ok := connector.stopPointRef(nextStopVisit.StopArea().Id())
-				if ok {
-					monitoredCall := &siri.MonitoredCall{}
-					monitoredCall.StopPointRef = stopAreaCode
-					monitoredCall.StopPointName = stopArea.Name
-					monitoredCall.VehicleAtStop = nextStopVisit.VehicleAtStop
-					monitoredCall.DestinationDisplay = nextStopVisit.Attributes["DestinationDisplay"]
-					monitoredCall.ExpectedArrivalTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
-					monitoredCall.ExpectedDepartureTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
-					monitoredCall.DepartureStatus = string(nextStopVisit.DepartureStatus)
-					monitoredCall.Order = &nextStopVisit.PassageOrder
-					monitoredCall.AimedArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed})
-					monitoredCall.AimedDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed})
-					monitoredCall.ArrivalStatus = string(nextStopVisit.ArrivalStatus)
-					monitoredCall.ActualArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual})
-					monitoredCall.ActualDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual})
-
-					activity.MonitoredVehicleJourney.MonitoredCall = monitoredCall
-				}
-
+	for j := range lineIds {
+		vs := connector.partner.Model().Vehicles().FindByLineId(lineIds[j])
+		for i := range vs {
+			vehicleId, ok := vs[i].CodeWithFallback(connector.vehicleRemoteCodeSpaces)
+			if !ok {
+				continue
 			}
+
+			vj := vs[i].VehicleJourney()
+			if vj == nil {
+				continue
+			}
+
+			dvj, ok := connector.datedVehicleJourneyRef(vj)
+			if !ok {
+				continue
+			}
+
+			activity := siri.NewSiriLiteVehicleActivity()
+			activity.RecordedAtTime = vs[i].RecordedAtTime
+			activity.ValidUntilTime = vs[i].ValidUntilTime
+			activity.VehicleMonitoringRef = vehicleId.Value()
+			activity.MonitoredVehicleJourney.LineRef = lineRef
+			activity.MonitoredVehicleJourney.PublishedLineName = requestedLine.Name
+			activity.MonitoredVehicleJourney.DirectionName = vj.Attributes[siri_attributes.DirectionName]
+			activity.MonitoredVehicleJourney.OriginName = vj.OriginName
+			activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
+			activity.MonitoredVehicleJourney.Monitored = vj.Monitored
+			activity.MonitoredVehicleJourney.Bearing = vs[i].Bearing
+			activity.MonitoredVehicleJourney.DriverRef = vs[i].DriverRef
+
+			refs := vj.References.Copy()
+			activity.MonitoredVehicleJourney.OriginRef = connector.handleRef("OriginRef", vj.Origin, refs)
+			activity.MonitoredVehicleJourney.DestinationRef = connector.handleRef("DestinationRef", vj.Origin, refs)
+
+			if vs[i].NextStopVisitId != model.StopVisitId("") {
+				nextStopVisit, ok := connector.Partner().Model().StopVisits().Find(vs[i].NextStopVisitId)
+				if ok {
+					stopArea, stopAreaCode, ok := connector.stopPointRef(nextStopVisit.StopArea().Id())
+					if ok {
+						monitoredCall := &siri.MonitoredCall{}
+						monitoredCall.StopPointRef = stopAreaCode
+						monitoredCall.StopPointName = stopArea.Name
+						monitoredCall.VehicleAtStop = nextStopVisit.VehicleAtStop
+						monitoredCall.DestinationDisplay = nextStopVisit.Attributes["DestinationDisplay"]
+						monitoredCall.ExpectedArrivalTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
+						monitoredCall.ExpectedDepartureTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
+						monitoredCall.DepartureStatus = string(nextStopVisit.DepartureStatus)
+						monitoredCall.Order = &nextStopVisit.PassageOrder
+						monitoredCall.AimedArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed})
+						monitoredCall.AimedDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Aimed})
+						monitoredCall.ArrivalStatus = string(nextStopVisit.ArrivalStatus)
+						monitoredCall.ActualArrivalTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual})
+						monitoredCall.ActualDepartureTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Actual})
+
+						activity.MonitoredVehicleJourney.MonitoredCall = monitoredCall
+					}
+
+				}
+			}
+
+			modelDate := connector.partner.Model().Date()
+			activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef =
+				connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
+			activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
+
+			activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vs[i].Longitude
+			activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vs[i].Latitude
+
+			activity.MonitoredVehicleJourney.Occupancy = vs[i].Occupancy
+
+			response.VehicleActivity = append(response.VehicleActivity, activity)
+			vehicleIds = append(vehicleIds, vehicleId.Value())
+			vehicleJourneyRefs[dvj] = struct{}{}
+
 		}
-
-		modelDate := connector.partner.Model().Date()
-		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DataFrameRef =
-			connector.partner.NewIdentifier(idgen.IdentifierAttributes{Type: "DataFrame", Id: modelDate.String()})
-		activity.MonitoredVehicleJourney.FramedVehicleJourneyRef.DatedVehicleJourneyRef = dvj
-
-		activity.MonitoredVehicleJourney.VehicleLocation.Longitude = vs[i].Longitude
-		activity.MonitoredVehicleJourney.VehicleLocation.Latitude = vs[i].Latitude
-
-		activity.MonitoredVehicleJourney.Occupancy = vs[i].Occupancy
-
-		response.VehicleActivity = append(response.VehicleActivity, activity)
-
-		vehicleIds = append(vehicleIds, vehicleId.Value())
-		vehicleJourneyRefs[dvj] = struct{}{}
-		lineRefs[lineRef] = struct{}{}
 	}
+
+	lineRefs[lineRef] = struct{}{}
 
 	if connector.partner.PartnerSettings.SortPaylodForTest() {
 		sort.Sort(siri.SortByVehicleMonitoringRef{VehicleActivities: response.VehicleActivity})

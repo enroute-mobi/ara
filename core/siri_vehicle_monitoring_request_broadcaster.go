@@ -129,7 +129,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehicle(vehicleRef 
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef(lineRef string, delivery *siri.SIRIVehicleMonitoringDelivery, message *audit.BigQueryMessage, siriResponse *siri.SIRIVehicleMonitoringResponse) {
 	code := model.NewCode(connector.remoteCodeSpace, lineRef)
-	line, ok := connector.partner.Model().Lines().FindByCode(code)
+	requestedLine, ok := connector.partner.Model().Lines().FindByCode(code)
 	if !ok {
 		delivery.ErrorCondition = &siri.ErrorCondition{
 			ErrorType: "InvalidDataReferencesError",
@@ -144,10 +144,14 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) getVehiclesWithLineRef
 
 	delivery.Status = true
 
-	vs := connector.partner.Model().Vehicles().FindByLineId(line.Id())
-	for i := range vs {
-		connector.buildVehicleActivity(delivery, line, lineRef, vs[i])
+	lineIds := connector.partner.Model().Lines().FindFamily(requestedLine.Id())
+	for j := range lineIds {
+		vs := connector.partner.Model().Vehicles().FindByLineId(lineIds[j])
+		for i := range vs {
+			connector.buildVehicleActivity(delivery, requestedLine, lineRef, vs[i])
+		}
 	}
+
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(delivery *siri.SIRIVehicleMonitoringDelivery, line *model.Line, lineRef string, vehicle *model.Vehicle) {
