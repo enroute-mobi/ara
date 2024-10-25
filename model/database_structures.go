@@ -88,6 +88,24 @@ type SelectStopArea struct {
 	CollectSituations sql.NullBool   `db:"collect_situations"`
 }
 
+type DatabaseStopAreaGroup struct {
+	Id              string `db:"id"`
+	ReferentialSlug string `db:"referential_slug"`
+	ModelName       string `db:"model_name"`
+	Name            string `db:"name"`
+	ShortName       string `db:"short_name"`
+	StopAreaIds     string `db:"stop_area_ids"`
+}
+
+type SelectStopAreaGroup struct {
+	Id              string
+	ReferentialSlug string `db:"referential_slug"`
+	ModelName       string `db:"model_name"`
+	Name            sql.NullString `db:"name"`
+	ShortName       sql.NullString `db:"short_name"`
+	StopAreaIds     sql.NullString `db:"stop_area_ids"`
+}
+
 type DatabaseLine struct {
 	Id                string         `db:"id"`
 	ReferentialSlug   string         `db:"referential_slug"`
