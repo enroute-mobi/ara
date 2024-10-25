@@ -103,7 +103,7 @@ func Test_Serve(t *testing.T) {
 	assert.Equal(http.StatusOK, responseRecorder.Code)
 	assert.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 
-	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,` +
+	expectedBody := `{"Import":{"Total":12,"line":2,"operator":2,"stop_area":2,` +
 		`"stop_area_group":1,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
 
 	assert.Equal(expectedBody, responseRecorder.Body.String())
@@ -237,7 +237,7 @@ func Test_Serve_With_ImportToken(t *testing.T) {
 	assert.Equal(http.StatusOK, responseRecorder.Code)
 	assert.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 
-	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,` +
+	expectedBody := `{"Import":{"Total":12,"line":2,"operator":2,"stop_area":2,` +
 		`"stop_area_group":1,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
 
 	assert.Equal(expectedBody, responseRecorder.Body.String())

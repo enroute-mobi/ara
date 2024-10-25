@@ -662,7 +662,7 @@ func (loader *Loader) errInsert(m string, e error) {
 
 func (r *Result) setTotalInserts() {
 	var c int64
-	for _, model := range [5]string{STOP_AREA, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
+	for _, model := range [6]string{STOP_AREA, STOP_AREA_GROUP, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
 		c += r.Import[model]
 	}
 	r.Import[TOTAL_INSERTS] = c
