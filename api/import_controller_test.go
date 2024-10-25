@@ -15,6 +15,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 )
 
 func prepareMultipart(t *testing.T, values map[string]io.Reader) (request *http.Request) {
@@ -68,6 +69,8 @@ func mustOpen(t *testing.T, f string) *os.File {
 }
 
 func Test_Serve(t *testing.T) {
+	assert := assert.New(t)
+
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
@@ -97,36 +100,31 @@ func Test_Serve(t *testing.T) {
 	server.HandleFlow(responseRecorder, request)
 
 	// Test the result
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v", status, http.StatusOK)
-	}
+	assert.Equal(http.StatusOK, responseRecorder.Code)
+	assert.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v", contentType, "application/json")
-	}
-	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
-	if responseRecorder.Body.String() != expectedBody {
-		t.Errorf("Handler returned wrong body:\n got %v\n want %v", responseRecorder.Body.String(), expectedBody)
-	}
+	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,` +
+		`"stop_area_group":1,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
+
+	assert.Equal(expectedBody, responseRecorder.Body.String())
 
 	referential.ReloadModel()
 
 	_, ok := referential.Model().Operators().Find("03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	if !ok {
-		t.Errorf("Operator should be found after the reload")
-	}
+	assert.True(ok)
+
 	_, ok = referential.Model().StopAreas().Find("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	if !ok {
-		t.Errorf("StopArea should be found after the reload")
-	}
+	assert.True(ok)
+
+	_, ok = referential.Model().StopAreaGroups().Find("cf3e1970-7a7e-4379-ae67-a67abe1c7c1b")
+	assert.True(ok)
+
 	_, ok = referential.Model().Lines().Find("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	if !ok {
-		t.Errorf("Line should be found after the reload")
-	}
+	assert.True(ok)
+
 	_, ok = referential.Model().VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
-	if !ok {
-		t.Errorf("VehicleJourney should be found after the reload")
-	}
+	assert.True(ok)
+
 	// FIXME: We don't reload SV for now
 	// _, ok = referential.Model().StopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	// if !ok {
@@ -144,15 +142,13 @@ func Test_Serve(t *testing.T) {
 	server.HandleFlow(responseRecorder2, request2)
 
 	// Test the result
-	if status := responseRecorder2.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v", status, http.StatusOK)
-	}
+	assert.Equal(http.StatusOK, responseRecorder2.Code)
+
 	result := model.Result{}
 	jsonDecoder := json.NewDecoder(responseRecorder2.Body)
 	jsonDecoder.Decode(&result)
-	if result.Import["Errors"] != 5 {
-		t.Errorf("Handler returned wrong nomber of errors:\n got %v\n want 5", result.Import["Errors"])
-	}
+
+	assert.Equal(int64(6), result.Import["Errors"])
 
 	values3 := map[string]io.Reader{
 		"data":    mustOpen(t, "testdata/import.csv"),
@@ -164,15 +160,12 @@ func Test_Serve(t *testing.T) {
 	server.HandleFlow(responseRecorder3, request3)
 
 	// Test the result
-	if status := responseRecorder3.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v", status, http.StatusOK)
-	}
+	assert.Equal(http.StatusOK, responseRecorder3.Code)
+
 	result3 := model.Result{}
 	jsonDecoder = json.NewDecoder(responseRecorder3.Body)
 	jsonDecoder.Decode(&result3)
-	if result3.Import["Errors"] != 0 {
-		t.Errorf("Handler returned wrong number of errors:\n got %v\n want 0", result3.Import["Errors"])
-	}
+	assert.Equal(int64(1), result3.Import["Errors"])
 }
 
 func Test_Serve_With_NoToken(t *testing.T) {
@@ -210,6 +203,8 @@ func Test_Serve_With_NoToken(t *testing.T) {
 }
 
 func Test_Serve_With_ImportToken(t *testing.T) {
+	assert := assert.New(t)
+
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
@@ -239,15 +234,11 @@ func Test_Serve_With_ImportToken(t *testing.T) {
 	server.HandleFlow(responseRecorder, request)
 
 	// Test the result
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v", status, http.StatusOK)
-	}
+	assert.Equal(http.StatusOK, responseRecorder.Code)
+	assert.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v", contentType, "application/json")
-	}
-	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
-	if responseRecorder.Body.String() != expectedBody {
-		t.Errorf("Handler returned wrong body:\n got %v\n want %v", responseRecorder.Body.String(), expectedBody)
-	}
+	expectedBody := `{"Import":{"Total":11,"line":2,"operator":2,"stop_area":2,` +
+		`"stop_area_group":1,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
+
+	assert.Equal(expectedBody, responseRecorder.Body.String())
 }

@@ -339,7 +339,6 @@ func (loader *Loader) handleStopAreaGroup(record []string) error {
 
 	// var err error
 	parseErrors := ComplexError{}
-	fmt.Println("xxxxxxxxxxxxxxxxxxx I AM HER xxxxxxxxxxxxxxxxxxxx")
 	if parseErrors.ErrorCount() != 0 {
 		return parseErrors
 	}
@@ -352,7 +351,7 @@ func (loader *Loader) handleStopAreaGroup(record []string) error {
 		record[4],
 		record[5],
 	)
-	fmt.Printf("values --->>> %#v\n", values)
+
 	loader.stopAreaGroups = append(loader.stopAreaGroups, values...)
 	loader.bulkCounter[STOP_AREA_GROUP]++
 
