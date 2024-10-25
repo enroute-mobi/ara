@@ -337,10 +337,14 @@ func (loader *Loader) handleStopAreaGroup(record []string) error {
 		return fmt.Errorf("wrong number of entries, expected 13 got %v", len(record))
 	}
 
-	// var err error
 	parseErrors := ComplexError{}
 	if parseErrors.ErrorCount() != 0 {
 		return parseErrors
+	}
+
+	err := loader.handleForce(STOP_AREA_GROUP, record[2])
+	if err != nil {
+		return err
 	}
 
 	values := fmt.Sprintf("($$%v$$, $$%v$$, $$%v$$, $$%v$$, $$%v$$, $$%v$$),",

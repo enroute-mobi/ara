@@ -165,7 +165,7 @@ func Test_Serve(t *testing.T) {
 	result3 := model.Result{}
 	jsonDecoder = json.NewDecoder(responseRecorder3.Body)
 	jsonDecoder.Decode(&result3)
-	assert.Equal(int64(1), result3.Import["Errors"])
+	assert.Zero(result3.Import["Errors"])
 }
 
 func Test_Serve_With_NoToken(t *testing.T) {
