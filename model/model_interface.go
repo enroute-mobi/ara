@@ -244,6 +244,10 @@ func (model *MemoryModel) Load() error {
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopAreas: %v", err)
 	}
+	err = model.stopAreaGroups.Load(model.referential)
+	if err != nil {
+		logger.Log.Debugf("Error while loading StopAreaGroups: %v", err)
+	}
 	err = model.lines.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Lines: %v", err)
