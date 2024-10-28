@@ -3,7 +3,9 @@ package model
 import (
 	"encoding/json"
 	"testing"
+	"time"
 
+	"bitbucket.org/enroute-mobi/ara/clock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -153,7 +155,7 @@ func Test_MemoryLineGroups_Load(t *testing.T) {
 		ModelName:       "2017-01-01",
 		ReferentialSlug: "referential",
 		ShortName:       "short_name",
-		LineIds:     `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
+		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 	}
 
 	Database.AddTableWithName(databaseLineGroup, "line_groups")

@@ -252,6 +252,10 @@ func (model *MemoryModel) Load() error {
 	if err != nil {
 		logger.Log.Debugf("Error while loading Lines: %v", err)
 	}
+	err = model.lineGroups.Load(model.referential)
+	if err != nil {
+		logger.Log.Debugf("Error while loading LineGroups: %v", err)
+	}
 	err = model.vehicleJourneys.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading VehicleJourneys: %v", err)

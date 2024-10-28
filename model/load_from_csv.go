@@ -21,7 +21,8 @@ stop_area,Id,ParentId,ReferentId,ModelName,Name,Codes,LineIds,Attributes,Referen
 line,Id,ModelName,Name,Codes,Attributes,References,CollectSituations
 vehicle_journey,Id,ModelName,Name,Codes,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
 stop_visit,Id,ModelName,Codes,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
-stop_area_group,Id,ModelName,Name,ShortName,LineIds
+stop_area_group,Id,ModelName,Name,ShortName,StopAreaIds
+line_group,Id,ModelName,Name,ShortName,LineIds
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -32,6 +33,7 @@ const (
 	STOP_AREA       = "stop_area"
 	STOP_AREA_GROUP = "stop_area_group"
 	LINE            = "line"
+	LINE_GROUP      = "line_group"
 	VEHICLE_JOURNEY = "vehicle_journey"
 	STOP_VISIT      = "stop_visit"
 	OPERATOR        = "operator"
@@ -49,6 +51,7 @@ type Loader struct {
 	stopAreas       []byte
 	stopAreaGroups  []byte
 	lines           []byte
+	lineGroups      []byte
 	operators       []byte
 	force           bool
 	printErrors     bool
@@ -99,7 +102,14 @@ func LoadFromCSVFile(filePath string, referentialSlug string, force bool) error 
 
 func NewLoader(referentialSlug string, force, printErrors bool) *Loader {
 	d := make(map[string]map[string]struct{})
-	for _, m := range [6]string{STOP_AREA, STOP_AREA_GROUP, LINE, VEHICLE_JOURNEY, STOP_VISIT, OPERATOR} {
+	for _, m := range [7]string{
+		STOP_AREA,
+		STOP_AREA_GROUP,
+		LINE,
+		LINE_GROUP,
+		VEHICLE_JOURNEY,
+		STOP_VISIT,
+		OPERATOR} {
 		d[m] = make(map[string]struct{})
 	}
 	r := Result{
@@ -160,6 +170,11 @@ func (loader Loader) Load(reader io.Reader) Result {
 			if err != nil {
 				loader.err(i, err)
 			}
+		case LINE_GROUP:
+			err := loader.handleLineGroup(record)
+			if err != nil {
+				loader.err(i, err)
+			}
 		case VEHICLE_JOURNEY:
 			err := loader.handleVehicleJourney(record)
 			if err != nil {
@@ -180,6 +195,7 @@ func (loader Loader) Load(reader io.Reader) Result {
 	loader.insertStopAreas()
 	loader.insertStopAreaGroups()
 	loader.insertLines()
+	loader.insertLineGroups()
 	loader.insertVehicleJourneys()
 	loader.insertStopVisits()
 
@@ -332,9 +348,8 @@ func (loader *Loader) handleStopArea(record []string) error {
 }
 
 func (loader *Loader) handleStopAreaGroup(record []string) error {
-
 	if len(record) != 6 {
-		return fmt.Errorf("wrong number of entries, expected 13 got %v", len(record))
+		return fmt.Errorf("wrong number of entries, expected 6 got %v", len(record))
 	}
 
 	parseErrors := ComplexError{}
@@ -501,6 +516,66 @@ func (loader *Loader) insertLines() {
 	}
 
 	loader.result.Import[LINE] += rows
+}
+
+func (loader *Loader) handleLineGroup(record []string) error {
+	if len(record) != 6 {
+		return fmt.Errorf("wrong number of entries, expected 6 got %v", len(record))
+	}
+
+	parseErrors := ComplexError{}
+	if parseErrors.ErrorCount() != 0 {
+		return parseErrors
+	}
+
+	err := loader.handleForce(LINE_GROUP, record[2])
+	if err != nil {
+		return err
+	}
+
+	values := fmt.Sprintf("($$%v$$, $$%v$$, $$%v$$, $$%v$$, $$%v$$, $$%v$$),",
+		loader.referentialSlug,
+		record[1],
+		record[2],
+		record[3],
+		record[4],
+		record[5],
+	)
+
+	loader.lineGroups = append(loader.lineGroups, values...)
+	loader.bulkCounter[LINE_GROUP]++
+
+	if loader.bulkCounter[LINE_GROUP] >= config.Config.LoadMaxInsert {
+		loader.insertLineGroups()
+	}
+
+	return nil
+}
+
+func (loader *Loader) insertLineGroups() {
+	if len(loader.lineGroups) == 0 {
+		return
+	}
+
+	defer func() {
+		loader.lineGroups = []byte{}
+		loader.bulkCounter[LINE_GROUP] = 0
+	}()
+
+	query := fmt.Sprintf("INSERT INTO line_groups(referential_slug, id, model_name, name, short_name, line_ids) VALUES %v;",
+		string(loader.lineGroups[:len(loader.lineGroups)-1]))
+	result, err := Database.Exec(query)
+	if err != nil {
+		loader.errInsert("lineGroups", err)
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		loader.errInsert("lineGroups", err)
+		return
+	}
+
+	loader.result.Import[LINE_GROUP] += rows
 }
 
 func (loader *Loader) handleVehicleJourney(record []string) error {
@@ -690,6 +765,15 @@ func (r Result) PrintResult() string {
   %v StopAreas
   %v StopAreaGroups
   %v Lines
+  %v LineGroups
   %v VehicleJourneys
-  %v StopVisits`, r.Import[ERRORS], r.Import[OPERATOR], r.Import[STOP_AREA], r.Import[STOP_AREA_GROUP], r.Import[LINE], r.Import[VEHICLE_JOURNEY], r.Import[STOP_VISIT])
+  %v StopVisits`,
+		r.Import[ERRORS],
+		r.Import[OPERATOR],
+		r.Import[STOP_AREA],
+		r.Import[STOP_AREA_GROUP],
+		r.Import[LINE],
+		r.Import[LINE_GROUP],
+		r.Import[VEHICLE_JOURNEY],
+		r.Import[STOP_VISIT])
 }
