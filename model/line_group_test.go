@@ -135,3 +135,49 @@ func Test_MemoryLineGroups_Delete(t *testing.T) {
 	_, ok := lineGroups.Find(existingLineGroup.Id())
 	assert.False(ok, "Deleted lineGroup should not be findable")
 }
+
+func Test_MemoryLineGroups_Load(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	InitTestDb(t)
+	defer CleanTestDb(t)
+
+	clock.SetDefaultClock(clock.NewFakeClock())
+	defer clock.SetDefaultClock(clock.NewRealClock())
+
+	// Insert Data in the test db
+	databaseLineGroup := DatabaseLineGroup{
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		Name:            "lineGroup1",
+		ModelName:       "2017-01-01",
+		ReferentialSlug: "referential",
+		ShortName:       "short_name",
+		LineIds:     `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
+	}
+
+	Database.AddTableWithName(databaseLineGroup, "line_groups")
+	err := Database.Insert(&databaseLineGroup)
+	require.NoError(err)
+
+	// Fetch data from the db
+	model := NewTestMemoryModel()
+	model.date = Date{
+		Year:  2017,
+		Month: time.January,
+		Day:   1,
+	}
+	lineGroups := model.LineGroups().(*MemoryLineGroups)
+	err = lineGroups.Load("referential")
+	require.NoError(err)
+
+	lineGroup, ok := lineGroups.Find(LineGroupId(databaseLineGroup.Id))
+	require.True(ok)
+
+	assert.Equal(LineGroupId("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"), lineGroup.Id())
+	assert.Equal("lineGroup1", lineGroup.Name)
+	assert.Equal("short_name", lineGroup.ShortName)
+	assert.Len(lineGroup.LineIds, 2)
+	assert.Equal(LineId("d0eebc99-9c0b"), lineGroup.LineIds[0])
+	assert.Equal(LineId("e0eebc99-9c0b"), lineGroup.LineIds[1])
+}
