@@ -103,7 +103,7 @@ func Test_Serve(t *testing.T) {
 	assert.Equal(http.StatusOK, responseRecorder.Code)
 	assert.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 
-	expectedBody := `{"Import":{"Total":12,"line":2,"operator":2,"stop_area":2,` +
+	expectedBody := `{"Import":{"Total":13,"line":2,"line_group":1,"operator":2,"stop_area":2,` +
 		`"stop_area_group":1,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
 
 	assert.Equal(expectedBody, responseRecorder.Body.String())
@@ -120,6 +120,9 @@ func Test_Serve(t *testing.T) {
 	assert.True(ok)
 
 	_, ok = referential.Model().Lines().Find("f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
+	assert.True(ok)
+
+	_, ok = referential.Model().LineGroups().Find("59208069-3cad-4108-968f-349c5d50a351")
 	assert.True(ok)
 
 	_, ok = referential.Model().VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -148,7 +151,7 @@ func Test_Serve(t *testing.T) {
 	jsonDecoder := json.NewDecoder(responseRecorder2.Body)
 	jsonDecoder.Decode(&result)
 
-	assert.Equal(int64(6), result.Import["Errors"])
+	assert.Equal(int64(7), result.Import["Errors"])
 
 	values3 := map[string]io.Reader{
 		"data":    mustOpen(t, "testdata/import.csv"),
@@ -237,7 +240,7 @@ func Test_Serve_With_ImportToken(t *testing.T) {
 	assert.Equal(http.StatusOK, responseRecorder.Code)
 	assert.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 
-	expectedBody := `{"Import":{"Total":12,"line":2,"operator":2,"stop_area":2,` +
+	expectedBody := `{"Import":{"Total":13,"line":2,"line_group":1,"operator":2,"stop_area":2,` +
 		`"stop_area_group":1,"stop_visit":2,"vehicle_journey":3},"Errors":{}}`
 
 	assert.Equal(expectedBody, responseRecorder.Body.String())
