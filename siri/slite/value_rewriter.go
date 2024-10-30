@@ -64,7 +64,12 @@ func rewriteVisit(parent rewriteParent, content map[string]interface{}) {
 			} else {
 				parent := newRewriteMapParent(content, key)
 				for _, entry := range arrayValue {
-					rewriteVisit(parent, entry.(map[string]interface{}))
+					switch ent := entry.(type) {
+					case string:
+						parent.SetText(ent)
+					case map[string]interface{}:
+						rewriteVisit(parent, ent)
+					}
 				}
 			}
 		}

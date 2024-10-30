@@ -58,6 +58,14 @@ func Test_RewriteValues_SkipNormalMap(t *testing.T) {
 	assert.Equal(`{"DestinationName":"Porte de Clignancourt"}`, output)
 }
 
+func Test_RewriteValues_ArrayWithElement(t *testing.T) {
+	assert := assert.New(t)
+
+	output := testRewriteValues(t, `{"VehicleFeatureRef": ["longTrain"] }`)
+	assert.Equal(`{"VehicleFeatureRef":"longTrain"}`, output)
+
+}
+
 func Test_RewriteValues_SkipNormalPayload(t *testing.T) {
 	assert := assert.New(t)
 
@@ -212,6 +220,9 @@ func Test_RewriteValues_RewriteWholePayload(t *testing.T) {
 									"OperatorRef": {
 										"value": "RATP-SIV:Operator::RATP.OCTAVE.4.4:"
 									},
+									"VehicleFeatureRef": [
+										"longTrain"
+									],
 									"FramedVehicleJourneyRef": {
 										"DataFrameRef": {
 											"value": "any"
@@ -461,7 +472,8 @@ func Test_RewriteValues_RewriteWholePayload(t *testing.T) {
 										"StopPointName": "Châtelet",
 										"VehicleAtStop": false
 									},
-									"OperatorRef": "RATP-SIV:Operator::RATP.OCTAVE.4.4:"
+									"OperatorRef": "RATP-SIV:Operator::RATP.OCTAVE.4.4:",
+									"VehicleFeatureRef": "longTrain"
 								},
 								"MonitoringRef": "STIF:StopPoint:Q:463158:",
 								"RecordedAtTime": "2023-05-31T07:27:00.568Z"
