@@ -1,7 +1,10 @@
 definitions:
   services:
     postgres:
-      image: postgres:9.6
+      image:
+        name: us.gcr.io/enroute-interne/enroute-postgresql:dev
+        username: _json_key
+        password: "$GCLOUD_API_KEYFILE"
       environment:
         POSTGRES_DB: ara
         POSTGRES_USER: ara
