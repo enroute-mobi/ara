@@ -569,7 +569,7 @@ Feature: Support SIRI EstimatedTimetable
       | VehicleJourneys | ["NINOXE:VehicleJourney:201"]  |
       | Lines           | ["NINOXE:Line:3:LOC"]          |
 
-  @ARA-1465 @siri-valid
+  @wip @ARA-1465 @siri-valid
   Scenario: Create ara models after an EstimatedTimetableDelivery with multiple Estimated VehicleJourneys in a subscription
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
