@@ -7,7 +7,7 @@ Given(/^I see ara (vehicle_journeys|stop_areas|stop_visits|lines|vehicles|partne
   show_me(model_type, nil)
 end
 
-Then(/^show me ara (vehicle_journeys|stop_areas|stop_visits|lines|vehicles|partners|operators|scheduled_stop_visits|subscriptions|situations)(?: for partner "([^"]+)")?$/) do |model_type, partner_name|
+Then(/^show me ara (vehicle_journeys|stop_areas|stop_area_groups|stop_visits|lines|line_groups|vehicles|partners|operators|scheduled_stop_visits|subscriptions|situations)(?: for partner "([^"]+)")?$/) do |model_type, partner_name|
   show_me(model_type, partner_name)
 end
 
