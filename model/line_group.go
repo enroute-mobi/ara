@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -124,4 +125,40 @@ func (lineGroup *LineGroup) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(&aux)
+}
+
+func (manager *MemoryLineGroups) Load(referentialSlug string) error {
+	var selectLineGroups []SelectLineGroup
+	modelName := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from line_groups where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	_, err := Database.Select(&selectLineGroups, sqlQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, sag := range selectLineGroups {
+		lineGroup := manager.New()
+		lineGroup.id = LineGroupId(sag.Id)
+
+		if sag.Name.Valid {
+			lineGroup.Name = sag.Name.String
+		}
+
+		if sag.ShortName.Valid {
+			lineGroup.ShortName = sag.ShortName.String
+		}
+
+		if sag.LineIds.Valid && len(sag.LineIds.String) > 0 {
+			var lineIds []LineId
+			if err = json.Unmarshal([]byte(sag.LineIds.String), &lineIds); err != nil {
+				return err
+			}
+			for i := range lineIds {
+				lineGroup.LineIds = append(lineGroup.LineIds, LineId(lineIds[i]))
+			}
+		}
+
+		manager.Save(lineGroup)
+	}
+	return nil
 }

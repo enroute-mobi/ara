@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -124,4 +125,40 @@ func (stopAreaGroup *StopAreaGroup) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(&aux)
+}
+
+func (manager *MemoryStopAreaGroups) Load(referentialSlug string) error {
+	var selectStopAreaGroups []SelectStopAreaGroup
+	modelName := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from stop_area_groups where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	_, err := Database.Select(&selectStopAreaGroups, sqlQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, sag := range selectStopAreaGroups {
+		stopAreaGroup := manager.New()
+		stopAreaGroup.id = StopAreaGroupId(sag.Id)
+
+		if sag.Name.Valid {
+			stopAreaGroup.Name = sag.Name.String
+		}
+
+		if sag.ShortName.Valid {
+			stopAreaGroup.ShortName = sag.ShortName.String
+		}
+
+		if sag.StopAreaIds.Valid && len(sag.StopAreaIds.String) > 0 {
+			var stopAreaIds []StopAreaId
+			if err = json.Unmarshal([]byte(sag.StopAreaIds.String), &stopAreaIds); err != nil {
+				return err
+			}
+			for i := range stopAreaIds {
+				stopAreaGroup.StopAreaIds = append(stopAreaGroup.StopAreaIds, StopAreaId(stopAreaIds[i]))
+			}
+		}
+
+		manager.Save(stopAreaGroup)
+	}
+	return nil
 }
