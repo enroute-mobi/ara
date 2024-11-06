@@ -21,6 +21,8 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Contro
 	"stop_areas":            NewStopAreaController,
 	"partners":              NewPartnerController,
 	"lines":                 NewLineController,
+	"line_groups":           NewLineGroupsController,
+	"stop_area_groups":      NewStopAreaGroupsController,
 	"stop_visits":           NewStopVisitController,
 	"scheduled_stop_visits": NewScheduledStopVisitController,
 	"vehicle_journeys":      NewVehicleJourneyController,

@@ -17,6 +17,8 @@ type Model interface {
 	Date() Date
 	Referential() string
 	Lines() Lines
+	LineGroups() LineGroups
+	StopAreaGroups() StopAreaGroups
 	Situations() Situations
 	StopAreas() StopAreas
 	StopVisits() StopVisits
@@ -29,6 +31,8 @@ type Model interface {
 
 type MemoryModel struct {
 	lines               *MemoryLines
+	lineGroups          *MemoryLineGroups
+	stopAreaGroups      *MemoryStopAreaGroups
 	vehicles            *MemoryVehicles
 	stopAreas           *MemoryStopAreas
 	stopVisits          *MemoryStopVisits
@@ -102,6 +106,14 @@ func (model *MemoryModel) refresh() {
 	operators := NewMemoryOperators()
 	operators.model = model
 	model.operators = operators
+
+	lineGroups := NewMemoryLineGroups()
+	lineGroups.model = model
+	model.lineGroups = lineGroups
+
+	stopAreaGroups := NewMemoryStopAreaGroups()
+	stopAreaGroups.model = model
+	model.stopAreaGroups = stopAreaGroups
 
 	vehicles := NewMemoryVehicles()
 	vehicles.model = model
@@ -205,6 +217,14 @@ func (model *MemoryModel) VehicleJourneys() VehicleJourneys {
 
 func (model *MemoryModel) Lines() Lines {
 	return model.lines
+}
+
+func (model *MemoryModel) LineGroups() LineGroups {
+	return model.lineGroups
+}
+
+func (model *MemoryModel) StopAreaGroups() StopAreaGroups {
+	return model.stopAreaGroups
 }
 
 func (model *MemoryModel) Operators() Operators {
