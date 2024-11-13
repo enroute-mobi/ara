@@ -10,56 +10,84 @@ definitions:
         POSTGRES_USER: ara
         POSTGRES_PASSWORD: ara
   steps:
+    - step: &static-check
+        name: Static Check
+        image:
+          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
+        script:
+          - eval "$(build.sh bitbucket::env)"
+          - build.sh golang::dependencies
+          - staticcheck ./...
+
+    - step: &build
+        name: Build
+        image:
+          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
+        script:
+          - eval "$(build.sh bitbucket::env)"
+          - build.sh golang::dependencies
+          - make build
+
     - step: &unit-tests
         name: Unit tests
-        image: golang:1.23
+        image:
+          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
         script:
-          - export TZ=Europe/Paris LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-
-          - apt-get update
-          - mkdir -p /usr/share/man/man1 /usr/share/man/man7
-          - export PACKAGES="build-essential ruby-dev libpq-dev libxml2-dev zlib1g-dev git-core postgresql-client-common libproj-dev"
-          - export BUNDLER_VERSION=$(tail -n1 Gemfile.lock)
-          - apt-get -y install --no-install-recommends locales $PACKAGES
-          - echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
-          - gem install bundler -v $BUNDLER_VERSION
-
-          # FIXME
-          - export BASE_PATH="${GOPATH}/src/bitbucket.org/enroute-mobi"
-          - mkdir -p ${BASE_PATH}
-          - export IMPORT_PATH="${BASE_PATH}/ara"
-          - ln -s ${PWD} ${IMPORT_PATH}
-          - cd ${IMPORT_PATH}
-
-          - bundle install --jobs 4 --deployment --path=ruby/vendor/
-
-          - export ARA_DB_NAME=ara ARA_DB_USER=ara ARA_DB_PASSWORD=ara ARA_DB_HOST=localhost
-          - export ARA_CONFIG=$PWD/config
-          - ./ci.sh
+          - eval "$(build.sh bitbucket::env)"
+          - build.sh golang::dependencies
+          - build.sh bitbucket::database
+          - make test_migrations
+          - make tests
         services:
           - postgres
 
+    - step: &cucumber
+        name: Cucumber Tests
+        image:
+          name: us.gcr.io/enroute-interne/enroute-ruby:3.3-dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
+        script:
+          - echo "TODO"
+
 pipelines:
   default:
-    - step: *unit-tests
+    - parallel:
+        steps:
+          - step: *static-check
+          - step: *unit-tests
+          - step: *build
+    - step: *cucumber
 
   branches:
     master:
       - parallel:
-        - step: *unit-tests
-        - step:
-            name: Build Docker
-            image:
-                name: us.gcr.io/enroute-interne/enroute-cloud-sdk:latest
-                username: _json_key
-                password: "$GCLOUD_API_KEYFILE"
-            caches:
-              - docker
-            services:
-              - docker
-            script:
-              - ./script/bitbucket-gcloud-configure-docker.sh
-              - ./script/bitbucket-build-docker.sh
+          steps:
+            - step: *static-check
+            - step: *unit-tests
+            - step: *build
+      - parallel:
+          steps:
+            - step: *cucumber
+            - step:
+                name: Build Docker
+                image:
+                  name: us.gcr.io/enroute-interne/enroute-cloud-sdk:latest
+                  username: _json_key
+                  password: "$GCLOUD_API_KEYFILE"
+                  caches:
+                    - docker
+                  services:
+                    - docker
+                  script:
+                    - build.sh gcloud::setup
+                    - build.sh bitbucket::docker::build
 
       - step:
           name: Deploy to test
@@ -75,7 +103,7 @@ pipelines:
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
-            - pipe: atlassian/datadog-send-event:2.2.0
+            - pipe: atlassian/datadog-send-event:2.3.1
               variables:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
@@ -97,7 +125,7 @@ pipelines:
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
-            - pipe: atlassian/datadog-send-event:2.2.0
+            - pipe: atlassian/datadog-send-event:2.3.1
               variables:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
@@ -119,7 +147,7 @@ pipelines:
           script:
             - git clone git@bitbucket.org:enroute-mobi/ara-env.git env
             - env/deploy-with-runner.sh
-            - pipe: atlassian/datadog-send-event:2.2.0
+            - pipe: atlassian/datadog-send-event:2.3.1
               variables:
                 API_KEY: $DATADOG_KEY
                 TITLE: "Build ${BITBUCKET_BUILD_NUMBER} deployed on ara ${BITBUCKET_DEPLOYMENT_ENVIRONMENT}"
