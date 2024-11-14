@@ -1,7 +1,7 @@
 require 'pg'
 
 Before('@database') do
-  config = YAML.load_file("config/database.yml")["test"]
+  config = YAML.load_file(Ara.instance.config_dir.join('database.yml'))["test"]
   config["dbname"] = config.delete("name")
   @connection = PG.connect config
 end
