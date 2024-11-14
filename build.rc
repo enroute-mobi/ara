@@ -3,12 +3,19 @@
 export DEV_PACKAGES="libxml2-dev"
 export RUN_PACKAGES="libxml2"
 
-function golang_dependencies() {
-    apt_install $DEFAULT_DEV_PACKAGES $DEV_PACKAGES $RUN_PACKAGES
+export CUCUMBER_PACKAGES="libpq-dev libxml2-dev zlib1g-dev postgresql-client-common libproj-dev"
+
+function golang_dependencies_install() {
+    apt_install $DEFAULT_DEV_PACKAGES $DEV_PACKAGES
 }
 
+function golang_dependencies_run() {
+    apt_install $RUN_PACKAGES
+}
+
+
 function bitbucket_database() {
-    cat > "config/database.yml" <<EOF
+    cat > "${ARA_ROOT:-.}/config/database.yml" <<EOF
 test:
   name: ${ARA_DB_NAME}
   user: ${ARA_DB_USER}
@@ -16,4 +23,14 @@ test:
   password: ${ARA_DB_PASSWORD}
   port: ${ARA_DB_PORT:-5432}
 EOF
+}
+
+function cucumber_dependencies() {
+    apt_install $DEFAULT_DEV_PACKAGES $CUCUMBER_PACKAGES $RUN_PACKAGES
+}
+
+function cucumber_install() {
+    # golang_dependencies_run not needed
+    cucumber_dependencies
+    bundler_install
 }

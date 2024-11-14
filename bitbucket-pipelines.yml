@@ -18,7 +18,7 @@ definitions:
           password: "$GCLOUD_API_KEYFILE"
         script:
           - eval "$(build.sh bitbucket::env)"
-          - build.sh golang::dependencies
+          - build.sh golang::dependencies::install
           - staticcheck ./...
 
     - step: &build
@@ -29,8 +29,10 @@ definitions:
           password: "$GCLOUD_API_KEYFILE"
         script:
           - eval "$(build.sh bitbucket::env)"
-          - build.sh golang::dependencies
+          - build.sh golang::dependencies::install
           - make build
+        artifacts:
+          - build/**
 
     - step: &unit-tests
         name: Unit tests
@@ -40,7 +42,7 @@ definitions:
           password: "$GCLOUD_API_KEYFILE"
         script:
           - eval "$(build.sh bitbucket::env)"
-          - build.sh golang::dependencies
+          - build.sh golang::dependencies::install
           - build.sh bitbucket::database
           - make test_migrations
           - make tests
@@ -54,7 +56,14 @@ definitions:
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
-          - echo "TODO"
+          - eval "$(build.sh bitbucket::env)"
+          - build.sh cucumber::install
+          - export ARA_ROOT=build
+          - build.sh bitbucket::database
+          - cd build && ARA_ENV=test ARA_ROOT=${PWD} ARA_CONFIG=${PWD}/config ./ara migrate up && cd ..
+          - bundle exec cucumber --tags "not @wip" --publish
+        services:
+          - postgres
 
 pipelines:
   default:

@@ -86,7 +86,6 @@ class Ara
     run_command = "#{run_command} &" if background
 
     Dir.chdir root do
-      puts "#{Dir.getwd} #{run_command}"
       system run_command
     end
   end
@@ -131,6 +130,7 @@ class Ara
   def self.stop
     return unless @ara
     @ara.stop
+    @ara = nil
   end
 
   def stop
