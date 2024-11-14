@@ -49,6 +49,15 @@ definitions:
         services:
           - postgres
 
+    - step: &bundle-audit
+        name: Bundle Audit
+        image:
+          name: us.gcr.io/enroute-interne/enroute-ruby:3.3-dev
+          username: _json_key
+          password: '$GCLOUD_API_KEYFILE'
+        script:
+          - build.sh bundle::audit
+
     - step: &cucumber
         name: Cucumber Tests
         image:
@@ -61,7 +70,7 @@ definitions:
           - export ARA_ROOT=build
           - build.sh bitbucket::database
           - cd build && ARA_ENV=test ARA_ROOT=${PWD} ARA_CONFIG=${PWD}/config ./ara migrate up && cd ..
-          - bundle exec cucumber --tags "not @wip" --publish
+          - TZ=Europe/Paris bundle exec cucumber --tags "not @wip" --publish
         services:
           - postgres
 
@@ -72,6 +81,7 @@ pipelines:
           - step: *static-check
           - step: *unit-tests
           - step: *build
+          - step: *bundle-audit
     - step: *cucumber
 
   branches:
@@ -81,6 +91,7 @@ pipelines:
             - step: *static-check
             - step: *unit-tests
             - step: *build
+            - step: *bundle-audit
       - parallel:
           steps:
             - step: *cucumber
