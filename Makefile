@@ -47,6 +47,7 @@ build:
 	install --mode=+x ${GOPATH}/bin/ara build
 	install -t build/db/migrations -D db/migrations/*.sql
 	install -t build/siri/templates -D siri/templates/*.template
+	install -t build/config -D config/config.yml config/database.yml config/test.yml
 	mkdir -p build/config
 
 clean:
