@@ -36,6 +36,10 @@ func NewFakeUUIDGenerator() *FakeUUIDGenerator {
 	return &FakeUUIDGenerator{realFormat: config.Config.FakeUUIDRealFormat}
 }
 
+func NewFakeUUIDGeneratorLegacy() *FakeUUIDGenerator {
+	return &FakeUUIDGenerator{realFormat: true}
+}
+
 type FakeUUIDGenerator struct {
 	mutex      sync.Mutex
 	counter    int

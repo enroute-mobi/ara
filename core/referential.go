@@ -257,6 +257,7 @@ func (referential *Referential) ReloadModel() {
 	referential.Stop()
 	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
+	referential.partners.Load()
 	referential.Start()
 }
 
