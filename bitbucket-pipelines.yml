@@ -10,6 +10,18 @@ definitions:
         POSTGRES_USER: ara
         POSTGRES_PASSWORD: ara
   steps:
+    - step: &go-mod
+        name: Go Mod
+        image:
+          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
+        script:
+          - eval "$(build.sh bitbucket::env)"
+          - go mod vendor
+        artifacts:
+          - vendor/**
+
     - step: &static-check
         name: Static Check
         image:
@@ -18,7 +30,7 @@ definitions:
           password: "$GCLOUD_API_KEYFILE"
         script:
           - eval "$(build.sh bitbucket::env)"
-          - build.sh golang::dependencies::install
+          - build.sh golang::dev::dependencies
           - staticcheck ./...
 
     - step: &build
@@ -29,7 +41,7 @@ definitions:
           password: "$GCLOUD_API_KEYFILE"
         script:
           - eval "$(build.sh bitbucket::env)"
-          - build.sh golang::dependencies::install
+          - build.sh golang::dev::dependencies
           - make build
         artifacts:
           - build/**
@@ -42,7 +54,7 @@ definitions:
           password: "$GCLOUD_API_KEYFILE"
         script:
           - eval "$(build.sh bitbucket::env)"
-          - build.sh golang::dependencies::install
+          - build.sh golang::dev::dependencies
           - build.sh bitbucket::database
           - make test_migrations
           - make tests
@@ -76,6 +88,7 @@ definitions:
 
 pipelines:
   default:
+    - step: *go-mod
     - parallel:
         steps:
           - step: *static-check

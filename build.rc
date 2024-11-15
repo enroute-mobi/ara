@@ -5,14 +5,22 @@ export RUN_PACKAGES="libxml2"
 
 export CUCUMBER_PACKAGES="libpq-dev libxml2-dev zlib1g-dev postgresql-client-common libproj-dev"
 
-function golang_dependencies_install() {
+function golang_dev_dependencies() {
     apt_install $DEFAULT_DEV_PACKAGES $DEV_PACKAGES
 }
 
-function golang_dependencies_run() {
+function golang_run_dependencies() {
     apt_install $RUN_PACKAGES
 }
 
+function golang_flags() {
+    # Use -mod=vendor when go mod vendor has been performed
+    if [ -f "vendor/modules.txt" ]; then
+        echo export GOFLAGS=\"-mod=vendor\"
+    fi
+}
+
+bitbucket_env_functions+=(golang_flags)
 
 function bitbucket_database() {
     cat > "${ARA_ROOT:-.}/config/database.yml" <<EOF
