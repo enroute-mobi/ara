@@ -111,6 +111,21 @@ func Test_MemoryStopAreaGroups_Find(t *testing.T) {
 	assert.Equal(stopAreaGroupId, stopAreaGroup.Id(), "Find should return a stopAreaGroup with the given Id")
 }
 
+func Test_MemoryStopAreaGroups_FindByShortName(t *testing.T) {
+	assert := assert.New(t)
+	stopAreaGroups := NewMemoryStopAreaGroups()
+
+	existingStopAreaGroup := stopAreaGroups.New()
+	existingStopAreaGroup.ShortName = "short_name"
+	stopAreaGroups.Save(existingStopAreaGroup)
+
+	stopAreaGroupId := existingStopAreaGroup.Id()
+
+	stopAreaGroup, ok := stopAreaGroups.FindByShortName("short_name")
+	assert.True(ok, "Find should return true when stopAreaGroup is found")
+	assert.Equal(stopAreaGroupId, stopAreaGroup.Id(), "Find should return a stopAreaGroup with the given Id")
+}
+
 func Test_MemoryStopAreaGroups_FindAll(t *testing.T) {
 	assert := assert.New(t)
 

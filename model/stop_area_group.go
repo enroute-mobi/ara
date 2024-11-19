@@ -45,6 +45,7 @@ type MemoryStopAreaGroups struct {
 	mutex *sync.RWMutex
 
 	byIdentifier map[StopAreaGroupId]*StopAreaGroup
+	byShortName  map[string]*StopAreaGroup
 }
 
 type StopAreaGroups interface {
@@ -53,6 +54,7 @@ type StopAreaGroups interface {
 	New() *StopAreaGroup
 
 	Find(StopAreaGroupId) (*StopAreaGroup, bool)
+	FindByShortName(string) (*StopAreaGroup, bool)
 	FindAll() []*StopAreaGroup
 	Save(*StopAreaGroup) bool
 	Delete(*StopAreaGroup) bool
@@ -62,12 +64,24 @@ func NewMemoryStopAreaGroups() *MemoryStopAreaGroups {
 	return &MemoryStopAreaGroups{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaGroupId]*StopAreaGroup),
+		byShortName:  make(map[string]*StopAreaGroup),
 	}
 }
 
 func (manager *MemoryStopAreaGroups) Find(id StopAreaGroupId) (*StopAreaGroup, bool) {
 	manager.mutex.RLock()
 	stopAreaGroup, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
+	if ok {
+		return stopAreaGroup.copy(), true
+	}
+	return &StopAreaGroup{}, false
+}
+
+func (manager *MemoryStopAreaGroups) FindByShortName(shortName string) (*StopAreaGroup, bool) {
+	manager.mutex.RLock()
+	stopAreaGroup, ok := manager.byShortName[shortName]
 	manager.mutex.RUnlock()
 
 	if ok {
@@ -99,6 +113,7 @@ func (manager *MemoryStopAreaGroups) Save(stopAreaGroup *StopAreaGroup) bool {
 	}
 	stopAreaGroup.model = manager.model
 	manager.byIdentifier[stopAreaGroup.Id()] = stopAreaGroup
+	manager.byShortName[stopAreaGroup.ShortName] = stopAreaGroup
 
 	manager.mutex.Unlock()
 	return true
@@ -108,6 +123,7 @@ func (manager *MemoryStopAreaGroups) Delete(stopAreaGroup *StopAreaGroup) bool {
 	manager.mutex.Lock()
 
 	delete(manager.byIdentifier, stopAreaGroup.Id())
+	delete(manager.byShortName, stopAreaGroup.ShortName)
 
 	manager.mutex.Unlock()
 	return true
