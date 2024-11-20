@@ -90,6 +90,7 @@ pipelines:
   default:
     - step: *go-mod
     - parallel:
+        fail-fast: true
         steps:
           - step: *static-check
           - step: *unit-tests
@@ -100,6 +101,7 @@ pipelines:
   branches:
     master:
       - parallel:
+          fail-fast: true
           steps:
             - step: *static-check
             - step: *unit-tests
