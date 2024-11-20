@@ -736,6 +736,62 @@ the includedStopAreas, it should not add it again`,
 	}
 }
 
+func Test_CollectSettings_With_Excluded_StopAreaGroups(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		"remote_code_space":                "dummy",
+		"collect.exclude_stop_areas":       "A,B",
+		"collect.exclude_stop_area_groups": "GROUP",
+	}
+
+	var TestCases = []struct {
+		fakeStopAreaResolver   func(string, string) ([]string, bool)
+		expectedCollectSetting *CollectSettings
+		message                string
+	}{
+		{
+			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{"C"}, true },
+			expectedCollectSetting: &CollectSettings{
+				excludedSA:    collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				includedSA:    collection{},
+				includedLines: collection{},
+				excludedLines: collection{},
+			},
+			message: `When the stopAreaResolver finds the StopArea Value, it should add it
+in the excluded StopAreas list`,
+		},
+		{
+			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{}, false },
+			expectedCollectSetting: &CollectSettings{
+				excludedSA:    collection{"A": struct{}{}, "B": struct{}{}},
+				includedSA:    collection{},
+				includedLines: collection{},
+				excludedLines: collection{},
+			},
+			message: `When the stopAreaResolver does not find the StopArea Value, the excluded StopAreas list
+should be unchanged`,
+		},
+		{
+			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{"A"}, false },
+			expectedCollectSetting: &CollectSettings{
+				excludedSA:    collection{"A": struct{}{}, "B": struct{}{}},
+				includedSA:    collection{},
+				includedLines: collection{},
+				excludedLines: collection{},
+			},
+			message: `When the stopAreaResolver finds the StopArea Value that already exists in
+the excludedStopAreas, it should not add it again`,
+		},
+	}
+
+	for _, tt := range TestCases {
+		resolvers := []func(string, string) ([]string, bool){tt.fakeStopAreaResolver}
+		partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings, resolvers...)
+		assert.Equal(tt.expectedCollectSetting, partnerSettings.CollectSettings(), tt.message)
+	}
+}
+
 func Test_HTTPClientOAuth_Empty(t *testing.T) {
 	assert := assert.New(t)
 

@@ -33,6 +33,7 @@ const (
 	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
 	COLLECT_EXCLUDE_LINES            = "collect.exclude_lines"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
+	COLLECT_EXCLUDE_STOP_AREA_GROUPS = "collect.exclude_stop_area_groups"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
 	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
@@ -737,6 +738,17 @@ func (s *PartnerSettings) setCollectSettings(settings map[string]string, resolve
 
 			for _, stopAreaValue := range stopAreaValues {
 				s.collectSettings.includedSA[stopAreaValue] = struct{}{}
+			}
+		}
+
+		for shortName := range toMap(settings[COLLECT_EXCLUDE_STOP_AREA_GROUPS]) {
+			stopAreaValues, ok := stopAreaResolver(shortName, remoteCodeSpace)
+			if !ok {
+				continue
+			}
+
+			for _, stopAreaValue := range stopAreaValues {
+				s.collectSettings.excludedSA[stopAreaValue] = struct{}{}
 			}
 		}
 	}
