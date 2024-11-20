@@ -111,6 +111,21 @@ func Test_MemoryLineGroups_Find(t *testing.T) {
 	assert.Equal(lineGroupId, lineGroup.Id(), "Find should return a lineGroup with the given Id")
 }
 
+func Test_MemoryLineGroups_FindByShortName(t *testing.T) {
+	assert := assert.New(t)
+	lineGroups := NewMemoryLineGroups()
+
+	existingLineGroup := lineGroups.New()
+	existingLineGroup.ShortName = "short_name"
+	lineGroups.Save(existingLineGroup)
+
+	lineGroupId := existingLineGroup.Id()
+
+	lineGroup, ok := lineGroups.FindByShortName("short_name")
+	assert.True(ok, "Find should return true when lineGroup is found")
+	assert.Equal(lineGroupId, lineGroup.Id(), "Find should return a lineGroup with the given Id")
+}
+
 func Test_MemoryLineGroups_FindAll(t *testing.T) {
 	assert := assert.New(t)
 
