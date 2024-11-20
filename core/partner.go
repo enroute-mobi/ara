@@ -911,7 +911,9 @@ func (manager *PartnerManager) Load() error {
 			if err = json.Unmarshal([]byte(p.Settings.String), &settings); err != nil {
 				return err
 			}
-			partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
+			resolvers := []func(string, string) ([]string, bool){manager.stopAreaResolverFromGroup}
+			partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings, resolvers...)
 		}
 
 		if p.ConnectorTypes.Valid && len(p.ConnectorTypes.String) > 0 {
@@ -994,4 +996,28 @@ func (manager *PartnerManager) newDbPartner(partner *Partner) (*model.DatabasePa
 		Settings:       string(settings),
 		ConnectorTypes: string(connectors),
 	}, nil
+}
+
+func (manager *PartnerManager) stopAreaResolverFromGroup(shortName, codeSpace string) ([]string, bool) {
+	group, ok := manager.Referential().Model().StopAreaGroups().FindByShortName(shortName)
+	if !ok {
+		return nil, false
+	}
+
+	stopAreaValues := []string{}
+	for _, id := range group.StopAreaIds {
+		sa, ok := manager.Referential().Model().StopAreas().Find(id)
+		if !ok {
+			return nil, false
+		}
+
+		code, ok := sa.Code(codeSpace)
+		if !ok {
+			return nil, false
+		}
+
+		stopAreaValues = append(stopAreaValues, code.Value())
+	}
+
+	return stopAreaValues, true
 }
