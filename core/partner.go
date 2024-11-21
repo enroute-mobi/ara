@@ -912,7 +912,10 @@ func (manager *PartnerManager) Load() error {
 				return err
 			}
 
-			resolvers := []func(string, string) ([]string, bool){manager.stopAreaResolverFromGroup}
+			resolvers := []func(string, string) ([]string, bool){
+				manager.stopAreaResolverFromGroup,
+				manager.lineResolverFromGroup,
+			}
 			partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings, resolvers...)
 		}
 
@@ -1020,4 +1023,28 @@ func (manager *PartnerManager) stopAreaResolverFromGroup(shortName, codeSpace st
 	}
 
 	return stopAreaValues, true
+}
+
+func (manager *PartnerManager) lineResolverFromGroup(shortName, codeSpace string) ([]string, bool) {
+	group, ok := manager.Referential().Model().LineGroups().FindByShortName(shortName)
+	if !ok {
+		return nil, false
+	}
+
+	lineValues := []string{}
+	for _, id := range group.LineIds {
+		sa, ok := manager.Referential().Model().Lines().Find(id)
+		if !ok {
+			return nil, false
+		}
+
+		code, ok := sa.Code(codeSpace)
+		if !ok {
+			return nil, false
+		}
+
+		lineValues = append(lineValues, code.Value())
+	}
+
+	return lineValues, true
 }

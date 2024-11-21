@@ -792,6 +792,64 @@ the excludedStopAreas, it should not add it again`,
 	}
 }
 
+func Test_CollectSettings_With_Included_LineGroups(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		"remote_code_space":           "dummy",
+		"collect.include_lines":       "A,B",
+		"collect.include_line_groups": "GROUP",
+	}
+
+	var TestCases = []struct {
+		fakeLineResolver       func(string, string) ([]string, bool)
+		expectedCollectSetting *CollectSettings
+		message                string
+	}{
+		{
+			fakeLineResolver: func(string, string) ([]string, bool) { return []string{"C"}, true },
+			expectedCollectSetting: &CollectSettings{
+				includedSA:    collection{},
+				excludedSA:    collection{},
+				includedLines: collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				excludedLines: collection{},
+			},
+			message: `When the lineResolver finds the Line Value, it should add it
+in the included Lines list`,
+		},
+		{
+			fakeLineResolver: func(string, string) ([]string, bool) { return []string{}, false },
+			expectedCollectSetting: &CollectSettings{
+				includedSA:    collection{},
+				excludedSA:    collection{},
+				includedLines: collection{"A": struct{}{}, "B": struct{}{}},
+				excludedLines: collection{},
+			},
+			message: `When the lineResolver does not find the Line Value, the included Lines list
+should be unchanged`,
+		},
+		{
+			fakeLineResolver: func(string, string) ([]string, bool) { return []string{"A"}, false },
+			expectedCollectSetting: &CollectSettings{
+				includedSA:    collection{},
+				excludedSA:    collection{},
+				includedLines: collection{"A": struct{}{}, "B": struct{}{}},
+				excludedLines: collection{},
+			},
+			message: `When the lineResolver finds the Line Value that already exists in
+the includedLines, it should not add it again`,
+		},
+	}
+
+	for _, tt := range TestCases {
+		resolvers := []func(string, string) ([]string, bool){
+			func(string, string) ([]string, bool) { return nil, false },
+			tt.fakeLineResolver}
+		partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings, resolvers...)
+		assert.Equal(tt.expectedCollectSetting, partnerSettings.CollectSettings(), tt.message)
+	}
+}
+
 func Test_HTTPClientOAuth_Empty(t *testing.T) {
 	assert := assert.New(t)
 
