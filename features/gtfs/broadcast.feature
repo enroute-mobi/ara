@@ -342,7 +342,6 @@ Feature: Support GTFS-RT feeds
       | local_credential     | secret   |
       | remote_code_space | external |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
-    And show me ara vehicle_journeys
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
       | vehicle_id | external:3456 |

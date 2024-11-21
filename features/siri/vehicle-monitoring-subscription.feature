@@ -799,7 +799,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-      And I see ara vehicles
       Then one Vehicle has the following attributes:
         | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
         | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
@@ -998,7 +997,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | ReferenceArray[0]     | Line, "internal": "testLine" |
       | SubscribeResourcesNow | true                         |
     And a minute has passed
-    # And show me ara subscriptions for partner "test"
     When I send this SIRI request
       """
      <?xml version='1.0' encoding='utf-8'?>
@@ -1063,7 +1061,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
        </ServiceDelivery>
      </Siri>
       """
-      # And show me ara vehicles for partner "test"
       Then one Vehicle has the following attributes:
         | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
         | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |

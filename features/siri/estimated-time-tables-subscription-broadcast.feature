@@ -2677,7 +2677,6 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:00:00.000Z |
       | ArrivalStatus               | onTime                                                               |
     And 10 seconds have passed
-    # And show me ara stop_visits
     When the StopVisit "6ba7b814-9dad-11d1-7-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | Delayed                  |

@@ -2031,7 +2031,6 @@ Feature: Support SIRI StopMonitoring by request
       | Bearing          |                            121.55 |
       | Latitude         |                             55.55 |
       | Longitude        |                         111.11111 |
-    And I see ara vehicles
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -2152,9 +2151,6 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
       # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
-    And I see ara lines
-    And I see ara stop_areas
-    And I see ara vehicle_journeys
     And a StopVisit exists with the following attributes:
       | Codes                         | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | PassageOrder                  |                                                                    4 |
@@ -2727,9 +2723,6 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
-    And I see ara lines
-    And I see ara stop_areas
-    And I see ara vehicle_journeys
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "stopVisit1"           |
       | PassageOrder                |                                  4 |
@@ -2754,7 +2747,6 @@ Feature: Support SIRI StopMonitoring by request
       | VehicleAtStop               | true                               |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
       | Schedule[actual]#Arrival    |           2017-01-01T13:00:00.000Z |
-    And I see ara stop_visits
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -2916,9 +2908,6 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
-    And I see ara lines
-    And I see ara stop_areas
-    And I see ara vehicle_journeys
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "stopVisit1"           |
       | PassageOrder                |                                  4 |
@@ -2935,7 +2924,6 @@ Feature: Support SIRI StopMonitoring by request
       | VehicleAtStop               | true                               |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
       | Schedule[actual]#Arrival    |           2017-01-01T13:00:00.000Z |
-    And I see ara stop_visits
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -3062,9 +3050,6 @@ Feature: Support SIRI StopMonitoring by request
       | Monitored       | true                                    |
       | DestinationName | La fin. <TER>                           |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
-    And I see ara lines
-    And I see ara stop_areas
-    And I see ara vehicle_journeys
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "stopVisit1"           |
       | PassageOrder                |                                  4 |
@@ -3089,7 +3074,6 @@ Feature: Support SIRI StopMonitoring by request
       | VehicleAtStop               | true                               |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
       | Schedule[actual]#Arrival    |           2017-01-01T13:00:00.000Z |
-    And I see ara stop_visits
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"

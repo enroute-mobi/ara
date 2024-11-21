@@ -15,7 +15,6 @@ Feature: Subscription Management
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | SubscribeResourcesNow | true                                               |
-    And show me ara subscriptions for partner "test"
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | CodeSpace                  | StopMonitoringBroadcast                            |
@@ -23,7 +22,6 @@ Feature: Subscription Management
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | SubscribeResourcesNow | true                                               |
     And a minute has passed
-    And show me ara subscriptions for partner "test"
     Then Subscriptions exist with the following attributes:
       | internal | NINOXE:StopPoint:SP:24:LOC |
       | internal | NINOXE:StopPoint:SP:25:LOC |
@@ -50,7 +48,6 @@ Feature: Subscription Management
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | ReferenceArray[1]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | SubscribeResourcesNow | true                                               |
-    And show me ara subscriptions for partner "test"
     And 30 seconds have passed
     Then Subscriptions exist with the following attributes:
       | internal | NINOXE:StopPoint:SP:24:LOC |
