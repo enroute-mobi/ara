@@ -100,6 +100,7 @@ pipelines:
 
   branches:
     master:
+      - step: *go-mod
       - parallel:
           fail-fast: true
           steps:
@@ -116,13 +117,13 @@ pipelines:
                   name: us.gcr.io/enroute-interne/enroute-cloud-sdk:latest
                   username: _json_key
                   password: "$GCLOUD_API_KEYFILE"
-                  caches:
-                    - docker
-                  services:
-                    - docker
-                  script:
-                    - build.sh gcloud::setup
-                    - build.sh bitbucket::docker::build
+                caches:
+                  - docker
+                services:
+                  - docker
+                script:
+                  - build.sh gcloud::setup
+                  - build.sh bitbucket::docker::build
 
       - step:
           name: Deploy to test
