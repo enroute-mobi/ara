@@ -33,11 +33,13 @@ const (
 	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
 	COLLECT_EXCLUDE_LINES            = "collect.exclude_lines"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
+	COLLECT_EXCLUDE_STOP_AREA_GROUPS = "collect.exclude_stop_area_groups"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
 	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
+	COLLECT_INCLUDE_STOP_AREA_GROUPS = "collect.include_stop_area_groups"
 	COLLECT_PERSISTENT               = "collect.persistent"
 	COLLECT_PRIORITY                 = "collect.priority"
 	COLLECT_SITUATIONS_INTERNAL_TAGS = "collect.situations.internal_tags"
@@ -154,21 +156,21 @@ func NewEmptyPartnerSettings(ug func() uuid.UUIDGenerator) *PartnerSettings {
 	partnerSettings := &PartnerSettings{
 		ug: ug,
 	}
-	partnerSettings.parseSettings(map[string]string{})
+	partnerSettings.parseSettings(map[string]string{}, nil)
 	return partnerSettings
 }
 
-func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string]string) *PartnerSettings {
+func NewPartnerSettings(generator func() uuid.UUIDGenerator, settings map[string]string, resolvers ...func(string, string) ([]string, bool)) *PartnerSettings {
 	partnerSettings := &PartnerSettings{
 		ug: generator,
 	}
 
-	partnerSettings.parseSettings(settings)
+	partnerSettings.parseSettings(settings, resolvers)
 
 	return partnerSettings
 }
 
-func (s *PartnerSettings) parseSettings(settings map[string]string) {
+func (s *PartnerSettings) parseSettings(settings map[string]string, resolvers []func(string, string) ([]string, bool)) {
 	s.setRemoteCodeSpaces(settings)
 	s.setCredentials(settings)
 	s.setRateLimit(settings)
@@ -181,7 +183,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string) {
 	s.setProducerRef(settings)
 	s.setSIRILinePublishedName(settings)
 	s.setSIRIDirectionType(settings)
-	s.setCollectSettings(settings)
+	s.setCollectSettings(settings, resolvers)
 	s.setSiriCredentialHeader(settings)
 	s.setSiriEnvelopeType(settings)
 	s.setSiriSoapEmptyResponseOnNotification(settings)
@@ -714,7 +716,7 @@ func (s *PartnerSettings) DiscoveryInterval() time.Duration {
 	return s.discoveryInterval
 }
 
-func (s *PartnerSettings) setCollectSettings(settings map[string]string) {
+func (s *PartnerSettings) setCollectSettings(settings map[string]string, resolvers []func(string, string) ([]string, bool)) {
 	s.collectSettings = &CollectSettings{
 		UseDiscoveredSA:    settings[COLLECT_USE_DISCOVERED_SA] != "",
 		UseDiscoveredLines: settings[COLLECT_USE_DISCOVERED_LINES] != "",
@@ -722,6 +724,33 @@ func (s *PartnerSettings) setCollectSettings(settings map[string]string) {
 		excludedSA:         toMap(settings[COLLECT_EXCLUDE_STOP_AREAS]),
 		includedLines:      toMap(settings[COLLECT_INCLUDE_LINES]),
 		excludedLines:      toMap(settings[COLLECT_EXCLUDE_LINES]),
+	}
+
+	if len(resolvers) != 0 {
+		remoteCodeSpace := s.RemoteCodeSpace()
+		stopAreaResolver := resolvers[0]
+
+		for shortName := range toMap(settings[COLLECT_INCLUDE_STOP_AREA_GROUPS]) {
+			stopAreaValues, ok := stopAreaResolver(shortName, remoteCodeSpace)
+			if !ok {
+				continue
+			}
+
+			for _, stopAreaValue := range stopAreaValues {
+				s.collectSettings.includedSA[stopAreaValue] = struct{}{}
+			}
+		}
+
+		for shortName := range toMap(settings[COLLECT_EXCLUDE_STOP_AREA_GROUPS]) {
+			stopAreaValues, ok := stopAreaResolver(shortName, remoteCodeSpace)
+			if !ok {
+				continue
+			}
+
+			for _, stopAreaValue := range stopAreaValues {
+				s.collectSettings.excludedSA[stopAreaValue] = struct{}{}
+			}
+		}
 	}
 }
 
