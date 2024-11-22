@@ -45,6 +45,7 @@ type MemoryLineGroups struct {
 	mutex *sync.RWMutex
 
 	byIdentifier map[LineGroupId]*LineGroup
+	byShortName  map[string]*LineGroup
 }
 
 type LineGroups interface {
@@ -53,6 +54,7 @@ type LineGroups interface {
 	New() *LineGroup
 
 	Find(LineGroupId) (*LineGroup, bool)
+	FindByShortName(string) (*LineGroup, bool)
 	FindAll() []*LineGroup
 	Save(*LineGroup) bool
 	Delete(*LineGroup) bool
@@ -62,12 +64,24 @@ func NewMemoryLineGroups() *MemoryLineGroups {
 	return &MemoryLineGroups{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineGroupId]*LineGroup),
+		byShortName:  make(map[string]*LineGroup),
 	}
 }
 
 func (manager *MemoryLineGroups) Find(id LineGroupId) (*LineGroup, bool) {
 	manager.mutex.RLock()
 	lineGroup, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
+	if ok {
+		return lineGroup.copy(), true
+	}
+	return &LineGroup{}, false
+}
+
+func (manager *MemoryLineGroups) FindByShortName(shortName string) (*LineGroup, bool) {
+	manager.mutex.RLock()
+	lineGroup, ok := manager.byShortName[shortName]
 	manager.mutex.RUnlock()
 
 	if ok {
@@ -99,6 +113,7 @@ func (manager *MemoryLineGroups) Save(lineGroup *LineGroup) bool {
 	}
 	lineGroup.model = manager.model
 	manager.byIdentifier[lineGroup.Id()] = lineGroup
+	manager.byShortName[lineGroup.ShortName] = lineGroup
 
 	manager.mutex.Unlock()
 	return true
@@ -108,6 +123,7 @@ func (manager *MemoryLineGroups) Delete(lineGroup *LineGroup) bool {
 	manager.mutex.Lock()
 
 	delete(manager.byIdentifier, lineGroup.Id())
+	delete(manager.byShortName, lineGroup.ShortName)
 
 	manager.mutex.Unlock()
 	return true

@@ -32,12 +32,14 @@ const (
 
 	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
 	COLLECT_EXCLUDE_LINES            = "collect.exclude_lines"
+	COLLECT_EXCLUDE_LINE_GROUPS      = "collect.exclude_line_groups"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREA_GROUPS = "collect.exclude_stop_area_groups"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
 	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
 	COLLECT_INCLUDE_LINES            = "collect.include_lines"
+	COLLECT_INCLUDE_LINE_GROUPS      = "collect.include_line_groups"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_INCLUDE_STOP_AREA_GROUPS = "collect.include_stop_area_groups"
 	COLLECT_PERSISTENT               = "collect.persistent"
@@ -726,8 +728,8 @@ func (s *PartnerSettings) setCollectSettings(settings map[string]string, resolve
 		excludedLines:      toMap(settings[COLLECT_EXCLUDE_LINES]),
 	}
 
+	remoteCodeSpace := s.RemoteCodeSpace()
 	if len(resolvers) != 0 {
-		remoteCodeSpace := s.RemoteCodeSpace()
 		stopAreaResolver := resolvers[0]
 
 		for shortName := range toMap(settings[COLLECT_INCLUDE_STOP_AREA_GROUPS]) {
@@ -749,6 +751,32 @@ func (s *PartnerSettings) setCollectSettings(settings map[string]string, resolve
 
 			for _, stopAreaValue := range stopAreaValues {
 				s.collectSettings.excludedSA[stopAreaValue] = struct{}{}
+			}
+		}
+	}
+
+	if len(resolvers) > 1 {
+		lineResolver := resolvers[1]
+
+		for shortName := range toMap(settings[COLLECT_INCLUDE_LINE_GROUPS]) {
+			lineValues, ok := lineResolver(shortName, remoteCodeSpace)
+			if !ok {
+				continue
+			}
+
+			for _, lineValue := range lineValues {
+				s.collectSettings.includedLines[lineValue] = struct{}{}
+			}
+		}
+
+		for shortName := range toMap(settings[COLLECT_EXCLUDE_LINE_GROUPS]) {
+			lineValues, ok := lineResolver(shortName, remoteCodeSpace)
+			if !ok {
+				continue
+			}
+
+			for _, lineValue := range lineValues {
+				s.collectSettings.excludedLines[lineValue] = struct{}{}
 			}
 		}
 	}
