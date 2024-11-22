@@ -13,6 +13,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTokens(t *testing.T) {
@@ -369,4 +370,58 @@ func Test_ReferentialController_Reload(t *testing.T) {
 	if sas[0].Id() != "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11" {
 		t.Errorf("Loaded stopArea have wrong id:\n got: %v\n want: a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", sas[0].Id())
 	}
+}
+
+func Test_ReferentialController_Reload_Partner(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	clock.SetDefaultClock(clock.NewFakeClock())
+	defer clock.SetDefaultClock(clock.NewRealClock())
+
+	// Insert Data in the test db
+	databasePartner := model.DatabasePartner{
+		Id:            "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialId: "6ba7b814-9dad-11d1-0000-00c04fd430c8",
+		Slug:          "partner_slug",
+		Name:          "Partner Name",
+	}
+
+	model.Database.AddTableWithName(databasePartner, "partners")
+
+	err := model.Database.Insert(&databasePartner)
+	require.NoError(err)
+
+	// Initialize referential manager
+	referentials := core.NewMemoryReferentials()
+	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGeneratorLegacy())
+	// Save a new referential
+	referential := referentials.New("referential")
+	referentials.Save(referential)
+
+	server := &Server{}
+	server.SetReferentials(referentials)
+
+	// Ensure No partners exist
+	partners := referential.Partners().FindAll()
+	assert.Empty(partners, "No partners should exist")
+
+	// Create a reload request
+	request, err := http.NewRequest("POST", fmt.Sprintf("/_referentials/%v/reload", referential.Id()), nil)
+	require.NoError(err)
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	server.HandleFlow(responseRecorder, request)
+	require.Equal(http.StatusOK, responseRecorder.Code)
+
+	// Test Results
+	partners = referential.Partners().FindAll()
+	assert.Len(partners, 1, "Partners must be loaded after a referential is reloaded")
+	assert.Equal(partners[0].Id(), core.PartnerId("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
 }
