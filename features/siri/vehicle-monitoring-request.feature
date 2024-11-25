@@ -1821,9 +1821,6 @@ Feature: Support SIRI VehicleMonitoring by request
       | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
-    And I see ara lines
-    And I see ara vehicle_journeys
-    And I see ara vehicles
     When I send this SIRI request
       """
       <?xml version='1.0' encoding='UTF-8'?>

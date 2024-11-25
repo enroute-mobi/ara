@@ -86,7 +86,6 @@ Feature: Support SIRI CheckStatus
       | remote_authentication.oauth.token_url     | http://localhost:8091 |
       | remote_url                                | http://localhost:8090 |
       | remote_authentication.oauth.scopes        | scope-test            |
-    And show me ara partners
     When 30 seconds have passed
     Then the SIRI server should have received a CheckStatus request with the payload:
           """

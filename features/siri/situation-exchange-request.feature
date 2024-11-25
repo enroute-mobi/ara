@@ -114,7 +114,6 @@ Feature: Support SIRI Situation Exchange by request
       | Prompt[Translations]#FI         | Juna vaihtaa junamateriaalia Dovressa. Valitettavasti sinun täytyy vaihtaa tällä asemalla. |
       | ScopeType                       | network                                                                                    |
       | Affects[Line]                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                          |
-    And show me ara situations
     And a Line exists with the following attributes:
       | Codes | "external": "NINOXE:Line:3:LOC" |
       | Name  | Ligne 3 Metro                   |

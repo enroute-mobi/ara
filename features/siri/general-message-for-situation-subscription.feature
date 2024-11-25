@@ -1143,7 +1143,6 @@ Feature: Support SIRI GeneralMessage by subscription
         | CollectSituations | true                                    |
       And 10 seconds have passed
       And 5 seconds have passed
-      And show me ara subscriptions for partner "test"
       When I send this SIRI request
         """
     <?xml version='1.0' encoding='utf-8'?>

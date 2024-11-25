@@ -84,7 +84,6 @@ Feature: Support SIRI LinesDiscovery
     And a Line exists with the following attributes:
       | Name  | Line 3                          |
       | Codes | "internal":"STIF:Line::C00274:" |
-    And show me ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"

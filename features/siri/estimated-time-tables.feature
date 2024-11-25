@@ -40,9 +40,6 @@ Feature: Support SIRI EstimatedTimetable
       | DepartureStatus               | Delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
-    And I see ara vehicle_journeys
-    And I see ara stop_visits
-    And I see ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -595,9 +592,6 @@ Feature: Support SIRI EstimatedTimetable
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:16:00.000Z |
       | ArrivalStatus               | onTime                                                               |
     #à l'heure
-    And I see ara vehicle_journeys
-    And I see ara stop_visits
-    And I see ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1528,9 +1522,6 @@ Feature: Support SIRI EstimatedTimetable
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:16:00.000Z |
       | ArrivalStatus               | onTime                                                               |
     #à l'heure
-    And I see ara vehicle_journeys
-    And I see ara stop_visits
-    And I see ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1739,9 +1730,6 @@ Feature: Support SIRI EstimatedTimetable
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:16:00.000Z |
       | ArrivalStatus               | onTime                                                               |
     #à l'heure
-    And I see ara vehicle_journeys
-    And I see ara stop_visits
-    And I see ara lines
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
