@@ -58,6 +58,7 @@ definitions:
           - build.sh bitbucket::database
           - make test_migrations
           - make tests
+          - build.sh codacy::report
         services:
           - postgres
 
