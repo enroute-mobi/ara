@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -23,7 +24,8 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	defer partners.Stop()
 
 	// Wait for the guardian to launch Run
-	fakeClock.BlockUntil(1)
+	ctx := context.TODO()
+	fakeClock.BlockUntilContext(ctx, 1)
 	// Advance time
 	fakeClock.Advance(31 * time.Second)
 	// Wait for the Test CheckStatusClient to finish Status()
@@ -70,7 +72,8 @@ func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
 	defer partners.Stop()
 
 	// Wait for the guardian to launch Run
-	fakeClock.BlockUntil(1)
+	ctx := context.TODO()
+	fakeClock.BlockUntilContext(ctx, 1)
 	// Advance time
 	fakeClock.Advance(31 * time.Second)
 	// Wait for the Test CheckStatusClient to finish Status()

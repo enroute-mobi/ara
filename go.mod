@@ -9,7 +9,7 @@ require (
 	github.com/getsentry/sentry-go v0.29.1
 	github.com/graph-gophers/graphql-go v1.5.0
 	github.com/jbowtie/gokogiri v0.0.0-20190301021639-37f655d3078f
-	github.com/jonboulle/clockwork v0.4.0
+	github.com/jonboulle/clockwork v0.5.0
 	github.com/lib/pq v1.10.9
 	github.com/pkg/errors v0.9.1
 	github.com/rubenv/sql-migrate v1.7.0
