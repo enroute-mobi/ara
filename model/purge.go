@@ -27,7 +27,15 @@ func (p *Purifier) Purge() error {
 		return fmt.Errorf("database error: %v", err)
 	}
 
-	table_names := []string{"stop_areas", "lines", "vehicle_journeys", "stop_visits", "operators"}
+	table_names := []string{
+		"stop_areas",
+		"stop_area_groups",
+		"lines",
+		"line_groups",
+		"vehicle_journeys",
+		"stop_visits",
+		"operators",
+	}
 	for i := range table_names {
 		r, err := tx.Exec(p.query(table_names[i]))
 		if err != nil {

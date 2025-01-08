@@ -14,7 +14,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "stopArea",
-		Codes:       "{}",
+		Codes:           "{}",
 		LineIds:         "[]",
 		Attributes:      "{}",
 		References:      "{}",
@@ -33,13 +33,35 @@ func fill_purifier_test_db(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	databaseStopAreaGroup := DatabaseStopAreaGroup{
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		ModelName:       "2017-01-01",
+		Name:            "stopAreaGroup",
+		ShortName:       "stop_area_group_short_name",
+		StopAreaIds:     `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
+	}
+
+	Database.AddTableWithName(databaseStopAreaGroup, "stop_area_groups")
+	err = Database.Insert(&databaseStopAreaGroup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	databaseStopAreaGroup.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
+	databaseStopAreaGroup.ModelName = "2017-01-02"
+	err = Database.Insert(&databaseStopAreaGroup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Insert Data in the test db
 	databaseLine := DatabaseLine{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
 		ModelName:       "2017-01-01",
 		Name:            "line",
-		Codes:       "{}",
+		Codes:           "{}",
 		Attributes:      "{}",
 		References:      "{}",
 	}
@@ -57,6 +79,28 @@ func fill_purifier_test_db(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	databaseLineGroup := DatabaseLineGroup{
+		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+		ReferentialSlug: "referential",
+		ModelName:       "2017-01-01",
+		Name:            "lineGroup",
+		ShortName:       "line_group_short_name",
+		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
+	}
+
+	Database.AddTableWithName(databaseLineGroup, "line_groups")
+	err = Database.Insert(&databaseLineGroup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	databaseLineGroup.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
+	databaseLineGroup.ModelName = "2017-01-02"
+	err = Database.Insert(&databaseLineGroup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	databaseVehicleJourney := DatabaseVehicleJourney{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
@@ -64,7 +108,7 @@ func fill_purifier_test_db(t *testing.T) {
 		Name:            "vehicleJourney",
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		DirectionType:   "",
-		Codes:       "{}",
+		Codes:           "{}",
 		Attributes:      "{}",
 		References:      "{}",
 	}
@@ -88,7 +132,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ModelName:        "2017-01-01",
 		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Codes:        "{}",
+		Codes:            "{}",
 		Schedules:        "[]",
 		Attributes:       "{}",
 		References:       "{}",
@@ -111,7 +155,7 @@ func fill_purifier_test_db(t *testing.T) {
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
 		Name:            "operator",
-		Codes:       "{}",
+		Codes:           "{}",
 		ModelName:       "2017-01-01",
 	}
 
@@ -130,7 +174,16 @@ func fill_purifier_test_db(t *testing.T) {
 }
 
 func check_record_count(expected_count int, t *testing.T) {
-	table_names := []string{"stop_areas", "lines", "vehicle_journeys", "stop_visits", "operators"}
+	table_names := []string{
+		"stop_areas",
+		"stop_area_groups",
+		"lines",
+		"line_groups",
+		"vehicle_journeys",
+		"stop_visits",
+		"operators",
+	}
+
 	for i := range table_names {
 		r, err := Database.Exec(fmt.Sprintf("select * from %v;", table_names[i]))
 		if err != nil {
