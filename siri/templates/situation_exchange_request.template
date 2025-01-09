@@ -1,6 +1,6 @@
 <siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
 		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
-		<siri:PreviewInterval>PT12H</siri:PreviewInterval>
-		<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ range .LineRef }}
+		<siri:PreviewInterval>PT12H</siri:PreviewInterval>{{ if not .StartTime.IsZero }}
+		<siri:StartTime>{{ .StartTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:StartTime>{{ end }}{{ range .LineRef }}
 		<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ range .StopPointRef }}
 		<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}
