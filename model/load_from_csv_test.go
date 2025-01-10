@@ -77,7 +77,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.Zero(li.Number)
 
 	_, ok = model.lineGroups.Find("59208069-3cad-4108-968f-349c5d50a351")
-	assert.False(ok, "No LIneGroups should exist for this model date")
+	assert.True(ok, "Can't find LineGroup : \"59208069-3cad-4108-968f-349c5d50a351\"")
 
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find VehicleJourney: \"01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
