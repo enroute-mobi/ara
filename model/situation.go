@@ -204,6 +204,22 @@ type TimeRange struct {
 	EndTime   time.Time
 }
 
+func (t *TimeRange) Overlaps(other *TimeRange) bool {
+	if other.EndTime.IsZero() && t.EndTime.IsZero() {
+		return true
+	}
+
+	if other.EndTime.IsZero() {
+		return other.StartTime.Before(t.EndTime)
+	}
+
+	if t.EndTime.IsZero() {
+		return t.StartTime.Before(other.EndTime)
+	}
+
+	return t.EndTime.After(other.StartTime) && t.StartTime.Before(other.EndTime)
+}
+
 func NewSituation(model Model) *Situation {
 	situation := &Situation{
 		model: model,

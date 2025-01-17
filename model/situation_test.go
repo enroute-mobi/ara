@@ -685,3 +685,104 @@ having a Referent should create StopId with the Refefent value`,
 		assert.Equal(tt.expectedLineRefs, GetReferencesSlice(broadcastedRefs.LineRefs))
 	}
 }
+
+func Test_Overlaps(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := []struct {
+		situationPeriod TimeRange
+		request         TimeRange
+		expected        bool
+		message         string
+	}{
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-03T01:30:06.000+02:00")}, false, `
+No overlap
+         +--------+ situationPeriod
+  +---+ request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-07T01:30:06.000+02:00")}, true, `
+Overlap
+     +--------+ situationPeriod
+  +------+ request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-06T01:30:06.000+02:00")}, true, `
+Overlap
+ +--------+ situationPeriod
+    +---+ request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-15T01:30:06.000+02:00")}, true, `
+Overlap
+ +--------+ situationPeriod
+      +---------+ request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-10T01:30:06.000+02:00"), parseTime("2023-06-20T01:30:06.000+02:00")}, false, `
+Touching but No overlap
+  +--------+ situationPeriod
+           +--------+  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-11T01:30:06.000+02:00"), parseTime("2023-06-20T01:30:06.000+02:00")}, false, `
+No overlap
+ +--------+ situationPeriod
+              +--------+ request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")}, true, `
+Overlap
+      +--------- .......  no end  situationPeriod
+ +--------+  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")}, true, `
+Overlap
+      +--------- .......  no end  situationPeriod
+          +--------+  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
+      +---------+ situationPeriod
+          +--------..... no end  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-05T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-10T01:30:06.000+02:00"), time.Time{}}, false, `
+No overlap
+ +------+ situationPeriod
+             +--------..... no end  request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
+      +------+ situationPeriod
+  +--------..... no end  request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
+      +------..... no end  situationPeriod
++--------..... no end  request`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-10T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
++------..... no end  situationPeriod
+      +--------..... no end  request`},
+	}
+
+	for _, tt := range tests {
+		result := tt.situationPeriod.Overlaps(&tt.request)
+		assert.Equal(tt.expected, result, tt.message)
+	}
+}
+
+func parseTime(t string) time.Time {
+	time, err := time.Parse(time.RFC3339, t)
+	if err != nil {
+		panic(err)
+	}
+	return time
+}
