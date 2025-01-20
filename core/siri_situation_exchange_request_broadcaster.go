@@ -189,6 +189,21 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	delivery.Situations = append(delivery.Situations, ptSituationElement)
 }
 
+func (connector *SIRISituationExchangeRequestBroadcaster) getBroadcastPeriod(request *sxml.XMLSituationExchangeRequest) *model.TimeRange {
+	period := &model.TimeRange{}
+
+	period.StartTime = connector.Clock().Now()
+	if !request.StartTime().IsZero() {
+		period.StartTime = request.StartTime()
+	}
+
+	if request.PreviewInterval() != 0 {
+		period.EndTime = request.StartTime().Add(request.PreviewInterval())
+	}
+
+	return period
+}
+
 func (connector *SIRISituationExchangeRequestBroadcaster) buildInfoLink(ptSituationElement *siri.SIRIPtSituationElement, infoLink *model.InfoLink) {
 	link := &siri.InfoLink{
 		Uri:         infoLink.Uri,
