@@ -378,7 +378,7 @@ func (visit *XMLPtSituationElement) ReportType() string {
 func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
 	if visit.publicationWindows == nil {
 		publicationWindows := []*XMLPeriod{}
-		nodes := visit.findNodes(siri_attributes.PublicationWindow)
+		nodes := visit.findDirectChildrenNodes(siri_attributes.PublicationWindow)
 		for _, node := range nodes {
 			publicationWindows = append(publicationWindows, NewXMLPeriod(node))
 		}
@@ -390,7 +390,7 @@ func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
 func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLPeriod {
 	if visit.validityPeriods == nil {
 		validityPeriods := []*XMLPeriod{}
-		nodes := visit.findNodes(siri_attributes.ValidityPeriod)
+		nodes := visit.findDirectChildrenNodes(siri_attributes.ValidityPeriod)
 		for _, node := range nodes {
 			validityPeriods = append(validityPeriods, NewXMLPeriod(node))
 		}
