@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -202,6 +203,32 @@ func NewAffectedLine() *AffectedLine {
 type TimeRange struct {
 	StartTime time.Time
 	EndTime   time.Time
+}
+
+func (s *Situation) BroadcastPeriod() *TimeRange {
+	var possibleMin []time.Time
+	var possibleMax []time.Time
+	for _, validityPeriod := range s.ValidityPeriods {
+		possibleMin = append(possibleMin, validityPeriod.StartTime)
+		possibleMax = append(possibleMax, validityPeriod.EndTime)
+	}
+
+	for _, publicationWindow := range s.PublicationWindows {
+		possibleMin = append(possibleMin, publicationWindow.StartTime)
+		possibleMax = append(possibleMax, publicationWindow.EndTime)
+	}
+
+	broadcastPeriod := &TimeRange{}
+	broadcastPeriod.StartTime = slices.MinFunc(possibleMin, time.Time.Compare)
+
+	for i := range possibleMax {
+		if possibleMax[i].IsZero() {
+			return broadcastPeriod
+		}
+	}
+	broadcastPeriod.EndTime = slices.MaxFunc(possibleMax, time.Time.Compare)
+
+	return broadcastPeriod
 }
 
 func (t *TimeRange) Overlaps(other *TimeRange) bool {

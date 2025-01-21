@@ -3,6 +3,7 @@ package core
 import (
 	"slices"
 	"strings"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
@@ -60,15 +61,16 @@ func (connector *SIRISituationExchangeRequestBroadcaster) Situations(request *sx
 	return response
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) getSituationExchangeDelivery(delivery *siri.SIRISituationExchangeDelivery, _ *sxml.XMLSituationExchangeRequest) {
+func (connector *SIRISituationExchangeRequestBroadcaster) getSituationExchangeDelivery(delivery *siri.SIRISituationExchangeDelivery, request *sxml.XMLSituationExchangeRequest) {
 	situations := connector.partner.Model().Situations().FindAll()
+	requestPeriod := connector.getBroadcastPeriod(request)
 	for i := range situations {
-		connector.buildSituation(delivery, situations[i])
+		connector.buildSituation(delivery, situations[i], requestPeriod)
 	}
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(delivery *siri.SIRISituationExchangeDelivery, situation model.Situation) {
-	if !connector.canBroadcast(situation) {
+func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(delivery *siri.SIRISituationExchangeDelivery, situation model.Situation, requestPeriod *model.TimeRange) {
+	if !connector.canBroadcast(situation, requestPeriod) {
 		return
 	}
 
@@ -190,9 +192,9 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) getBroadcastPeriod(request *sxml.XMLSituationExchangeRequest) *model.TimeRange {
-	period := &model.TimeRange{}
+	period := model.TimeRange{}
 
-	period.StartTime = connector.Clock().Now()
+	period.StartTime = connector.Clock().Now().Add(-1 * time.Hour)
 	if !request.StartTime().IsZero() {
 		period.StartTime = request.StartTime()
 	}
@@ -201,7 +203,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) getBroadcastPeriod(req
 		period.EndTime = request.StartTime().Add(request.PreviewInterval())
 	}
 
-	return period
+	return &period
 }
 
 func (connector *SIRISituationExchangeRequestBroadcaster) buildInfoLink(ptSituationElement *siri.SIRIPtSituationElement, infoLink *model.InfoLink) {
@@ -383,13 +385,12 @@ func (connector *SIRISituationExchangeRequestBroadcaster) resolveStopAreaRef(sto
 	return stopAreaCode.Value(), true
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) canBroadcast(situation model.Situation) bool {
+func (connector *SIRISituationExchangeRequestBroadcaster) canBroadcast(situation model.Situation, requestPeriod *model.TimeRange) bool {
 	if situation.Origin == string(connector.partner.Slug()) {
 		return false
 	}
 
-	if !situation.GMValidUntil().IsZero() &&
-		situation.GMValidUntil().Before(connector.Clock().Now()) {
+	if !situation.BroadcastPeriod().Overlaps(requestPeriod) {
 		return false
 	}
 
