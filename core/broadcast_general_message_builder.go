@@ -2,6 +2,7 @@ package core
 
 import (
 	"slices"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
@@ -292,7 +293,11 @@ func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation model.Situ
 		return false
 	}
 
-	if situation.GMValidUntil().Before(builder.Clock().Now()) {
+	requestPeriod := &model.TimeRange{
+		StartTime: builder.Clock().Now().Add(-1 * time.Hour),
+	}
+
+	if !situation.BroadcastPeriod().Overlaps(requestPeriod) {
 		return false
 	}
 

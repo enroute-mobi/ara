@@ -10,6 +10,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | RecordedAt                   | 2017-01-01T03:30:06+02:00                     |
       | Version                      | 1                                             |
       | Keywords                     | ["Others"]                                    |
+      | ValidityPeriods[0]#StartTime | 2016-01-01T20:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00                     |
       | ReportType                   | general                                       |
       | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
