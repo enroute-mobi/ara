@@ -372,6 +372,27 @@ func Test_BroadcastSituationInternalTags(t *testing.T) {
 	assert.Equal([]string{"first", "second"}, partnerSettings.BroadcastSituationsInternalTags())
 }
 
+func Test_SituationsTTLNotDefined(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{}
+
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal(time.Duration(3600000000000), partnerSettings.SituationsTTL(), "Should set SituationsTTL at default 1 Hour")
+}
+
+func Test_SituationsTTLDefined(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		BROADCAST_SITUATIONS_TTL: "1h20m",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal(time.Duration(4800000000000), partnerSettings.SituationsTTL())
+}
+
 func Test_DefaultSRSName_Empty(t *testing.T) {
 	assert := assert.New(t)
 

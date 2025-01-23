@@ -63,6 +63,7 @@ const (
 	BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY      = "broadcast.siri.stop_monitoring.maximum_resources_per_delivery"
 	BROADCAST_DEFAULT_SM_MAXIMUM_RESOURCES_PER_DELIVERY   = 50
 	BROADCAST_SITUATIONS_INTERNAL_TAGS                    = "broadcast.situations.internal_tags"
+	BROADCAST_SITUATIONS_TTL                              = "broadcast.situations.time_to_live"
 	BROADCAST_SUBSCRIPTIONS_PERSISTENT                    = "broadcast.subscriptions.persistent"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
@@ -83,6 +84,7 @@ const (
 	SIRI_CREDENTIAL_HEADER                   = "siri.credential.header"
 	SIRI_SOAP_EMPTY_RESPONSE_ON_NOTIFICATION = "siri.soap.empty_response_on_notification"
 	DEFAULT_GTFS_TTL                         = 30 * time.Second
+	DEFAULT_SITUATIONS_TTL                   = 1 * time.Hour
 
 	SORT_PAYLOAD_FOR_TEST = "sort_payload_for_test"
 
@@ -113,6 +115,7 @@ type PartnerSettings struct {
 	collectPriority                     int
 	collectSituationsInternalTags       []string
 	broadcastSituationsInternalTags     []string
+	broadcastSituationsTTL              time.Duration
 	defaultSRSName                      string
 	noDestinationRefRewritingFrom       []string
 	noDataFrameRefRewritingFrom         []string
@@ -195,6 +198,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string, resolvers []
 	s.setCollectPriority(settings)
 	s.setCollectSituationsInternalTags(settings)
 	s.setBroadcastSituationsInternalTags(settings)
+	s.setSituationsTTL(settings)
 	s.setDefaultSRSName(settings)
 	s.setNoDestinationRefRewritingFrom(settings)
 	s.setNoDataFrameRefRewritingFrom(settings)
@@ -601,6 +605,20 @@ func (s *PartnerSettings) setBroadcastSituationsInternalTags(settings map[string
 
 func (s *PartnerSettings) BroadcastSituationsInternalTags() []string {
 	return s.broadcastSituationsInternalTags
+}
+
+func (s *PartnerSettings) setSituationsTTL(settings map[string]string) {
+	duration := DEFAULT_SITUATIONS_TTL
+
+	if settings[BROADCAST_SITUATIONS_TTL] != "" {
+		duration, _ = time.ParseDuration(settings[BROADCAST_SITUATIONS_TTL])
+	}
+
+	s.broadcastSituationsTTL = duration
+}
+
+func (s *PartnerSettings) SituationsTTL() (t time.Duration) {
+	return s.broadcastSituationsTTL
 }
 
 func (s *PartnerSettings) setDefaultSRSName(settings map[string]string) {
