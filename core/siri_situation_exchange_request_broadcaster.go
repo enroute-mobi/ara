@@ -3,7 +3,6 @@ package core
 import (
 	"slices"
 	"strings"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
@@ -194,7 +193,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 func (connector *SIRISituationExchangeRequestBroadcaster) getBroadcastPeriod(request *sxml.XMLSituationExchangeRequest) *model.TimeRange {
 	period := model.TimeRange{}
 
-	period.StartTime = connector.Clock().Now().Add(-1 * time.Hour)
+	period.StartTime = connector.Clock().Now().Add(-connector.partner.SituationsTTL())
 	if !request.StartTime().IsZero() {
 		period.StartTime = request.StartTime()
 	}

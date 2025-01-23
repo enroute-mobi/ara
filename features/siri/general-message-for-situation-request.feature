@@ -757,3 +757,77 @@ Feature: Support SIRI GeneralMessage for Situation
         </S:Body>
       </S:Envelope>
       """
+
+  @ARA-1542
+  Scenario: Handle a SIRI GeneralMessage with partner setting broadcast.situations.time_to_live outside broadcast period wihout RequestTimeStamp should not broadcast situation
+    Given a Situation exists with the following attributes:
+      | Codes                        | "external" : "test"               |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
+      | Version                      | 1                                 |
+      | Keywords                     | ["Commercial", "Test"]            |
+      | ReportType                   | general                           |
+      | ParticipantRef               | "535"                             |
+      | VersionedAt                  | 2017-01-01T01:02:03+02:00         |
+      | Progress                     | published                         |
+      | Reality                      | test                              |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T03:10:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T03:14:06+02:00         |
+      | Affects[AllLines]            |                                   |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    And a StopArea exists with the following attributes:
+      | Name  | Test                                     |
+      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+    And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:
+      | local_credential                  | NINOXE:default |
+      | remote_code_space                 | external       |
+      | broadcast.situations.time_to_live | 5m             |
+    # Situation BroadcastPeriod() ends at 2017-01-01T03:14:06+02:00, and requestPeriod will start at 2017-01-01T05:15:06+02:00
+    # so the Situation should not be broadcasted
+    When I send this SIRI request
+      """
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ServiceRequestInfo>
+            <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
+            <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
+            <ns2:MessageIdentifier>GeneralMessage:Test:0</ns2:MessageIdentifier>
+          </ServiceRequestInfo>
+          <Request version="2.0:FR-IDF-2.4">
+            <ns2:MessageIdentifier>GeneralMessage:Test:0</ns2:MessageIdentifier>
+            <ns2:Extensions>
+              <ns6:IDFGeneralMessageRequestFilter>
+              </ns6:IDFGeneralMessageRequestFilter>
+            </ns2:Extensions>
+          </Request>
+          <RequestExtension/>
+        </ns7:GetGeneralMessage>
+      </S:Body>
+    </S:Envelope>
+      """
+    # Situation BroadcastPeriod() ends at 2017-01-01T03:14:06+02:00, and requestPeriod will start at 2017-01-01T05:15:06+02:00
+    # so the Situation should not be broadcasted
+    Then I should receive this SIRI response
+    """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetGeneralMessageResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:GeneralMessageDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>GeneralMessage:Test:0</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+              </siri:GeneralMessageDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetGeneralMessageResponse>
+        </S:Body>
+      </S:Envelope>
+    """

@@ -2,7 +2,6 @@ package core
 
 import (
 	"slices"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core/idgen"
@@ -294,7 +293,7 @@ func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation model.Situ
 	}
 
 	requestPeriod := &model.TimeRange{
-		StartTime: builder.Clock().Now().Add(-1 * time.Hour),
+		StartTime: builder.Clock().Now().Add(-builder.partner.SituationsTTL()),
 	}
 
 	if !situation.BroadcastPeriod().Overlaps(requestPeriod) {
