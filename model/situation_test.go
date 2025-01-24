@@ -1,12 +1,14 @@
 package model
 
 import (
-	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"encoding/json"
 
-	"github.com/stretchr/testify/assert"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
+
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Situation_Id(t *testing.T) {
@@ -785,4 +787,33 @@ func parseTime(t string) time.Time {
 		panic(err)
 	}
 	return time
+}
+
+func Test_BroadcastPeriod(t *testing.T) {
+	assert := assert.New(t)
+
+	// One Period
+	validityPeriod := &TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}}
+
+	situation := &Situation{}
+	situation.ValidityPeriods = append(situation.ValidityPeriods, validityPeriod)
+
+	broadcastPeriod := situation.BroadcastPeriod()
+
+	assert.Equal(parseTime("2023-06-05T01:30:06.000+02:00"), broadcastPeriod.StartTime)
+	assert.Equal(time.Time{}, broadcastPeriod.EndTime)
+
+	// Adding a period with defined endTime
+	window := &TimeRange{parseTime("2021-06-05T01:30:06.000+02:00"), parseTime("2030-06-05T01:30:06.000+02:00")}
+	situation.PublicationWindows = append(situation.PublicationWindows, window)
+
+	assert.Equal(parseTime("2021-06-05T01:30:06.000+02:00"), situation.BroadcastPeriod().StartTime)
+	assert.Equal(time.Time{}, situation.BroadcastPeriod().EndTime, "if one period has an no endTime, the brodactPeriod should have no endTime")
+
+	// Adding a period with lower startTime
+	window = &TimeRange{parseTime("1999-06-05T01:30:06.000+02:00"), parseTime("2050-06-05T01:30:06.000+02:00")}
+	situation.PublicationWindows = append(situation.PublicationWindows, window)
+
+	assert.Equal(parseTime("1999-06-05T01:30:06.000+02:00"), situation.BroadcastPeriod().StartTime)
+	assert.Equal(time.Time{}, situation.BroadcastPeriod().EndTime, "Should be the minimum period startTime")
 }
