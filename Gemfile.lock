@@ -1,6 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
-  revision: 6c6de1dd8d6c98294b812dad50d849912ea9ef2f
+  revision: 6f14c6adc4473cb836cc1cec07c539ee60eaef0c
   specs:
     gtfs-rt (0.1.0)
       racc
@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://bitbucket.org/enroute-mobi/siri-xsd.git
-  revision: 17bdd662ab0cc7b225bd9842450500b32ab5564b
+  revision: 70924a81eb687493bcce12b0736331fa07630185
   specs:
     siri-xsd (0.1.0)
       listen
@@ -38,7 +38,7 @@ GEM
       bundler (>= 1.2.0, < 3)
       thor (~> 1.0)
     coderay (1.1.3)
-    concurrent-ruby (1.3.4)
+    concurrent-ruby (1.3.5)
     connection_pool (2.5.0)
     csv (3.3.2)
     cucumber (9.2.1)
@@ -62,7 +62,7 @@ GEM
       bigdecimal
     cucumber-gherkin (27.0.0)
       cucumber-messages (>= 19.1.4, < 23)
-    cucumber-html-formatter (21.7.0)
+    cucumber-html-formatter (21.8.0)
       cucumber-messages (> 19, < 27)
     cucumber-messages (22.0.0)
     cucumber-tag-expressions (6.1.1)
@@ -73,7 +73,7 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.8)
       domain_name (~> 0.5)
-    i18n (1.14.6)
+    i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     license_finder (7.2.1)
       bundler
@@ -86,7 +86,7 @@ GEM
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    logger (1.6.4)
+    logger (1.6.5)
     method_source (1.1.0)
     mime-types (3.6.0)
       logger
@@ -97,7 +97,7 @@ GEM
     minitest (5.25.4)
     multi_test (1.1.0)
     netrc (0.11.0)
-    nokogiri (1.18.1)
+    nokogiri (1.18.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     pg (1.5.9)
@@ -155,4 +155,4 @@ DEPENDENCIES
   webrick
 
 BUNDLED WITH
-   2.5.6
+   2.6.3
