@@ -65,7 +65,7 @@ definitions:
     - step: &bundle-audit
         name: Bundle Audit
         image:
-          name: us.gcr.io/enroute-interne/enroute-ruby:3.3-dev
+          name: us.gcr.io/enroute-interne/enroute-ruby:3.4-dev
           username: _json_key
           password: '$GCLOUD_API_KEYFILE'
         script:
@@ -74,7 +74,7 @@ definitions:
     - step: &cucumber
         name: Cucumber Tests
         image:
-          name: us.gcr.io/enroute-interne/enroute-ruby:3.3-dev
+          name: us.gcr.io/enroute-interne/enroute-ruby:3.4-dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
