@@ -319,11 +319,13 @@ func (smb *SMBroadcaster) logSIRIStopMonitoringNotify(message *audit.BigQueryMes
 	message.Lines = GetModelReferenceSlice(lineRefs)
 	message.VehicleJourneys = GetModelReferenceSlice(VehicleJourneyRefs)
 
-	delivery := notification.Deliveries[0]
+	if len(notification.Deliveries) != 0 {
+		delivery := notification.Deliveries[0]
 
-	if !delivery.Status {
-		message.Status = "Error"
-		message.ErrorDetails = delivery.ErrorString()
+		if !delivery.Status {
+			message.Status = "Error"
+			message.ErrorDetails = delivery.ErrorString()
+		}
 	}
 
 	xml, err := notification.BuildXML(smb.connector.Partner().SIRIEnvelopeType())

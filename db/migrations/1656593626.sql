@@ -7,5 +7,5 @@ ALTER TABLE vehicle_journeys
 -- +migrate Down
 -- SQL section 'Down' is executed when this migration is rolled back
 
-ALTER TABLE vehicle_journe exit
+ALTER TABLE vehicle_journeys
       DROP COLUMN IF EXISTS direction_type;
