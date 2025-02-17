@@ -94,6 +94,60 @@ func Test_Situation_MarshalJSON(t *testing.T) {
 	assert.JSONEq(expected, string(jsonBytes))
 }
 
+func Test_Situation_UnmarshalJSON_Summary(t *testing.T) {
+	assert := assert.New(t)
+	text := `{
+"Summary":{"DefaultValue":"Noel"}
+}`
+	apiSituation := &APISituation{}
+	apiSituation.codes = make(Codes)
+
+	err := json.Unmarshal([]byte(text), &apiSituation)
+	assert.Nil(err)
+
+	assert.Equal("Noel", apiSituation.Summary.DefaultValue)
+}
+
+func Test_Situation_UnmarshalJSON_Summary_Empty(t *testing.T) {
+	assert := assert.New(t)
+	text := `{}`
+
+	apiSituation := &APISituation{}
+	apiSituation.codes = make(Codes)
+
+	err := json.Unmarshal([]byte(text), &apiSituation)
+	assert.Nil(err)
+
+	assert.Nil(apiSituation.Summary)
+}
+
+func Test_Situation_UnmarshalJSON_Description(t *testing.T) {
+	assert := assert.New(t)
+	text := `{
+"Description":{"DefaultValue":"Noel"}
+}`
+	apiSituation := &APISituation{}
+	apiSituation.codes = make(Codes)
+
+	err := json.Unmarshal([]byte(text), &apiSituation)
+	assert.Nil(err)
+
+	assert.Equal("Noel", apiSituation.Description.DefaultValue)
+}
+
+func Test_Situation_UnmarshalJSON_Description_Empty(t *testing.T) {
+	assert := assert.New(t)
+	text := `{}`
+
+	apiSituation := &APISituation{}
+	apiSituation.codes = make(Codes)
+
+	err := json.Unmarshal([]byte(text), &apiSituation)
+	assert.Nil(err)
+
+	assert.Nil(apiSituation.Description)
+}
+
 func Test_Situation_UnmarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 	text := `{
@@ -124,13 +178,6 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 		NewCode("hastus", "sqypis"),
 	}
 
-	expectedSmmary := &TranslatedString{
-		DefaultValue: "Noel",
-	}
-	expectedDescription := &TranslatedString{
-		DefaultValue: "Joyeux Noel",
-	}
-
 	expectedAffectedStopArea := NewAffectedStopArea()
 	expectedAffectedStopArea.StopAreaId = "259344234"
 
@@ -148,9 +195,14 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	expectedAffectedRoute := &AffectedRoute{RouteRef: "Route:66:LOC"}
 	expectedAffectedLine.AffectedRoutes = append(expectedAffectedLine.AffectedRoutes, expectedAffectedRoute)
 
-	assert.Equal(expectedSmmary, apiSituation.Summary)
+	assert.Equal("Noel", apiSituation.Summary.DefaultValue)
+	assert.Nil(apiSituation.Summary.Translations)
+
 	assert.Equal([]string{"tag1"}, apiSituation.InternalTags)
-	assert.Equal(expectedDescription, apiSituation.Description)
+
+	assert.Equal("Joyeux Noel", apiSituation.Description.DefaultValue)
+	assert.Nil(apiSituation.Description.Translations)
+
 	assert.Len(apiSituation.Affects, 2)
 	assert.Equal(expectedAffectedStopArea, apiSituation.Affects[0])
 	assert.Equal(expectedAffectedLine, apiSituation.Affects[1])
@@ -222,13 +274,42 @@ func Test_Validate_Empty(t *testing.T) {
 	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("ValidityPeriods"))
 }
 
-func Test_Validate_Empty_Summary(t *testing.T) {
+func Test_Validate_Summary_Empty_DefaultValue(t *testing.T) {
 	assert := assert.New(t)
 	situations := NewMemorySituations()
 	situation := situations.New()
 	situation.Summary = &TranslatedString{
 		DefaultValue: "",
 	}
+	apiSituation := situation.Definition()
+
+	assert.False(apiSituation.Validate())
+	assert.Equal([]string{"Can't be empty"}, apiSituation.Errors.Get("Summary"))
+}
+
+func Test_Validate_Summary_Empty_DefaultValue_With_Translation(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+
+	translations := make(map[string]string)
+	translations["fr"] = "test"
+
+	situation.Summary = &TranslatedString{
+		DefaultValue: "",
+		Translations: translations,
+	}
+	apiSituation := situation.Definition()
+
+	assert.False(apiSituation.Validate())
+	assert.Empty(apiSituation.Errors.Get("Summary"))
+}
+
+func Test_Validate_Nil_Summary(t *testing.T) {
+	assert := assert.New(t)
+	situations := NewMemorySituations()
+	situation := situations.New()
+
 	apiSituation := situation.Definition()
 
 	assert.False(apiSituation.Validate())

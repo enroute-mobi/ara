@@ -325,6 +325,8 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 	aux := &struct {
 		Codes map[string]string
 		*Alias
+		Summary     *TranslatedString
+		Description *TranslatedString
 	}{
 		Alias: (*Alias)(situation),
 	}
@@ -336,6 +338,18 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 
 	if aux.Codes != nil {
 		situation.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+	}
+
+	if situation.Summary != nil && aux.Summary == nil {
+		situation.Summary = nil
+	} else {
+		situation.Summary = aux.Summary
+	}
+
+	if situation.Description != nil && aux.Description == nil {
+		situation.Description = nil
+	} else {
+		situation.Description = aux.Description
 	}
 
 	return nil
@@ -553,9 +567,15 @@ func (apiSituation *APISituation) Validate() bool {
 		apiSituation.Errors.Add("Version", e.ERROR_BLANK)
 	}
 
+	if apiSituation.Summary == nil {
+		apiSituation.Errors.Add("Summary", e.ERROR_BLANK)
+	}
+
 	if apiSituation.Summary != nil {
 		if apiSituation.Summary.DefaultValue == "" {
-			apiSituation.Errors.Add("Summary", e.ERROR_BLANK)
+			if apiSituation.Summary.Translations == nil {
+				apiSituation.Errors.Add("Summary", e.ERROR_BLANK)
+			}
 		}
 	}
 
