@@ -340,17 +340,8 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 		situation.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
-	if situation.Summary != nil && aux.Summary == nil {
-		situation.Summary = nil
-	} else {
-		situation.Summary = aux.Summary
-	}
-
-	if situation.Description != nil && aux.Description == nil {
-		situation.Description = nil
-	} else {
-		situation.Description = aux.Description
-	}
+	situation.Summary = aux.Summary
+	situation.Description = aux.Description
 
 	return nil
 }
