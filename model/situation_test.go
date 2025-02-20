@@ -1,12 +1,14 @@
 package model
 
 import (
-	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"encoding/json"
 
-	"github.com/stretchr/testify/assert"
+	"bitbucket.org/enroute-mobi/ara/gtfs"
+
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Situation_Id(t *testing.T) {
@@ -684,4 +686,134 @@ having a Referent should create StopId with the Refefent value`,
 		assert.Equal(tt.expectedMonitoringRefs, GetReferencesSlice(broadcastedRefs.MonitoringRefs))
 		assert.Equal(tt.expectedLineRefs, GetReferencesSlice(broadcastedRefs.LineRefs))
 	}
+}
+
+func Test_Overlaps(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := []struct {
+		situationPeriod TimeRange
+		request         TimeRange
+		expected        bool
+		message         string
+	}{
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-03T01:30:06.000+02:00")}, false, `
+No overlap
+         +--------+ situationPeriod
+  +---+ request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-07T01:30:06.000+02:00")}, true, `
+Overlap
+     +--------+ situationPeriod
+  +------+ request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-06T01:30:06.000+02:00")}, true, `
+Overlap
+ +--------+ situationPeriod
+    +---+ request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-15T01:30:06.000+02:00")}, true, `
+Overlap
+ +--------+ situationPeriod
+      +---------+ request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-10T01:30:06.000+02:00"), parseTime("2023-06-20T01:30:06.000+02:00")}, false, `
+Touching but No overlap
+  +--------+ situationPeriod
+           +--------+  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-11T01:30:06.000+02:00"), parseTime("2023-06-20T01:30:06.000+02:00")}, false, `
+No overlap
+ +--------+ situationPeriod
+              +--------+ request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")}, true, `
+Overlap
+      +--------- .......  no end  situationPeriod
+ +--------+  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")}, true, `
+Overlap
+      +--------- .......  no end  situationPeriod
+          +--------+  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
+      +---------+ situationPeriod
+          +--------..... no end  request
+`},
+		{TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-05T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-10T01:30:06.000+02:00"), time.Time{}}, false, `
+No overlap
+ +------+ situationPeriod
+             +--------..... no end  request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
+      +------+ situationPeriod
+  +--------..... no end  request
+`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
+      +------..... no end  situationPeriod
++--------..... no end  request`},
+		{TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}},
+			TimeRange{parseTime("2023-06-10T01:30:06.000+02:00"), time.Time{}}, true, `
+Overlap
++------..... no end  situationPeriod
+      +--------..... no end  request`},
+	}
+
+	for _, tt := range tests {
+		result := tt.situationPeriod.Overlaps(&tt.request)
+		assert.Equal(tt.expected, result, tt.message)
+	}
+}
+
+func parseTime(t string) time.Time {
+	time, err := time.Parse(time.RFC3339, t)
+	if err != nil {
+		panic(err)
+	}
+	return time
+}
+
+func Test_BroadcastPeriod(t *testing.T) {
+	assert := assert.New(t)
+
+	// One Period
+	validityPeriod := &TimeRange{parseTime("2023-06-05T01:30:06.000+02:00"), time.Time{}}
+
+	situation := &Situation{}
+	situation.ValidityPeriods = append(situation.ValidityPeriods, validityPeriod)
+
+	broadcastPeriod := situation.BroadcastPeriod()
+
+	assert.Equal(parseTime("2023-06-05T01:30:06.000+02:00"), broadcastPeriod.StartTime)
+	assert.Equal(time.Time{}, broadcastPeriod.EndTime)
+
+	// Adding a period with defined endTime
+	window := &TimeRange{parseTime("2021-06-05T01:30:06.000+02:00"), parseTime("2030-06-05T01:30:06.000+02:00")}
+	situation.PublicationWindows = append(situation.PublicationWindows, window)
+
+	assert.Equal(parseTime("2021-06-05T01:30:06.000+02:00"), situation.BroadcastPeriod().StartTime)
+	assert.Equal(time.Time{}, situation.BroadcastPeriod().EndTime, "if one period has an no endTime, the brodactPeriod should have no endTime")
+
+	// Adding a period with lower startTime
+	window = &TimeRange{parseTime("1999-06-05T01:30:06.000+02:00"), parseTime("2050-06-05T01:30:06.000+02:00")}
+	situation.PublicationWindows = append(situation.PublicationWindows, window)
+
+	assert.Equal(parseTime("1999-06-05T01:30:06.000+02:00"), situation.BroadcastPeriod().StartTime)
+	assert.Equal(time.Time{}, situation.BroadcastPeriod().EndTime, "Should be the minimum period startTime")
 }

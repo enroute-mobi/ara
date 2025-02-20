@@ -292,7 +292,11 @@ func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation model.Situ
 		return false
 	}
 
-	if situation.GMValidUntil().Before(builder.Clock().Now()) {
+	requestPeriod := &model.TimeRange{
+		StartTime: builder.Clock().Now().Add(-builder.partner.SituationsTTL()),
+	}
+
+	if !situation.BroadcastPeriod().Overlaps(requestPeriod) {
 		return false
 	}
 
