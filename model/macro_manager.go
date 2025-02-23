@@ -1,52 +1,18 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 	"sync"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model/hooks"
+	"bitbucket.org/enroute-mobi/ara/model/model_types"
 )
 
-type hook uint8
-type ModelType uint8
 type macros [][][]Macro
 
 type Macros interface {
-	GetMacros(hook, ModelType) []Macro
-}
-
-const (
-	// Warning: Hooks needs to be sorted
-	AfterCreate hook = iota
-	AfterSave
-
-	totalHookNumber = 2
-)
-
-const (
-	StopAreaType ModelType = iota
-	LineType
-	VehicleJourneyType
-	StopVisitType
-	VehicleType
-	MacroSituationType
-
-	totalModelTypes = 6
-)
-
-var modelType = map[string]ModelType{
-	"StopArea":       StopAreaType,
-	"Line":           LineType,
-	"VehicleJourney": VehicleJourneyType,
-	"StopVisit":      StopVisitType,
-	"Vehicle":        VehicleType,
-	"Situation":      MacroSituationType,
-}
-
-var hooks = map[string]hook{
-	"AfterCreate": AfterCreate,
-	"AfterSave":   AfterSave,
+	GetMacros(hooks.Type, model_types.Model) []Macro
 }
 
 type MacroManager struct {
@@ -70,31 +36,28 @@ func (mm *MacroManager) Reset() {
 }
 
 func (mm *MacroManager) reset() {
-	mm.macros = make([][][]Macro, totalHookNumber)
-	for i := range totalHookNumber {
-		mm.macros[i] = make([][]Macro, totalModelTypes)
-		for j := range totalModelTypes {
-			mm.macros[i][j] = make([]Macro, 5)
-		}
+	mm.macros = make([][][]Macro, hooks.Total)
+	for i := range hooks.Total {
+		mm.macros[i] = make([][]Macro, model_types.Total)
 	}
 }
 
 /* Unused but I keep the methods here for now
 
-func (mm *MacroManager) SetMacro(h hook, t ModelType, m Macro) {
+func (mm *MacroManager) SetMacro(h hooks.Type, t ModelType, m Macro) {
 	mm.mutex.Lock()
 	mm.setMacro(h, t, m)
 	mm.mutex.Unlock()
 }
 
-func (mm *MacroManager) setMacro(h hook, t ModelType, m Macro) {
+func (mm *MacroManager) setMacro(h hooks.Type, t ModelType, m Macro) {
 	mm.macros[h][t] = append(mm.macros[h][t], m)
 }
 */
 
 // If we ask for AfterCreate, we'll also get AfterSave Macros
-func (mm MacroManager) GetMacros(h hook, t ModelType) (m []Macro) {
-	for i := 0; i < totalHookNumber; i++ {
+func (mm MacroManager) GetMacros(h hooks.Type, t model_types.Model) (m []Macro) {
+	for i := 0; i < hooks.Total; i++ {
 		m = append(m, mm.macros[i][t]...)
 	}
 	return
@@ -102,11 +65,11 @@ func (mm MacroManager) GetMacros(h hook, t ModelType) (m []Macro) {
 
 type macroBuilder struct {
 	manager        *MacroManager
-	initialContext []*contextBuilder
-	contexes       map[string]*contextBuilder
+	initialContext []*macroContextBuilder
+	contexes       map[string]*macroContextBuilder
 }
 
-type contextBuilder struct {
+type macroContextBuilder struct {
 	childrenId string
 	macro      *SelectMacro
 	updaters   []*SelectMacro
@@ -126,8 +89,8 @@ func (b *macroBuilder) buildMacros() []error {
 	return e
 }
 
-func (b *macroBuilder) buildContext(c *contextBuilder) []error {
-	h, mt, errs := hookAndModelType(c.macro)
+func (b *macroBuilder) buildContext(c *macroContextBuilder) []error {
+	h, mt, errs := HookAndModelType(c.macro)
 	if len(errs) != 0 {
 		return errs
 	}
@@ -142,7 +105,7 @@ func (b *macroBuilder) buildContext(c *contextBuilder) []error {
 }
 
 func (b *macroBuilder) buildUpdater(sm *SelectMacro) []error {
-	h, mt, errs := hookAndModelType(sm)
+	h, mt, errs := HookAndModelType(sm)
 	if len(errs) != 0 {
 		return errs
 	}
@@ -161,21 +124,7 @@ func (b *macroBuilder) buildUpdater(sm *SelectMacro) []error {
 	return e
 }
 
-func hookAndModelType(sm *SelectMacro) (h hook, mt ModelType, errs []error) {
-	if !sm.ModelType.Valid {
-		errs = append(errs, errors.New("Macro with invalid Type"))
-		return
-	}
-	mt = modelType[sm.ModelType.String]
-
-	h, ok := hooks[sm.Hook.String]
-	if !ok {
-		h = AfterSave
-	}
-	return
-}
-
-func (b *macroBuilder) handleContexes(c *contextBuilder, m *Macro) []error {
+func (b *macroBuilder) handleContexes(c *macroContextBuilder, m *Macro) []error {
 	e := []error{}
 	if c.macro != nil {
 		context, err := NewContexFromDatabase(c.macro)
@@ -207,7 +156,7 @@ func (manager *MacroManager) Load(referentialSlug string) error {
 
 	builder := &macroBuilder{
 		manager:  manager,
-		contexes: make(map[string]*contextBuilder),
+		contexes: make(map[string]*macroContextBuilder),
 	}
 
 	var selectMacros []SelectMacro
@@ -220,7 +169,7 @@ func (manager *MacroManager) Load(referentialSlug string) error {
 
 	for _, sm := range selectMacros {
 		if !sm.ContextId.Valid {
-			context := &contextBuilder{
+			context := &macroContextBuilder{
 				updaters: make([]*SelectMacro, 0),
 			}
 			if IsContext(sm.Type) {
@@ -236,7 +185,7 @@ func (manager *MacroManager) Load(referentialSlug string) error {
 		parent := builder.contexes[sm.ContextId.String]
 		if IsContext(sm.Type) {
 			parent.childrenId = sm.Id
-			context := &contextBuilder{}
+			context := &macroContextBuilder{}
 			context.macro = &sm
 			builder.contexes[sm.Id] = context
 			continue

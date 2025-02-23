@@ -27,6 +27,7 @@ type Model interface {
 	Operators() Operators
 	Vehicles() Vehicles
 	Macros() Macros
+	Controls() Controls
 }
 
 type MemoryModel struct {
@@ -41,6 +42,7 @@ type MemoryModel struct {
 	situations          *MemorySituations
 	operators           *MemoryOperators
 	macros              *MacroManager
+	controls            *ControlManager
 	SMEventsChan        chan StopMonitoringBroadcastEvent
 	GMEventsChan        chan SituationBroadcastEvent
 	SXEventsChan        chan SituationBroadcastEvent
@@ -121,11 +123,17 @@ func (model *MemoryModel) refresh() {
 	model.vehicles.broadcastEvent = model.broadcastVeEvent
 
 	model.macros = NewMacroManager()
+	model.controls = NewControlManager()
 }
 
 func (model *MemoryModel) RefreshMacros() {
 	model.macros = NewMacroManager()
 	model.macros.Load(model.referential)
+}
+
+func (model *MemoryModel) RefreshControls() {
+	model.controls = NewControlManager()
+	model.controls.Load(model.referential)
 }
 
 func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
@@ -239,6 +247,10 @@ func (model *MemoryModel) Macros() Macros {
 	return model.macros
 }
 
+func (model *MemoryModel) Controls() Controls {
+	return model.controls
+}
+
 func (model *MemoryModel) Load() error {
 	err := model.stopAreas.Load(model.referential)
 	if err != nil {
@@ -271,6 +283,10 @@ func (model *MemoryModel) Load() error {
 	err = model.macros.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Macros: %v", err)
+	}
+	err = model.controls.Load(model.referential)
+	if err != nil {
+		logger.Log.Debugf("Error while loading Controls: %v", err)
 	}
 	return nil
 }

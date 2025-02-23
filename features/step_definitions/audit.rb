@@ -1,6 +1,15 @@
 def an_audit_event_with_attributes(attributes)
   attributes = attributes.rows_hash if attributes.respond_to?(:rows_hash)
 
+  attributes.dup.each do |key, value|
+    if key =~ /(TargetModel|TranslationInfo)\[([^\]]+)\]/
+      a = $1
+      name = $2
+      attributes[a] ||= {}
+      attributes[a][name] = value
+      attributes.delete key
+    end
+  end
   # Transform specified values into integer, nil, regexp, etc
   attribute_matchers = attributes.map do |attribute, value|
       matcher =

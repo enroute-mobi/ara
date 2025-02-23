@@ -5,25 +5,20 @@ import (
 )
 
 type MacroId string
-type contextAttributes interface{}
 type updaterAttributes interface{}
-type context func(ModelInstance) bool
 type updater func(ModelInstance) error
-type contexFactory func(contextAttributes) (context, error)
 type updaterFactory func(updaterAttributes) (updater, error)
 
 const (
-	IfAttribute               = "IfAttribute"
 	SetAttribute              = "SetAttribute"
 	DefineAimedScheduledTimes = "DefineAimedScheduledTimes"
 	DefineSituationAffects    = "DefineSituationAffects"
 )
 
-var contexes = []string{IfAttribute}
 var updaters = []string{SetAttribute, DefineAimedScheduledTimes}
 
 type Macro struct {
-	c context
+	c Context
 	u []updater
 }
 
@@ -31,7 +26,7 @@ func NewMacro() *Macro {
 	return &Macro{}
 }
 
-func NewMacroWithContext(c context) *Macro {
+func NewMacroWithContext(c Context) *Macro {
 	return &Macro{
 		c: c,
 	}
@@ -41,7 +36,7 @@ func (m *Macro) AddUpdater(u updater) {
 	m.u = append(m.u, u)
 }
 
-func (m *Macro) AddContext(c context) {
+func (m *Macro) AddContext(c Context) {
 	if m.c == nil {
 		m.c = c
 		return
@@ -67,13 +62,6 @@ func (m *Macro) Update(mi ModelInstance) (ok bool, err error) {
 	return true, nil
 }
 
-func NewContexFromDatabase(sm *SelectMacro) (context, error) {
-	if sm.ModelType.String == "VehicleJourney" && sm.Type == IfAttribute {
-		return NewVehicleJourneyIfAttributeContext(sm)
-	}
-	return nil, nil
-}
-
 func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
 	if sm.ModelType.String == "VehicleJourney" && sm.Type == SetAttribute {
 		return NewVehicleJourneySetAttributeUpdater(sm)
@@ -83,10 +71,6 @@ func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
 		return NewDefineSituationAffectsUpdater(sm)
 	}
 	return nil, nil
-}
-
-func IsContext(c string) bool {
-	return slices.Contains(contexes, c)
 }
 
 func IsUpdater(u string) bool {
