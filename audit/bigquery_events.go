@@ -11,6 +11,7 @@ const (
 	BQ_MESSAGE                    = "message"
 	BQ_VEHICLE_EVENT              = "vehicle"
 	BQ_PARTNER_EVENT              = "partner"
+	BQ_CONTROL_EVENT              = "control"
 	BQ_LONG_TERM_STOP_VISIT_EVENT = "long_term_stop_visit"
 
 	CHECK_STATUS_REQUEST BigQueryMessageType = "CheckStatusRequest"
@@ -271,9 +272,58 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "vehicle_occupancy", Required: false, Type: bigquery.StringFieldType},
 }
 
+type BigQueryControlEvent struct {
+	UUID            string          `bigquery:"uuid"`
+	Timestamp       time.Time       `bigquery:"timestamp"`
+	Criticity       string          `bigquery:"criticity"`
+	ControlType     string          `bigquery:"control_type"`
+	InternalCode    string          `bigquery:"internal_code"`
+	TargetModel     TargetModel     `bigquery:"target_model"`
+	TranslationInfo TranslationInfo `bigquery:"translation_info"`
+}
+
+type TargetModel struct {
+	Class string `bigquery:"class"`
+	UUID  string `bigquery:"uuid"`
+}
+
+type TranslationInfo struct {
+	MessageKey        string `bigquery:"message_key"`
+	MessageAttributes string `bigquery:"message_attributes"`
+}
+
+func (bq *BigQueryControlEvent) EventType() string        { return BQ_CONTROL_EVENT }
+func (bq *BigQueryControlEvent) SetTimeStamp(t time.Time) { bq.Timestamp = t }
+func (bq *BigQueryControlEvent) SetUUID(u string)         { bq.UUID = u }
+
+var bqControlSchema = bigquery.Schema{
+	{Name: "uuid", Required: false, Type: bigquery.StringFieldType},
+	{Name: "timestamp", Required: false, Type: bigquery.TimestampFieldType},
+	{Name: "criticity", Required: false, Type: bigquery.StringFieldType},
+	{Name: "control_type", Required: false, Type: bigquery.StringFieldType},
+	{Name: "internal_code", Required: false, Type: bigquery.StringFieldType},
+	{Name: "target_model",
+		Required: false,
+		Type:     bigquery.RecordFieldType,
+		Schema: bigquery.Schema{
+			{Name: "class", Type: bigquery.StringFieldType},
+			{Name: "uuid", Type: bigquery.StringFieldType},
+		},
+	},
+	{Name: "translation_info",
+		Required: false,
+		Type:     bigquery.RecordFieldType,
+		Schema: bigquery.Schema{
+			{Name: "message_key", Type: bigquery.StringFieldType},
+			{Name: "message_attributes", Type: bigquery.StringFieldType},
+		},
+	},
+}
+
 var AraBigQuerySchemas = map[string]bigquery.Schema{
 	"bqMessageSchema":            bqMessageSchema,
 	"bqVehicleSchema":            bqVehicleSchema,
 	"bqPartnerSchema":            bqPartnerSchema,
 	"bqLongTermStopVisitsSchema": bqLongTermStopVisitsSchema,
+	"bqControlSchema":            bqControlSchema,
 }
