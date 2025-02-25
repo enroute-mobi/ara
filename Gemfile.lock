@@ -1,6 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
-  revision: 6f14c6adc4473cb836cc1cec07c539ee60eaef0c
+  revision: a529cd303e4c1d8a09929d569aa4eb570ca342b5
   specs:
     gtfs-rt (0.1.0)
       racc
@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://bitbucket.org/enroute-mobi/siri-xsd.git
-  revision: 70924a81eb687493bcce12b0736331fa07630185
+  revision: 99c5656de3d5c8a2f69611830366eb9d666e9caf
   specs:
     siri-xsd (0.1.0)
       listen
@@ -17,7 +17,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (8.0.1)
+    activesupport (8.0.2)
       base64
       benchmark (>= 0.3)
       bigdecimal
@@ -62,11 +62,11 @@ GEM
       bigdecimal
     cucumber-gherkin (27.0.0)
       cucumber-messages (>= 19.1.4, < 23)
-    cucumber-html-formatter (21.8.0)
-      cucumber-messages (> 19, < 27)
+    cucumber-html-formatter (21.9.0)
+      cucumber-messages (> 19, < 28)
     cucumber-messages (22.0.0)
-    cucumber-tag-expressions (6.1.1)
-    diff-lcs (1.5.1)
+    cucumber-tag-expressions (6.1.2)
+    diff-lcs (1.6.0)
     domain_name (0.6.20240107)
     drb (2.2.1)
     ffi (1.17.1)
@@ -86,18 +86,18 @@ GEM
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    logger (1.6.5)
+    logger (1.6.6)
     method_source (1.1.0)
-    mime-types (3.6.0)
+    mime-types (3.6.1)
       logger
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2025.0107)
+    mime-types-data (3.2025.0304)
     mini_mime (1.1.5)
     mini_portile2 (2.8.8)
-    minitest (5.25.4)
+    minitest (5.25.5)
     multi_test (1.1.0)
     netrc (0.11.0)
-    nokogiri (1.18.3)
+    nokogiri (1.18.4)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     pg (1.5.9)
@@ -114,7 +114,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.4.0)
+    rexml (3.4.1)
     rspec-expectations (3.13.3)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
