@@ -98,6 +98,7 @@ func (server *Server) ListenAndServe() error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", server.HandleFlow)
 	mux.HandleFunc("POST /{referential_slug}/graphql", server.handleGraphql)
+	mux.HandleFunc("POST /{referential_slug}/push", server.handlePush)
 
 	server.srv = &http.Server{
 		Handler:      mux,
@@ -186,11 +187,6 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 		return
 	}
 
-	if foundStrings[2] == "push" {
-		server.handlePush(response, request, foundStrings[1])
-		return
-	}
-
 	if foundStrings[2] == "gtfs" {
 		server.handleGtfs(response, request, foundStrings[1], foundStrings[3])
 		return
@@ -258,14 +254,17 @@ func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Req
 	siriHandler.serve(response, request, requestData)
 }
 
-func (server *Server) handlePush(response http.ResponseWriter, request *http.Request, referential string) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+func (server *Server) handlePush(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
 	}
 
 	logger.Log.Debugf("Push request: %v", request)
+
+	response.Header().Set("Server", version.ApplicationName())
 
 	pushHandler := NewPushHandler(foundReferential, server.getToken(request))
 	pushHandler.serve(response, request)
