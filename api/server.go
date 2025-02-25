@@ -100,6 +100,9 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("POST /{referential_slug}/graphql", server.handleGraphql)
 	mux.HandleFunc("POST /{referential_slug}/push", server.handlePush)
 
+	mux.HandleFunc("GET /{referential_slug}/gtfs", server.handleGtfs)
+	mux.HandleFunc("GET /{referential_slug}/gtfs/{resource}", server.handleGtfs)
+
 	server.srv = &http.Server{
 		Handler:      mux,
 		Addr:         server.bind,
@@ -187,11 +190,6 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 		return
 	}
 
-	if foundStrings[2] == "gtfs" {
-		server.handleGtfs(response, request, foundStrings[1], foundStrings[3])
-		return
-	}
-
 	requestData := NewRequestDataFromContent(foundStrings)
 	requestData.Method = request.Method
 	requestData.Url = request.URL.Path
@@ -270,8 +268,9 @@ func (server *Server) handlePush(response http.ResponseWriter, request *http.Req
 	pushHandler.serve(response, request)
 }
 
-func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Request, referential, resource string) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
@@ -279,8 +278,11 @@ func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Req
 
 	logger.Log.Debugf("Gtfs request: %v", request)
 
+	response.Header().Set("Server", version.ApplicationName())
+
 	gtfsHandler := NewGtfsHandler(foundReferential, server.getToken(request))
 
+	resource := request.PathValue("resource")
 	gtfsHandler.serve(response, request, resource)
 }
 
