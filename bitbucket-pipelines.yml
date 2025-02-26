@@ -2,7 +2,7 @@ definitions:
   services:
     postgres:
       image:
-        name: us.gcr.io/enroute-interne/enroute-postgresql:dev
+        name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-postgresql:dev
         username: _json_key
         password: "$GCLOUD_API_KEYFILE"
       environment:
@@ -13,7 +13,7 @@ definitions:
     - step: &go-mod
         name: Go Mod
         image:
-          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-golang:dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
@@ -25,7 +25,7 @@ definitions:
     - step: &static-check
         name: Static Check
         image:
-          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-golang:dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
@@ -36,7 +36,7 @@ definitions:
     - step: &build
         name: Build
         image:
-          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-golang:dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
@@ -49,7 +49,7 @@ definitions:
     - step: &unit-tests
         name: Unit tests
         image:
-          name: us.gcr.io/enroute-interne/enroute-golang:dev
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-golang:dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
@@ -65,7 +65,7 @@ definitions:
     - step: &bundle-audit
         name: Bundle Audit
         image:
-          name: us.gcr.io/enroute-interne/enroute-ruby:3.4-dev
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-ruby:3.4-dev
           username: _json_key
           password: '$GCLOUD_API_KEYFILE'
         script:
@@ -74,7 +74,7 @@ definitions:
     - step: &cucumber
         name: Cucumber Tests
         image:
-          name: us.gcr.io/enroute-interne/enroute-ruby:3.4-dev
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-ruby:3.4-dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
         script:
@@ -115,7 +115,7 @@ pipelines:
             - step:
                 name: Build Docker
                 image:
-                  name: us.gcr.io/enroute-interne/enroute-cloud-sdk:latest
+                  name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
                   username: _json_key
                   password: "$GCLOUD_API_KEYFILE"
                 caches:
@@ -129,7 +129,7 @@ pipelines:
       - step:
           name: Deploy to test
           image:
-              name: eu.gcr.io/enroute-interne/enroute-cloud-sdk:latest
+              name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
               username: _json_key
               password: "$GCLOUD_API_KEYFILE"
           deployment: test
@@ -150,7 +150,7 @@ pipelines:
       - step:
           name: Deploy to staging
           image:
-              name: eu.gcr.io/enroute-interne/enroute-cloud-sdk:latest
+              name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
               username: _json_key
               password: "$GCLOUD_API_KEYFILE"
           deployment: staging
@@ -172,7 +172,7 @@ pipelines:
       - step:
           name: Deploy to production
           image:
-              name: eu.gcr.io/enroute-interne/enroute-cloud-sdk:latest
+              name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
               username: _json_key
               password: "$GCLOUD_API_KEYFILE"
           deployment: production
