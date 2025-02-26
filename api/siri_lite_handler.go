@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/api/rah"
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -27,19 +28,19 @@ func NewSIRILiteHandler(referential *core.Referential, token string) *SIRILiteHa
 	}
 }
 
-func (handler *SIRILiteHandler) requestHandler(requestData *SIRIRequestData) SIRILiteRequestHandler {
-	switch requestData.Request {
-	case "vehicle-monitoring":
+func (handler *SIRILiteHandler) requestHandler(resource string, filters url.Values) SIRILiteRequestHandler {
+	switch resource {
+	case "vehicle-monitoring.json":
 		return &SIRILiteVehicleMonitoringRequestHandler{
-			requestUrl:  requestData.Url,
-			filters:     requestData.Filters,
+			// requestUrl:  requestData.Url,
+			filters:     filters,
 			referential: handler.referential,
 		}
 	}
 	return nil
 }
 
-func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *http.Request, requestData *SIRIRequestData) {
+func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *http.Request) {
 	if handler.token == "" {
 		http.Error(response, "No Authorization Token", http.StatusUnauthorized)
 		return
@@ -57,7 +58,11 @@ func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *htt
 		return
 	}
 
-	requestHandler := handler.requestHandler(requestData)
+	resource := request.PathValue("resource")
+	request.ParseForm()
+	request.URL.RequestURI()
+
+	requestHandler := handler.requestHandler(resource, request.Form)
 	if requestHandler == nil {
 		http.Error(response, "The SIRI Lite request doesn’t match a defined broadcast", http.StatusNotFound)
 		return

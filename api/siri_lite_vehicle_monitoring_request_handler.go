@@ -26,7 +26,7 @@ func (handler *SIRILiteVehicleMonitoringRequestHandler) Respond(connector core.C
 
 	t := clock.DefaultClock().Now()
 
-	response := connector.(core.VehicleMonitoringLiteRequestBroadcaster).RequestVehicles(handler.requestUrl, handler.filters, message)
+	response := connector.(core.VehicleMonitoringLiteRequestBroadcaster).RequestVehicles(handler.filters, message)
 
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {

@@ -96,12 +96,17 @@ func NewServer(bind string) *Server {
 func (server *Server) ListenAndServe() error {
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", server.HandleFlow)
+
 	mux.HandleFunc("POST /{referential_slug}/graphql", server.handleGraphql)
 	mux.HandleFunc("POST /{referential_slug}/push", server.handlePush)
 
 	mux.HandleFunc("GET /{referential_slug}/gtfs", server.handleGtfs)
 	mux.HandleFunc("GET /{referential_slug}/gtfs/{resource}", server.handleGtfs)
+
+	mux.HandleFunc("POST /{referential_slug}/siri", server.HandleSIRI)
+	mux.HandleFunc("GET /{referential_slug}/siri/v2.0/{resource}", server.handleSIRILite)
+
+	mux.HandleFunc("/", server.HandleFlow)
 
 	server.srv = &http.Server{
 		Handler:      mux,
@@ -178,18 +183,6 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 	}
 	response.Header().Set("Server", version.ApplicationName())
 
-	if foundStrings[2] == "siri" {
-		requestData, ok := NewSIRIRequestDataFromContent(foundStrings)
-		if !ok {
-			http.Error(response, "Invalid request", http.StatusBadRequest)
-			return
-		}
-		requestData.Filters = request.URL.Query()
-		requestData.Url = request.URL.RequestURI()
-		server.handleSIRI(response, request, requestData)
-		return
-	}
-
 	requestData := NewRequestDataFromContent(foundStrings)
 	requestData.Method = request.Method
 	requestData.Url = request.URL.Path
@@ -237,19 +230,26 @@ func (server *Server) handleWithReferentialControllers(response http.ResponseWri
 	controller.serve(response, request, requestData)
 }
 
-func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, requestData *SIRIRequestData) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
+func (server *Server) handleSIRILite(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+
+	logger.Log.Debugf("SIRI Lite request: %v", request)
+
+	siriLiteHandler := NewSIRILiteHandler(foundReferential, server.getToken(request))
+	siriLiteHandler.serve(response, request)
+}
+
+func (server *Server) HandleSIRI(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 
 	logger.Log.Debugf("SIRI request: %v", request)
 
-	if requestData.Request == "" {
-		siriHandler := NewSIRIHandler(foundReferential)
-		siriHandler.serve(response, request)
-		return
-	}
+	response.Header().Set("Server", version.ApplicationName())
 
-	siriHandler := NewSIRILiteHandler(foundReferential, server.getToken(request))
-	siriHandler.serve(response, request, requestData)
+	siriHandler := NewSIRIHandler(foundReferential)
+	siriHandler.serve(response, request)
 }
 
 func (server *Server) handlePush(response http.ResponseWriter, request *http.Request) {
