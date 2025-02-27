@@ -106,6 +106,8 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("POST /{referential_slug}/siri", server.HandleSIRI)
 	mux.HandleFunc("GET /{referential_slug}/siri/v2.0/{resource}", server.handleSIRILite)
 
+	mux.HandleFunc("GET /_status", server.handleStatus)
+
 	mux.HandleFunc("/", server.HandleFlow)
 
 	server.srv = &http.Server{
@@ -205,6 +207,11 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 	}
 
 	server.handleWithReferentialControllers(response, request, requestData)
+}
+
+func (server *Server) handleStatus(response http.ResponseWriter, request *http.Request) {
+	controller := NewStatusController(server)
+	controller.serve(response, request, &RequestData{})
 }
 
 func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
