@@ -107,6 +107,8 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("GET /{referential_slug}/siri/v2.0/{resource}", server.handleSIRILite)
 
 	mux.HandleFunc("GET /_status", server.handleStatus)
+	mux.HandleFunc("GET /_time", server.handleTimeGet)
+	mux.HandleFunc("POST /_time/advance", server.handleTimeAdvance)
 
 	mux.HandleFunc("/", server.HandleFlow)
 
@@ -214,8 +216,23 @@ func (server *Server) handleStatus(response http.ResponseWriter, request *http.R
 	controller.serve(response, request, &RequestData{})
 }
 
-func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+func (server *Server) handleTimeGet(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
 
+	controller := NewTimeController(server)
+	controller.get(response)
+}
+
+func (server *Server) handleTimeAdvance(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewTimeController(server)
+	controller.advance(response, request)
+}
+
+func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)

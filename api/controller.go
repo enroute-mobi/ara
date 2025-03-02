@@ -13,7 +13,6 @@ var idPattern = regexp.MustCompile("([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)")
 
 var newControllerMap = map[string](func(*Server) ControllerInterface){
 	"_referentials": NewReferentialController,
-	"_time":         NewTimeController,
 	"_status":       NewStatusController,
 }
 
