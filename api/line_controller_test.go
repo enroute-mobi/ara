@@ -10,18 +10,14 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/require"
 )
 
 func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line *model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -54,7 +50,29 @@ func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *test
 	responseRecorder = httptest.NewRecorder()
 
 	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	fmt.Printf(" ----------------- Method: %s", method)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "lines")
+	switch method {
+	case "GET":
+		if sendIdentifier == false && body == nil {
+			server.handleReferentialModelIndex(responseRecorder, request)
+		} else {
+			request.SetPathValue("id", string(line.Id()))
+			server.handleReferentialModelShow(responseRecorder, request)
+		}
+	case "POST":
+		server.handleReferentialModelCreate(responseRecorder, request)
+	case "PUT":
+		request.SetPathValue("id", string(line.Id()))
+		server.handleReferentialModelUpdate(responseRecorder, request)
+	case "DELETE":
+		request.SetPathValue("id", string(line.Id()))
+		server.handleReferentialModelDelete(responseRecorder, request)
+	default:
+		t.Fatalf("Unknown method: %s", method)
+	}
+
 	return
 }
 

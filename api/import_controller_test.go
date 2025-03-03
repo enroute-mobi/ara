@@ -96,8 +96,8 @@ func Test_Serve(t *testing.T) {
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	server.handleReferentialImport(responseRecorder, request)
 
 	// Test the result
 	assert.Equal(http.StatusOK, responseRecorder.Code)
@@ -142,7 +142,8 @@ func Test_Serve(t *testing.T) {
 	request2 := prepareMultipart(t, values2)
 
 	responseRecorder2 := httptest.NewRecorder()
-	server.HandleFlow(responseRecorder2, request2)
+	request2.SetPathValue("referential_slug", string(referential.Slug()))
+	server.handleReferentialImport(responseRecorder2, request2)
 
 	// Test the result
 	assert.Equal(http.StatusOK, responseRecorder2.Code)
@@ -160,7 +161,8 @@ func Test_Serve(t *testing.T) {
 	request3 := prepareMultipart(t, values3)
 
 	responseRecorder3 := httptest.NewRecorder()
-	server.HandleFlow(responseRecorder3, request3)
+	request3.SetPathValue("referential_slug", string(referential.Slug()))
+	server.handleReferentialImport(responseRecorder3, request3)
 
 	// Test the result
 	assert.Equal(http.StatusOK, responseRecorder3.Code)
@@ -196,8 +198,8 @@ func Test_Serve_With_NoToken(t *testing.T) {
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	server.handleReferentialImport(responseRecorder, request)
 
 	// Test the result
 	if status := responseRecorder.Code; status == http.StatusOK {
@@ -233,8 +235,8 @@ func Test_Serve_With_ImportToken(t *testing.T) {
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	server.handleReferentialImport(responseRecorder, request)
 
 	// Test the result
 	assert.Equal(http.StatusOK, responseRecorder.Code)

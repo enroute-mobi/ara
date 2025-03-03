@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func checkStopVisitResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -49,11 +50,7 @@ func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t 
 	stopVisit2.Schedules.SetArrivalTime("actual", svTime)
 	referential.Model().StopVisits().Save(stopVisit2)
 
-	url := "/default/stop_visits"
-	if method == "GET" && !sendIdentifier {
-		url = url + "?After=2006/01/02-15:04:05"
-	}
-	address := []byte(url)
+	address := []byte("/default/stop_visits")
 	if sendIdentifier {
 		address = append(address, fmt.Sprintf("/%s", stopVisit.Id())...)
 	}
@@ -67,8 +64,27 @@ func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t 
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_visits")
+	switch method {
+	case "GET":
+		if sendIdentifier == false && body == nil {
+			server.handleReferentialModelIndex(responseRecorder, request)
+		} else {
+			request.SetPathValue("id", string(stopVisit.Id()))
+			server.handleReferentialModelShow(responseRecorder, request)
+		}
+	case "POST":
+		server.handleReferentialModelCreate(responseRecorder, request)
+	case "PUT":
+		request.SetPathValue("id", string(stopVisit.Id()))
+		server.handleReferentialModelUpdate(responseRecorder, request)
+	case "DELETE":
+		request.SetPathValue("id", string(stopVisit.Id()))
+		server.handleReferentialModelDelete(responseRecorder, request)
+	default:
+		t.Fatalf("Unknown method: %s", method)
+	}
 
 	return
 }
@@ -143,6 +159,7 @@ func Test_StopVisitController_Create(t *testing.T) {
 }
 
 func Test_StopVisitController_Index(t *testing.T) {
+	assert := assert.New(t)
 	// Send request
 	_, responseRecorder, _ := prepareStopVisitRequest("GET", false, nil, t)
 
@@ -150,11 +167,22 @@ func Test_StopVisitController_Index(t *testing.T) {
 	checkStopVisitResponseStatus(responseRecorder, t)
 
 	//Test Results
-
-	expected := `[{"Origin":"","VehicleAtStop":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Schedules":[{"ArrivalTime":"2007-01-02T15:04:05Z","Kind":"actual"}],"Collected":false}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected := `[
+{
+"Origin": "",
+"VehicleAtStop": false,
+"Id": "6ba7b814-9dad-11d1-0-00c04fd430c8",
+"Schedules": [{"ArrivalTime":"2007-01-02T15:04:05Z","Kind":"actual"}],
+"Collected": false
+},
+{
+"Origin":"",
+"VehicleAtStop":false,
+"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8",
+"Schedules":[{"ArrivalTime":"2005-01-02T15:04:05Z","Kind":"actual"}],
+"Collected":false
+}]`
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_StopVisitController_FindStopVisit(t *testing.T) {

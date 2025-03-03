@@ -29,12 +29,14 @@ func TestTokens(t *testing.T) {
 	referentials.Save(referential)
 
 	// Create a request
-	request, err := http.NewRequest("Get", "/first_referential/partners", nil)
+	request, err := http.NewRequest("GET", "/first_referential/partners", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
 	responseRecorder := httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
 	if status := responseRecorder.Code; status == http.StatusOK {
 		t.Errorf("Handler returned wrong status code: %v", status)
@@ -46,7 +48,9 @@ func TestTokens(t *testing.T) {
 	referential.Save()
 
 	responseRecorder = httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
 	if status := responseRecorder.Code; status == http.StatusOK {
 		t.Errorf("Handler returned wrong status code: %v", status)
@@ -55,7 +59,9 @@ func TestTokens(t *testing.T) {
 	request.Header.Set("Authorization", "Token token=12345")
 
 	responseRecorder = httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
 	if status := responseRecorder.Code; status != http.StatusOK {
 		t.Errorf("Handler returned wrong status code: %v", status)
@@ -64,7 +70,9 @@ func TestTokens(t *testing.T) {
 	request.Header.Set("Authorization", "Token token=23456")
 
 	responseRecorder = httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
 	if status := responseRecorder.Code; status == http.StatusOK {
 		t.Errorf("Handler returned wrong status code: %v", status)
@@ -165,7 +173,7 @@ func Test_ReferentialController_Show(t *testing.T) {
 	// Send request
 	referential, responseRecorder, server, request := referentialPrepareRequest("GET", true, nil, t)
 	request.SetPathValue("id", string(referential.Id()))
-	server.handleReferentialShow(responseRecorder, request)
+	server.handleReferentialGet(responseRecorder, request)
 
 	// Test response
 	referentialCheckResponseStatus(responseRecorder, t)

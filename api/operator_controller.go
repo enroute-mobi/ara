@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -15,11 +14,9 @@ type OperatorController struct {
 	referential *core.Referential
 }
 
-func NewOperatorController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &OperatorController{
-			referential: referential,
-		},
+func NewOperatorController(referential *core.Referential) RestfulResource {
+	return &OperatorController{
+		referential: referential,
 	}
 }
 
@@ -32,7 +29,7 @@ func (controller *OperatorController) findOperator(identifier string) (*model.Op
 	return controller.referential.Model().Operators().Find(model.OperatorId(identifier))
 }
 
-func (controller *OperatorController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *OperatorController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Operators Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Model().Operators().FindAll())

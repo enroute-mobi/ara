@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -15,11 +14,9 @@ type StopAreaController struct {
 	referential *core.Referential
 }
 
-func NewStopAreaController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &StopAreaController{
-			referential: referential,
-		},
+func NewStopAreaController(referential *core.Referential) RestfulResource {
+	return &StopAreaController{
+		referential: referential,
 	}
 }
 
@@ -32,7 +29,7 @@ func (controller *StopAreaController) findStopArea(identifier string) (*model.St
 	return controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
 }
 
-func (controller *StopAreaController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *StopAreaController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("StopAreas Index")
 
 	stime := controller.referential.Clock().Now()

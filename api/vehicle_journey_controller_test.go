@@ -53,8 +53,27 @@ func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byt
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "vehicle_journeys")
+	switch method {
+	case "GET":
+		if sendIdentifier == false && body == nil {
+			server.handleReferentialModelIndex(responseRecorder, request)
+		} else {
+			request.SetPathValue("id", string(vehicleJourney.Id()))
+			server.handleReferentialModelShow(responseRecorder, request)
+		}
+	case "POST":
+		server.handleReferentialModelCreate(responseRecorder, request)
+	case "PUT":
+		request.SetPathValue("id", string(vehicleJourney.Id()))
+		server.handleReferentialModelUpdate(responseRecorder, request)
+	case "DELETE":
+		request.SetPathValue("id", string(vehicleJourney.Id()))
+		server.handleReferentialModelDelete(responseRecorder, request)
+	default:
+		t.Fatalf("Unknown method: %s", method)
+	}
 
 	return
 }

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -17,11 +16,9 @@ type SituationController struct {
 	referential *core.Referential
 }
 
-func NewSituationController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &SituationController{
-			referential: referential,
-		},
+func NewSituationController(referential *core.Referential) RestfulResource {
+	return &SituationController{
+		referential: referential,
 	}
 }
 
@@ -34,7 +31,7 @@ func (controller *SituationController) findSituation(identifier string) (model.S
 	return controller.referential.Model().Situations().Find(model.SituationId(identifier))
 }
 
-func (controller *SituationController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *SituationController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Situations Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Model().Situations().FindAll())

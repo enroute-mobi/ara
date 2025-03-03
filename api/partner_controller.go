@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 	"time"
@@ -18,11 +17,9 @@ type PartnerController struct {
 	referential *core.Referential
 }
 
-func NewPartnerController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &PartnerController{
-			referential: referential,
-		},
+func NewPartnerController(referential *core.Referential) RestfulResource {
+	return &PartnerController{
+		referential: referential,
 	}
 }
 
@@ -135,7 +132,7 @@ func (controller *PartnerController) findPartner(identifier string) *core.Partne
 	return controller.referential.Partners().Find(core.PartnerId(identifier))
 }
 
-func (controller *PartnerController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *PartnerController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Partners Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Partners().FindAll())
