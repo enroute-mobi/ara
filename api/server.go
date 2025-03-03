@@ -110,6 +110,14 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("GET /_time", server.handleTimeGet)
 	mux.HandleFunc("POST /_time/advance", server.handleTimeAdvance)
 
+	mux.HandleFunc("GET /_referentials", server.handleReferentialIndex)
+	mux.HandleFunc("POST /_referentials", server.handleReferentialCreate)
+	mux.HandleFunc("GET /_referentials/{id}", server.handleReferentialShow)
+	mux.HandleFunc("PUT /_referentials/{id}", server.handleReferentialUpdate)
+	mux.HandleFunc("DELETE /_referentials/{id}", server.handleReferentialDelete)
+	mux.HandleFunc("POST /_referentials/save", server.handleReferentialSave)
+	mux.HandleFunc("POST /_referentials/reload/{id}", server.handleReferentialReload)
+
 	mux.HandleFunc("/", server.HandleFlow)
 
 	server.srv = &http.Server{
@@ -121,19 +129,6 @@ func (server *Server) ListenAndServe() error {
 
 	logger.Log.Debugf("Starting server on %s", server.bind)
 	return server.srv.ListenAndServe()
-}
-
-func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-	newController, ok := newControllerMap[requestData.Referential]
-	if !ok {
-		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-		return
-	}
-
-	logger.Log.Debugf("%s controller request: %v", requestData.Resource, request)
-
-	controller := newController(server)
-	controller.serve(response, request, requestData)
 }
 
 func (server *Server) getToken(r *http.Request) string {
@@ -194,21 +189,113 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 
 	response.Header().Set("Content-Type", "application/json")
 
-	if strings.HasPrefix(requestData.Referential, "_") {
-		if requestData.Referential != "_status" && !server.isAdmin(request) {
-			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-			logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-			return
-		}
-		if requestData.Referential == "_referentials" {
-			requestData.Action = requestData.Id
-			requestData.Id = requestData.Resource
-		}
-		server.handleControllers(response, request, requestData)
+	server.handleWithReferentialControllers(response, request, requestData)
+}
+
+func (server *Server) handleReferentialIndex(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
 		return
 	}
 
-	server.handleWithReferentialControllers(response, request, requestData)
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.Index(response)
+}
+
+func (server *Server) handleReferentialCreate(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.Create(response, request)
+}
+
+func (server *Server) handleReferentialShow(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	id := request.PathValue("id")
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.Show(response, id)
+}
+
+func (server *Server) handleReferentialUpdate(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	id := request.PathValue("id")
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.Update(response, request, id)
+}
+
+func (server *Server) handleReferentialDelete(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	id := request.PathValue("id")
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.Delete(response, id)
+}
+
+func (server *Server) handleReferentialSave(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.Save(response)
+}
+
+func (server *Server) handleReferentialReload(response http.ResponseWriter, request *http.Request) {
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	id := request.PathValue("id")
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewReferentialController(server)
+	controller.reload(id, response)
 }
 
 func (server *Server) handleStatus(response http.ResponseWriter, request *http.Request) {

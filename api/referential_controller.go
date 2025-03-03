@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -15,11 +14,9 @@ type ReferentialController struct {
 	server *Server
 }
 
-func NewReferentialController(server *Server) ControllerInterface {
-	return &Controller{
-		restfulResource: &ReferentialController{
-			server: server,
-		},
+func NewReferentialController(server *Server) *ReferentialController {
+	return &ReferentialController{
+		server: server,
 	}
 }
 
@@ -39,7 +36,7 @@ func (controller *ReferentialController) findReferential(identifier string) *cor
 	return controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
 }
 
-func (controller *ReferentialController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *ReferentialController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Referentials Index")
 
 	jsonBytes, _ := json.Marshal(controller.server.CurrentReferentials().FindAll())
@@ -69,13 +66,19 @@ func (controller *ReferentialController) Delete(response http.ResponseWriter, id
 	jsonBytes, _ := referential.MarshalJSON()
 	referential.Stop()
 	controller.server.CurrentReferentials().Delete(referential)
+
 	response.Write(jsonBytes)
 }
 
-func (controller *ReferentialController) Update(response http.ResponseWriter, identifier string, body []byte) {
+func (controller *ReferentialController) Update(response http.ResponseWriter, request *http.Request, identifier string) {
 	referential := controller.findReferential(identifier)
 	if referential == nil {
 		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), http.StatusNotFound)
+		return
+	}
+
+	body := getRequestBody(response, request)
+	if body == nil {
 		return
 	}
 
@@ -104,7 +107,11 @@ func (controller *ReferentialController) Update(response http.ResponseWriter, id
 	response.Write(jsonBytes)
 }
 
-func (controller *ReferentialController) Create(response http.ResponseWriter, body []byte) {
+func (controller *ReferentialController) Create(response http.ResponseWriter, request *http.Request) {
+	body := getRequestBody(response, request)
+	if body == nil {
+		return
+	}
 	logger.Log.Debugf("Create referential: %s", string(body))
 
 	referential := controller.server.CurrentReferentials().New("")
