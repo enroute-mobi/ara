@@ -315,7 +315,6 @@ func Test_PartnerController_Save(t *testing.T) {
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
 	request.SetPathValue("referential_slug", string(referential.Slug()))
 	server.handleReferentialPartnerSave(responseRecorder, request)
 

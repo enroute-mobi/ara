@@ -17,7 +17,7 @@ func NewStatusController(server *Server) ControllerInterface {
 	return &StatusController{}
 }
 
-func (controller *StatusController) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+func (controller *StatusController) serve(response http.ResponseWriter, request *http.Request) {
 	status := Status{
 		Status:  "ok",
 		Version: version.Value(),

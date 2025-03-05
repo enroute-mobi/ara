@@ -31,7 +31,7 @@ func NewImportController(referential *core.Referential) ControllerInterface {
 	}
 }
 
-func (controller *ImportController) serve(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+func (controller *ImportController) serve(response http.ResponseWriter, request *http.Request) {
 	mediaType, params, err := mime.ParseMediaType(request.Header.Get("Content-Type"))
 	if err != nil || !strings.HasPrefix(mediaType, "multipart/") {
 		http.Error(response, "Expected multipart content", http.StatusUnsupportedMediaType)

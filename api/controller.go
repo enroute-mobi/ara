@@ -22,7 +22,6 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Restfu
 	"situations":            NewSituationController,
 	"operators":             NewOperatorController,
 	"vehicles":              NewVehicleController,
-	// "import":           NewImportController,
 }
 
 type RestfulResource interface {
@@ -38,16 +37,13 @@ type SubscriptionResource interface {
 	SubscriptionsCreate(response http.ResponseWriter, identifier string, body []byte)
 	SubscriptionsDelete(response http.ResponseWriter, identifier string, subscriptionId string)
 }
-type ActionResource interface {
-	Action(response http.ResponseWriter, requestData *RequestData)
-}
 
 type Savable interface {
 	Save(response http.ResponseWriter)
 }
 
 type ControllerInterface interface {
-	serve(response http.ResponseWriter, request *http.Request, requestData *RequestData)
+	serve(response http.ResponseWriter, request *http.Request)
 }
 
 func getRequestBody(response http.ResponseWriter, request *http.Request) []byte {

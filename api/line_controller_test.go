@@ -49,8 +49,6 @@ func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *test
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	fmt.Printf(" ----------------- Method: %s", method)
 	request.SetPathValue("referential_slug", string(referential.Slug()))
 	request.SetPathValue("model", "lines")
 	switch method {

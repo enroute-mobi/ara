@@ -20,14 +20,6 @@ func NewReferentialController(server *Server) *ReferentialController {
 	}
 }
 
-func (controller *ReferentialController) Action(response http.ResponseWriter, requestData *RequestData) {
-	if requestData.Action == "reload" {
-		controller.reload(requestData.Id, response)
-		return
-	}
-	http.Error(response, fmt.Sprintf("Action not supported: %s", requestData.Action), http.StatusInternalServerError)
-}
-
 func (controller *ReferentialController) findReferential(identifier string) *core.Referential {
 	referential := controller.server.CurrentReferentials().FindBySlug(core.ReferentialSlug(identifier))
 	if referential != nil {

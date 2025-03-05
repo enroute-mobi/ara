@@ -2,8 +2,6 @@ package api
 
 import (
 	"net/http"
-	"net/url"
-	"regexp"
 	"slices"
 	"strings"
 	"time"
@@ -12,14 +10,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
 )
-
-var pathPattern = regexp.MustCompile("/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?")
-var requestDataPathPattern = regexp.MustCompile("([0-9a-zA-Z-_]+(?::[0-9a-zA-Z-_:]+)?)?(?:/([0-9a-zA-Z-_]+))?")
-var siriPathPattern = regexp.MustCompile("v2.0/([a-z-]+).json")
 
 type Server struct {
 	uuid.UUIDConsumer
@@ -32,59 +25,6 @@ type Server struct {
 	apiKey      string
 }
 
-type SIRIRequestData struct {
-	Filters     url.Values
-	Referential string
-	Request     string
-	Url         string
-}
-
-type RequestData struct {
-	Filters     url.Values
-	Body        []byte
-	Method      string
-	Referential string
-	Resource    string
-	Id          string
-	Action      string
-	Url         string
-}
-
-func NewRequestDataFromContent(params []string) *RequestData {
-	requestFiller := make([]string, 15)
-
-	copy(requestFiller, params)
-
-	foundStrings := requestDataPathPattern.FindStringSubmatch(requestFiller[3])
-
-	return &RequestData{
-		Referential: requestFiller[1],
-		Resource:    requestFiller[2],
-		Id:          foundStrings[1],
-		Action:      foundStrings[2],
-	}
-}
-
-func NewSIRIRequestDataFromContent(params []string) (*SIRIRequestData, bool) {
-	requestFiller := make([]string, 15)
-
-	copy(requestFiller, params)
-
-	requestData := &SIRIRequestData{
-		Referential: requestFiller[1],
-	}
-
-	if requestFiller[3] != "" {
-		foundStrings := siriPathPattern.FindStringSubmatch(requestFiller[3])
-		if len(foundStrings) == 0 {
-			return nil, false
-		}
-		requestData.Request = foundStrings[1]
-	}
-
-	return requestData, true
-}
-
 func NewServer(bind string) *Server {
 	server := Server{bind: bind}
 	server.startedTime = server.Clock().Now()
@@ -95,7 +35,6 @@ func NewServer(bind string) *Server {
 }
 
 func (server *Server) ListenAndServe() error {
-
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("POST /{referential_slug}/graphql", server.handleGraphql)
@@ -132,8 +71,6 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("GET /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsIndex)
 	mux.HandleFunc("POST /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsCreate)
 	mux.HandleFunc("DELETE /{referential_slug}/partners/{id}/subscriptions/{subscription_id}", server.handlePartnerSubscriptionsDelete)
-
-	mux.HandleFunc("/", server.HandleFlow)
 
 	server.srv = &http.Server{
 		Handler:      mux,
@@ -192,27 +129,6 @@ func (server *Server) isAuthForImport(referential *core.Referential, request *ht
 	}
 
 	return slices.Contains(referential.ImportTokens, authToken)
-}
-
-func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
-	defer monitoring.HandleHttpPanic(response)
-
-	path := request.URL.RequestURI()
-	foundStrings := pathPattern.FindStringSubmatch(path)
-	if foundStrings == nil || foundStrings[1] == "" {
-		http.Error(response, "Invalid request", http.StatusBadRequest)
-		return
-	}
-	response.Header().Set("Server", version.ApplicationName())
-
-	requestData := NewRequestDataFromContent(foundStrings)
-	requestData.Method = request.Method
-	requestData.Url = request.URL.Path
-	requestData.Filters = request.URL.Query()
-
-	response.Header().Set("Content-Type", "application/json")
-
-	// server.handleWithReferentialControllers(response, request, requestData)
 }
 
 func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, request *http.Request) {
@@ -411,7 +327,7 @@ func (server *Server) handleReferentialImport(response http.ResponseWriter, requ
 	logger.Log.Debugf("Import controller request: %v", request)
 
 	controller := NewImportController(foundReferential)
-	controller.serve(response, request, &RequestData{})
+	controller.serve(response, request)
 }
 
 func (server *Server) handleReferentialIndex(response http.ResponseWriter, request *http.Request) {
@@ -530,7 +446,7 @@ func (server *Server) handleReferentialReload(response http.ResponseWriter, requ
 
 func (server *Server) handleStatus(response http.ResponseWriter, request *http.Request) {
 	controller := NewStatusController(server)
-	controller.serve(response, request, &RequestData{})
+	controller.serve(response, request)
 }
 
 func (server *Server) handleTimeGet(response http.ResponseWriter, request *http.Request) {
@@ -548,28 +464,6 @@ func (server *Server) handleTimeAdvance(response http.ResponseWriter, request *h
 	controller := NewTimeController(server)
 	controller.advance(response, request)
 }
-
-// func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-// 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
-// 	if foundReferential == nil {
-// 		http.Error(response, "Referential not found", http.StatusNotFound)
-// 		return
-// 	}
-// 	if !server.isAuth(foundReferential, request, requestData) {
-// 		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-// 		return
-// 	}
-// 	newController, ok := newWithReferentialControllerMap[requestData.Resource]
-// 	if !ok {
-// 		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	logger.Log.Debugf("%s controller request: %v", requestData.Resource, request)
-
-// 	controller := newController(foundReferential)
-// 	controller.serve(response, request, requestData)
-// }
 
 func (server *Server) handleSIRILite(response http.ResponseWriter, request *http.Request) {
 	referentialSlug := request.PathValue("referential_slug")

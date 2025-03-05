@@ -237,8 +237,9 @@ func benchmarkStopVisitsIndex(sv int, b *testing.B) {
 		request.Header.Set("Authorization", "Token token=testToken")
 
 		responseRecorder := httptest.NewRecorder()
-
-		server.HandleFlow(responseRecorder, request)
+		request.SetPathValue("referential_slug", string(referential.Slug()))
+		request.SetPathValue("model", "stop_visits")
+		server.handleReferentialModelIndex(responseRecorder, request)
 	}
 }
 
