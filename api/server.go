@@ -113,20 +113,25 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("GET /_referentials", server.handleReferentialIndex)
 	mux.HandleFunc("POST /_referentials", server.handleReferentialCreate)
 
-	// To avoid overlap between /{referential_slug}/gtfs and  /_referentials/{id}
-	mux.HandleFunc("GET /{referential_slug}/{id}", server.handleReferentialGet)
+	// To avoid overlap between /{referential_slug}/gtfs and  /_referentials/{id} and /{referential_slug}
+	mux.HandleFunc("GET /{referential_slug}/{model}", server.handleReferentialGet)
 
 	mux.HandleFunc("PUT /_referentials/{id}", server.handleReferentialUpdate)
 	mux.HandleFunc("DELETE /_referentials/{id}", server.handleReferentialDelete)
 	mux.HandleFunc("POST /_referentials/save", server.handleReferentialSave)
 	mux.HandleFunc("POST /_referentials/reload/{id}", server.handleReferentialReload)
 
-	mux.HandleFunc("GET /{referential_slug}/{model}", server.handleReferentialModelIndex)
 	mux.HandleFunc("GET /{referential_slug}/{model}/{id}", server.handleReferentialModelShow)
 	mux.HandleFunc("POST /{referential_slug}/{model}", server.handleReferentialModelCreate)
 	mux.HandleFunc("PUT /{referential_slug}/{model}/{id}", server.handleReferentialModelUpdate)
 	mux.HandleFunc("DELETE /{referential_slug}/{model}/{id}", server.handleReferentialModelDelete)
 	mux.HandleFunc("POST /{referential_slug}/imports", server.handleReferentialImport)
+
+	mux.HandleFunc("POST /{referential_slug}/partners/save", server.handleReferentialPartnerSave)
+
+	mux.HandleFunc("GET /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsIndex)
+	mux.HandleFunc("POST /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsCreate)
+	mux.HandleFunc("DELETE /{referential_slug}/partners/{id}/subscriptions/{subscription_id}", server.handlePartnerSubscriptionsDelete)
 
 	mux.HandleFunc("/", server.HandleFlow)
 
@@ -212,6 +217,7 @@ func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Req
 
 func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, request *http.Request) {
 	referentialSlug := request.PathValue("referential_slug")
+
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
@@ -335,6 +341,27 @@ func (server *Server) handleReferentialModelUpdate(response http.ResponseWriter,
 	controller.Update(response, id, body)
 }
 
+func (server *Server) handleReferentialPartnerSave(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	partnerControler := NewPartnerController(foundReferential)
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	logger.Log.Debugf("Partner controller Save request: %v", request)
+
+	partnerControler.(Savable).Save(response)
+}
+
 func (server *Server) handleReferentialModelDelete(response http.ResponseWriter, request *http.Request) {
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
@@ -416,23 +443,27 @@ func (server *Server) handleReferentialCreate(response http.ResponseWriter, requ
 }
 
 func (server *Server) handleReferentialGet(response http.ResponseWriter, request *http.Request) {
-	id := request.PathValue("id")
+	model := request.PathValue("model")
 	referentialSlug := request.PathValue("referential_slug")
-	if id == "gtfs" && referentialSlug != "_referentials" {
+	if model == "gtfs" && referentialSlug != "_referentials" {
 		server.handleGtfs(response, request)
 	}
 
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+	if referentialSlug == "_referentials" {
+		if !server.isAdmin(request) {
+			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+			logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+			return
+		}
+
+		response.Header().Set("Server", version.ApplicationName())
+		response.Header().Set("Content-Type", "application/json")
+		controller := NewReferentialController(server)
+		controller.Show(response, model)
 		return
 	}
 
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
-	controller.Show(response, id)
+	server.handleReferentialModelIndex(response, request)
 }
 
 func (server *Server) handleReferentialUpdate(response http.ResponseWriter, request *http.Request) {
@@ -610,4 +641,64 @@ func (server *Server) handleGraphql(response http.ResponseWriter, request *http.
 
 	graphqlHandler := NewGraphqlHandler(foundReferential, server.getToken(request))
 	graphqlHandler.serve(response, request)
+}
+
+func (server *Server) handlePartnerSubscriptionsIndex(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	partnerController := NewPartnerController(foundReferential)
+	id := request.PathValue("id")
+	partnerController.(SubscriptionResource).SubscriptionsIndex(response, id)
+}
+
+func (server *Server) handlePartnerSubscriptionsCreate(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	body := getRequestBody(response, request)
+	if body == nil {
+		return
+	}
+
+	partnerController := NewPartnerController(foundReferential)
+	id := request.PathValue("id")
+	partnerController.(SubscriptionResource).SubscriptionsCreate(response, id, body)
+}
+
+func (server *Server) handlePartnerSubscriptionsDelete(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	partnerController := NewPartnerController(foundReferential)
+	id := request.PathValue("id")
+	subscriptionId := request.PathValue("subscription_id")
+	partnerController.(SubscriptionResource).SubscriptionsDelete(response, id, subscriptionId)
 }

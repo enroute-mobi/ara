@@ -172,7 +172,8 @@ func Test_ReferentialController_Update(t *testing.T) {
 func Test_ReferentialController_Show(t *testing.T) {
 	// Send request
 	referential, responseRecorder, server, request := referentialPrepareRequest("GET", true, nil, t)
-	request.SetPathValue("id", string(referential.Id()))
+	request.SetPathValue("model", string(referential.Id()))
+	request.SetPathValue("referential_slug", "_referentials")
 	server.handleReferentialGet(responseRecorder, request)
 
 	// Test response

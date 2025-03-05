@@ -33,6 +33,11 @@ type RestfulResource interface {
 	Create(response http.ResponseWriter, body []byte)
 }
 
+type SubscriptionResource interface {
+	SubscriptionsIndex(response http.ResponseWriter, identifier string)
+	SubscriptionsCreate(response http.ResponseWriter, identifier string, body []byte)
+	SubscriptionsDelete(response http.ResponseWriter, identifier string, subscriptionId string)
+}
 type ActionResource interface {
 	Action(response http.ResponseWriter, requestData *RequestData)
 }

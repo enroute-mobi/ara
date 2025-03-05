@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/stretchr/testify/require"
 )
@@ -56,8 +57,6 @@ func preparePartnerRequest(method string, sendIdentifier bool, body []byte, t *t
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	fmt.Printf(" ----------------- Method: %s", method)
 	request.SetPathValue("referential_slug", string(referential.Slug()))
 	request.SetPathValue("model", "partners")
 	switch method {
@@ -83,26 +82,37 @@ func preparePartnerRequest(method string, sendIdentifier bool, body []byte, t *t
 	return
 }
 
-// func Test_PartnerController_Action_Subscriber(t *testing.T) {
-// 	rdata := &RequestTestData{}
-// 	server, referential := createReferential()
-// 	partner := createPartner(referential)
+// func Test_PartnerController_SubscriptionsIndex(t *testing.T) {
+// 	// Send request
+// 	partner, responseRecorder, referential := preparePartnerRequest("GET", true, nil, t)
 
-// 	rdata.Id = string(partner.Id())
-// 	rdata.Method = "GET"
-// 	rdata.Action = "subscriptions"
-// 	rdata.Server = server
+// 	// Check response
+// 	checkPartnerResponseStatus(responseRecorder, t)
 
-// 	sub := partner.Subscriptions()
-// 	sub.New("kind")
+// 	// Create Subscription
+// 	subscripions := partner.Subscriptions()
+// 	subscription := subscripions.New("kind")
+// 	subscription.Save()
 
-// 	responseRecorder := sendRequest(rdata, t)
-// 	partnerCheckResponseStatus(responseRecorder, t)
+// 	address := []byte("/default/partners")
+// 	address = append(address, fmt.Sprintf("/%s", subscription.Id())...)
+
+// 	request, err := http.NewRequest("GET", string(address), bytes.NewReader(body))
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	request.Header.Set("Authorization", "Token token=testToken")
+
+// 	// Create a ResponseRecorder
+// 	responseRecorder = httptest.NewRecorder()
+
+// 	// sending request
+// 	request.SetPathValue("referential_slug", string(referential.Slug()))
+// 	request.SetPathValue("model", "partners")
 
 // 	if len(partner.Subscriptions().FindAll()) != 1 {
 // 		t.Errorf("Should find one subscription")
 // 	}
-
 // }
 
 func Test_PartnerController_Delete(t *testing.T) {
@@ -145,9 +155,9 @@ func Test_PartnerController_Update(t *testing.T) {
 	if expected, _ := updatedPartner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
 		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
 	}
-	// if len(partner.Subscriptions().FindAll()) > 0 {
-	// 	t.Errorf("All subscription should be deleted after a partenr Edit")
-	// }
+	if len(partner.Subscriptions().FindAll()) > 0 {
+		t.Errorf("All subscription should be deleted after a partenr Edit")
+	}
 }
 
 func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
@@ -175,7 +185,7 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 
 func Test_PartnerController_Show(t *testing.T) {
 	// Send request
-	partner, responseRecorder, _ := prepareLineRequest("GET", true, nil, t)
+	partner, responseRecorder, _ := preparePartnerRequest("GET", true, nil, t)
 
 	// Check response
 	checkPartnerResponseStatus(responseRecorder, t)
@@ -237,7 +247,7 @@ func Test_PartnerController_Create_Invalid(t *testing.T) {
 
 func Test_PartnerController_Index(t *testing.T) {
 	// Send request
-	_, responseRecorder, _ := preparePartnerRequest("POST", false, nil, t)
+	_, responseRecorder, _ := preparePartnerRequest("GET", false, nil, t)
 
 	// Rest response
 	checkPartnerResponseStatus(responseRecorder, t)
@@ -272,59 +282,60 @@ func Test_PartnerController_Index(t *testing.T) {
 // 	}
 // }
 
-// func Test_PartnerController_Save(t *testing.T) {
-// 	model.InitTestDb(t)
-// 	defer model.CleanTestDb(t)
+func Test_PartnerController_Save(t *testing.T) {
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
 
-// 	// Create a referential
-// 	referentials := core.NewMemoryReferentials()
-// 	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-// 	server := &Server{}
-// 	server.SetReferentials(referentials)
-// 	referential := referentials.New("default")
-// 	referential.Tokens = []string{"testToken"}
-// 	referential.Save()
-// 	status, refErr := referentials.SaveToDatabase()
-// 	if status != 200 {
-// 		t.Fatalf("Cannot save referentials to Database: %v", refErr)
-// 	}
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+	status, refErr := referentials.SaveToDatabase()
+	if status != 200 {
+		t.Fatalf("Cannot save referentials to Database: %v", refErr)
+	}
 
-// 	// Initialize the partners manager
-// 	referential.Partners().SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-// 	// Save a new partner
-// 	partner := referential.Partners().New("First Partner")
-// 	referential.Partners().Save(partner)
+	// Initialize the partners manager
+	referential.Partners().SetUUIDGenerator(uuid.NewRealUUIDGenerator())
+	// Save a new partner
+	partner := referential.Partners().New("First Partner")
+	referential.Partners().Save(partner)
 
-// 	// Create a request
-// 	request, err := http.NewRequest("POST", "/default/partners/save", nil)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	request.Header.Set("Authorization", "Token token=testToken")
+	// Create a request
+	request, err := http.NewRequest("POST", "/default/partners/save", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Authorization", "Token token=testToken")
 
-// 	// Create a ResponseRecorder
-// 	responseRecorder := httptest.NewRecorder()
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
 
-// 	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-// 	server.HandleFlow(responseRecorder, request)
+	// Call HandleFlow method and pass in our Request and ResponseRecorder.
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	server.handleReferentialPartnerSave(responseRecorder, request)
 
-// 	// Test response
-// 	partnerCheckResponseStatus(responseRecorder, t)
+	// Test response
+	checkPartnerResponseStatus(responseRecorder, t)
 
-// 	//Test Results
-// 	selectPartners := []model.SelectPartner{}
-// 	sqlQuery := "select * from partners"
-// 	_, err = model.Database.Select(&selectPartners, sqlQuery)
-// 	if err != nil {
-// 		t.Fatalf("Error while fetching partners: %v", err)
-// 	}
-// 	if len(selectPartners) == 0 {
-// 		t.Fatal("Partner should be found")
-// 	}
-// 	if selectPartners[0].Id != string(partner.Id()) {
-// 		t.Errorf("Saved partner has wrong id, got: %v want: %v", selectPartners[0].Id, partner.Id())
-// 	}
-// 	if selectPartners[0].ReferentialId != string(referential.Id()) {
-// 		t.Errorf("Saved partner has wrong referential id, got: %v want: %v", selectPartners[0].ReferentialId, referential.Id())
-// 	}
-// }
+	//Test Results
+	selectPartners := []model.SelectPartner{}
+	sqlQuery := "select * from partners"
+	_, err = model.Database.Select(&selectPartners, sqlQuery)
+	if err != nil {
+		t.Fatalf("Error while fetching partners: %v", err)
+	}
+	if len(selectPartners) == 0 {
+		t.Fatal("Partner should be found")
+	}
+	if selectPartners[0].Id != string(partner.Id()) {
+		t.Errorf("Saved partner has wrong id, got: %v want: %v", selectPartners[0].Id, partner.Id())
+	}
+	if selectPartners[0].ReferentialId != string(referential.Id()) {
+		t.Errorf("Saved partner has wrong referential id, got: %v want: %v", selectPartners[0].ReferentialId, referential.Id())
+	}
+}
