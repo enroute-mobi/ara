@@ -10,18 +10,15 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkOperatorResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareOperatorRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (operator *model.Operator, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -80,6 +77,8 @@ func prepareOperatorRequest(method string, sendIdentifier bool, body []byte, t *
 }
 
 func Test_OperatorController_Delete(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	operator, responseRecorder, referential := prepareOperatorRequest("DELETE", true, nil, t)
 
@@ -88,15 +87,16 @@ func Test_OperatorController_Delete(t *testing.T) {
 
 	//Test Results
 	_, ok := referential.Model().Operators().Find(operator.Id())
-	if ok {
-		t.Errorf("Operator shouldn't be found after DELETE request")
-	}
-	if expected, _ := operator.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.False(ok, "Operator shouldn't be found after DELETE request")
+
+	expected, err := operator.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_OperatorController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Name":"OperatorName",
                   "Code": { "CodeSpace": "value" }}`)
@@ -107,16 +107,16 @@ func Test_OperatorController_Update(t *testing.T) {
 
 	// Test Results
 	updatedOperator, ok := referential.Model().Operators().Find(operator.Id())
-	if !ok {
-		t.Errorf("Operator should be found after PUT request")
-	}
+	assert.True(ok, "Operator should be found after PUT request")
 
-	if expected, _ := updatedOperator.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected, err := updatedOperator.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_OperatorController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	operator, responseRecorder, _ := prepareOperatorRequest("GET", true, nil, t)
 
@@ -124,12 +124,13 @@ func Test_OperatorController_Show(t *testing.T) {
 	checkOperatorResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := operator.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedOperator, _ := operator.MarshalJSON()
+	assert.JSONEq(string(expectedOperator), responseRecorder.Body.String())
 }
 
 func Test_OperatorController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{
 		"Name":"OperatorName"}`)
@@ -141,18 +142,16 @@ func Test_OperatorController_Create(t *testing.T) {
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// operator should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	operator, ok := referential.Model().Operators().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("Operator should be found after POST request")
-	}
-	operatorMarshal, _ := operator.MarshalJSON()
+	_, ok := referential.Model().Operators().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	assert.True(ok, "Operator should be found after POST request")
+
 	expected := `{"Name":"OperatorName","Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
-	if responseRecorder.Body.String() != string(expected) && string(operatorMarshal) != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_OperatorController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareOperatorRequest("GET", false, nil, t)
 
@@ -161,7 +160,5 @@ func Test_OperatorController_Index(t *testing.T) {
 
 	//Test Results
 	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
