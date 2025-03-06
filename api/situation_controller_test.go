@@ -10,18 +10,15 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkSituationResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (situation model.Situation, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -79,6 +76,8 @@ func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t 
 }
 
 func Test_SituationController_Delete(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	situation, responseRecorder, referential := prepareSituationRequest("DELETE", true, nil, t)
 
@@ -87,15 +86,16 @@ func Test_SituationController_Delete(t *testing.T) {
 
 	//Test Results
 	_, ok := referential.Model().Situations().Find(situation.Id())
-	if ok {
-		t.Errorf("Situation shouldn't be found after DELETE request")
-	}
-	if expected, _ := situation.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.False(ok, "Situation shouldn't be found after DELETE request")
+
+	expected, err := situation.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_SituationController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Summary":{"DefaultValue":"Noel"},
 "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" },
@@ -107,16 +107,16 @@ func Test_SituationController_Update(t *testing.T) {
 
 	// Test Results
 	updatedSituation, ok := referential.Model().Situations().Find(situation.Id())
-	if !ok {
-		t.Errorf("Situation should be found after PUT request")
-	}
+	assert.True(ok, "Situation should be found after PUT request")
 
-	if expected, _ := updatedSituation.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected, err := updatedSituation.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_SituationController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	situation, responseRecorder, _ := prepareSituationRequest("GET", true, nil, t)
 
@@ -124,12 +124,14 @@ func Test_SituationController_Show(t *testing.T) {
 	checkSituationResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := situation.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected, err := situation.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_SituationController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Summary":{"DefaultValue":"Noel"},
                 "Affects" : [{"LineId":"lol","Type": "Line"}],
@@ -143,18 +145,16 @@ func Test_SituationController_Create(t *testing.T) {
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// situation should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	situation, ok := referential.Model().Situations().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("Situation should be found after POST request")
-	}
-	situationMarshal, _ := situation.MarshalJSON()
+	_, ok := referential.Model().Situations().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	assert.True(ok, "Situation should be found after POST request")
+
 	expected := `{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"Origin":"","ValidityPeriods":null,"PublicationWindows":null,"Summary":{"DefaultValue":"Noel"},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Affects":[{"Type":"Line","LineId":"lol"}]}`
-	if responseRecorder.Body.String() != string(expected) && string(situationMarshal) != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_SituationController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareSituationRequest("GET", false, nil, t)
 
@@ -163,7 +163,5 @@ func Test_SituationController_Index(t *testing.T) {
 
 	//Test Results
 	expected := `[{"Origin":"","ValidityPeriods":null,"PublicationWindows":null,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
