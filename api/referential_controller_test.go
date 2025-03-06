@@ -17,6 +17,8 @@ import (
 )
 
 func TestTokens(t *testing.T) {
+	require := require.New(t)
+
 	// Initialize referential manager
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -30,18 +32,14 @@ func TestTokens(t *testing.T) {
 
 	// Create a request
 	request, err := http.NewRequest("GET", "/first_referential/partners", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
+
 	responseRecorder := httptest.NewRecorder()
 	request.SetPathValue("referential_slug", "first_referential")
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status == http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-		panic(responseRecorder.Body)
-	}
+	require.Equal(http.StatusUnauthorized, responseRecorder.Code)
 
 	referential.Tokens = []string{"12345"}
 	referential.ImportTokens = []string{"23456"}
@@ -52,9 +50,7 @@ func TestTokens(t *testing.T) {
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status == http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-	}
+	require.Equal(http.StatusUnauthorized, responseRecorder.Code)
 
 	request.Header.Set("Authorization", "Token token=12345")
 
@@ -63,9 +59,7 @@ func TestTokens(t *testing.T) {
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
 
 	request.Header.Set("Authorization", "Token token=23456")
 
@@ -74,9 +68,7 @@ func TestTokens(t *testing.T) {
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status == http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-	}
+	require.Equal(http.StatusUnauthorized, responseRecorder.Code)
 }
 
 func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
