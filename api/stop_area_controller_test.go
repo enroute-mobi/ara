@@ -127,6 +127,8 @@ func Test_StopAreaController_Show(t *testing.T) {
 }
 
 func Test_StopAreaController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Name": "test" }`)
 	_, responseRecorder, referential := prepareStopAreaRequest("POST", false, body, t)
@@ -138,18 +140,17 @@ func Test_StopAreaController_Create(t *testing.T) {
 	// Using the fake uuid generator, the uuid of the created
 	// stopArea should be 6ba7b814-9dad-11d1-1-00c04fd430c8
 	stopArea, ok := referential.Model().StopAreas().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("StopArea should be found after POST request")
-	}
-	if expected := "test"; stopArea.Name != expected {
-		t.Errorf("Invalid stopArea name after POST request:\n got: %v\n want: %v", stopArea.Name, expected)
-	}
-	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.True(ok, "StopArea should be found after POST request")
+	assert.Equal("test", stopArea.Name)
+
+	expectedStopArea, err := stopArea.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expectedStopArea), responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareStopAreaRequest("GET", false, nil, t)
 
@@ -158,12 +159,12 @@ func Test_StopAreaController_Index(t *testing.T) {
 
 	//Test Results
 	expected := `[{"Origins":{},"Name":"First StopArea","CollectChildren":false,"CollectSituations":false,"CollectedAlways":true,"Monitored":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_FindStopArea(t *testing.T) {
+	assert := assert.New(t)
+
 	ref := core.NewMemoryReferentials().New("test")
 
 	stopArea := ref.Model().StopAreas().New()
@@ -176,12 +177,8 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 	}
 
 	_, ok := controller.findStopArea("codeSpace:value")
-	if !ok {
-		t.Error("Can't find StopArea by Code")
-	}
+	assert.True(ok, "Can't find StopArea by Code")
 
 	_, ok = controller.findStopArea(string(stopArea.Id()))
-	if !ok {
-		t.Error("Can't find StopArea by Id")
-	}
+	assert.True(ok, "Can't find StopArea by Id")
 }
