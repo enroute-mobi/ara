@@ -12,18 +12,14 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkStopVisitResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopVisit *model.StopVisit, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -85,6 +81,8 @@ func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t 
 }
 
 func Test_StopVisitController_Delete(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	stopVisit, responseRecorder, referential := prepareStopVisitRequest("DELETE", true, nil, t)
 
@@ -93,15 +91,16 @@ func Test_StopVisitController_Delete(t *testing.T) {
 
 	//Test Results
 	_, ok := referential.Model().StopVisits().Find(stopVisit.Id())
-	if ok {
-		t.Errorf("StopVisit shouldn't be found after DELETE request")
-	}
-	if expected, _ := stopVisit.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.False(ok, "StopVisit shouldn't be found after DELETE request")
+
+	expected, err := stopVisit.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_StopVisitController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	stopVisit, responseRecorder, referential := prepareStopVisitRequest("PUT", true, body, t)
@@ -111,16 +110,16 @@ func Test_StopVisitController_Update(t *testing.T) {
 
 	// Test Results
 	updatedStopVisit, ok := referential.Model().StopVisits().Find(stopVisit.Id())
-	if !ok {
-		t.Errorf("StopVisit should be found after PUT request")
-	}
+	assert.True(ok, "StopVisit should be found after PUT request")
 
-	if expected, _ := updatedStopVisit.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected, err := updatedStopVisit.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_StopVisitController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	stopVisit, responseRecorder, _ := prepareStopVisitRequest("GET", true, nil, t)
 
@@ -128,12 +127,13 @@ func Test_StopVisitController_Show(t *testing.T) {
 	checkStopVisitResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := stopVisit.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedStopVisit, _ := stopVisit.MarshalJSON()
+	assert.JSONEq(string(expectedStopVisit), responseRecorder.Body.String())
 }
 
 func Test_StopVisitController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareStopVisitRequest("POST", false, body, t)
@@ -145,12 +145,12 @@ func Test_StopVisitController_Create(t *testing.T) {
 	// Using the fake uuid generator, the uuid of the created
 	// stopVisit should be 6ba7b814-9dad-11d1-2-00c04fd430c8
 	stopVisit, ok := referential.Model().StopVisits().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("StopVisit should be found after POST request")
-	}
-	if expected, _ := stopVisit.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.True(ok, "StopVisit should be found after POST request")
+
+	expected := `{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"Origin":"","VehicleAtStop":false,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Collected":false}`
+	stopVisitMarshal, err := stopVisit.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(expected, string(stopVisitMarshal))
 }
 
 func Test_StopVisitController_Index(t *testing.T) {
@@ -174,6 +174,8 @@ func Test_StopVisitController_Index(t *testing.T) {
 }
 
 func Test_StopVisitController_FindStopVisit(t *testing.T) {
+	assert := assert.New(t)
+
 	ref := core.NewMemoryReferentials().New("test")
 	stopVisit := ref.Model().StopVisits().New()
 	code := model.NewCode("codeSpace", "stif:value")
@@ -185,14 +187,10 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 	}
 
 	_, ok := controller.findStopVisit("codeSpace:stif:value")
-	if !ok {
-		t.Error("Can't find StopVisit by Code")
-	}
+	assert.True(ok, "Can't find StopVisit by Code")
 
 	_, ok = controller.findStopVisit(string(stopVisit.Id()))
-	if !ok {
-		t.Error("Can't find StopVisit by Id")
-	}
+	assert.True(ok, "Can't find StopVisit by Id")
 }
 
 func benchmarkStopVisitsIndex(sv int, b *testing.B) {
