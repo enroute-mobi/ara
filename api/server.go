@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
 )
@@ -131,20 +132,38 @@ func (server *Server) isAuthForImport(referential *core.Referential, request *ht
 	return slices.Contains(referential.ImportTokens, authToken)
 }
 
-func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
+func (server *Server) referentialSetup(response http.ResponseWriter, request *http.Request) (controller *ReferentialController) {
+	defer monitoring.HandleHttpPanic(response)
 
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller = NewReferentialController(server)
+	return
+}
+
+func (server *Server) referentialModelSetup(response http.ResponseWriter, request *http.Request) (controller RestfulResource, model string) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
 	}
+
 	if !server.isAuth(foundReferential, request) {
 		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
 
-	model := request.PathValue("model")
+	model = request.PathValue("model")
 	newController, ok := newWithReferentialControllerMap[model]
 	if !ok {
 		http.Error(response, "Invalid ressource", http.StatusBadRequest)
@@ -154,106 +173,66 @@ func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, 
 	response.Header().Set("Server", version.ApplicationName())
 	response.Header().Set("Content-Type", "application/json")
 
+	controller = newController(foundReferential)
+
+	return
+}
+
+func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, request *http.Request) {
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
+		return
+	}
+
 	logger.Log.Debugf("%s controller Index request: %v", model, request)
 
-	controller := newController(foundReferential)
 	controller.Index(response)
 }
 
 func (server *Server) handleReferentialModelShow(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
-	if foundReferential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
 		return
 	}
-	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		return
-	}
-
-	model := request.PathValue("model")
-	newController, ok := newWithReferentialControllerMap[model]
-	if !ok {
-		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-		return
-	}
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
 
 	logger.Log.Debugf("%s controller Show request: %v", model, request)
 
-	controller := newController(foundReferential)
 	id := request.PathValue("id")
 	controller.Show(response, id)
 }
 
 func (server *Server) handleReferentialModelCreate(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
-	if foundReferential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
-		return
-	}
-	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
 		return
 	}
 
-	model := request.PathValue("model")
-	newController, ok := newWithReferentialControllerMap[model]
-	if !ok {
-		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-		return
-	}
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	logger.Log.Debugf("%s controller Show request: %v", model, request)
+	logger.Log.Debugf("%s controller Delete request: %v", model, request)
 
 	body := getRequestBody(response, request)
 	if body == nil {
 		return
 	}
 
-	controller := newController(foundReferential)
+	logger.Log.Debugf("%s controller Create request: %v", model, request)
+
 	controller.Create(response, body)
 }
 
 func (server *Server) handleReferentialModelUpdate(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
-	if foundReferential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
 		return
 	}
-	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		return
-	}
-
-	model := request.PathValue("model")
-	newController, ok := newWithReferentialControllerMap[model]
-	if !ok {
-		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-		return
-	}
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	logger.Log.Debugf("%s controller Update request: %v", model, request)
-
-	controller := newController(foundReferential)
-	id := request.PathValue("id")
 
 	body := getRequestBody(response, request)
 	if body == nil {
 		return
 	}
 
+	logger.Log.Debugf("%s controller Update request: %v", model, request)
+
+	id := request.PathValue("id")
 	controller.Update(response, id, body)
 }
 
@@ -279,32 +258,14 @@ func (server *Server) handleReferentialPartnerSave(response http.ResponseWriter,
 }
 
 func (server *Server) handleReferentialModelDelete(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
-	if foundReferential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
 		return
 	}
-	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		return
-	}
-
-	model := request.PathValue("model")
-	newController, ok := newWithReferentialControllerMap[model]
-	if !ok {
-		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-		return
-	}
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
 
 	logger.Log.Debugf("%s controller Delete request: %v", model, request)
 
-	controller := newController(foundReferential)
 	id := request.PathValue("id")
-
 	controller.Delete(response, id)
 }
 
@@ -331,51 +292,27 @@ func (server *Server) handleReferentialImport(response http.ResponseWriter, requ
 }
 
 func (server *Server) handleReferentialIndex(response http.ResponseWriter, request *http.Request) {
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-		return
-	}
+	controller := server.referentialSetup(response, request)
 
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
 	controller.Index(response)
 }
 
 func (server *Server) handleReferentialCreate(response http.ResponseWriter, request *http.Request) {
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-		return
-	}
+	controller := server.referentialSetup(response, request)
 
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
 	controller.Create(response, request)
 }
 
 func (server *Server) handleReferentialGet(response http.ResponseWriter, request *http.Request) {
-	model := request.PathValue("model")
+	data := request.PathValue("model")
 	referentialSlug := request.PathValue("referential_slug")
-	if model == "gtfs" && referentialSlug != "_referentials" {
+	if data == "gtfs" && referentialSlug != "_referentials" {
 		server.handleGtfs(response, request)
 	}
 
 	if referentialSlug == "_referentials" {
-		if !server.isAdmin(request) {
-			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-			logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-			return
-		}
-
-		response.Header().Set("Server", version.ApplicationName())
-		response.Header().Set("Content-Type", "application/json")
-		controller := NewReferentialController(server)
-		controller.Show(response, model)
+		controller := server.referentialSetup(response, request)
+		controller.Show(response, data)
 		return
 	}
 
@@ -383,73 +320,45 @@ func (server *Server) handleReferentialGet(response http.ResponseWriter, request
 }
 
 func (server *Server) handleReferentialUpdate(response http.ResponseWriter, request *http.Request) {
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-		return
-	}
+	controller := server.referentialSetup(response, request)
 
 	id := request.PathValue("id")
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
 	controller.Update(response, request, id)
 }
 
 func (server *Server) handleReferentialDelete(response http.ResponseWriter, request *http.Request) {
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-		return
-	}
+	controller := server.referentialSetup(response, request)
 
 	id := request.PathValue("id")
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
 	controller.Delete(response, id)
 }
 
 func (server *Server) handleReferentialSave(response http.ResponseWriter, request *http.Request) {
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-		return
-	}
+	controller := server.referentialSetup(response, request)
 
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
 	controller.Save(response)
 }
 
 func (server *Server) handleReferentialReload(response http.ResponseWriter, request *http.Request) {
-	if !server.isAdmin(request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-		return
-	}
+	controller := server.referentialSetup(response, request)
 
 	id := request.PathValue("id")
-
-	response.Header().Set("Server", version.ApplicationName())
-	response.Header().Set("Content-Type", "application/json")
-
-	controller := NewReferentialController(server)
 	controller.reload(id, response)
 }
 
 func (server *Server) handleStatus(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
 	controller := NewStatusController(server)
 	controller.serve(response, request)
 }
 
 func (server *Server) handleTimeGet(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	response.Header().Set("Server", version.ApplicationName())
 	response.Header().Set("Content-Type", "application/json")
 
@@ -458,6 +367,8 @@ func (server *Server) handleTimeGet(response http.ResponseWriter, request *http.
 }
 
 func (server *Server) handleTimeAdvance(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	response.Header().Set("Server", version.ApplicationName())
 	response.Header().Set("Content-Type", "application/json")
 
@@ -466,6 +377,8 @@ func (server *Server) handleTimeAdvance(response http.ResponseWriter, request *h
 }
 
 func (server *Server) handleSIRILite(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 
@@ -476,6 +389,8 @@ func (server *Server) handleSIRILite(response http.ResponseWriter, request *http
 }
 
 func (server *Server) HandleSIRI(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 
@@ -488,6 +403,8 @@ func (server *Server) HandleSIRI(response http.ResponseWriter, request *http.Req
 }
 
 func (server *Server) handlePush(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
@@ -504,6 +421,8 @@ func (server *Server) handlePush(response http.ResponseWriter, request *http.Req
 }
 
 func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
@@ -522,6 +441,8 @@ func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Req
 }
 
 func (server *Server) handleGraphql(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
@@ -537,7 +458,9 @@ func (server *Server) handleGraphql(response http.ResponseWriter, request *http.
 	graphqlHandler.serve(response, request)
 }
 
-func (server *Server) handlePartnerSubscriptionsIndex(response http.ResponseWriter, request *http.Request) {
+func (server *Server) partnerSubscriptionsSetup(response http.ResponseWriter, request *http.Request) (controller RestfulResource) {
+	defer monitoring.HandleHttpPanic(response)
+
 	referentialSlug := request.PathValue("referential_slug")
 	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
@@ -550,49 +473,39 @@ func (server *Server) handlePartnerSubscriptionsIndex(response http.ResponseWrit
 		return
 	}
 
-	partnerController := NewPartnerController(foundReferential)
+	controller = NewPartnerController(foundReferential)
+	return
+}
+
+func (server *Server) handlePartnerSubscriptionsIndex(response http.ResponseWriter, request *http.Request) {
+	controller := server.partnerSubscriptionsSetup(response, request)
+
+	logger.Log.Debugf("Partner Subscriptions controller Index request: %v", request)
+
 	id := request.PathValue("id")
-	partnerController.(SubscriptionResource).SubscriptionsIndex(response, id)
+	controller.(SubscriptionResource).SubscriptionsIndex(response, id)
 }
 
 func (server *Server) handlePartnerSubscriptionsCreate(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
-	if foundReferential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
-		return
-	}
-
-	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		return
-	}
+	controller := server.partnerSubscriptionsSetup(response, request)
 
 	body := getRequestBody(response, request)
 	if body == nil {
 		return
 	}
 
-	partnerController := NewPartnerController(foundReferential)
+	logger.Log.Debugf("Partner Subscriptions controller Create request: %v", request)
+
 	id := request.PathValue("id")
-	partnerController.(SubscriptionResource).SubscriptionsCreate(response, id, body)
+	controller.(SubscriptionResource).SubscriptionsCreate(response, id, body)
 }
 
 func (server *Server) handlePartnerSubscriptionsDelete(response http.ResponseWriter, request *http.Request) {
-	referentialSlug := request.PathValue("referential_slug")
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
-	if foundReferential == nil {
-		http.Error(response, "Referential not found", http.StatusNotFound)
-		return
-	}
+	controller := server.partnerSubscriptionsSetup(response, request)
 
-	if !server.isAuth(foundReferential, request) {
-		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-		return
-	}
+	logger.Log.Debugf("Partner Subscriptions controller Delete request: %v", request)
 
-	partnerController := NewPartnerController(foundReferential)
-	id := request.PathValue("id")
 	subscriptionId := request.PathValue("subscription_id")
-	partnerController.(SubscriptionResource).SubscriptionsDelete(response, id, subscriptionId)
+	id := request.PathValue("id")
+	controller.(SubscriptionResource).SubscriptionsDelete(response, id, subscriptionId)
 }

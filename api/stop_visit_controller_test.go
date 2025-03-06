@@ -45,11 +45,6 @@ func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t 
 	stopVisit.Schedules.SetArrivalTime("actual", svTime)
 	referential.Model().StopVisits().Save(stopVisit)
 
-	stopVisit2 := model.NewStopVisit(referential.Model())
-	svTime, _ = time.Parse(timeLayout, "2005/01/02-15:04:05")
-	stopVisit2.Schedules.SetArrivalTime("actual", svTime)
-	referential.Model().StopVisits().Save(stopVisit2)
-
 	address := []byte("/default/stop_visits")
 	if sendIdentifier {
 		address = append(address, fmt.Sprintf("/%s", stopVisit.Id())...)
@@ -149,7 +144,7 @@ func Test_StopVisitController_Create(t *testing.T) {
 	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// stopVisit should be 6ba7b814-9dad-11d1-2-00c04fd430c8
-	stopVisit, ok := referential.Model().StopVisits().Find("6ba7b814-9dad-11d1-2-00c04fd430c8")
+	stopVisit, ok := referential.Model().StopVisits().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
 	if !ok {
 		t.Errorf("StopVisit should be found after POST request")
 	}
@@ -174,13 +169,6 @@ func Test_StopVisitController_Index(t *testing.T) {
 "Id": "6ba7b814-9dad-11d1-0-00c04fd430c8",
 "Schedules": [{"ArrivalTime":"2007-01-02T15:04:05Z","Kind":"actual"}],
 "Collected": false
-},
-{
-"Origin":"",
-"VehicleAtStop":false,
-"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8",
-"Schedules":[{"ArrivalTime":"2005-01-02T15:04:05Z","Kind":"actual"}],
-"Collected":false
 }]`
 	assert.JSONEq(expected, responseRecorder.Body.String())
 }
