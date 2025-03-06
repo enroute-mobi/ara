@@ -10,18 +10,15 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkVehicleResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareVehicleRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicle *model.Vehicle, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -82,23 +79,24 @@ func prepareVehicleRequest(method string, sendIdentifier bool, body []byte, t *t
 }
 
 func Test_VehicleController_Delete(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	vehicle, responseRecorder, referential := prepareVehicleRequest("DELETE", true, nil, t)
 
 	// Test response
 	checkVehicleResponseStatus(responseRecorder, t)
 
-	//Test Results
 	_, ok := referential.Model().Vehicles().Find(vehicle.Id())
-	if ok {
-		t.Errorf("Vehicle shouldn't be found after DELETE request")
-	}
-	if expected, _ := vehicle.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.False(ok, "Vehicle shouldn't be found after DELETE request")
+
+	expectedVehicle, _ := vehicle.MarshalJSON()
+	assert.JSONEq(string(expectedVehicle), responseRecorder.Body.String())
 }
 
 func Test_VehicleController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Bearing": 13.3 }`)
 	vehicle, responseRecorder, referential := prepareVehicleRequest("PUT", true, body, t)
@@ -108,19 +106,16 @@ func Test_VehicleController_Update(t *testing.T) {
 
 	// Test Results
 	updatedVehicle, ok := referential.Model().Vehicles().Find(vehicle.Id())
-	if !ok {
-		t.Errorf("Vehicle should be found after PUT request")
-	}
+	assert.True(ok, "Vehicle should be found after PUT request")
+	assert.Equal(13.3, updatedVehicle.Bearing)
 
-	if expected := 13.3; updatedVehicle.Bearing != expected {
-		t.Errorf("Vehicle bearing should be updated after PUT request:\n got: %v\n want: %v", updatedVehicle.Bearing, expected)
-	}
-	if expected, _ := updatedVehicle.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedVehicle, _ := updatedVehicle.MarshalJSON()
+	assert.JSONEq(string(expectedVehicle), responseRecorder.Body.String())
 }
 
 func Test_VehicleController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	vehicle, responseRecorder, _ := prepareVehicleRequest("GET", true, nil, t)
 
@@ -128,12 +123,13 @@ func Test_VehicleController_Show(t *testing.T) {
 	checkVehicleResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := vehicle.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedVehicle, _ := vehicle.MarshalJSON()
+	assert.JSONEq(string(expectedVehicle), responseRecorder.Body.String())
 }
 
 func Test_VehicleController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Bearing": 1.234 }`)
 	_, responseRecorder, referential := prepareVehicleRequest("POST", false, body, t)
@@ -145,18 +141,16 @@ func Test_VehicleController_Create(t *testing.T) {
 	// Using the fake uuid generator, the uuid of the created
 	// vehicle should be 6ba7b814-9dad-11d1-1-00c04fd430c8
 	vehicle, ok := referential.Model().Vehicles().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("Vehicle should be found after POST request")
-	}
-	if expected := 1.234; vehicle.Bearing != expected {
-		t.Errorf("Invalid vehicle bearing after POST request:\n got: %v\n want: %v", vehicle.Bearing, expected)
-	}
-	if expected, _ := vehicle.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.True(ok, "Vehicle should be found after POST request")
+	assert.Equal(1.234, vehicle.Bearing)
+
+	expectedVehicle, _ := vehicle.MarshalJSON()
+	assert.JSONEq(string(expectedVehicle), responseRecorder.Body.String())
 }
 
 func Test_VehicleController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareVehicleRequest("GET", false, nil, t)
 
@@ -165,13 +159,14 @@ func Test_VehicleController_Index(t *testing.T) {
 
 	//Test Results
 	expected := `[{"RecordedAtTime":"0001-01-01T00:00:00Z","ValidUntilTime":"0001-01-01T00:00:00Z","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_VehicleController_FindVehicle(t *testing.T) {
+	assert := assert.New(t)
+
 	ref := core.NewMemoryReferentials().New("test")
+
 	vehicle := ref.Model().Vehicles().New()
 	code := model.NewCode("codeSpace", "value")
 	vehicle.SetCode(code)
@@ -182,12 +177,8 @@ func Test_VehicleController_FindVehicle(t *testing.T) {
 	}
 
 	_, ok := controller.findVehicle("codeSpace:value")
-	if !ok {
-		t.Error("Can't find Vehicle by Code")
-	}
+	assert.True(ok, "Can't find Vehicle by Code")
 
 	_, ok = controller.findVehicle(string(vehicle.Id()))
-	if !ok {
-		t.Error("Can't find Vehicle by Id")
-	}
+	assert.True(ok, "Can't find Vehicle by Id")
 }
