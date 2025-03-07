@@ -32,7 +32,6 @@ func (handler *SIRILiteHandler) requestHandler(resource string, filters url.Valu
 	switch resource {
 	case "vehicle-monitoring.json":
 		return &SIRILiteVehicleMonitoringRequestHandler{
-			// requestUrl:  requestData.Url,
 			filters:     filters,
 			referential: handler.referential,
 		}
