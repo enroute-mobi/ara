@@ -10,6 +10,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -82,40 +83,149 @@ func preparePartnerRequest(method string, sendIdentifier bool, body []byte, t *t
 	return
 }
 
-// func Test_PartnerController_SubscriptionsIndex(t *testing.T) {
-// 	// Send request
-// 	partner, responseRecorder, referential := preparePartnerRequest("GET", true, nil, t)
+func Test_PartnerController_SubscriptionsCreate(t *testing.T) {
+	assert := assert.New(t)
 
-// 	// Check response
-// 	checkPartnerResponseStatus(responseRecorder, t)
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
 
-// 	// Create Subscription
-// 	subscripions := partner.Subscriptions()
-// 	subscription := subscripions.New("kind")
-// 	subscription.Save()
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	// Save a new Partner
+	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	partner := referential.Partners().New("first_partner")
+	referential.Partners().Save(partner)
 
-// 	address := []byte("/default/partners")
-// 	address = append(address, fmt.Sprintf("/%s", subscription.Id())...)
+	address := []byte("/default/partners")
+	address = append(address, fmt.Sprintf("/%s", partner.Slug())...)
 
-// 	request, err := http.NewRequest("GET", string(address), bytes.NewReader(body))
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	request.Header.Set("Authorization", "Token token=testToken")
+	body := []byte(`{ "Kind": "kind"}`)
 
-// 	// Create a ResponseRecorder
-// 	responseRecorder = httptest.NewRecorder()
+	request, err := http.NewRequest("GET", string(address), bytes.NewReader(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Authorization", "Token token=testToken")
 
-// 	// sending request
-// 	request.SetPathValue("referential_slug", string(referential.Slug()))
-// 	request.SetPathValue("model", "partners")
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
 
-// 	if len(partner.Subscriptions().FindAll()) != 1 {
-// 		t.Errorf("Should find one subscription")
-// 	}
-// }
+	// sending request
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("id", "first_partner")
+
+	server.handlePartnerSubscriptionsCreate(responseRecorder, request)
+
+	assert.Equal(http.StatusOK, responseRecorder.Code)
+	assert.Len(partner.Subscriptions().FindAll(), 1)
+
+	subscription := partner.Subscriptions().FindAll()[0]
+	assert.Equal("kind", subscription.Kind())
+}
+
+func Test_PartnerController_SubscriptionsIndex(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	// Save a new Partner
+	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	partner := referential.Partners().New("first_partner")
+	referential.Partners().Save(partner)
+
+	// Create Subscription
+	subscripions := partner.Subscriptions()
+	subscription := subscripions.New("kind")
+	subscription.Save()
+
+	address := []byte("/default/partners")
+	address = append(address, fmt.Sprintf("/%s", partner.Slug())...)
+
+	request, err := http.NewRequest("GET", string(address), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Authorization", "Token token=testToken")
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// sending request
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("id", "first_partner")
+
+	server.handlePartnerSubscriptionsIndex(responseRecorder, request)
+
+	assert.Equal(http.StatusOK, responseRecorder.Code)
+	expected := `[{"Kind":"kind","SubscriptionRef":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	assert.JSONEq(expected, responseRecorder.Body.String())
+}
+
+func Test_PartnerController_SubscriptionsDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	// Save a new Partner
+	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	partner := referential.Partners().New("first_partner")
+	referential.Partners().Save(partner)
+
+	// Create Subscription
+	subscripions := partner.Subscriptions()
+	subscription := subscripions.New("kind")
+	subscription.Save()
+
+	// Test subscriptions
+	assert.Len(partner.Subscriptions().FindAll(), 1)
+
+	address := []byte("/default/partners")
+	address = append(address, fmt.Sprintf("/%s", partner.Slug())...)
+
+	request, err := http.NewRequest("DELETE", string(address), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Authorization", "Token token=testToken")
+
+	// Create a ResponseRecorder
+	responseRecorder := httptest.NewRecorder()
+
+	// sending request
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("id", "first_partner")
+	request.SetPathValue("subscription_id", string(subscription.Id()))
+
+	server.handlePartnerSubscriptionsDelete(responseRecorder, request)
+
+	assert.Equal(http.StatusOK, responseRecorder.Code)
+	assert.Empty(partner.Subscriptions().FindAll())
+}
 
 func Test_PartnerController_Delete(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	partner, responseRecorder, referential := preparePartnerRequest("DELETE", true, nil, t)
 
@@ -124,15 +234,16 @@ func Test_PartnerController_Delete(t *testing.T) {
 
 	//Test Results
 	deletedPartner := referential.Partners().Find(partner.Id())
-	if deletedPartner != nil {
-		t.Errorf("Partner shouldn't be found after DELETE request")
-	}
-	if expected, _ := partner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.Nil(deletedPartner, "Partner shouldn't be found after DELETE request")
+
+	expected, err := partner.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_PartnerController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Slug": "another_test", "Name": "test" }`)
 	partner, responseRecorder, referential := preparePartnerRequest("PUT", true, body, t)
@@ -142,25 +253,20 @@ func Test_PartnerController_Update(t *testing.T) {
 
 	// Test Results
 	updatedPartner := referential.Partners().Find(partner.Id())
-	if updatedPartner == nil {
-		t.Errorf("Partner should be found after PUT request")
-	}
+	assert.NotNil(updatedPartner, "Partner should be found after PUT request")
+	assert.Equal(core.PartnerSlug("another_test"), updatedPartner.Slug())
+	assert.Equal("test", updatedPartner.Name)
 
-	if expected := core.PartnerSlug("another_test"); updatedPartner.Slug() != expected {
-		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
-	}
-	if expected := "test"; updatedPartner.Name != expected {
-		t.Errorf("Partner name should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
-	}
-	if expected, _ := updatedPartner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
-	if len(partner.Subscriptions().FindAll()) > 0 {
-		t.Errorf("All subscription should be deleted after a partenr Edit")
-	}
+	expected, err := updatedPartner.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
+
+	assert.Empty(partner.Subscriptions().FindAll(), "All subscription should be deleted after a partner Edit")
 }
 
 func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "ConnectorTypes": ["test-check-status-client"] }`)
 	partner, responseRecorder, referential := preparePartnerRequest("PUT", true, body, t)
@@ -170,20 +276,14 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 
 	// Test Results
 	updatedPartner := referential.Partners().Find(partner.Id())
-	if updatedPartner == nil {
-		t.Errorf("Partner should be found after PUT request")
-	}
-
-	if expected := core.PartnerSlug("first_partner"); updatedPartner.Slug() != expected {
-		t.Errorf("Partner slug should be updated after PUT request:\n got: %v\n want: %v", updatedPartner.Slug(), expected)
-	}
-
-	if len(updatedPartner.ConnectorTypes) != 1 {
-		t.Errorf("ConnectorTypes should have been updated by POST request:\n got: %v\n want: %v", updatedPartner.ConnectorTypes, []string{"test-check-status-client"})
-	}
+	assert.NotNil(updatedPartner, "Partner should be found after PUT request")
+	assert.Equal(core.PartnerSlug("first_partner"), updatedPartner.Slug())
+	assert.Len(updatedPartner.ConnectorTypes, 1, "ConnectorTypes should have been updated by POST request")
 }
 
 func Test_PartnerController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	partner, responseRecorder, _ := preparePartnerRequest("GET", true, nil, t)
 
@@ -191,12 +291,14 @@ func Test_PartnerController_Show(t *testing.T) {
 	checkPartnerResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := partner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected, err := partner.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_PartnerController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Slug": "test" }`)
 	_, responseRecorder, referential := preparePartnerRequest("POST", false, body, t)
@@ -205,84 +307,52 @@ func Test_PartnerController_Create(t *testing.T) {
 	checkPartnerResponseStatus(responseRecorder, t)
 
 	// Test Results
-	fmt.Printf("ALL PARTNERS ___---> %#v\n", referential.Partners().FindAll())
-	if len(referential.Partners().FindAll()) != 2 {
-		t.Errorf("Partner should be found after POST %v", referential.Partners().FindAll()[0].Id())
-		return
-	}
+	assert.Len(referential.Partners().FindAll(), 2)
 
 	partner, _ := referential.Partners().FindBySlug(core.PartnerSlug("test"))
-	if partner == nil {
-		t.Errorf("Partner should be found after POST request, %v", referential.Partners().FindAll()[0].Id())
-	}
-	if expected := core.PartnerSlug("test"); partner.Slug() != expected {
-		t.Errorf("Invalid partner slug after POST request:\n got: %v\n want: %v", partner.Slug(), expected)
-	}
-	if expected, _ := partner.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.NotNil(partner)
+	assert.Equal("test", string(partner.Slug()))
+
+	expected, err := partner.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_PartnerController_Create_Invalid(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Slug": "invalid_slug", "ConnectorTypes": ["test-validation-connector"] }`)
 	_, responseRecorder, _ := preparePartnerRequest("POST", false, body, t)
 
-	// Check response
-	if status := responseRecorder.Code; status != http.StatusBadRequest {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusBadRequest)
-	}
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	// Test response
+	require.Equal(http.StatusBadRequest, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type")) //
 
 	// Test Results
 	expected := `{"Slug":"invalid_slug","ConnectorTypes":["test-validation-connector"],"Errors":{"slug":["Invalid format"]}}`
-	if responseRecorder.Body.String() != expected {
-		t.Errorf("Wrong body for invalid POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_PartnerController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := preparePartnerRequest("GET", false, nil, t)
 
-	// Rest response
+	// Test response
 	checkPartnerResponseStatus(responseRecorder, t)
 
 	//Test Results
 	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"first_partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
-// func Test_PartnerController_FindPartner(t *testing.T) {
-// 	// Create a referential
-// 	referentials := core.NewMemoryReferentials()
-// 	referential := referentials.New("default")
-// 	referential.Save()
-
-// 	// Save a new partner
-// 	partner := referential.Partners().New("First Partner")
-// 	referential.Partners().Save(partner)
-
-// 	controller := &PartnerController{referential: referential}
-
-// 	foundPartner := controller.findPartner("First Partner")
-// 	if foundPartner == nil {
-// 		t.Error("Can't find Partner by Slug")
-// 	}
-
-// 	foundPartner = controller.findPartner(string(partner.Id()))
-// 	if foundPartner == nil {
-// 		t.Error("Can't find Partner by Id")
-// 	}
-// }
-
 func Test_PartnerController_Save(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
@@ -295,9 +365,8 @@ func Test_PartnerController_Save(t *testing.T) {
 	referential.Tokens = []string{"testToken"}
 	referential.Save()
 	status, refErr := referentials.SaveToDatabase()
-	if status != 200 {
-		t.Fatalf("Cannot save referentials to Database: %v", refErr)
-	}
+	require.NoError(refErr)
+	require.Equal(200, status, "Cannot save referentials to Database")
 
 	// Initialize the partners manager
 	referential.Partners().SetUUIDGenerator(uuid.NewRealUUIDGenerator())
@@ -307,9 +376,8 @@ func Test_PartnerController_Save(t *testing.T) {
 
 	// Create a request
 	request, err := http.NewRequest("POST", "/default/partners/save", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
+
 	request.Header.Set("Authorization", "Token token=testToken")
 
 	// Create a ResponseRecorder
@@ -325,16 +393,29 @@ func Test_PartnerController_Save(t *testing.T) {
 	selectPartners := []model.SelectPartner{}
 	sqlQuery := "select * from partners"
 	_, err = model.Database.Select(&selectPartners, sqlQuery)
-	if err != nil {
-		t.Fatalf("Error while fetching partners: %v", err)
-	}
-	if len(selectPartners) == 0 {
-		t.Fatal("Partner should be found")
-	}
-	if selectPartners[0].Id != string(partner.Id()) {
-		t.Errorf("Saved partner has wrong id, got: %v want: %v", selectPartners[0].Id, partner.Id())
-	}
-	if selectPartners[0].ReferentialId != string(referential.Id()) {
-		t.Errorf("Saved partner has wrong referential id, got: %v want: %v", selectPartners[0].ReferentialId, referential.Id())
-	}
+	assert.Nil(err)
+	assert.Len(selectPartners, 1)
+	assert.Equal(selectPartners[0].Id, string(partner.Id()))
+	assert.Equal(selectPartners[0].ReferentialId, string(referential.Id()))
+}
+
+func Test_PartnerController_FindPartner(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	referential := referentials.New("default")
+	referential.Save()
+
+	// Save a new partner
+	partner := referential.Partners().New("First Partner")
+	referential.Partners().Save(partner)
+
+	controller := &PartnerController{referential: referential}
+
+	foundPartner := controller.findPartner("First Partner")
+	assert.NotNil(foundPartner, "Can't find Partner by Slug")
+
+	foundPartner = controller.findPartner(string(partner.Id()))
+	assert.NotNil(foundPartner, "Can't find Partner by Id")
 }
