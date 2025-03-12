@@ -63,3 +63,14 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 	}
 	return body
 }
+
+func paginateSlice(pageNum int, pageSize int, sliceLength int) (int, int) {
+	firstEntry := (pageNum - 1) * pageSize
+	lastEntry := firstEntry + pageSize
+
+	if lastEntry > sliceLength {
+		lastEntry = sliceLength
+	}
+
+	return firstEntry, lastEntry
+}

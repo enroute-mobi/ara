@@ -186,8 +186,7 @@ func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, 
 
 	logger.Log.Debugf("%s controller Index request: %v", model, request)
 
-	params := request.URL.Query()
-	controller.Index(response, params)
+	controller.Index(response, request.URL.Query())
 }
 
 func (server *Server) handleReferentialModelShow(response http.ResponseWriter, request *http.Request) {

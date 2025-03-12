@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -31,10 +33,37 @@ func (controller *SituationController) findSituation(identifier string) (model.S
 	return controller.referential.Model().Situations().Find(model.SituationId(identifier))
 }
 
-func (controller *SituationController) Index(response http.ResponseWriter) {
+func (controller *SituationController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Situations Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().Situations().FindAll())
+	allSituations := controller.referential.Model().Situations().FindAll()
+	if len(params) == 0 {
+		jsonBytes, _ := json.Marshal(allSituations)
+		response.Write(jsonBytes)
+		return
+	}
+
+	page, err := strconv.Atoi(params.Get("page"))
+	if err != nil {
+		http.Error(response, fmt.Sprintf("Invalid request: query parameter \"page\":'%s", params.Get("page")), http.StatusBadRequest)
+		return
+	}
+	per_page, err := strconv.Atoi(params.Get("per_page"))
+	if err != nil {
+		http.Error(response, fmt.Sprintf("Invalid request: query parameter \"per_page\":'%s", params.Get("")), http.StatusBadRequest)
+		return
+	}
+
+	if page == 0 && per_page == 0 {
+		jsonBytes, _ := json.Marshal(allSituations)
+		response.Write(jsonBytes)
+		return
+	}
+
+	start, end := paginateSlice(page, per_page, len(allSituations))
+	pagedSlice := allSituations[start:end]
+
+	jsonBytes, _ := json.Marshal(pagedSlice)
 	response.Write(jsonBytes)
 }
 
