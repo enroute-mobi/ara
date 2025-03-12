@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -29,7 +30,7 @@ func (controller *StopAreaController) findStopArea(identifier string) (*model.St
 	return controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
 }
 
-func (controller *StopAreaController) Index(response http.ResponseWriter) {
+func (controller *StopAreaController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("StopAreas Index")
 
 	stime := controller.referential.Clock().Now()

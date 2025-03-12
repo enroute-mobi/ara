@@ -3,6 +3,7 @@ package api
 import (
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -25,7 +26,7 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Restfu
 }
 
 type RestfulResource interface {
-	Index(response http.ResponseWriter)
+	Index(response http.ResponseWriter, params url.Values)
 	Show(response http.ResponseWriter, identifier string)
 	Delete(response http.ResponseWriter, identifier string)
 	Update(response http.ResponseWriter, identifier string, body []byte)

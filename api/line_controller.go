@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -29,7 +30,7 @@ func (controller *LineController) findLine(identifier string) (*model.Line, bool
 	return controller.referential.Model().Lines().Find(model.LineId(identifier))
 }
 
-func (controller *LineController) Index(response http.ResponseWriter) {
+func (controller *LineController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("Lines Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Model().Lines().FindAll())

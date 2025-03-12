@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -28,7 +29,7 @@ func (controller *ReferentialController) findReferential(identifier string) *cor
 	return controller.server.CurrentReferentials().Find(core.ReferentialId(identifier))
 }
 
-func (controller *ReferentialController) Index(response http.ResponseWriter) {
+func (controller *ReferentialController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("Referentials Index")
 
 	jsonBytes, _ := json.Marshal(controller.server.CurrentReferentials().FindAll())

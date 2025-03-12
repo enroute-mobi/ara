@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sort"
 	"time"
 
@@ -94,7 +95,7 @@ func (controller *PartnerController) findPartner(identifier string) *core.Partne
 	return controller.referential.Partners().Find(core.PartnerId(identifier))
 }
 
-func (controller *PartnerController) Index(response http.ResponseWriter) {
+func (controller *PartnerController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("Partners Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Partners().FindAll())
