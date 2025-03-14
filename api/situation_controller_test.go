@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"path"
 	"testing"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -186,9 +187,13 @@ func Test_SituationController_Index_Paginated(t *testing.T) {
 
 	// Create and save 2 new situations
 	situation := referential.Model().Situations().New()
+	recordedAt, _ := time.Parse(time.RFC3339, "2016-01-01T01:00:00+02:00")
+	situation.RecordedAt = recordedAt
 	referential.Model().Situations().Save(&situation)
 
 	situation2 := referential.Model().Situations().New()
+	recordedAt, _ = time.Parse(time.RFC3339, "2015-01-01T01:00:00+02:00")
+	situation2.RecordedAt = recordedAt
 	referential.Model().Situations().Save(&situation2)
 
 	all := referential.Model().Situations().FindAll()
@@ -221,6 +226,7 @@ func Test_SituationController_Index_Paginated(t *testing.T) {
 	err = json.Unmarshal(data, &situations)
 	assert.NoError(err)
 	assert.Len(situations, 2, "All situations should be provided with page: 1 and per_page: 2")
+	assert.True(situations[0].RecordedAt.Before(situations[1].RecordedAt), "Situations should be orederd by RecordedAt")
 
 	// test pagination with paer_page = 1
 	params.Set("per_page", "1")
@@ -240,6 +246,73 @@ func Test_SituationController_Index_Paginated(t *testing.T) {
 	err = json.Unmarshal(data, &situations)
 	assert.NoError(err)
 	assert.Len(situations, 1, "1 Situation should be provided with page: 1 and per_page: 1")
+}
+
+func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new situations
+	situation := referential.Model().Situations().New()
+	start, _ := time.Parse(time.RFC3339, "2016-01-01T01:00:00+02:00")
+	validityPeriod := &model.TimeRange{
+		StartTime: start,
+		EndTime:   time.Time{},
+	}
+	situation.ValidityPeriods = append(situation.ValidityPeriods, validityPeriod)
+	referential.Model().Situations().Save(&situation)
+
+	situation2 := referential.Model().Situations().New()
+	start, _ = time.Parse(time.RFC3339, "2015-01-01T01:00:00+02:00")
+	validityPeriod = &model.TimeRange{
+		StartTime: start,
+		EndTime:   time.Time{},
+	}
+	situation2.ValidityPeriods = append(situation2.ValidityPeriods, validityPeriod)
+	referential.Model().Situations().Save(&situation2)
+
+	all := referential.Model().Situations().FindAll()
+	assert.Len(all, 2)
+
+	// Create a request
+	path := path.Join("default", "situations")
+
+	params := url.Values{}
+	params.Add("page", "1")
+	params.Add("per_page", "2")
+	params.Add("order", "validity_periods_start")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "situations")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	var situations []model.APISituation
+	err = json.Unmarshal(data, &situations)
+	assert.NoError(err)
+	assert.Len(situations, 2, "All situations should be provided with page: 1 and per_page: 2")
+	assert.True(situations[0].ValidityPeriods[0].StartTime.Before(situations[1].ValidityPeriods[0].StartTime))
 }
 
 func URI(baseurl string, path string, params url.Values) (*url.URL, error) {

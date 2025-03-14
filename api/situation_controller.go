@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -37,7 +38,20 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 	logger.Log.Debugf("Situations Index")
 
 	allSituations := controller.referential.Model().Situations().FindAll()
+	order := params.Get("order")
+	switch order {
+	case "validity_periods_start":
+		sort.Slice(allSituations, func(i, j int) bool {
+			return allSituations[i].BroadcastPeriod().StartTime.Before(allSituations[j].BroadcastPeriod().StartTime)
+		})
+	default:
+		sort.Slice(allSituations, func(i, j int) bool {
+			return allSituations[i].RecordedAt.Before(allSituations[j].RecordedAt)
+		})
+	}
+
 	if len(params) == 0 {
+		// We send all situations
 		jsonBytes, _ := json.Marshal(allSituations)
 		response.Write(jsonBytes)
 		return
