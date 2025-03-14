@@ -62,16 +62,24 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 		http.Error(response, fmt.Sprintf("Invalid request: query parameter \"page\":'%s", params.Get("page")), http.StatusBadRequest)
 		return
 	}
-	per_page, err := strconv.Atoi(params.Get("per_page"))
-	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: query parameter \"per_page\":'%s", params.Get("")), http.StatusBadRequest)
-		return
+
+	var per_page int
+	if params.Get("per_page") != "" {
+		per_page, err = strconv.Atoi(params.Get("per_page"))
+		if page != 0 && err != nil {
+			http.Error(response, fmt.Sprintf("Invalid request: query parameter \"per_page\":'%s", params.Get("")), http.StatusBadRequest)
+			return
+		}
 	}
 
 	if page == 0 && per_page == 0 {
 		jsonBytes, _ := json.Marshal(allSituations)
 		response.Write(jsonBytes)
 		return
+	}
+
+	if per_page == 0 || per_page > DEFAULT_PER_PAGE {
+		per_page = DEFAULT_PER_PAGE
 	}
 
 	start, end := paginateSlice(page, per_page, len(allSituations))

@@ -25,6 +25,10 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Restfu
 	"vehicles":              NewVehicleController,
 }
 
+const (
+	DEFAULT_PER_PAGE = 30
+)
+
 type RestfulResource interface {
 	Index(response http.ResponseWriter, params url.Values)
 	Show(response http.ResponseWriter, identifier string)

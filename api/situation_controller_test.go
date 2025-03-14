@@ -315,6 +315,109 @@ func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *t
 	assert.True(situations[0].ValidityPeriods[0].StartTime.Before(situations[1].ValidityPeriods[0].StartTime))
 }
 
+func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_Not_Provided(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new situations
+	for i := 0; i <= 34; i++ {
+		situation := referential.Model().Situations().New()
+		referential.Model().Situations().Save(&situation)
+	}
+
+	all := referential.Model().Situations().FindAll()
+	assert.Len(all, 35)
+
+	// Create a request
+	path := path.Join("default", "situations")
+
+	params := url.Values{}
+	params.Add("page", "1")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "situations")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	var situations []model.APISituation
+	err = json.Unmarshal(data, &situations)
+	assert.NoError(err)
+	assert.Len(situations, 30, "situations should be provided with unknown per_page")
+}
+
+func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_AboveDefaultPerPage(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new situations
+	for i := 0; i <= 34; i++ {
+		situation := referential.Model().Situations().New()
+		referential.Model().Situations().Save(&situation)
+	}
+
+	all := referential.Model().Situations().FindAll()
+	assert.Len(all, 35)
+
+	// Create a request
+	path := path.Join("default", "situations")
+
+	params := url.Values{}
+	params.Add("page", "1")
+	params.Add("per_page", "50")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "situations")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	var situations []model.APISituation
+	err = json.Unmarshal(data, &situations)
+	assert.NoError(err)
+	assert.Len(situations, 30, "situations should be provided with per_page above Default per_page")
+}
+
 func URI(baseurl string, path string, params url.Values) (*url.URL, error) {
 	base, err := url.Parse(baseurl)
 	if err != nil {
