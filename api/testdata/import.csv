@@ -5,8 +5,8 @@ line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"lineCode"
 vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},{},outbound
 vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},{},inboud
 vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-03,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},{}
-stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,{"internal":"stopVisitCode"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},"{""OperatorRef"":{""Type"":""OperatorRef"",""ObjectId"":{""internal"":""operatorCode""}}}"
-stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,{"internal":"stopVisitCode"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},"{""OperatorRef"":{""Type"":""OperatorRef"",""ObjectId"":{""internal"":""operatorCode""}}}"
+stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,{"internal":"stopVisitCode"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},"{""OperatorRef"":{""Type"":""OperatorRef"",""Code"":{""internal"":""operatorCode""}}}"
+stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,{"internal":"stopVisitCode"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},"{""OperatorRef"":{""Type"":""OperatorRef"",""Code"":{""internal"":""operatorCode""}}}"
 operator,03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"operatorCode"}
 operator,03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"operatorCode"}
 stop_area_group,cf3e1970-7a7e-4379-ae67-a67abe1c7c1b,2017-01-01,Name,ShortName,"[""a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11""]"
