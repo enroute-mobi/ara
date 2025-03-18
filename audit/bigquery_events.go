@@ -145,6 +145,7 @@ type BigQueryVehicleEvent struct {
 	Latitude       float64        `bigquery:"latitude"`
 	Bearing        float64        `bigquery:"bearing"`
 	RecordedAtTime civil.DateTime `bigquery:"recorded_at_time"`
+	Occupancy      string         `bigquery:"occupancy"`
 }
 
 func (bq *BigQueryVehicleEvent) EventType() string        { return BQ_VEHICLE_EVENT }
@@ -160,6 +161,7 @@ var bqVehicleSchema = bigquery.Schema{
 	{Name: "bearing", Required: false, Type: bigquery.FloatFieldType},
 	{Name: "recorded_at_time", Required: false, Type: bigquery.DateTimeFieldType},
 	{Name: "codes", Repeated: true, Type: bigquery.StringFieldType},
+	{Name: "occupancy", Required: false, Type: bigquery.StringFieldType},
 }
 
 type BigQueryLongTermStopVisitEvent struct {

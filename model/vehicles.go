@@ -280,6 +280,7 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 		Longitude:      v.Longitude,
 		Latitude:       v.Latitude,
 		Bearing:        v.Bearing,
+		Occupancy:      v.Occupancy,
 		RecordedAtTime: civil.DateTimeOf(v.RecordedAtTime),
 	}
 
