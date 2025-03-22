@@ -10,18 +10,15 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkVehicleJourneyResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicleJourney *model.VehicleJourney, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -53,14 +50,34 @@ func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byt
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "vehicle_journeys")
+	switch method {
+	case "GET":
+		if sendIdentifier == false && body == nil {
+			server.handleReferentialModelIndex(responseRecorder, request)
+		} else {
+			request.SetPathValue("id", string(vehicleJourney.Id()))
+			server.handleReferentialModelShow(responseRecorder, request)
+		}
+	case "POST":
+		server.handleReferentialModelCreate(responseRecorder, request)
+	case "PUT":
+		request.SetPathValue("id", string(vehicleJourney.Id()))
+		server.handleReferentialModelUpdate(responseRecorder, request)
+	case "DELETE":
+		request.SetPathValue("id", string(vehicleJourney.Id()))
+		server.handleReferentialModelDelete(responseRecorder, request)
+	default:
+		t.Fatalf("Unknown method: %s", method)
+	}
 
 	return
 }
 
 func Test_VehicleJourneyController_Delete(t *testing.T) {
-	// Send request
+	assert := assert.New(t)
+
 	vehicleJourney, responseRecorder, referential := prepareVehicleJourneyRequest("DELETE", true, nil, t)
 
 	// Test response
@@ -68,15 +85,16 @@ func Test_VehicleJourneyController_Delete(t *testing.T) {
 
 	//Test Results
 	_, ok := referential.Model().VehicleJourneys().Find(vehicleJourney.Id())
-	if ok {
-		t.Errorf("VehicleJourney shouldn't be found after DELETE request")
-	}
-	if expected, _ := vehicleJourney.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.False(ok, "VehicleJourney shouldn't be found after DELETE request")
+
+	expected, err := vehicleJourney.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_VehicleJourneyController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	vehicleJourney, responseRecorder, referential := prepareVehicleJourneyRequest("PUT", true, body, t)
@@ -86,16 +104,16 @@ func Test_VehicleJourneyController_Update(t *testing.T) {
 
 	// Test Results
 	updatedVehicleJourney, ok := referential.Model().VehicleJourneys().Find(vehicleJourney.Id())
-	if !ok {
-		t.Errorf("VehicleJourney should be found after PUT request")
-	}
+	assert.True(ok, "VehicleJourney should be found after PUT request")
 
-	if expected, _ := updatedVehicleJourney.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expected, err := updatedVehicleJourney.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
 func Test_VehicleJourneyController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	vehicleJourney, responseRecorder, _ := prepareVehicleJourneyRequest("GET", true, nil, t)
 
@@ -103,12 +121,13 @@ func Test_VehicleJourneyController_Show(t *testing.T) {
 	checkVehicleJourneyResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := vehicleJourney.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedVehicleJourney, _ := vehicleJourney.MarshalJSON()
+	assert.JSONEq(string(expectedVehicleJourney), responseRecorder.Body.String())
 }
 
 func Test_VehicleJourneyController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareVehicleJourneyRequest("POST", false, body, t)
@@ -120,15 +139,17 @@ func Test_VehicleJourneyController_Create(t *testing.T) {
 	// Using the fake uuid generator, the uuid of the created
 	// vehicleJourney should be 6ba7b814-9dad-11d1-1-00c04fd430c8
 	vehicleJourney, ok := referential.Model().VehicleJourneys().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("VehicleJourney should be found after POST request")
-	}
-	if expected, _ := vehicleJourney.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.True(ok, "VehicleJourney should be found after POST request")
+
+	expected := `{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"HasCompleteStopSequence":false,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Monitored":false}`
+	vehicleJourneyMarshal, err := vehicleJourney.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(expected, string(vehicleJourneyMarshal))
 }
 
 func Test_VehicleJourneyController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareVehicleJourneyRequest("GET", false, nil, t)
 
@@ -137,12 +158,12 @@ func Test_VehicleJourneyController_Index(t *testing.T) {
 
 	//Test Results
 	expected := `[{"Monitored":false,"HasCompleteStopSequence":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
+	assert := assert.New(t)
+
 	ref := core.NewMemoryReferentials().New("test")
 
 	vehicleJourney := ref.Model().VehicleJourneys().New()
@@ -155,12 +176,8 @@ func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 	}
 
 	_, ok := controller.findVehicleJourney("codeSpace:value")
-	if !ok {
-		t.Error("Can't find VehicleJourney by Code")
-	}
+	assert.True(ok, "Can't find VehicleJourney by Code")
 
 	_, ok = controller.findVehicleJourney(string(vehicleJourney.Id()))
-	if !ok {
-		t.Error("Can't find VehicleJourney by Id")
-	}
+	assert.True(ok, "Can't find VehicleJourney by Id")
 }

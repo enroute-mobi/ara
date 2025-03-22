@@ -17,6 +17,8 @@ import (
 )
 
 func TestTokens(t *testing.T) {
+	require := require.New(t)
+
 	// Initialize referential manager
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -29,46 +31,44 @@ func TestTokens(t *testing.T) {
 	referentials.Save(referential)
 
 	// Create a request
-	request, err := http.NewRequest("Get", "/first_referential/partners", nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	responseRecorder := httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request, err := http.NewRequest("GET", "/first_referential/partners", nil)
+	require.NoError(err)
 
-	if status := responseRecorder.Code; status == http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-		panic(responseRecorder.Body)
-	}
+	responseRecorder := httptest.NewRecorder()
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	require.Equal(http.StatusUnauthorized, responseRecorder.Code)
 
 	referential.Tokens = []string{"12345"}
 	referential.ImportTokens = []string{"23456"}
 	referential.Save()
 
 	responseRecorder = httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status == http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-	}
+	require.Equal(http.StatusUnauthorized, responseRecorder.Code)
 
 	request.Header.Set("Authorization", "Token token=12345")
 
 	responseRecorder = httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
 
 	request.Header.Set("Authorization", "Token token=23456")
 
 	responseRecorder = httptest.NewRecorder()
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("model", "partners")
+	server.handleReferentialModelIndex(responseRecorder, request)
 
-	if status := responseRecorder.Code; status == http.StatusOK {
-		t.Errorf("Handler returned wrong status code: %v", status)
-	}
+	require.Equal(http.StatusUnauthorized, responseRecorder.Code)
 }
 
 func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
@@ -83,7 +83,7 @@ func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder,
 	}
 }
 
-func referentialPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (referential *core.Referential, responseRecorder *httptest.ResponseRecorder, server *Server) {
+func referentialPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (referential *core.Referential, responseRecorder *httptest.ResponseRecorder, server *Server, request *http.Request) {
 	// Initialize referential manager
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -105,16 +105,14 @@ func referentialPrepareRequest(method string, sendIdentifier bool, body []byte, 
 
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
-
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
-
 	return
 }
 
 func Test_ReferentialController_Delete(t *testing.T) {
 	// Send request
-	referential, responseRecorder, server := referentialPrepareRequest("DELETE", true, nil, t)
+	referential, responseRecorder, server, request := referentialPrepareRequest("DELETE", true, nil, t)
+	request.SetPathValue("id", string(referential.Id()))
+	server.handleReferentialDelete(responseRecorder, request)
 
 	// Test response
 	referentialCheckResponseStatus(responseRecorder, t)
@@ -139,7 +137,9 @@ func Test_ReferentialController_Update(t *testing.T) {
 "Settings": {"model.refresh_time": "4h", "logger.verbose.stop_areas": "stif:STIF:StopPoint:Q:473947:"}
 }`)
 
-	referential, responseRecorder, server := referentialPrepareRequest("PUT", true, body, t)
+	referential, responseRecorder, server, request := referentialPrepareRequest("PUT", true, body, t)
+	request.SetPathValue("id", string(referential.Id()))
+	server.handleReferentialUpdate(responseRecorder, request)
 
 	// Check response
 	referentialCheckResponseStatus(responseRecorder, t)
@@ -161,29 +161,12 @@ func Test_ReferentialController_Update(t *testing.T) {
 	assert.Equal(expectedLoggerStopAreas, updatedReferential.LoggerVerboseStopAreas())
 }
 
-func Test_ReferentialController_Update_ExistingSlug(t *testing.T) {
-	// Prepare and send request
-	body := []byte(`{"Slug":"referential"}`)
-	referentialPrepareRequest("POST", false, body, t)
-
-	body = []byte(`{"Slug":"referential"}`)
-	_, responseRecorder, _ := referentialPrepareRequest("POST", true, body, t)
-	// Check response
-	if status := responseRecorder.Code; status != http.StatusBadRequest {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusBadRequest)
-	}
-
-	// Check response
-	if status := responseRecorder.Code; status != http.StatusBadRequest {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusBadRequest)
-	}
-}
-
 func Test_ReferentialController_Show(t *testing.T) {
 	// Send request
-	referential, responseRecorder, _ := referentialPrepareRequest("GET", true, nil, t)
+	referential, responseRecorder, server, request := referentialPrepareRequest("GET", true, nil, t)
+	request.SetPathValue("model", string(referential.Id()))
+	request.SetPathValue("referential_slug", "_referentials")
+	server.handleReferentialGet(responseRecorder, request)
 
 	// Test response
 	referentialCheckResponseStatus(responseRecorder, t)
@@ -197,7 +180,8 @@ func Test_ReferentialController_Show(t *testing.T) {
 func Test_ReferentialController_Create(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{ "Slug": "test" }`)
-	_, responseRecorder, server := referentialPrepareRequest("POST", false, body, t)
+	_, responseRecorder, server, request := referentialPrepareRequest("POST", false, body, t)
+	server.handleReferentialCreate(responseRecorder, request)
 
 	// Check response
 	referentialCheckResponseStatus(responseRecorder, t)
@@ -220,7 +204,8 @@ func Test_ReferentialController_Create(t *testing.T) {
 func Test_ReferentialController_Create_Invalid(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{}`)
-	_, responseRecorder, _ := referentialPrepareRequest("POST", false, body, t)
+	_, responseRecorder, server, request := referentialPrepareRequest("POST", false, body, t)
+	server.handleReferentialCreate(responseRecorder, request)
 
 	// Check response
 	if status := responseRecorder.Code; status != http.StatusBadRequest {
@@ -242,7 +227,8 @@ func Test_ReferentialController_Create_Invalid(t *testing.T) {
 func Test_ReferentialController_Create_ExistingSlug(t *testing.T) {
 	// Prepare and send request
 	body := []byte(`{"Slug":"first_referential"}`)
-	_, responseRecorder, _ := referentialPrepareRequest("POST", false, body, t)
+	_, responseRecorder, server, request := referentialPrepareRequest("POST", false, body, t)
+	server.handleReferentialCreate(responseRecorder, request)
 
 	// Check response
 	if status := responseRecorder.Code; status != http.StatusBadRequest {
@@ -253,7 +239,8 @@ func Test_ReferentialController_Create_ExistingSlug(t *testing.T) {
 
 func Test_ReferentialController_Index(t *testing.T) {
 	// Send request
-	referential, responseRecorder, _ := referentialPrepareRequest("GET", false, nil, t)
+	referential, responseRecorder, server, request := referentialPrepareRequest("GET", false, nil, t)
+	server.handleReferentialIndex(responseRecorder, request)
 
 	// Test response
 	referentialCheckResponseStatus(responseRecorder, t)
@@ -289,8 +276,7 @@ func Test_ReferentialController_Save(t *testing.T) {
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	server.handleReferentialSave(responseRecorder, request)
 
 	// Test response
 	referentialCheckResponseStatus(responseRecorder, t)
@@ -351,9 +337,8 @@ func Test_ReferentialController_Reload(t *testing.T) {
 
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
-
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("id", string(referential.Id()))
+	server.handleReferentialReload(responseRecorder, request)
 
 	// Test response
 	if status := responseRecorder.Code; status != http.StatusOK {
@@ -416,8 +401,8 @@ func Test_ReferentialController_Reload_Partner(t *testing.T) {
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("id", string(referential.Id()))
+	server.handleReferentialReload(responseRecorder, request)
 	require.Equal(http.StatusOK, responseRecorder.Code)
 
 	// Test Results

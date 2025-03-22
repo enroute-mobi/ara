@@ -17,6 +17,9 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential) {
@@ -63,37 +66,33 @@ func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential)
 }
 
 func siriHandler_Request(server *Server, buffer remote.Buffer, t *testing.T) *httptest.ResponseRecorder {
+	require := require.New(t)
+
 	clock.SetDefaultClock(clock.NewFakeClock())
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// Create a request
 	request, err := http.NewRequest("POST", "/default/siri", buffer)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
 
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.HandleFlow)
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /{referential_slug}/siri", server.HandleSIRI)
 
 	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
-	handler.ServeHTTP(responseRecorder, request)
+	mux.ServeHTTP(responseRecorder, request)
 
 	// Check the status code is what we expect.
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
-
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "text/xml; charset=utf-8" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "text/xml; charset=utf-8")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("text/xml; charset=utf-8", responseRecorder.Header().Get("Content-Type"))
 
 	return responseRecorder
 }
 
 func Test_SIRIHandler_SOAP(t *testing.T) {
+	assert := assert.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
@@ -109,70 +108,62 @@ func Test_SIRIHandler_SOAP(t *testing.T) {
 
 	// Check the response body is what we expect.
 	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !response.Status() {
-		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status())
-	}
+	assert.NoError(err)
+	assert.True(response.Status())
 }
 
 func Test_SIRIHandler_SOAPResponse(t *testing.T) {
+	assert := assert.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	buffer.WriteXML(request)
 
 	server, _ := siriHandler_PrepareServer(remote.SOAP_SIRI_ENVELOPE)
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
-	if err != nil {
-		t.Errorf("We should receive a SOAP response, got error: %v", err)
-	}
+	assert.NoError(err, "We should receive a SOAP response")
 }
 
 func Test_SIRIHandler_RawResponse(t *testing.T) {
+	assert := assert.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	buffer.WriteXML(request)
 
 	server, _ := siriHandler_PrepareServer(remote.RAW_SIRI_ENVELOPE)
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
-	if err == nil {
-		t.Errorf("NewSIRIEnvelope with SOAP option should return an error")
-	}
+	assert.Error(err, "NewSIRIEnvelope with SOAP option should return an error")
 
 	responseRecorder = siriHandler_Request(server, buffer, t) // Making the request again as the reader should be empty
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.RAW_SIRI_ENVELOPE)
-	if err != nil {
-		t.Errorf("We shouldn't get an error while trying to create a raw envelope, got: %v", err)
-	}
+	assert.NoError(err, "We shouldn't get an error while trying to create a raw envelope")
 }
 
 func Test_SIRIHandler_Raw(t *testing.T) {
+	assert := assert.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.RAW_SIRI_ENVELOPE)
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	buffer.WriteXML(request)
 
 	server, _ := siriHandler_PrepareServer("")
@@ -180,24 +171,20 @@ func Test_SIRIHandler_Raw(t *testing.T) {
 
 	// Check the response body is what we expect.
 	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !response.Status() {
-		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status())
-	}
+	assert.NoError(err)
+	assert.True(response.Status())
 }
 
 func Test_SIRIHandler_CheckStatus(t *testing.T) {
+	assert := assert.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 	request, err := siri.NewSIRICheckStatusRequest("Ara",
 		clock.DefaultClock().Now(),
 		"Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC").BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	buffer.WriteXML(request)
 
 	server, _ := siriHandler_PrepareServer("")
@@ -205,91 +192,61 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 
 	// Check the response body is what we expect.
 	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if expected := "http://ara"; response.Address() != expected {
-		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
-	}
-
-	if expected := "Ara"; response.ProducerRef() != expected {
-		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: %v", response.ProducerRef(), expected)
-	}
-
-	if expected := "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
-		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: %v", response.RequestMessageRef(), expected)
-	}
-
-	if expected := "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
-		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: %v", response.ResponseMessageIdentifier(), expected)
-	}
-
-	if !response.Status() {
-		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status())
-	}
+	assert.NoError(err)
+	assert.Equal("http://ara", response.Address())
+	assert.Equal("Ara", response.ProducerRef())
+	assert.Equal("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.RequestMessageRef())
+	assert.Equal("Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier())
+	assert.True(response.Status())
 
 	expectedDate := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
-	if !response.ResponseTimestamp().Equal(expectedDate) {
-		t.Errorf("Wrong ResponseTimestamp in response:\n got: %v\n want: %v", response.ResponseTimestamp(), expectedDate)
-	}
-
-	if !response.ServiceStartedTime().Equal(expectedDate) {
-		t.Errorf("Wrong ServiceStartedTime in response:\n got: %v\n want: %v", response.ServiceStartedTime(), expectedDate)
-	}
+	assert.True(response.ResponseTimestamp().Equal(expectedDate))
+	assert.True(response.ServiceStartedTime().Equal(expectedDate))
 }
 
 func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	server, _ := siriHandler_PrepareServer("")
 
 	// Create a request
 	file, err := os.Open("testdata/checkstatus-soap-request.xml.gz")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
 	defer file.Close()
 
 	request, err := http.NewRequest("POST", "/default/siri", file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
+
 	request.Header.Set("Content-Encoding", "gzip")
 	request.Header.Set("Content-Type", "text/xml; charset=utf-8")
 
 	// Create a ResponseRecorder
 	responseRecorder := httptest.NewRecorder()
-	handler := http.HandlerFunc(server.HandleFlow)
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /{referential_slug}/siri", server.HandleSIRI)
 
 	// Call ServeHTTP method and pass in our Request and ResponseRecorder.
-	handler.ServeHTTP(responseRecorder, request)
-
-	// Check the status code is what we expect.
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	mux.ServeHTTP(responseRecorder, request)
+	assert.Equal(http.StatusOK, responseRecorder.Code)
 
 	// Check the response body is what we expect.
 	response, err := sxml.NewXMLCheckStatusResponseFromContent(responseRecorder.Body.Bytes())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !response.Status() {
-		t.Errorf("Wrong Status in response:\n got: %v\n want: true", response.Status())
-	}
+	assert.NoError(err)
+	assert.True(response.Status())
 }
 
 func Test_SIRIHandler_StopMonitoring(t *testing.T) {
+	assert := assert.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 	request, err := siri.NewSIRIGetStopMonitoringRequest("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC",
 		"codeValue",
 		"Ara",
 		clock.DefaultClock().Now()).BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	buffer.WriteXML(request)
 
 	server, referential := siriHandler_PrepareServer("")
@@ -334,54 +291,36 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 	// Check the response body is what we expect.
 	response, err := sxml.NewXMLStopMonitoringResponseFromContent(responseRecorder.Body.Bytes())
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
 
 	delivery := response.StopMonitoringDeliveries()[0]
-	if len(delivery.XMLMonitoredStopVisits()) != 2 {
-		t.Fatalf("Past StopVisit should be ignored, got %v stopVisits", len(delivery.XMLMonitoredStopVisits()))
-	}
+	assert.Len(delivery.XMLMonitoredStopVisits(), 2, "Past StopVisit should be ignored")
+	assert.True(delivery.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(delivery.XMLMonitoredStopVisits()[0].ActualArrivalTime()),
+		"Stop visits are not chronollogicaly ordered ")
 
-	if !delivery.XMLMonitoredStopVisits()[1].ActualArrivalTime().After(delivery.XMLMonitoredStopVisits()[0].ActualArrivalTime()) {
-		t.Errorf("Stop visits are not chronollogicaly ordered ")
-	}
-
-	if expected := "http://ara"; response.Address() != expected {
-		t.Errorf("Wrong Address in response:\n got: %v\n want: %v", response.Address(), expected)
-	}
-
-	if expected := "Ara"; response.ProducerRef() != expected {
-		t.Errorf("Wrong ProducerRef in response:\n got: %v\n want: %v", response.ProducerRef(), expected)
-	}
-
-	if expected := "Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.RequestMessageRef() != expected {
-		t.Errorf("Wrong RequestMessageRef in response:\n got: %v\n want: %v", response.RequestMessageRef(), expected)
-	}
-
-	if expected := "Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC"; response.ResponseMessageIdentifier() != expected {
-		t.Errorf("Wrong ResponseMessageIdentifier in response:\n got: %v\n want: %v", response.ResponseMessageIdentifier(), expected)
-	}
+	assert.Equal("http://ara", response.Address())
+	assert.Equal("Ara", response.ProducerRef())
+	assert.Equal("Ara:Message::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.RequestMessageRef())
+	assert.Equal("Ara:ResponseMessage::6ba7b814-9dad-11d1-0-00c04fd430c8:LOC", response.ResponseMessageIdentifier())
 
 	expectedDate := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
-	if !response.ResponseTimestamp().Equal(expectedDate) {
-		t.Errorf("Wrong ResponseTimestamp in response:\n got: %v\n want: %v", response.ResponseTimestamp(), expectedDate)
-	}
+	assert.True(response.ResponseTimestamp().Equal(expectedDate))
 }
 
 func Test_SIRIHandler_SiriService(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	// Generate the request Body
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 
 	file, err := os.Open("testdata/siri-service-request-soap.xml")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
 	defer file.Close()
+
 	content, err := io.ReadAll(file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
+
 	buffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer("")
@@ -456,9 +395,8 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 
 	// responseRecorder.Body.String()
 	envelope, err := remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	responseBody := envelope.Body().String()
 
 	// TEMP: Find a better way to test?
@@ -557,10 +495,7 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 	<AnswerExtension/>
 </sw:GetSiriServiceResponse>`
 
-	// Check the response body is what we expect.
-	if responseBody != expectedResponseBody {
-		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
-	}
+	assert.Equal(expectedResponseBody, responseBody)
 }
 
 func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
@@ -633,17 +568,18 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 }
 
 func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 
 	file, err := os.Open("testdata/estimated_timetable_request.xml")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
 	defer file.Close()
+
 	content, err := io.ReadAll(file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
+
 	buffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer("")
@@ -721,9 +657,8 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	envelope, err := remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	responseBody := envelope.Body().String()
 
 	expectedResponseBody := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -790,24 +725,22 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	<AnswerExtension/>
 </sw:GetEstimatedTimetableResponse>`
 
-	// Check the response body is what we expect.
-	if responseBody != expectedResponseBody {
-		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
-	}
+	assert.Equal(expectedResponseBody, responseBody)
 }
 
 func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
 	buffer := remote.NewSIRIBuffer(remote.SOAP_SIRI_ENVELOPE)
 
 	file, err := os.Open("testdata/lines-discovery-request.xml")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
 	defer file.Close()
+
 	content, err := io.ReadAll(file)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
+
 	buffer.WriteXML(string(content))
 
 	server, referential := siriHandler_PrepareServer("")
@@ -830,9 +763,8 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	envelope, err := remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
+
 	responseBody := envelope.Body().String()
 
 	expectedResponseBody := `<sw:LinesDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
@@ -853,8 +785,5 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 	<AnswerExtension/>
 </sw:LinesDiscoveryResponse>`
 
-	// Check the response body is what we expect.
-	if responseBody != expectedResponseBody {
-		t.Errorf("Unexpected response body:\n expected: %v\n got: %v", expectedResponseBody, responseBody)
-	}
+	assert.Equal(expectedResponseBody, responseBody)
 }

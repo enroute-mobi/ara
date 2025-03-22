@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -15,11 +14,9 @@ type LineController struct {
 	referential *core.Referential
 }
 
-func NewLineController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &LineController{
-			referential: referential,
-		},
+func NewLineController(referential *core.Referential) RestfulResource {
+	return &LineController{
+		referential: referential,
 	}
 }
 
@@ -32,7 +29,7 @@ func (controller *LineController) findLine(identifier string) (*model.Line, bool
 	return controller.referential.Model().Lines().Find(model.LineId(identifier))
 }
 
-func (controller *LineController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *LineController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Lines Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Model().Lines().FindAll())

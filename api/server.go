@@ -2,8 +2,7 @@ package api
 
 import (
 	"net/http"
-	"net/url"
-	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -16,10 +15,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/version"
 )
 
-var pathPattern = regexp.MustCompile("/([0-9a-zA-Z-_]+)(?:/([0-9a-zA-Z-_]+))?(?:/([/0-9a-zA-Z-_.:]+))?")
-var requestDataPathPattern = regexp.MustCompile("([0-9a-zA-Z-_]+(?::[0-9a-zA-Z-_:]+)?)?(?:/([0-9a-zA-Z-_]+))?")
-var siriPathPattern = regexp.MustCompile("v2.0/([a-z-]+).json")
-
 type Server struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
@@ -29,59 +24,6 @@ type Server struct {
 	bind        string
 	startedTime time.Time
 	apiKey      string
-}
-
-type SIRIRequestData struct {
-	Filters     url.Values
-	Referential string
-	Request     string
-	Url         string
-}
-
-type RequestData struct {
-	Filters     url.Values
-	Body        []byte
-	Method      string
-	Referential string
-	Resource    string
-	Id          string
-	Action      string
-	Url         string
-}
-
-func NewRequestDataFromContent(params []string) *RequestData {
-	requestFiller := make([]string, 15)
-
-	copy(requestFiller, params)
-
-	foundStrings := requestDataPathPattern.FindStringSubmatch(requestFiller[3])
-
-	return &RequestData{
-		Referential: requestFiller[1],
-		Resource:    requestFiller[2],
-		Id:          foundStrings[1],
-		Action:      foundStrings[2],
-	}
-}
-
-func NewSIRIRequestDataFromContent(params []string) (*SIRIRequestData, bool) {
-	requestFiller := make([]string, 15)
-
-	copy(requestFiller, params)
-
-	requestData := &SIRIRequestData{
-		Referential: requestFiller[1],
-	}
-
-	if requestFiller[3] != "" {
-		foundStrings := siriPathPattern.FindStringSubmatch(requestFiller[3])
-		if len(foundStrings) == 0 {
-			return nil, false
-		}
-		requestData.Request = foundStrings[1]
-	}
-
-	return requestData, true
 }
 
 func NewServer(bind string) *Server {
@@ -94,28 +36,52 @@ func NewServer(bind string) *Server {
 }
 
 func (server *Server) ListenAndServe() error {
+	mux := http.NewServeMux()
+
+	mux.HandleFunc("POST /{referential_slug}/graphql", server.handleGraphql)
+	mux.HandleFunc("POST /{referential_slug}/push", server.handlePush)
+
+	mux.HandleFunc("GET /{referential_slug}/gtfs/{resource}", server.handleGtfs)
+
+	mux.HandleFunc("POST /{referential_slug}/siri", server.HandleSIRI)
+	mux.HandleFunc("GET /{referential_slug}/siri/v2.0/{resource}", server.handleSIRILite)
+
+	mux.HandleFunc("GET /_status", server.handleStatus)
+	mux.HandleFunc("GET /_time", server.handleTimeGet)
+	mux.HandleFunc("POST /_time/advance", server.handleTimeAdvance)
+
+	mux.HandleFunc("GET /_referentials", server.handleReferentialIndex)
+	mux.HandleFunc("POST /_referentials", server.handleReferentialCreate)
+
+	// To avoid overlap between /{referential_slug}/gtfs and  /_referentials/{id} and /{referential_slug}
+	mux.HandleFunc("GET /{referential_slug}/{model}", server.handleReferentialGet)
+
+	mux.HandleFunc("PUT /_referentials/{id}", server.handleReferentialUpdate)
+	mux.HandleFunc("DELETE /_referentials/{id}", server.handleReferentialDelete)
+	mux.HandleFunc("POST /_referentials/save", server.handleReferentialSave)
+	mux.HandleFunc("POST /_referentials/reload/{id}", server.handleReferentialReload)
+
+	mux.HandleFunc("GET /{referential_slug}/{model}/{id}", server.handleReferentialModelShow)
+	mux.HandleFunc("POST /{referential_slug}/{model}", server.handleReferentialModelCreate)
+	mux.HandleFunc("PUT /{referential_slug}/{model}/{id}", server.handleReferentialModelUpdate)
+	mux.HandleFunc("DELETE /{referential_slug}/{model}/{id}", server.handleReferentialModelDelete)
+	mux.HandleFunc("POST /{referential_slug}/import", server.handleReferentialImport)
+
+	mux.HandleFunc("POST /{referential_slug}/partners/save", server.handleReferentialPartnerSave)
+
+	mux.HandleFunc("GET /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsIndex)
+	mux.HandleFunc("POST /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsCreate)
+	mux.HandleFunc("DELETE /{referential_slug}/partners/{id}/subscriptions/{subscription_id}", server.handlePartnerSubscriptionsDelete)
+
 	server.srv = &http.Server{
+		Handler:      mux,
 		Addr:         server.bind,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 60 * time.Second,
 	}
-	http.HandleFunc("/", server.HandleFlow)
 
 	logger.Log.Debugf("Starting server on %s", server.bind)
 	return server.srv.ListenAndServe()
-}
-
-func (server *Server) handleControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
-	newController, ok := newControllerMap[requestData.Referential]
-	if !ok {
-		http.Error(response, "Invalid ressource", http.StatusBadRequest)
-		return
-	}
-
-	logger.Log.Debugf("%s controller request: %v", requestData.Resource, request)
-
-	controller := newController(server)
-	controller.serve(response, request, requestData)
 }
 
 func (server *Server) getToken(r *http.Request) string {
@@ -134,7 +100,7 @@ func (server *Server) isAdmin(r *http.Request) bool {
 	return server.getToken(r) == server.apiKey
 }
 
-func (server *Server) isAuth(referential *core.Referential, request *http.Request, requestData *RequestData) bool {
+func (server *Server) isAuth(referential *core.Referential, request *http.Request) bool {
 	authToken := server.getToken(request)
 
 	if authToken == "" {
@@ -147,119 +113,300 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 		}
 	}
 
-	if requestData.Resource == "import" {
-		for _, token := range referential.ImportTokens {
-			if authToken == token {
-				return true
-			}
-		}
-	}
-
 	return false
 }
 
-func (server *Server) HandleFlow(response http.ResponseWriter, request *http.Request) {
-	defer monitoring.HandleHttpPanic(response)
+func (server *Server) isAuthForImport(referential *core.Referential, request *http.Request) bool {
+	authToken := server.getToken(request)
 
-	path := request.URL.RequestURI()
-	foundStrings := pathPattern.FindStringSubmatch(path)
-	if foundStrings == nil || foundStrings[1] == "" {
-		http.Error(response, "Invalid request", http.StatusBadRequest)
-		return
+	if authToken == "" {
+		return false
 	}
-	response.Header().Set("Server", version.ApplicationName())
 
-	if foundStrings[2] == "siri" {
-		requestData, ok := NewSIRIRequestDataFromContent(foundStrings)
-		if !ok {
-			http.Error(response, "Invalid request", http.StatusBadRequest)
-			return
+	for _, token := range referential.Tokens {
+		if authToken == token {
+			return true
 		}
-		requestData.Filters = request.URL.Query()
-		requestData.Url = request.URL.RequestURI()
-		server.handleSIRI(response, request, requestData)
-		return
 	}
 
-	if foundStrings[2] == "push" {
-		server.handlePush(response, request, foundStrings[1])
-		return
-	}
-
-	if foundStrings[2] == "gtfs" {
-		server.handleGtfs(response, request, foundStrings[1], foundStrings[3])
-		return
-	}
-
-	if foundStrings[2] == "graphql" {
-		server.handleGraphql(response, request, foundStrings[1])
-		return
-	}
-
-	requestData := NewRequestDataFromContent(foundStrings)
-	requestData.Method = request.Method
-	requestData.Url = request.URL.Path
-	requestData.Filters = request.URL.Query()
-
-	response.Header().Set("Content-Type", "application/json")
-
-	if strings.HasPrefix(requestData.Referential, "_") {
-		if requestData.Referential != "_status" && !server.isAdmin(request) {
-			http.Error(response, "Unauthorized request", http.StatusUnauthorized)
-			logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
-			return
-		}
-		if requestData.Referential == "_referentials" {
-			requestData.Action = requestData.Id
-			requestData.Id = requestData.Resource
-		}
-		server.handleControllers(response, request, requestData)
-		return
-	}
-
-	server.handleWithReferentialControllers(response, request, requestData)
+	return slices.Contains(referential.ImportTokens, authToken)
 }
 
-func (server *Server) handleWithReferentialControllers(response http.ResponseWriter, request *http.Request, requestData *RequestData) {
+func (server *Server) referentialSetup(response http.ResponseWriter, request *http.Request) (controller *ReferentialController) {
+	defer monitoring.HandleHttpPanic(response)
 
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
+	if !server.isAdmin(request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		logger.Log.Debugf("Tried to access ressource admin without autorization token:\n%v", request)
+		return
+	}
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller = NewReferentialController(server)
+	return
+}
+
+func (server *Server) referentialModelSetup(response http.ResponseWriter, request *http.Request) (controller RestfulResource, model string) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
 	}
-	if !server.isAuth(foundReferential, request, requestData) {
+
+	if !server.isAuth(foundReferential, request) {
 		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
 		return
 	}
-	newController, ok := newWithReferentialControllerMap[requestData.Resource]
+
+	model = request.PathValue("model")
+	newController, ok := newWithReferentialControllerMap[model]
 	if !ok {
 		http.Error(response, "Invalid ressource", http.StatusBadRequest)
 		return
 	}
 
-	logger.Log.Debugf("%s controller request: %v", requestData.Resource, request)
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
 
-	controller := newController(foundReferential)
-	controller.serve(response, request, requestData)
+	controller = newController(foundReferential)
+
+	return
 }
 
-func (server *Server) handleSIRI(response http.ResponseWriter, request *http.Request, requestData *SIRIRequestData) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(requestData.Referential))
-
-	logger.Log.Debugf("SIRI request: %v", request)
-
-	if requestData.Request == "" {
-		siriHandler := NewSIRIHandler(foundReferential)
-		siriHandler.serve(response, request)
+func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, request *http.Request) {
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
 		return
 	}
 
-	siriHandler := NewSIRILiteHandler(foundReferential, server.getToken(request))
-	siriHandler.serve(response, request, requestData)
+	logger.Log.Debugf("%s controller Index request: %v", model, request)
+
+	controller.Index(response)
 }
 
-func (server *Server) handlePush(response http.ResponseWriter, request *http.Request, referential string) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+func (server *Server) handleReferentialModelShow(response http.ResponseWriter, request *http.Request) {
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
+		return
+	}
+
+	logger.Log.Debugf("%s controller Show request: %v", model, request)
+
+	id := request.PathValue("id")
+	controller.Show(response, id)
+}
+
+func (server *Server) handleReferentialModelCreate(response http.ResponseWriter, request *http.Request) {
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
+		return
+	}
+
+	logger.Log.Debugf("%s controller Delete request: %v", model, request)
+
+	body := getRequestBody(response, request)
+	if body == nil {
+		return
+	}
+
+	logger.Log.Debugf("%s controller Create request: %v", model, request)
+
+	controller.Create(response, body)
+}
+
+func (server *Server) handleReferentialModelUpdate(response http.ResponseWriter, request *http.Request) {
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
+		return
+	}
+
+	body := getRequestBody(response, request)
+	if body == nil {
+		return
+	}
+
+	logger.Log.Debugf("%s controller Update request: %v", model, request)
+
+	id := request.PathValue("id")
+	controller.Update(response, id, body)
+}
+
+func (server *Server) handleReferentialPartnerSave(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	partnerControler := NewPartnerController(foundReferential)
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	logger.Log.Debugf("Partner controller Save request: %v", request)
+
+	partnerControler.(Savable).Save(response)
+}
+
+func (server *Server) handleReferentialModelDelete(response http.ResponseWriter, request *http.Request) {
+	controller, model := server.referentialModelSetup(response, request)
+	if controller == nil {
+		return
+	}
+
+	logger.Log.Debugf("%s controller Delete request: %v", model, request)
+
+	id := request.PathValue("id")
+	controller.Delete(response, id)
+}
+
+func (server *Server) handleReferentialImport(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	if !server.isAuthForImport(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	logger.Log.Debugf("Import controller request: %v", request)
+
+	controller := NewImportController(foundReferential)
+	controller.serve(response, request)
+}
+
+func (server *Server) handleReferentialIndex(response http.ResponseWriter, request *http.Request) {
+	controller := server.referentialSetup(response, request)
+
+	controller.Index(response)
+}
+
+func (server *Server) handleReferentialCreate(response http.ResponseWriter, request *http.Request) {
+	controller := server.referentialSetup(response, request)
+
+	controller.Create(response, request)
+}
+
+func (server *Server) handleReferentialGet(response http.ResponseWriter, request *http.Request) {
+	data := request.PathValue("model")
+	referentialSlug := request.PathValue("referential_slug")
+	if data == "gtfs" && referentialSlug != "_referentials" {
+		server.handleGtfs(response, request)
+	}
+
+	if referentialSlug == "_referentials" {
+		controller := server.referentialSetup(response, request)
+		controller.Show(response, data)
+		return
+	}
+
+	server.handleReferentialModelIndex(response, request)
+}
+
+func (server *Server) handleReferentialUpdate(response http.ResponseWriter, request *http.Request) {
+	controller := server.referentialSetup(response, request)
+
+	id := request.PathValue("id")
+	controller.Update(response, request, id)
+}
+
+func (server *Server) handleReferentialDelete(response http.ResponseWriter, request *http.Request) {
+	controller := server.referentialSetup(response, request)
+
+	id := request.PathValue("id")
+	controller.Delete(response, id)
+}
+
+func (server *Server) handleReferentialSave(response http.ResponseWriter, request *http.Request) {
+	controller := server.referentialSetup(response, request)
+
+	controller.Save(response)
+}
+
+func (server *Server) handleReferentialReload(response http.ResponseWriter, request *http.Request) {
+	controller := server.referentialSetup(response, request)
+
+	id := request.PathValue("id")
+	controller.reload(id, response)
+}
+
+func (server *Server) handleStatus(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewStatusController(server)
+	controller.serve(response, request)
+}
+
+func (server *Server) handleTimeGet(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewTimeController(server)
+	controller.get(response)
+}
+
+func (server *Server) handleTimeAdvance(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	controller := NewTimeController(server)
+	controller.advance(response, request)
+}
+
+func (server *Server) handleSIRILite(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+
+	logger.Log.Debugf("SIRI Lite request: %v", request)
+
+	siriLiteHandler := NewSIRILiteHandler(foundReferential, server.getToken(request))
+	siriLiteHandler.serve(response, request)
+}
+
+func (server *Server) HandleSIRI(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+
+	logger.Log.Debugf("SIRI request: %v", request)
+
+	response.Header().Set("Server", version.ApplicationName())
+
+	siriHandler := NewSIRIHandler(foundReferential)
+	siriHandler.serve(response, request)
+}
+
+func (server *Server) handlePush(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
@@ -267,12 +414,17 @@ func (server *Server) handlePush(response http.ResponseWriter, request *http.Req
 
 	logger.Log.Debugf("Push request: %v", request)
 
+	response.Header().Set("Server", version.ApplicationName())
+
 	pushHandler := NewPushHandler(foundReferential, server.getToken(request))
 	pushHandler.serve(response, request)
 }
 
-func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Request, referential, resource string) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
@@ -280,12 +432,19 @@ func (server *Server) handleGtfs(response http.ResponseWriter, request *http.Req
 
 	logger.Log.Debugf("Gtfs request: %v", request)
 
+	response.Header().Set("Server", version.ApplicationName())
+
 	gtfsHandler := NewGtfsHandler(foundReferential, server.getToken(request))
+
+	resource := request.PathValue("resource")
 	gtfsHandler.serve(response, request, resource)
 }
 
-func (server *Server) handleGraphql(response http.ResponseWriter, request *http.Request, referential string) {
-	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referential))
+func (server *Server) handleGraphql(response http.ResponseWriter, request *http.Request) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
 	if foundReferential == nil {
 		http.Error(response, "Referential not found", http.StatusNotFound)
 		return
@@ -293,6 +452,60 @@ func (server *Server) handleGraphql(response http.ResponseWriter, request *http.
 
 	logger.Log.Debugf("Graphql request: %v", request)
 
+	response.Header().Set("Server", version.ApplicationName())
+
 	graphqlHandler := NewGraphqlHandler(foundReferential, server.getToken(request))
 	graphqlHandler.serve(response, request)
+}
+
+func (server *Server) partnerSubscriptionsSetup(response http.ResponseWriter, request *http.Request) (controller RestfulResource) {
+	defer monitoring.HandleHttpPanic(response)
+
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	controller = NewPartnerController(foundReferential)
+	return
+}
+
+func (server *Server) handlePartnerSubscriptionsIndex(response http.ResponseWriter, request *http.Request) {
+	controller := server.partnerSubscriptionsSetup(response, request)
+
+	logger.Log.Debugf("Partner Subscriptions controller Index request: %v", request)
+
+	id := request.PathValue("id")
+	controller.(SubscriptionResource).SubscriptionsIndex(response, id)
+}
+
+func (server *Server) handlePartnerSubscriptionsCreate(response http.ResponseWriter, request *http.Request) {
+	controller := server.partnerSubscriptionsSetup(response, request)
+
+	body := getRequestBody(response, request)
+	if body == nil {
+		return
+	}
+
+	logger.Log.Debugf("Partner Subscriptions controller Create request: %v", request)
+
+	id := request.PathValue("id")
+	controller.(SubscriptionResource).SubscriptionsCreate(response, id, body)
+}
+
+func (server *Server) handlePartnerSubscriptionsDelete(response http.ResponseWriter, request *http.Request) {
+	controller := server.partnerSubscriptionsSetup(response, request)
+
+	logger.Log.Debugf("Partner Subscriptions controller Delete request: %v", request)
+
+	subscriptionId := request.PathValue("subscription_id")
+	id := request.PathValue("id")
+	controller.(SubscriptionResource).SubscriptionsDelete(response, id, subscriptionId)
 }

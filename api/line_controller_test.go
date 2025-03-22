@@ -10,18 +10,15 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line *model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -53,8 +50,28 @@ func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *test
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "lines")
+	switch method {
+	case "GET":
+		if sendIdentifier == false && body == nil {
+			server.handleReferentialModelIndex(responseRecorder, request)
+		} else {
+			request.SetPathValue("id", string(line.Id()))
+			server.handleReferentialModelShow(responseRecorder, request)
+		}
+	case "POST":
+		server.handleReferentialModelCreate(responseRecorder, request)
+	case "PUT":
+		request.SetPathValue("id", string(line.Id()))
+		server.handleReferentialModelUpdate(responseRecorder, request)
+	case "DELETE":
+		request.SetPathValue("id", string(line.Id()))
+		server.handleReferentialModelDelete(responseRecorder, request)
+	default:
+		t.Fatalf("Unknown method: %s", method)
+	}
+
 	return
 }
 
@@ -76,6 +93,8 @@ func Test_LineController_Delete(t *testing.T) {
 }
 
 func Test_LineController_Update(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
 	line, responseRecorder, referential := prepareLineRequest("PUT", true, body, t)
@@ -83,31 +102,31 @@ func Test_LineController_Update(t *testing.T) {
 	// Check response
 	checkLineResponseStatus(responseRecorder, t)
 
-	// Test Results
 	updatedLine, ok := referential.Model().Lines().Find(line.Id())
-	if !ok {
-		t.Errorf("Line should be found after PUT request")
-	}
+	assert.True(ok, "Line should be found after PUT request")
 
-	if expected, _ := updatedLine.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedLine, err := updatedLine.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expectedLine), responseRecorder.Body.String())
 }
 
 func Test_LineController_Show(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	line, responseRecorder, _ := prepareLineRequest("GET", true, nil, t)
 
 	// Test response
 	checkLineResponseStatus(responseRecorder, t)
 
-	//Test Results
-	if expected, _ := line.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	expectedLine, err := line.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expectedLine), responseRecorder.Body.String())
 }
 
 func Test_LineController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ 	"References" : {
 		"JourneyPattern":{"Code":{"lol":"lel"}, "Id":"42"}
@@ -118,35 +137,31 @@ func Test_LineController_Create(t *testing.T) {
 	// Check response
 	checkLineResponseStatus(responseRecorder, t)
 
-	// Test Results
 	// Using the fake uuid generator, the uuid of the created
 	// line should be 6ba7b814-9dad-11d1-1-00c04fd430c8
-	line, ok := referential.Model().Lines().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("Line should be found after POST request")
-	}
-	lineMarshal, _ := line.MarshalJSON()
+	_, ok := referential.Model().Lines().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
+	assert.True(ok, "Line should be found after POST request")
+
 	expected := `{"CollectSituations":false,"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":{"JourneyPattern":{"Code":{"lol":"lel"}}},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
-	if responseRecorder.Body.String() != string(expected) && string(lineMarshal) != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_LineController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareLineRequest("GET", false, nil, t)
 
 	// Test response
 	checkLineResponseStatus(responseRecorder, t)
 
-	//Test Results
 	expected := `[{"CollectSituations":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_LineController_FindLine(t *testing.T) {
+	assert := assert.New(t)
+
 	ref := core.NewMemoryReferentials().New("test")
 
 	line := ref.Model().Lines().New()
@@ -159,12 +174,8 @@ func Test_LineController_FindLine(t *testing.T) {
 	}
 
 	_, ok := controller.findLine("codeSpace:stif:value")
-	if !ok {
-		t.Error("Can't find Line by Code")
-	}
+	assert.True(ok, "Can't find Line by Code")
 
 	_, ok = controller.findLine(string(line.Id()))
-	if !ok {
-		t.Error("Can't find Line by Id")
-	}
+	assert.True(ok, "Can't find Line by Id")
 }

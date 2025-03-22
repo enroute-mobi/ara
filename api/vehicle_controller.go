@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -15,11 +14,9 @@ type VehicleController struct {
 	referential *core.Referential
 }
 
-func NewVehicleController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &VehicleController{
-			referential: referential,
-		},
+func NewVehicleController(referential *core.Referential) RestfulResource {
+	return &VehicleController{
+		referential: referential,
 	}
 }
 
@@ -32,7 +29,7 @@ func (controller *VehicleController) findVehicle(identifier string) (*model.Vehi
 	return controller.referential.Model().Vehicles().Find(model.VehicleId(identifier))
 }
 
-func (controller *VehicleController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *VehicleController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Vehicles Index")
 
 	stime := controller.referential.Clock().Now()

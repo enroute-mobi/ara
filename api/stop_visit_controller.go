@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -16,19 +14,15 @@ type StopVisitController struct {
 	svs model.StopVisits
 }
 
-func NewStopVisitController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &StopVisitController{
-			svs: referential.Model().StopVisits(),
-		},
+func NewStopVisitController(referential *core.Referential) RestfulResource {
+	return &StopVisitController{
+		svs: referential.Model().StopVisits(),
 	}
 }
 
-func NewScheduledStopVisitController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &StopVisitController{
-			svs: referential.Model().ScheduledStopVisits(),
-		},
+func NewScheduledStopVisitController(referential *core.Referential) RestfulResource {
+	return &StopVisitController{
+		svs: referential.Model().ScheduledStopVisits(),
 	}
 }
 
@@ -41,48 +35,11 @@ func (controller *StopVisitController) findStopVisit(identifier string) (*model.
 	return controller.svs.Find(model.StopVisitId(identifier))
 }
 
-func (controller *StopVisitController) filterStopVisits(stopVisits []*model.StopVisit, filters url.Values) []*model.StopVisit {
-	selectors := []model.StopVisitSelector{}
-	filteredStopVisits := []*model.StopVisit{}
-
-	for key, value := range filters {
-		switch key {
-		case "After":
-			layout := "2006/01/02-15:04:05"
-			startTime, err := time.Parse(layout, value[0])
-			if err != nil {
-				continue
-			}
-			selectors = append(selectors, model.StopVisitSelectorAfterTime(startTime))
-		case "Before":
-			layout := "2006/01/02-15:04:05"
-			endTime, err := time.Parse(layout, value[0])
-			if err != nil {
-				continue
-			}
-			selectors = append(selectors, model.StopVisitSelectorAfterTime(endTime))
-		case "StopArea":
-			selectors = append(selectors, model.StopVisitSelectByStopAreaId(model.StopAreaId(value[0])))
-		}
-	}
-
-	selector := model.CompositeStopVisitSelector(selectors)
-	for _, sv := range stopVisits {
-		if !selector(sv) {
-			continue
-		}
-		filteredStopVisits = append(filteredStopVisits, sv)
-	}
-
-	return filteredStopVisits
-}
-
-func (controller *StopVisitController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *StopVisitController) Index(response http.ResponseWriter) {
 	stopVisits := controller.svs.FindAll()
-	filteredStopVisits := controller.filterStopVisits(stopVisits, filters)
 
 	logger.Log.Debugf("StopVisits Index")
-	jsonBytes, _ := json.Marshal(filteredStopVisits)
+	jsonBytes, _ := json.Marshal(stopVisits)
 	response.Write(jsonBytes)
 }
 

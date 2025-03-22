@@ -10,18 +10,15 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func checkStopAreaResponseStatus(responseRecorder *httptest.ResponseRecorder, t *testing.T) {
-	if status := responseRecorder.Code; status != http.StatusOK {
-		t.Errorf("Handler returned wrong status code:\n got %v\n want %v",
-			status, http.StatusOK)
-	}
+	require := require.New(t)
 
-	if contentType := responseRecorder.Header().Get("Content-Type"); contentType != "application/json" {
-		t.Errorf("Handler returned wrong Content-Type:\n got: %v\n want: %v",
-			contentType, "application/json")
-	}
+	require.Equal(http.StatusOK, responseRecorder.Code)
+	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
 func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea *model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
@@ -54,13 +51,33 @@ func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *
 	// Create a ResponseRecorder
 	responseRecorder = httptest.NewRecorder()
 
-	// Call HandleFlow method and pass in our Request and ResponseRecorder.
-	server.HandleFlow(responseRecorder, request)
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+	switch method {
+	case "GET":
+		if sendIdentifier == false && body == nil {
+			server.handleReferentialModelIndex(responseRecorder, request)
+		} else {
+			request.SetPathValue("id", string(stopArea.Id()))
+			server.handleReferentialModelShow(responseRecorder, request)
+		}
+	case "POST":
+		server.handleReferentialModelCreate(responseRecorder, request)
+	case "PUT":
+		request.SetPathValue("id", string(stopArea.Id()))
+		server.handleReferentialModelUpdate(responseRecorder, request)
+	case "DELETE":
+		request.SetPathValue("id", string(stopArea.Id()))
+		server.handleReferentialModelDelete(responseRecorder, request)
+	default:
+		t.Fatalf("Unknown method: %s", method)
+	}
 
 	return
 }
 
 func Test_StopAreaController_Delete(t *testing.T) {
+	assert := assert.New(t)
 	// Send request
 	stopArea, responseRecorder, referential := prepareStopAreaRequest("DELETE", true, nil, t)
 
@@ -69,15 +86,15 @@ func Test_StopAreaController_Delete(t *testing.T) {
 
 	//Test Results
 	_, ok := referential.Model().StopAreas().Find(stopArea.Id())
-	if ok {
-		t.Errorf("StopArea shouldn't be found after DELETE request")
-	}
-	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for DELETE response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.False(ok, "StopArea shouldn't be found after DELETE request")
+
+	stopAreaBytes, err := stopArea.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(stopAreaBytes), responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_Update(t *testing.T) {
+	assert := assert.New(t)
 	// Prepare and send request
 	body := []byte(`{ "Name": "Yet another test" }`)
 	stopArea, responseRecorder, referential := prepareStopAreaRequest("PUT", true, body, t)
@@ -87,19 +104,16 @@ func Test_StopAreaController_Update(t *testing.T) {
 
 	// Test Results
 	updatedStopArea, ok := referential.Model().StopAreas().Find(stopArea.Id())
-	if !ok {
-		t.Errorf("StopArea should be found after PUT request")
-	}
+	assert.True(ok)
+	assert.Equal("Yet another test", updatedStopArea.Name, "StopArea name should be updated after PUT request")
 
-	if expected := "Yet another test"; updatedStopArea.Name != expected {
-		t.Errorf("StopArea name should be updated after PUT request:\n got: %v\n want: %v", updatedStopArea.Name, expected)
-	}
-	if expected, _ := updatedStopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for PUT response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	updatedStopAreaBytes, err := updatedStopArea.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(updatedStopAreaBytes), responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_Show(t *testing.T) {
+	assert := assert.New(t)
 	// Send request
 	stopArea, responseRecorder, _ := prepareStopAreaRequest("GET", true, nil, t)
 
@@ -107,12 +121,14 @@ func Test_StopAreaController_Show(t *testing.T) {
 	checkStopAreaResponseStatus(responseRecorder, t)
 
 	//Test Results
-	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (show) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	stopAreaBytes, err := stopArea.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(stopAreaBytes), responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_Create(t *testing.T) {
+	assert := assert.New(t)
+
 	// Prepare and send request
 	body := []byte(`{ "Name": "test" }`)
 	_, responseRecorder, referential := prepareStopAreaRequest("POST", false, body, t)
@@ -124,18 +140,17 @@ func Test_StopAreaController_Create(t *testing.T) {
 	// Using the fake uuid generator, the uuid of the created
 	// stopArea should be 6ba7b814-9dad-11d1-1-00c04fd430c8
 	stopArea, ok := referential.Model().StopAreas().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
-	if !ok {
-		t.Errorf("StopArea should be found after POST request")
-	}
-	if expected := "test"; stopArea.Name != expected {
-		t.Errorf("Invalid stopArea name after POST request:\n got: %v\n want: %v", stopArea.Name, expected)
-	}
-	if expected, _ := stopArea.MarshalJSON(); responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for POST response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.True(ok, "StopArea should be found after POST request")
+	assert.Equal("test", stopArea.Name)
+
+	expectedStopArea, err := stopArea.MarshalJSON()
+	assert.NoError(err)
+	assert.JSONEq(string(expectedStopArea), responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_Index(t *testing.T) {
+	assert := assert.New(t)
+
 	// Send request
 	_, responseRecorder, _ := prepareStopAreaRequest("GET", false, nil, t)
 
@@ -144,12 +159,12 @@ func Test_StopAreaController_Index(t *testing.T) {
 
 	//Test Results
 	expected := `[{"Origins":{},"Name":"First StopArea","CollectChildren":false,"CollectSituations":false,"CollectedAlways":true,"Monitored":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
-	if responseRecorder.Body.String() != string(expected) {
-		t.Errorf("Wrong body for GET (index) response request:\n got: %v\n want: %v", responseRecorder.Body.String(), string(expected))
-	}
+	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
 func Test_StopAreaController_FindStopArea(t *testing.T) {
+	assert := assert.New(t)
+
 	ref := core.NewMemoryReferentials().New("test")
 
 	stopArea := ref.Model().StopAreas().New()
@@ -162,12 +177,8 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 	}
 
 	_, ok := controller.findStopArea("codeSpace:value")
-	if !ok {
-		t.Error("Can't find StopArea by Code")
-	}
+	assert.True(ok, "Can't find StopArea by Code")
 
 	_, ok = controller.findStopArea(string(stopArea.Id()))
-	if !ok {
-		t.Error("Can't find StopArea by Id")
-	}
+	assert.True(ok, "Can't find StopArea by Id")
 }

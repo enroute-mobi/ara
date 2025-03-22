@@ -15,7 +15,7 @@ import (
 )
 
 type VehicleMonitoringLiteRequestBroadcaster interface {
-	RequestVehicles(string, url.Values, *audit.BigQueryMessage) *siri.SiriLiteResponse
+	RequestVehicles(url.Values, *audit.BigQueryMessage) *siri.SiriLiteResponse
 }
 
 type SIRILiteVehicleMonitoringRequestBroadcaster struct {
@@ -37,7 +37,7 @@ func NewSIRILiteVehicleMonitoringRequestBroadcaster(partner *Partner) *SIRILiteV
 	return connector
 }
 
-func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(url string, filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {
+func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(filters url.Values, message *audit.BigQueryMessage) (siriLiteResponse *siri.SiriLiteResponse) {
 	lineRef := filters.Get("LineRef")
 
 	message.RequestIdentifier = filters.Get("MessageIdentifier")

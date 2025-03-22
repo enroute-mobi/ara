@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
 	"sort"
-	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -18,70 +16,50 @@ type PartnerController struct {
 	referential *core.Referential
 }
 
-func NewPartnerController(referential *core.Referential) ControllerInterface {
-	return &Controller{
-		restfulResource: &PartnerController{
-			referential: referential,
-		},
+func NewPartnerController(referential *core.Referential) RestfulResource {
+	return &PartnerController{
+		referential: referential,
 	}
 }
 
-func (controller *PartnerController) getActionId(action, url string) (string, bool) {
-	index := strings.LastIndex(url, action) + len(action) + 1
-	if index >= len(url)-1 {
-		return "", false
-	}
-	id := url[index:]
-
-	sz := len(id)
-	if sz > 0 && id[sz-1] == '/' {
-		id = id[:sz-1]
-	}
-	return id, true
-}
-
-func (controller *PartnerController) subscriptionsIndex(response http.ResponseWriter, requestData *RequestData) {
-	partner := controller.findPartner(requestData.Id)
+func (controller *PartnerController) SubscriptionsIndex(response http.ResponseWriter, identifier string) {
+	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), http.StatusInternalServerError)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusInternalServerError)
 		return
 	}
-	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
+
+	logger.Log.Debugf("Get partner %s for Subscriptions", identifier)
 
 	subscriptions := partner.Subscriptions()
 	jsonBytes, _ := json.Marshal(subscriptions.FindAll())
 	response.Write(jsonBytes)
 }
 
-func (controller *PartnerController) subscriptionsDelete(response http.ResponseWriter, requestData *RequestData) {
-	partner := controller.findPartner(requestData.Id)
+func (controller *PartnerController) SubscriptionsDelete(response http.ResponseWriter, identifier string, subscriptionId string) {
+	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), http.StatusInternalServerError)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusInternalServerError)
 		return
 	}
-	logger.Log.Debugf("Get partner %s for Subscriptions", requestData.Id)
+	logger.Log.Debugf("Get partner %s for Subscriptions", identifier)
 
-	id, ok := controller.getActionId(requestData.Action, requestData.Url)
-	if !ok {
-		http.Error(response, "Invalid request, id can't be nil", http.StatusBadRequest)
-		return
-	}
-	partner.Subscriptions().DeleteById(core.SubscriptionId(id))
+	partner.Subscriptions().DeleteById(core.SubscriptionId(subscriptionId))
 }
 
-func (controller *PartnerController) subscriptionsCreate(response http.ResponseWriter, requestData *RequestData) {
-	logger.Log.Debugf("Create Subscription: %s", string(requestData.Body))
+func (controller *PartnerController) SubscriptionsCreate(response http.ResponseWriter, identifier string, body []byte) {
+	logger.Log.Debugf("Create Subscription: %s", string(body))
 
-	partner := controller.findPartner(requestData.Id)
+	partner := controller.findPartner(identifier)
 	if partner == nil {
-		http.Error(response, fmt.Sprintf("Partner not found: %s", requestData.Id), http.StatusInternalServerError)
+		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusInternalServerError)
 		return
 	}
 
 	subscription := partner.Subscriptions().New("")
 	apiSubscription := core.APISubscription{}
 
-	err := json.Unmarshal(requestData.Body, &apiSubscription)
+	err := json.Unmarshal(body, &apiSubscription)
 	if err != nil {
 		http.Error(response, fmt.Sprintf("Invalid request: can't parse request body: %v", err), http.StatusBadRequest)
 		return
@@ -108,25 +86,6 @@ func (controller *PartnerController) subscriptionsCreate(response http.ResponseW
 	response.Write(jsonBytes)
 }
 
-func (controller *PartnerController) subscriptions(response http.ResponseWriter, requestData *RequestData) {
-	switch requestData.Method {
-	case "GET":
-		controller.subscriptionsIndex(response, requestData)
-	case "POST":
-		controller.subscriptionsCreate(response, requestData)
-	case "DELETE":
-		controller.subscriptionsDelete(response, requestData)
-	}
-}
-
-func (controller *PartnerController) Action(response http.ResponseWriter, requestData *RequestData) {
-	if requestData.Action == "subscriptions" {
-		controller.subscriptions(response, requestData)
-		return
-	}
-	http.Error(response, fmt.Sprintf("Action not supported: %s", requestData.Action), http.StatusInternalServerError)
-}
-
 func (controller *PartnerController) findPartner(identifier string) *core.Partner {
 	partner, ok := controller.referential.Partners().FindBySlug(core.PartnerSlug(identifier))
 	if ok {
@@ -135,7 +94,7 @@ func (controller *PartnerController) findPartner(identifier string) *core.Partne
 	return controller.referential.Partners().Find(core.PartnerId(identifier))
 }
 
-func (controller *PartnerController) Index(response http.ResponseWriter, filters url.Values) {
+func (controller *PartnerController) Index(response http.ResponseWriter) {
 	logger.Log.Debugf("Partners Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Partners().FindAll())
