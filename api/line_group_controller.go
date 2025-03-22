@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -24,7 +25,7 @@ func (controller *LineGroupsController) findLineGroup(identifier string) (*model
 	return controller.referential.Model().LineGroups().Find(model.LineGroupId(identifier))
 }
 
-func (controller *LineGroupsController) Index(response http.ResponseWriter) {
+func (controller *LineGroupsController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("LineGroup Index")
 	controller.referential.Model().Lines()
 	jsonBytes, _ := json.Marshal(controller.referential.Model().LineGroups().FindAll())

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -35,7 +36,7 @@ func (controller *StopVisitController) findStopVisit(identifier string) (*model.
 	return controller.svs.Find(model.StopVisitId(identifier))
 }
 
-func (controller *StopVisitController) Index(response http.ResponseWriter) {
+func (controller *StopVisitController) Index(response http.ResponseWriter, _params url.Values) {
 	stopVisits := controller.svs.FindAll()
 
 	logger.Log.Debugf("StopVisits Index")

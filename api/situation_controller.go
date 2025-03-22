@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
+	"sort"
+	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -31,10 +34,58 @@ func (controller *SituationController) findSituation(identifier string) (model.S
 	return controller.referential.Model().Situations().Find(model.SituationId(identifier))
 }
 
-func (controller *SituationController) Index(response http.ResponseWriter) {
+func (controller *SituationController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Situations Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().Situations().FindAll())
+	allSituations := controller.referential.Model().Situations().FindAll()
+	order := params.Get("order")
+	switch order {
+	case "validity_periods_start":
+		sort.Slice(allSituations, func(i, j int) bool {
+			return allSituations[i].BroadcastPeriod().StartTime.Before(allSituations[j].BroadcastPeriod().StartTime)
+		})
+	default:
+		sort.Slice(allSituations, func(i, j int) bool {
+			return allSituations[i].RecordedAt.Before(allSituations[j].RecordedAt)
+		})
+	}
+
+	if len(params) == 0 {
+		// We send all situations
+		jsonBytes, _ := json.Marshal(allSituations)
+		response.Write(jsonBytes)
+		return
+	}
+
+	page, err := strconv.Atoi(params.Get("page"))
+	if err != nil {
+		http.Error(response, fmt.Sprintf("Invalid request: query parameter \"page\":'%s", params.Get("page")), http.StatusBadRequest)
+		return
+	}
+
+	var per_page int
+	if params.Get("per_page") != "" {
+		per_page, err = strconv.Atoi(params.Get("per_page"))
+		if page != 0 && err != nil {
+			http.Error(response, fmt.Sprintf("Invalid request: query parameter \"per_page\":'%s", params.Get("")), http.StatusBadRequest)
+			return
+		}
+	}
+
+	if page == 0 && per_page == 0 {
+		jsonBytes, _ := json.Marshal(allSituations)
+		response.Write(jsonBytes)
+		return
+	}
+
+	if per_page == 0 || per_page > DEFAULT_PER_PAGE {
+		per_page = DEFAULT_PER_PAGE
+	}
+
+	start, end := paginateSlice(page, per_page, len(allSituations))
+	pagedSlice := allSituations[start:end]
+
+	jsonBytes, _ := json.Marshal(pagedSlice)
 	response.Write(jsonBytes)
 }
 

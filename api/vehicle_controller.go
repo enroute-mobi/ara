@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -29,7 +30,7 @@ func (controller *VehicleController) findVehicle(identifier string) (*model.Vehi
 	return controller.referential.Model().Vehicles().Find(model.VehicleId(identifier))
 }
 
-func (controller *VehicleController) Index(response http.ResponseWriter) {
+func (controller *VehicleController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("Vehicles Index")
 
 	stime := controller.referential.Clock().Now()

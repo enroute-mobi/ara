@@ -186,7 +186,7 @@ func (server *Server) handleReferentialModelIndex(response http.ResponseWriter, 
 
 	logger.Log.Debugf("%s controller Index request: %v", model, request)
 
-	controller.Index(response)
+	controller.Index(response, request.URL.Query())
 }
 
 func (server *Server) handleReferentialModelShow(response http.ResponseWriter, request *http.Request) {
@@ -294,7 +294,7 @@ func (server *Server) handleReferentialImport(response http.ResponseWriter, requ
 func (server *Server) handleReferentialIndex(response http.ResponseWriter, request *http.Request) {
 	controller := server.referentialSetup(response, request)
 
-	controller.Index(response)
+	controller.Index(response, nil)
 }
 
 func (server *Server) handleReferentialCreate(response http.ResponseWriter, request *http.Request) {

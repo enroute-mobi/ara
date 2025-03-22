@@ -3,6 +3,7 @@ package api
 import (
 	"io"
 	"net/http"
+	"net/url"
 	"regexp"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -24,8 +25,12 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Restfu
 	"vehicles":              NewVehicleController,
 }
 
+const (
+	DEFAULT_PER_PAGE = 30
+)
+
 type RestfulResource interface {
-	Index(response http.ResponseWriter)
+	Index(response http.ResponseWriter, params url.Values)
 	Show(response http.ResponseWriter, identifier string)
 	Delete(response http.ResponseWriter, identifier string)
 	Update(response http.ResponseWriter, identifier string, body []byte)
@@ -61,4 +66,15 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 		return nil
 	}
 	return body
+}
+
+func paginateSlice(pageNum int, pageSize int, sliceLength int) (int, int) {
+	firstEntry := (pageNum - 1) * pageSize
+	lastEntry := firstEntry + pageSize
+
+	if lastEntry > sliceLength {
+		lastEntry = sliceLength
+	}
+
+	return firstEntry, lastEntry
 }

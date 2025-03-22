@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -29,7 +30,7 @@ func (controller *OperatorController) findOperator(identifier string) (*model.Op
 	return controller.referential.Model().Operators().Find(model.OperatorId(identifier))
 }
 
-func (controller *OperatorController) Index(response http.ResponseWriter) {
+func (controller *OperatorController) Index(response http.ResponseWriter, _params url.Values) {
 	logger.Log.Debugf("Operators Index")
 
 	jsonBytes, _ := json.Marshal(controller.referential.Model().Operators().FindAll())
