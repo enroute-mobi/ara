@@ -1186,6 +1186,7 @@ Feature: Support SIRI VehicleMonitoring by request
                 <ns5:Coordinates>1044593 6298716</ns5:Coordinates>
               </ns5:VehicleLocation>
               <ns5:Bearing>287.0</ns5:Bearing>
+              <ns5:Occupancy>seatsAvailable</ns5:Occupancy>
               <ns5:VehicleRef>RLA290</ns5:VehicleRef>
               <ns5:DriverRef>5753</ns5:DriverRef>
               <ns5:MonitoredCall>
@@ -1250,6 +1251,12 @@ Feature: Support SIRI VehicleMonitoring by request
       | VehicleJourneys | ["RLA_Bus:VehicleJourney::2978464:LOC"] |
       | Lines           | ["RLA_Bus:Line::05:LOC"]                |
       | Vehicles        | ["RLA290"]                              |
+    And an audit event should exist with these attributes:
+      | ID        | /{test-uuid}/        |
+      | Bearing   | 287                  |
+      | Codes     | ["internal:RLA290"]  |
+      | Timestamp | 2017-01-01T12:02:00Z |
+      | Occupancy | manySeatsAvailable   | # see https://enroute.atlassian.net/browse/ARA-1189
 
   Scenario: Collect Vehicle Position with numeric srsName
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
