@@ -56,8 +56,8 @@ func (sva *StopVisitArchiver) Archive() {
 
 		for _, obj := range vj.codes {
 			code := &audit.Code{
-				Kind:  obj.codeSpace,
-				Value: obj.value,
+				CodeSpace: obj.codeSpace,
+				Value:     obj.value,
 			}
 			longTermStopVisitEvent.VehicleJourneyCodes = append(longTermStopVisitEvent.VehicleJourneyCodes, *code)
 		}
@@ -72,8 +72,8 @@ func (sva *StopVisitArchiver) Archive() {
 			longTermStopVisitEvent.LineNumber = vj.Line().Number
 			for _, obj := range vj.Line().codes {
 				code := &audit.Code{
-					Kind:  obj.codeSpace,
-					Value: obj.value,
+					CodeSpace: obj.codeSpace,
+					Value:     obj.value,
 				}
 				longTermStopVisitEvent.LineCodes = append(longTermStopVisitEvent.LineCodes, *code)
 			}
@@ -86,8 +86,8 @@ func (sva *StopVisitArchiver) Archive() {
 
 	for _, obj := range sa.codes {
 		code := &audit.Code{
-			Kind:  obj.codeSpace,
-			Value: obj.value,
+			CodeSpace: obj.codeSpace,
+			Value:     obj.value,
 		}
 		longTermStopVisitEvent.StopAreaCodes = append(longTermStopVisitEvent.StopAreaCodes, *code)
 	}

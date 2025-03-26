@@ -152,16 +152,16 @@ Feature: Audit API exchanges
       | DepartureStatus               | departed                                                                                 |
       | ArrivalStatus                 | arrived                                                                                  |
       | StopAreaName                  | Origin                                                                                   |
-      | StopAreaCodes                 | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                                 |
+      | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                                 |
       | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                |
       | LineName                      | Ligne 3 Metro                                                                            |
       | LineNumber                    | L3                                                                                       |
       | TransportMode                 | bus                                                                                      |
-      | LineCodes                     | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"Kind"=>"ddip", "Value"=>"L3:LOC"}]               |
+      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]               |
       | VehicleJourneyDirectionType   | aller                                                                                    |
       | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                           |
       | VehicleJourneyOriginName      | Origin                                                                                   |
-      | VehicleJourneyCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
+      | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
 
   @ARA-1241
   Scenario: Audit a event for a Stop Visit when arrival and departure statuses are cancelled
@@ -312,16 +312,16 @@ Feature: Audit API exchanges
       | DepartureStatus               | cancelled                                                     |
       | ArrivalStatus                 | cancelled                                                     |
       | StopAreaName                  | Origin                                                        |
-      | StopAreaCodes                 | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]          |
+      | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]          |
       | StopAreaCoordinates           | POINT(2.352200 48.856600)                                     |
       | LineName                      | Ligne 3 Metro                                                 |
       | LineNumber                    | L3                                                            |
       | TransportMode                 | bus                                                           |
-      | LineCodes                     | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"}]               |
+      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"}]               |
       | VehicleJourneyDirectionType   | aller                                                         |
       | VehicleJourneyDestinationName | Mago-Cime OMNI                                                |
       | VehicleJourneyOriginName      | Origin                                                        |
-      | VehicleJourneyCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]       |
+      | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]       |
 
   @ARA-1241
   Scenario: Audit a event for a Stop Visit when departure & arrival status are set by Ara internal update mechanism
@@ -379,12 +379,12 @@ Feature: Audit API exchanges
       | DepartureStatus     | departed                                                                                 |
       | ArrivalStatus       | arrived                                                                                  |
       | StopAreaName        | Mago-Cime OMNI                                                                           |
-      | StopAreaCodes       | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                                 |
+      | StopAreaCodes       | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                                 |
       | LineName            | Ligne 3 Metro                                                                            |
       | LineNumber          | L3                                                                                       |
       | TransportMode       | bus                                                                                      |
-      | LineCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"Kind"=>"ddip", "Value"=>"L3:LOC"}]               |
-      | VehicleJourneyCodes | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
+      | LineCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]               |
+      | VehicleJourneyCodes | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
 
   @ARA-1241
   Scenario: Audit a event for a Stop Visit when receiving a MonitoredStopVisitCancellation
@@ -518,12 +518,12 @@ Feature: Audit API exchanges
       | DepartureStatus     | departed                                                                                 |
       | ArrivalStatus       | arrived                                                                                  |
       | StopAreaName        | Mago-Cime OMNI                                                                           |
-      | StopAreaCodes       | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                                 |
+      | StopAreaCodes       | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                                 |
       | LineName            | Ligne 3 Metro                                                                            |
       | LineNumber          | L3                                                                                       |
       | TransportMode       | bus                                                                                      |
-      | LineCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"Kind"=>"ddip", "Value"=>"L3:LOC"}]               |
-      | VehicleJourneyCodes | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
+      | LineCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]               |
+      | VehicleJourneyCodes | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
 
   @ARA-1241
   Scenario: Audit a event for a Stop Visit when departure status is departed and the StopVisit is the NextStopVisit of a Vehicle
@@ -691,15 +691,15 @@ Feature: Audit API exchanges
       | DepartureStatus               | departed                                                                                 |
       | ArrivalStatus                 | arrived                                                                                  |
       | StopAreaName                  | Origin                                                                                   |
-      | StopAreaCodes                 | [{"Kind"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                                 |
+      | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                                 |
       | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                |
       | LineName                      | Ligne 3 Metro                                                                            |
       | LineNumber                    | L3                                                                                       |
       | TransportMode                 | bus                                                                                      |
-      | LineCodes                     | [{"Kind"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"Kind"=>"ddip", "Value"=>"L3:LOC"}]              |
+      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]              |
       | VehicleJourneyDirectionType   | aller                                                                                    |
       | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                           |
       | VehicleJourneyOriginName      | Origin                                                                                   |
-      | VehicleJourneyCodes           | [{"Kind"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
+      | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
       | VehicleOccupancy              | manySeatsAvailable                                                                       |
       | VehicleDriverRef              | Driver:245                                                                               |

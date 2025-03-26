@@ -199,8 +199,8 @@ type BigQueryLongTermStopVisitEvent struct {
 }
 
 type Code struct {
-	Kind  string `bigquery:"kind"`
-	Value string `bigquery:"value"`
+	CodeSpace string `bigquery:"code_space"`
+	Value     string `bigquery:"value"`
 }
 
 func (bq *BigQueryLongTermStopVisitEvent) EventType() string        { return BQ_LONG_TERM_STOP_VISIT_EVENT }
@@ -231,7 +231,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 		Repeated: true,
 		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
-			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "code_space", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
 		},
 	},
@@ -246,7 +246,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 		Repeated: true,
 		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
-			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "code_space", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
 		},
 	},
@@ -260,7 +260,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 		Repeated: true,
 		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
-			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "code_space", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
 		},
 	},
