@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -294,7 +295,9 @@ func (bq *BigQueryClient) run() {
 		case vehicleMessage := <-bq.vehicleEvents:
 			bq.send(vehicleMessage, bq.vehicleInserter)
 		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
-			bq.send(longTermStopVisitMessage, bq.longTermStopVisitInserter)
+			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
+				bq.send(longTermStopVisitMessage, bq.longTermStopVisitInserter)
+			}
 		}
 	}
 }
