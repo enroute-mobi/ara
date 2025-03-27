@@ -169,6 +169,7 @@ type BigQueryLongTermStopVisitEvent struct {
 	Timestamp time.Time `bigquery:"timestamp"`
 
 	StopVisitUUID      string                 `bigquery:"stop_visit_uuid"`
+	PassageOrder       int                    `bigquery:"passage_order"`
 	AimedDepartureTime bigquery.NullTimestamp `bigquery:"aimed_departure_time"`
 	AimedArrivalTime   bigquery.NullTimestamp `bigquery:"aimed_arrival_time"`
 
@@ -212,6 +213,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "timestamp", Required: true, Type: bigquery.TimestampFieldType},
 
 	{Name: "stop_visit_uuid", Required: true, Type: bigquery.StringFieldType},
+	{Name: "passage_order", Required: false, Type: bigquery.BigNumericFieldType},
 
 	{Name: "aimed_departure_time", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "aimed_arrival_time", Required: false, Type: bigquery.TimestampFieldType},

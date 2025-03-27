@@ -146,21 +146,22 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | StopVisitUUID                 | /{test-uuid}/                                                                            |
-      | AimedArrivalTime              | 2017-01-01T13:00:00+02:00                                                                |
-      | ExpectedArrivalTime           | 2017-01-01T13:01:00+02:00                                                                |
-      | DepartureStatus               | departed                                                                                 |
-      | ArrivalStatus                 | arrived                                                                                  |
-      | StopAreaName                  | Origin                                                                                   |
+      | StopVisitUUID                 | /{test-uuid}/                                                                                      |
+      | PassageOrder                  | 4                                                                                                  |
+      | AimedArrivalTime              | 2017-01-01T13:00:00+02:00                                                                          |
+      | ExpectedArrivalTime           | 2017-01-01T13:01:00+02:00                                                                          |
+      | DepartureStatus               | departed                                                                                           |
+      | ArrivalStatus                 | arrived                                                                                            |
+      | StopAreaName                  | Origin                                                                                             |
       | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                                 |
-      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                |
-      | LineName                      | Ligne 3 Metro                                                                            |
-      | LineNumber                    | L3                                                                                       |
-      | TransportMode                 | bus                                                                                      |
-      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]               |
-      | VehicleJourneyDirectionType   | aller                                                                                    |
-      | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                           |
-      | VehicleJourneyOriginName      | Origin                                                                                   |
+      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                          |
+      | LineName                      | Ligne 3 Metro                                                                                      |
+      | LineNumber                    | L3                                                                                                 |
+      | TransportMode                 | bus                                                                                                |
+      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}] |
+      | VehicleJourneyDirectionType   | aller                                                                                              |
+      | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                                     |
+      | VehicleJourneyOriginName      | Origin                                                                                             |
       | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
 
   @ARA-1241
@@ -306,22 +307,23 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | StopVisitUUID                 | /{test-uuid}/                                                 |
-      | ActualArrivalTime             | 2017-01-01T13:05:00+02:00                                     |
-      | ActualDepartureTime           | 2017-01-01T13:22:00+02:00                                     |
-      | DepartureStatus               | cancelled                                                     |
-      | ArrivalStatus                 | cancelled                                                     |
-      | StopAreaName                  | Origin                                                        |
-      | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]          |
-      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                     |
-      | LineName                      | Ligne 3 Metro                                                 |
-      | LineNumber                    | L3                                                            |
-      | TransportMode                 | bus                                                           |
-      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"}]               |
-      | VehicleJourneyDirectionType   | aller                                                         |
-      | VehicleJourneyDestinationName | Mago-Cime OMNI                                                |
-      | VehicleJourneyOriginName      | Origin                                                        |
-      | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]       |
+      | StopVisitUUID                 | /{test-uuid}/                                                      |
+      | PassageOrder                  | 4                                                                  |
+      | ActualArrivalTime             | 2017-01-01T13:05:00+02:00                                          |
+      | ActualDepartureTime           | 2017-01-01T13:22:00+02:00                                          |
+      | DepartureStatus               | cancelled                                                          |
+      | ArrivalStatus                 | cancelled                                                          |
+      | StopAreaName                  | Origin                                                             |
+      | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}] |
+      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                          |
+      | LineName                      | Ligne 3 Metro                                                      |
+      | LineNumber                    | L3                                                                 |
+      | TransportMode                 | bus                                                                |
+      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"}]          |
+      | VehicleJourneyDirectionType   | aller                                                              |
+      | VehicleJourneyDestinationName | Mago-Cime OMNI                                                     |
+      | VehicleJourneyOriginName      | Origin                                                             |
+      | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]  |
 
   @ARA-1241
   Scenario: Audit a event for a Stop Visit when departure & arrival status are set by Ara internal update mechanism
@@ -371,19 +373,20 @@ Feature: Audit API exchanges
     And a minute has passed
     And a minute has passed
     Then an audit event should exist with these attributes:
-      | StopVisitUUID       | /{test-uuid}/                                                                            |
-      | AimedArrivalTime    | 2017-01-01T11:55:00+02:00                                                                |
-      | AimedDepartureTime  | 2017-01-01T11:59:00+02:00                                                                |
-      | ActualArrivalTime   | 2017-01-01T11:55:00+02:00                                                                |
-      | ActualDepartureTime | 2017-01-01T11:59:00+02:00                                                                |
-      | DepartureStatus     | departed                                                                                 |
-      | ArrivalStatus       | arrived                                                                                  |
-      | StopAreaName        | Mago-Cime OMNI                                                                           |
+      | StopVisitUUID       | /{test-uuid}/                                                                                      |
+      | PassageOrder        | 4                                                                                                  |
+      | AimedArrivalTime    | 2017-01-01T11:55:00+02:00                                                                          |
+      | AimedDepartureTime  | 2017-01-01T11:59:00+02:00                                                                          |
+      | ActualArrivalTime   | 2017-01-01T11:55:00+02:00                                                                          |
+      | ActualDepartureTime | 2017-01-01T11:59:00+02:00                                                                          |
+      | DepartureStatus     | departed                                                                                           |
+      | ArrivalStatus       | arrived                                                                                            |
+      | StopAreaName        | Mago-Cime OMNI                                                                                     |
       | StopAreaCodes       | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                                 |
-      | LineName            | Ligne 3 Metro                                                                            |
-      | LineNumber          | L3                                                                                       |
-      | TransportMode       | bus                                                                                      |
-      | LineCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]               |
+      | LineName            | Ligne 3 Metro                                                                                      |
+      | LineNumber          | L3                                                                                                 |
+      | TransportMode       | bus                                                                                                |
+      | LineCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}] |
       | VehicleJourneyCodes | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
 
   @ARA-1241
@@ -511,18 +514,19 @@ Feature: Audit API exchanges
       """
     And a minute has passed
     Then an audit event should exist with these attributes:
-      | StopVisitUUID       | /{test-uuid}/                                                                            |
-      | ActualArrivalTime   | 2017-01-01T12:55:00+02:00                                                                |
-      | AimedDepartureTime  | 2017-01-01T12:59:00+02:00                                                               |
-      | AimedArrivalTime    | 2017-01-01T12:55:00+02:00                                                                |
-      | DepartureStatus     | departed                                                                                 |
-      | ArrivalStatus       | arrived                                                                                  |
-      | StopAreaName        | Mago-Cime OMNI                                                                           |
+      | StopVisitUUID       | /{test-uuid}/                                                                                      |
+      | PassageOrder        | 4                                                                                                  |
+      | ActualArrivalTime   | 2017-01-01T12:55:00+02:00                                                                          |
+      | AimedDepartureTime  | 2017-01-01T12:59:00+02:00                                                                          |
+      | AimedArrivalTime    | 2017-01-01T12:55:00+02:00                                                                          |
+      | DepartureStatus     | departed                                                                                           |
+      | ArrivalStatus       | arrived                                                                                            |
+      | StopAreaName        | Mago-Cime OMNI                                                                                     |
       | StopAreaCodes       | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:62:LOC"}]                                 |
-      | LineName            | Ligne 3 Metro                                                                            |
-      | LineNumber          | L3                                                                                       |
-      | TransportMode       | bus                                                                                      |
-      | LineCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]               |
+      | LineName            | Ligne 3 Metro                                                                                      |
+      | LineNumber          | L3                                                                                                 |
+      | TransportMode       | bus                                                                                                |
+      | LineCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}] |
       | VehicleJourneyCodes | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
 
   @ARA-1241
@@ -685,21 +689,22 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | StopVisitUUID                 | /{test-uuid}/                                                                            |
-      | AimedArrivalTime              | 2017-01-01T13:00:00+02:00                                                                |
-      | ExpectedArrivalTime           | 2017-01-01T13:01:00+02:00                                                                |
-      | DepartureStatus               | departed                                                                                 |
-      | ArrivalStatus                 | arrived                                                                                  |
-      | StopAreaName                  | Origin                                                                                   |
+      | StopVisitUUID                 | /{test-uuid}/                                                                                      |
+      | PassageOrder                  | 4                                                                                                  |
+      | AimedArrivalTime              | 2017-01-01T13:00:00+02:00                                                                          |
+      | ExpectedArrivalTime           | 2017-01-01T13:01:00+02:00                                                                          |
+      | DepartureStatus               | departed                                                                                           |
+      | ArrivalStatus                 | arrived                                                                                            |
+      | StopAreaName                  | Origin                                                                                             |
       | StopAreaCodes                 | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:StopPoint:SP:24:LOC"}]                                 |
-      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                |
-      | LineName                      | Ligne 3 Metro                                                                            |
-      | LineNumber                    | L3                                                                                       |
-      | TransportMode                 | bus                                                                                      |
-      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}]              |
-      | VehicleJourneyDirectionType   | aller                                                                                    |
-      | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                           |
-      | VehicleJourneyOriginName      | Origin                                                                                   |
+      | StopAreaCoordinates           | POINT(2.352200 48.856600)                                                                          |
+      | LineName                      | Ligne 3 Metro                                                                                      |
+      | LineNumber                    | L3                                                                                                 |
+      | TransportMode                 | bus                                                                                                |
+      | LineCodes                     | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:Line:3:LOC"},{"CodeSpace"=>"ddip", "Value"=>"L3:LOC"}] |
+      | VehicleJourneyDirectionType   | aller                                                                                              |
+      | VehicleJourneyDestinationName | Mago-Cime OMNI                                                                                     |
+      | VehicleJourneyOriginName      | Origin                                                                                             |
       | VehicleJourneyCodes           | [{"CodeSpace"=>"internal", "Value"=>"NINOXE:VehicleJourney:201"}]                                  |
-      | VehicleOccupancy              | manySeatsAvailable                                                                       |
-      | VehicleDriverRef              | Driver:245                                                                               |
+      | VehicleOccupancy              | manySeatsAvailable                                                                                 |
+      | VehicleDriverRef              | Driver:245                                                                                         |

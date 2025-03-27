@@ -34,6 +34,7 @@ func (sva *StopVisitArchiver) Archive() {
 	vj := sva.VehicleJourney()
 	longTermStopVisitEvent := &audit.BigQueryLongTermStopVisitEvent{
 		StopVisitUUID:      string(sv.Id()),
+		PassageOrder:       sv.PassageOrder,
 		AimedArrivalTime:   sva.setArrivalTimeEventFromKind(sv, schedules.Aimed),
 		AimedDepartureTime: sva.setDepartureTimeEventFromKind(sv, schedules.Aimed),
 
