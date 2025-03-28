@@ -106,7 +106,7 @@ Feature: Support SIRI subscription
   </S:Body>
 </S:Envelope>
     """
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
 
   @ARA-1267
@@ -434,7 +434,7 @@ Feature: Support SIRI subscription
   </TerminateSubscriptionResponse>
 </Siri>
      """
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:Line:A:BUS  |
       | internal | NINOXE:Line:3:LOC  |
       | internal | NINOXE:Line:C:Tram |

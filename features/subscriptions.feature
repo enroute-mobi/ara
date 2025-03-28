@@ -22,7 +22,7 @@ Feature: Subscription Management
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | SubscribeResourcesNow | true                                               |
     And a minute has passed
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
       | internal | NINOXE:StopPoint:SP:25:LOC |
     When I edit the "fake_partner" SIRI server with new ServiceStartedTime "2017-01-01T14:00:20.000+02:00"
@@ -49,7 +49,7 @@ Feature: Subscription Management
       | ReferenceArray[1]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | SubscribeResourcesNow | true                                               |
     And 30 seconds have passed
-    Then Subscriptions exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
       | internal | NINOXE:StopPoint:SP:25:LOC |
     When I edit the "fake_partner" SIRI server with new ServiceStartedTime "2017-01-01T14:00:20.000+02:00"
