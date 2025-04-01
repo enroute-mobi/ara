@@ -169,6 +169,7 @@ type BigQueryLongTermStopVisitEvent struct {
 	Timestamp time.Time `bigquery:"timestamp"`
 
 	StopVisitUUID      string                 `bigquery:"stop_visit_uuid"`
+	PassageOrder       int                    `bigquery:"passage_order"`
 	AimedDepartureTime bigquery.NullTimestamp `bigquery:"aimed_departure_time"`
 	AimedArrivalTime   bigquery.NullTimestamp `bigquery:"aimed_arrival_time"`
 
@@ -199,8 +200,8 @@ type BigQueryLongTermStopVisitEvent struct {
 }
 
 type Code struct {
-	Kind  string `bigquery:"kind"`
-	Value string `bigquery:"value"`
+	CodeSpace string `bigquery:"code_space"`
+	Value     string `bigquery:"value"`
 }
 
 func (bq *BigQueryLongTermStopVisitEvent) EventType() string        { return BQ_LONG_TERM_STOP_VISIT_EVENT }
@@ -212,6 +213,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 	{Name: "timestamp", Required: true, Type: bigquery.TimestampFieldType},
 
 	{Name: "stop_visit_uuid", Required: true, Type: bigquery.StringFieldType},
+	{Name: "passage_order", Required: false, Type: bigquery.BigNumericFieldType},
 
 	{Name: "aimed_departure_time", Required: false, Type: bigquery.TimestampFieldType},
 	{Name: "aimed_arrival_time", Required: false, Type: bigquery.TimestampFieldType},
@@ -231,7 +233,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 		Repeated: true,
 		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
-			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "code_space", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
 		},
 	},
@@ -246,7 +248,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 		Repeated: true,
 		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
-			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "code_space", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
 		},
 	},
@@ -260,7 +262,7 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 		Repeated: true,
 		Type:     bigquery.RecordFieldType,
 		Schema: bigquery.Schema{
-			{Name: "kind", Type: bigquery.StringFieldType},
+			{Name: "code_space", Type: bigquery.StringFieldType},
 			{Name: "value", Type: bigquery.StringFieldType},
 		},
 	},
