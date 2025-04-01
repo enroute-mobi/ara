@@ -83,7 +83,7 @@ definitions:
           - export ARA_ROOT=build
           - build.sh bitbucket::database
           - cd build && ARA_ENV=test ARA_ROOT=${PWD} ARA_CONFIG=${PWD}/config ./ara migrate up && cd ..
-          - TZ=Europe/Paris bundle exec cucumber --tags "not @wip" --publish
+          - TZ=Europe/Paris bundle exec cucumber --strict --tags "not @wip" --publish
         services:
           - postgres
 
