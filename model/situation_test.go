@@ -400,7 +400,7 @@ func Test_MemorySituations_Save(t *testing.T) {
 
 	situation := situations.New()
 
-	if success := situations.Save(&situation); !success {
+	if success := situations.Save(situation); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -421,7 +421,7 @@ func Test_MemorySituations_Find(t *testing.T) {
 	situations := NewMemorySituations()
 
 	existingSituation := situations.New()
-	situations.Save(&existingSituation)
+	situations.Save(existingSituation)
 
 	situationId := existingSituation.Id()
 
@@ -439,7 +439,7 @@ func Test_MemorySituations_FindAll(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		existingSituation := situations.New()
-		situations.Save(&existingSituation)
+		situations.Save(existingSituation)
 	}
 
 	foundSituations := situations.FindAll()
@@ -454,9 +454,9 @@ func Test_MemorySituations_Delete(t *testing.T) {
 	existingSituation := situations.New()
 	code := NewCode("codeSpace", "value")
 	existingSituation.SetCode(code)
-	situations.Save(&existingSituation)
+	situations.Save(existingSituation)
 
-	situations.Delete(&existingSituation)
+	situations.Delete(existingSituation)
 
 	_, ok := situations.Find(existingSituation.Id())
 	if ok {

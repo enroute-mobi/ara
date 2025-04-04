@@ -13,6 +13,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/sym01/htmlsanitizer"
+	"golang.org/x/exp/maps"
 )
 
 type SituationId ModelId
@@ -31,6 +32,18 @@ type SituationType string
 type TranslatedString struct {
 	DefaultValue string            `json:",omitempty"`
 	Translations map[string]string `json:",omitempty"`
+}
+
+func (translatedString *TranslatedString) Copy() (t *TranslatedString) {
+	if translatedString == nil {
+		return nil
+	}
+
+	ts := TranslatedString{}
+	ts.DefaultValue = translatedString.DefaultValue
+	ts.Translations = maps.Clone(translatedString.Translations)
+
+	return &ts
 }
 
 type Situation struct {
@@ -373,7 +386,7 @@ func (affect AffectedLine) MarshalJSON() ([]byte, error) {
 }
 
 func (affect AffectedAllLines) MarshalJSON() ([]byte, error) {
-		type Alias AffectedAllLines
+	type Alias AffectedAllLines
 	aux := struct {
 		Type SituationType
 		Alias
@@ -434,6 +447,15 @@ func (t *TimeRange) MarshalJSON() ([]byte, error) {
 
 func (situation *Situation) modelId() ModelId {
 	return ModelId(situation.id)
+}
+
+func (situation *Situation) copy() *Situation {
+	s := *situation
+	s.CodeConsumer = situation.CodeConsumer.Copy()
+	s.Summary = situation.Summary.Copy()
+	s.Description = situation.Description.Copy()
+
+	return &s
 }
 
 func (situation *Situation) MarshalJSON() ([]byte, error) {
@@ -703,10 +725,10 @@ type MemorySituations struct {
 type Situations interface {
 	uuid.UUIDInterface
 
-	New() Situation
-	Find(id SituationId) (Situation, bool)
-	FindByCode(code Code) (Situation, bool)
-	FindAll() []Situation
+	New() *Situation
+	Find(id SituationId) (*Situation, bool)
+	FindByCode(code Code) (*Situation, bool)
+	FindAll() []*Situation
 	Save(situation *Situation) bool
 	Delete(situation *Situation) bool
 }
@@ -718,46 +740,42 @@ func NewMemorySituations() *MemorySituations {
 	}
 }
 
-func (manager *MemorySituations) New() Situation {
-	situation := NewSituation(manager.model)
-	return *situation
+func (manager *MemorySituations) New() *Situation {
+	return NewSituation(manager.model)
 }
 
-func (manager *MemorySituations) Find(id SituationId) (Situation, bool) {
+func (manager *MemorySituations) Find(id SituationId) (*Situation, bool) {
 	manager.mutex.RLock()
 	situation, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
 
 	if ok {
-		return *situation, true
+		return situation.copy(), true
 	}
-	return Situation{}, false
+	return &Situation{}, false
 }
 
-func (manager *MemorySituations) FindAll() (situations []Situation) {
+func (manager *MemorySituations) FindAll() (situations []*Situation) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	if len(manager.byIdentifier) == 0 {
-		return []Situation{}
-	}
 	for _, situation := range manager.byIdentifier {
-		situations = append(situations, *situation)
+		situations = append(situations, situation.copy())
 	}
 	return
 }
 
-func (manager *MemorySituations) FindByCode(code Code) (Situation, bool) {
+func (manager *MemorySituations) FindByCode(code Code) (*Situation, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
 	for _, situation := range manager.byIdentifier {
 		situationCode, _ := situation.Code(code.CodeSpace())
 		if situationCode.Value() == code.Value() {
-			return *situation, true
+			return situation.copy(), true
 		}
 	}
-	return Situation{}, false
+	return &Situation{}, false
 }
 
 func (manager *MemorySituations) Save(situation *Situation) bool {

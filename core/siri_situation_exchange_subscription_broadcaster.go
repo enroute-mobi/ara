@@ -88,7 +88,7 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) checkEvent(sId mo
 		}
 
 		lastState, ok := resource.LastState(string(situation.Id()))
-		if ok && !lastState.(*ls.SituationLastChange).Haschanged(&situation) {
+		if ok && !lastState.(*ls.SituationLastChange).Haschanged(situation) {
 			continue
 		}
 		connector.addfilteredSituations(situation, sub, resource)
@@ -178,13 +178,13 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) addSituations(sub
 	}
 }
 
-func (connector *SIRISituationExchangeSubscriptionBroadcaster) addfilteredSituations(situation model.Situation, sub *Subscription, r *SubscribedResource) {
+func (connector *SIRISituationExchangeSubscriptionBroadcaster) addfilteredSituations(situation *model.Situation, sub *Subscription, r *SubscribedResource) {
 	if situation.GMValidUntil().Before(connector.Clock().Now()) {
 		return
 	}
 
 	if sub.SubscriptionOption("LineRef") == "" && sub.SubscriptionOption("StopPointRef") == "" {
-		r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
+		r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(situation, sub))
 		connector.addSituation(sub.Id(), situation.Id())
 		return
 	}
@@ -192,14 +192,14 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) addfilteredSituat
 	for _, affect := range situation.Affects {
 		if affect.GetType() == model.SituationTypeLine {
 			if lineRef, ok := connector.lineRef(sub); ok && model.ModelId(lineRef) == affect.GetId() {
-				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
+				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(situation, sub))
 				connector.addSituation(sub.Id(), situation.Id())
 				continue
 			}
 		}
 		if affect.GetType() == model.SituationTypeStopArea {
 			if stopPointRef, ok := connector.stopPointRef(sub); ok && model.ModelId(stopPointRef) == affect.GetId() {
-				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(&situation, sub))
+				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(situation, sub))
 				connector.addSituation(sub.Id(), situation.Id())
 				continue
 			}

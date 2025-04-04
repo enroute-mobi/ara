@@ -95,7 +95,7 @@ func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	}
 	macros := manager.model.Macros().GetMacros(h, MacroSituationType)
 	for i := range macros {
-		macros[i].Update(&situation)
+		macros[i].Update(situation)
 	}
 
 	situation.Save()

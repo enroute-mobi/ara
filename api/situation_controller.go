@@ -25,7 +25,8 @@ func NewSituationController(referential *core.Referential) RestfulResource {
 	}
 }
 
-func (controller *SituationController) findSituation(identifier string) (model.Situation, bool) {
+func (controller *SituationController) findSituation(identifier string) (*model.Situation, bool) {
+
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		code := model.NewCode(foundStrings[1], foundStrings[2])
@@ -116,7 +117,8 @@ func (controller *SituationController) Delete(response http.ResponseWriter, iden
 	logger.Log.Debugf("Delete situation %s", identifier)
 
 	jsonBytes, _ := situation.MarshalJSON()
-	controller.referential.Model().Situations().Delete(&situation)
+	controller.referential.Model().Situations().Delete(situation)
+
 	response.Write(jsonBytes)
 }
 
@@ -161,7 +163,7 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 	}
 
 	situation.SetDefinition(apiSituation)
-	controller.referential.Model().Situations().Save(&situation)
+	controller.referential.Model().Situations().Save(situation)
 	jsonBytes, _ := json.Marshal(&situation)
 
 	response.Write(jsonBytes)
@@ -204,7 +206,7 @@ func (controller *SituationController) Create(response http.ResponseWriter, body
 	}
 
 	situation.SetDefinition(apiSituation)
-	controller.referential.Model().Situations().Save(&situation)
+	controller.referential.Model().Situations().Save(situation)
 	jsonBytes, _ := json.Marshal(&situation)
 
 	response.Write(jsonBytes)

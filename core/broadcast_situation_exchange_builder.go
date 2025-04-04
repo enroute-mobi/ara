@@ -31,7 +31,7 @@ func NewBroadcastSituationExchangeBuilder(partner *Partner, connector string) *B
 	}
 }
 
-func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation model.Situation, delivery *siri.SIRISituationExchangeDelivery) {
+func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation *model.Situation, delivery *siri.SIRISituationExchangeDelivery) {
 	if !builder.canBroadcast(situation) {
 		return
 	}
@@ -194,7 +194,7 @@ func (connector *BroadcastSituationExchangeBuilder) buildActionCommon(actionComm
 
 	connector.buildAffects(actionCommon.Affects, &siriActionCommon.SIRIAffects, delivery)
 
-	if siriActionCommon.AffectedLines != nil || siriActionCommon.AffectedStopPoints != nil || siriActionCommon.AffectedAllLines{
+	if siriActionCommon.AffectedLines != nil || siriActionCommon.AffectedStopPoints != nil || siriActionCommon.AffectedAllLines {
 		siriActionCommon.HasAffects = true
 	}
 
@@ -333,7 +333,7 @@ func (builder *BroadcastSituationExchangeBuilder) resolveStopAreaRef(stopAreaId 
 	return stopAreaCode.Value(), true
 }
 
-func (builder *BroadcastSituationExchangeBuilder) canBroadcast(situation model.Situation) bool {
+func (builder *BroadcastSituationExchangeBuilder) canBroadcast(situation *model.Situation) bool {
 	if situation.Origin == string(builder.partner.Slug()) {
 		return false
 	}
