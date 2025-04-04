@@ -1,12 +1,15 @@
 package api
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"regexp"
+	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/model"
 )
 
 var idPattern = regexp.MustCompile("([0-9a-zA-Z-]+):([0-9a-zA-Z-:]+)")
@@ -66,6 +69,42 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 		return nil
 	}
 	return body
+}
+
+type Paginable interface {
+	model.Situation
+}
+
+func paginate[P Paginable](p []*P, params url.Values) ([]*P, error) {
+	if len(params) == 0 {
+		return p, nil
+	}
+
+	page, err := strconv.Atoi(params.Get("page"))
+	if err != nil {
+		return nil, fmt.Errorf("invalid request: query parameter \"page\": %s", params.Get("page"))
+	}
+
+	var per_page int
+	if params.Get("per_page") != "" {
+		per_page, err = strconv.Atoi(params.Get("per_page"))
+		if page != 0 && err != nil {
+			return nil, fmt.Errorf("invalid request: query parameter \"per_page\": %s", params.Get("per_page"))
+		}
+	}
+
+	if page == 0 && per_page == 0 {
+		return p, nil
+	}
+
+	if per_page == 0 || per_page > DEFAULT_PER_PAGE {
+		per_page = DEFAULT_PER_PAGE
+	}
+
+	start, end := paginateSlice(page, per_page, len(p))
+	pagedSlice := p[start:end]
+
+	return pagedSlice, nil
 }
 
 func paginateSlice(pageNum int, pageSize int, sliceLength int) (int, int) {
