@@ -59,7 +59,7 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("PUT /_referentials/{id}", server.handleReferentialUpdate)
 	mux.HandleFunc("DELETE /_referentials/{id}", server.handleReferentialDelete)
 	mux.HandleFunc("POST /_referentials/save", server.handleReferentialSave)
-	mux.HandleFunc("POST /_referentials/reload/{id}", server.handleReferentialReload)
+	mux.HandleFunc("POST /_referentials/{id}/reload", server.handleReferentialReload)
 
 	mux.HandleFunc("GET /{referential_slug}/{model}/{id}", server.handleReferentialModelShow)
 	mux.HandleFunc("POST /{referential_slug}/{model}", server.handleReferentialModelCreate)
