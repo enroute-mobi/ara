@@ -13,6 +13,7 @@ const (
 	SetAttribute              = "SetAttribute"
 	DefineAimedScheduledTimes = "DefineAimedScheduledTimes"
 	DefineSituationAffects    = "DefineSituationAffects"
+	CreateCode                = "CreateCode"
 )
 
 var updaters = []string{SetAttribute, DefineAimedScheduledTimes}
@@ -63,12 +64,15 @@ func (m *Macro) Update(mi ModelInstance) (ok bool, err error) {
 }
 
 func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
-	if sm.ModelType.String == "VehicleJourney" && sm.Type == SetAttribute {
+	switch {
+	case sm.ModelType.String == "VehicleJourney" && sm.Type == SetAttribute:
 		return NewVehicleJourneySetAttributeUpdater(sm)
-	} else if sm.ModelType.String == "StopVisit" && sm.Type == DefineAimedScheduledTimes {
+	case sm.ModelType.String == "StopVisit" && sm.Type == DefineAimedScheduledTimes:
 		return NewStopVisitDefineAimedScheduledTimesUpdater(sm)
-	} else if sm.ModelType.String == "Situation" && sm.Type == DefineSituationAffects {
+	case sm.ModelType.String == "Situation" && sm.Type == DefineSituationAffects:
 		return NewDefineSituationAffectsUpdater(sm)
+	case sm.Type == CreateCode:
+		return NewCreateCodeUpdater(sm)
 	}
 	return nil, nil
 }
