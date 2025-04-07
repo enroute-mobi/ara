@@ -31,3 +31,16 @@ Feature: Manager Referentials
     And a VehicleJourney "internal":"1STD721689197098" should not exist
     And a StopVisit "internal":"SIRI:34852540" should not exist
     And a StopArea "internal":"value" should exist
+
+  @nostart @database @ARA-1695
+  Scenario: Reload referential through API
+    Given the table "referentials" has the following data:
+      | referential_id                         | slug   | settings | tokens          |
+      | '6ba7b814-9dad-11d1-0000-00c04fd430c8' | 'test' | '{}'     | '["testtoken"]' |
+    When I start Ara
+    Then a StopArea "external":"H1911" should not exist in Referential "test"
+    Given the table "stop_areas" has the following data:
+      | referential_slug | id                                      |  model_name  | codes                  |
+      | 'test'           | 'c521f40d-79fb-4a2c-90f7-ea89a527a65e'  | '2017-01-01' | '{"external":"H1911"}' |
+    When I reload the referential "test"
+    Then a StopArea "external":"H1911" should exist in Referential "test"

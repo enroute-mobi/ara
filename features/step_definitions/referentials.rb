@@ -73,3 +73,7 @@ end
 When('I save all referentials') do
   RestClient.post url_for(path: "_referentials/save"), "", {:Authorization => "Token token=#{$adminToken}"}
 end
+
+When(/I reload the referential "([^"]+)"$/) do |referential|
+  RestClient.post url_for(path: "_referentials/#{referential}/reload"), "", {content_type: :json, :Authorization => "Token token=#{$adminToken}"}
+end
