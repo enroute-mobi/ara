@@ -26,7 +26,7 @@ func checkSituationResponseStatus(responseRecorder *httptest.ResponseRecorder, t
 	require.Equal("application/json", responseRecorder.Header().Get("Content-Type"))
 }
 
-func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (situation model.Situation, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
+func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (situation *model.Situation, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
 	referentials := core.NewMemoryReferentials()
 	server := &Server{}
@@ -39,7 +39,7 @@ func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t 
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	// Save a new situation
 	situation = referential.Model().Situations().New()
-	referential.Model().Situations().Save(&situation)
+	referential.Model().Situations().Save(situation)
 
 	// Create a request
 	address := []byte("/default/situations")
@@ -189,12 +189,12 @@ func Test_SituationController_Index_Paginated(t *testing.T) {
 	situation := referential.Model().Situations().New()
 	recordedAt, _ := time.Parse(time.RFC3339, "2016-01-01T01:00:00+02:00")
 	situation.RecordedAt = recordedAt
-	referential.Model().Situations().Save(&situation)
+	referential.Model().Situations().Save(situation)
 
 	situation2 := referential.Model().Situations().New()
 	recordedAt, _ = time.Parse(time.RFC3339, "2015-01-01T01:00:00+02:00")
 	situation2.RecordedAt = recordedAt
-	referential.Model().Situations().Save(&situation2)
+	referential.Model().Situations().Save(situation2)
 
 	all := referential.Model().Situations().FindAll()
 	assert.Len(all, 2)
@@ -270,7 +270,7 @@ func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *t
 		EndTime:   time.Time{},
 	}
 	situation.ValidityPeriods = append(situation.ValidityPeriods, validityPeriod)
-	referential.Model().Situations().Save(&situation)
+	referential.Model().Situations().Save(situation)
 
 	situation2 := referential.Model().Situations().New()
 	start, _ = time.Parse(time.RFC3339, "2015-01-01T01:00:00+02:00")
@@ -279,7 +279,7 @@ func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *t
 		EndTime:   time.Time{},
 	}
 	situation2.ValidityPeriods = append(situation2.ValidityPeriods, validityPeriod)
-	referential.Model().Situations().Save(&situation2)
+	referential.Model().Situations().Save(situation2)
 
 	all := referential.Model().Situations().FindAll()
 	assert.Len(all, 2)
@@ -332,7 +332,7 @@ func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_Not_Pr
 	// Create and save 2 new situations
 	for i := 0; i <= 34; i++ {
 		situation := referential.Model().Situations().New()
-		referential.Model().Situations().Save(&situation)
+		referential.Model().Situations().Save(situation)
 	}
 
 	all := referential.Model().Situations().FindAll()
@@ -383,7 +383,7 @@ func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_AboveD
 	// Create and save 2 new situations
 	for i := 0; i <= 34; i++ {
 		situation := referential.Model().Situations().New()
-		referential.Model().Situations().Save(&situation)
+		referential.Model().Situations().Save(situation)
 	}
 
 	all := referential.Model().Situations().FindAll()

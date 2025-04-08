@@ -250,7 +250,7 @@ multiple affected StopPoints if at least one of the external resource match`,
 
 		// Cleanup
 		subs.Delete()
-		connector.(*SIRISituationExchangeSubscriptionBroadcaster).Partner().Model().Situations().Delete(&situation)
+		connector.(*SIRISituationExchangeSubscriptionBroadcaster).Partner().Model().Situations().Delete(situation)
 		connector.(*SIRISituationExchangeSubscriptionBroadcaster).situationExchangeBroadcaster.Stop()
 	}
 }

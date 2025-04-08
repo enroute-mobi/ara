@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
-	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -25,7 +24,8 @@ func NewSituationController(referential *core.Referential) RestfulResource {
 	}
 }
 
-func (controller *SituationController) findSituation(identifier string) (model.Situation, bool) {
+func (controller *SituationController) findSituation(identifier string) (*model.Situation, bool) {
+
 	foundStrings := idPattern.FindStringSubmatch(identifier)
 	if foundStrings != nil {
 		code := model.NewCode(foundStrings[1], foundStrings[2])
@@ -50,42 +50,13 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 		})
 	}
 
-	if len(params) == 0 {
-		// We send all situations
-		jsonBytes, _ := json.Marshal(allSituations)
-		response.Write(jsonBytes)
-		return
-	}
-
-	page, err := strconv.Atoi(params.Get("page"))
+	paginatedSituations, err := paginate(allSituations, params)
 	if err != nil {
-		http.Error(response, fmt.Sprintf("Invalid request: query parameter \"page\":'%s", params.Get("page")), http.StatusBadRequest)
+		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	var per_page int
-	if params.Get("per_page") != "" {
-		per_page, err = strconv.Atoi(params.Get("per_page"))
-		if page != 0 && err != nil {
-			http.Error(response, fmt.Sprintf("Invalid request: query parameter \"per_page\":'%s", params.Get("")), http.StatusBadRequest)
-			return
-		}
-	}
-
-	if page == 0 && per_page == 0 {
-		jsonBytes, _ := json.Marshal(allSituations)
-		response.Write(jsonBytes)
-		return
-	}
-
-	if per_page == 0 || per_page > DEFAULT_PER_PAGE {
-		per_page = DEFAULT_PER_PAGE
-	}
-
-	start, end := paginateSlice(page, per_page, len(allSituations))
-	pagedSlice := allSituations[start:end]
-
-	jsonBytes, _ := json.Marshal(pagedSlice)
+	jsonBytes, _ := json.Marshal(paginatedSituations)
 	response.Write(jsonBytes)
 }
 
@@ -116,7 +87,8 @@ func (controller *SituationController) Delete(response http.ResponseWriter, iden
 	logger.Log.Debugf("Delete situation %s", identifier)
 
 	jsonBytes, _ := situation.MarshalJSON()
-	controller.referential.Model().Situations().Delete(&situation)
+	controller.referential.Model().Situations().Delete(situation)
+
 	response.Write(jsonBytes)
 }
 
@@ -161,7 +133,7 @@ func (controller *SituationController) Update(response http.ResponseWriter, iden
 	}
 
 	situation.SetDefinition(apiSituation)
-	controller.referential.Model().Situations().Save(&situation)
+	controller.referential.Model().Situations().Save(situation)
 	jsonBytes, _ := json.Marshal(&situation)
 
 	response.Write(jsonBytes)
@@ -204,7 +176,7 @@ func (controller *SituationController) Create(response http.ResponseWriter, body
 	}
 
 	situation.SetDefinition(apiSituation)
-	controller.referential.Model().Situations().Save(&situation)
+	controller.referential.Model().Situations().Save(situation)
 	jsonBytes, _ := json.Marshal(&situation)
 
 	response.Write(jsonBytes)

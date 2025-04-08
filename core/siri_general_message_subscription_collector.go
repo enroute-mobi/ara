@@ -158,7 +158,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) cancelGeneralMessage(x
 			logger.Log.Debugf("Updating situation %v progress to closed because of cancellation", situation.Id())
 			situation.RecordedAt = cancellation.RecordedAtTime()
 			situation.Progress = model.SituationProgressClosed
-			connector.partner.Model().Situations().Save(&situation)
+			connector.partner.Model().Situations().Save(situation)
 		}
 	}
 }

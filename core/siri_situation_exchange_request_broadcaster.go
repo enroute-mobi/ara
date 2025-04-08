@@ -68,7 +68,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) getSituationExchangeDe
 	}
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(delivery *siri.SIRISituationExchangeDelivery, situation model.Situation, requestPeriod *model.TimeRange) {
+func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(delivery *siri.SIRISituationExchangeDelivery, situation *model.Situation, requestPeriod *model.TimeRange) {
 	if !connector.canBroadcast(situation, requestPeriod) {
 		return
 	}
@@ -384,7 +384,7 @@ func (connector *SIRISituationExchangeRequestBroadcaster) resolveStopAreaRef(sto
 	return stopAreaCode.Value(), true
 }
 
-func (connector *SIRISituationExchangeRequestBroadcaster) canBroadcast(situation model.Situation, requestPeriod *model.TimeRange) bool {
+func (connector *SIRISituationExchangeRequestBroadcaster) canBroadcast(situation *model.Situation, requestPeriod *model.TimeRange) bool {
 	if situation.Origin == string(connector.partner.Slug()) {
 		return false
 	}

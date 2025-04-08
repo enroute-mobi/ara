@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -30,15 +31,21 @@ func (controller *StopAreaController) findStopArea(identifier string) (*model.St
 	return controller.referential.Model().StopAreas().Find(model.StopAreaId(identifier))
 }
 
-func (controller *StopAreaController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *StopAreaController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("StopAreas Index")
 
-	stime := controller.referential.Clock().Now()
-	sas := controller.referential.Model().StopAreas().FindAll()
-	logger.Log.Debugf("StopAreaController FindAll time : %v", controller.referential.Clock().Since(stime))
-	stime = controller.referential.Clock().Now()
-	jsonBytes, _ := json.Marshal(sas)
-	logger.Log.Debugf("StopAreaController Json Marshal time : %v ", controller.referential.Clock().Since(stime))
+	allStopAreas := controller.referential.Model().StopAreas().FindAll()
+	sort.Slice(allStopAreas, func(i, j int) bool {
+		return allStopAreas[i].Name < allStopAreas[j].Name
+	})
+
+	paginatedStopAreas, err := paginate(allStopAreas, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedStopAreas)
 	response.Write(jsonBytes)
 }
 

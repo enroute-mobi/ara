@@ -49,7 +49,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	situation := partners.Model().Situations().New()
 	code := model.NewCode("test kind", "test value")
 	situation.SetCode(code)
-	partners.Model().Situations().Save(&situation)
+	partners.Model().Situations().Save(situation)
 
 	line := partners.Model().Lines().New()
 	lineCode := model.NewCode("test kind", "line value")

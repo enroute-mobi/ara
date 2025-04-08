@@ -550,7 +550,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	situation := model.Situations().New()
 	situation.SetCode(code)
 	situation.SetCode(NewCode("_default", code.HashValue()))
-	model.Situations().Save(&situation)
+	model.Situations().Save(situation)
 
 	manager := newUpdateManager(model)
 	event := completeEvent(code, testTime)
@@ -559,7 +559,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 
-	assert.True(checkSituation(updatedSituation, code, testTime))
+	assert.True(checkSituation(*updatedSituation, code, testTime))
 
 }
 
@@ -573,7 +573,7 @@ func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 	situation.SetCode(code)
 	situation.RecordedAt = testTime
 	situation.Version = 1
-	model.Situations().Save(&situation)
+	model.Situations().Save(situation)
 
 	manager := newUpdateManager(model)
 	event := completeEvent(code, testTime)
@@ -582,7 +582,7 @@ func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 
-	assert.False(checkSituation(updatedSituation, code, testTime), "Situation should not be updated")
+	assert.False(checkSituation(*updatedSituation, code, testTime), "Situation should not be updated")
 }
 
 func completeEvent(code Code, testTime time.Time) (event *SituationUpdateEvent) {

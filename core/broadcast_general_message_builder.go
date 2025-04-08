@@ -52,7 +52,7 @@ func (builder *BroadcastGeneralMessageBuilder) SetStopPointRef(stopPointRef []st
 	}
 }
 
-func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessageCancellation(situation model.Situation) *siri.SIRIGeneralMessageCancellation {
+func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessageCancellation(situation *model.Situation) *siri.SIRIGeneralMessageCancellation {
 	if !builder.canBroadcast(situation) {
 		return nil
 	}
@@ -77,7 +77,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessageCancellation(s
 	return siriGeneralMessageCancellation
 }
 
-func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation model.Situation) *siri.SIRIGeneralMessage {
+func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation *model.Situation) *siri.SIRIGeneralMessage {
 	if !builder.canBroadcast(situation) {
 		return nil
 	}
@@ -140,7 +140,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 
 	if situation.Summary != nil {
 		sts := siri.SIRITranslatedString{
-			Tag:                       "MessageText",
+			Tag:              "MessageText",
 			TranslatedString: *situation.Summary,
 		}
 
@@ -154,7 +154,7 @@ func (builder *BroadcastGeneralMessageBuilder) BuildGeneralMessage(situation mod
 
 	if situation.Description != nil {
 		sts := siri.SIRITranslatedString{
-			Tag:                       "MessageText",
+			Tag:              "MessageText",
 			TranslatedString: *situation.Description,
 		}
 		siriMessage := &siri.SIRIMessage{
@@ -287,7 +287,7 @@ func (builder *BroadcastGeneralMessageBuilder) checkAffectFilter(affectedRefs []
 	return false
 }
 
-func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation model.Situation) bool {
+func (builder *BroadcastGeneralMessageBuilder) canBroadcast(situation *model.Situation) bool {
 	if situation.Origin == string(builder.partner.Slug()) {
 		return false
 	}

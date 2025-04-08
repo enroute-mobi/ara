@@ -140,11 +140,10 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 
 		// DescriptionText
 		if situation.Description != nil {
-		var d gtfs.TranslatedString
-		situation.Description.ToProto(&d)
-		alert.DescriptionText = &d
+			var d gtfs.TranslatedString
+			situation.Description.ToProto(&d)
+			alert.DescriptionText = &d
 		}
-
 
 		feedEntity.Alert = alert
 		entities = append(entities, feedEntity)
@@ -153,7 +152,7 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 	return
 }
 
-func (connector *ServiceAlertsBroadcaster) canBroadcast(situation model.Situation) bool {
+func (connector *ServiceAlertsBroadcaster) canBroadcast(situation *model.Situation) bool {
 	tagsToBroadcast := connector.partner.BroadcastSituationsInternalTags()
 	if len(tagsToBroadcast) != 0 {
 		for _, tag := range situation.InternalTags {
