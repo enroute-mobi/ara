@@ -2,8 +2,9 @@ package model
 
 import (
 	"database/sql"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Macro_DefineSituationAffects(t *testing.T) {
@@ -23,7 +24,7 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 		Attributes:      sql.NullString{String: "{}", Valid: true},
 	}
 
-	cb := &contextBuilder{
+	cb := &macroContextBuilder{
 		childrenId: "",
 		macro:      nil,
 		updaters:   []*SelectMacro{sm},
@@ -31,8 +32,8 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 
 	builder := &macroBuilder{
 		manager:        manager,
-		initialContext: []*contextBuilder{cb},
-		contexes:       make(map[string]*contextBuilder),
+		initialContext: []*macroContextBuilder{cb},
+		contexes:       make(map[string]*macroContextBuilder),
 	}
 
 	err := builder.buildMacros()

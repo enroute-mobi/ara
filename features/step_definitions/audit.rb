@@ -41,3 +41,7 @@ end
 Then('an audit event should not exist with these attributes:') do |attributes|
   expect(BigQuery.received_events).to_not include(an_audit_event_with_attributes(attributes))
 end
+
+Then('a Control Message should exist with these attributes:') do |attributes|
+  step "an audit event should exist with these attributes:", attributes
+end

@@ -2,6 +2,13 @@ package model
 
 import "database/sql"
 
+type DatabaseStructureWithContext interface {
+	GetHook() sql.NullString
+	GetModelType() sql.NullString
+	GetType() string
+	GetAttributes() sql.NullString
+}
+
 type DatabaseReferential struct {
 	ReferentialId  string         `db:"referential_id"`
 	Slug           string         `db:"slug"`
@@ -222,4 +229,49 @@ type SelectMacro struct {
 	ModelType       sql.NullString `db:"model_type"`
 	Hook            sql.NullString
 	Attributes      sql.NullString
+}
+
+func (m *SelectMacro) GetHook() sql.NullString {
+	return m.Hook
+}
+
+func (m *SelectMacro) GetModelType() sql.NullString {
+	return m.ModelType
+}
+
+func (m *SelectMacro) GetType() string {
+	return m.Type
+}
+
+func (m *SelectMacro) GetAttributes() sql.NullString {
+	return m.Attributes
+}
+
+type SelectControl struct {
+	Id              string
+	ReferentialSlug string         `db:"referential_slug"`
+	ContextId       sql.NullString `db:"context_id"`
+	Position        int
+	Type            string
+	ModelType       sql.NullString `db:"model_type"`
+	Hook            sql.NullString
+	Criticity       sql.NullString
+	InternalCode    sql.NullString `db:"internal_code"`
+	Attributes      sql.NullString
+}
+
+func (c *SelectControl) GetHook() sql.NullString {
+	return c.Hook
+}
+
+func (c *SelectControl) GetModelType() sql.NullString {
+	return c.ModelType
+}
+
+func (c *SelectControl) GetType() string {
+	return c.Type
+}
+
+func (m *SelectControl) GetAttributes() sql.NullString {
+	return m.Attributes
 }

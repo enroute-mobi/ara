@@ -24,6 +24,7 @@ const (
 	PARTNER_TABLE              = "partners"
 	VEHICLE_TABLE              = "vehicles"
 	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
+	CONTROL_TABLE              = "control_messages"
 )
 
 type BigQuery interface {
@@ -80,6 +81,7 @@ type FakeBigQuery struct {
 	partnerEvents           []*BigQueryPartnerEvent
 	vehicleEvents           []*BigQueryVehicleEvent
 	longTermStopVisitEvents []*BigQueryLongTermStopVisitEvent
+	controlEvents           []*BigQueryControlEvent
 }
 
 func NewFakeBigQuery() *FakeBigQuery {
@@ -99,6 +101,8 @@ func (bq *FakeBigQuery) WriteEvent(e BigQueryEvent) error {
 		bq.vehicleEvents = append(bq.vehicleEvents, e.(*BigQueryVehicleEvent))
 	case BQ_LONG_TERM_STOP_VISIT_EVENT:
 		bq.longTermStopVisitEvents = append(bq.longTermStopVisitEvents, e.(*BigQueryLongTermStopVisitEvent))
+	case BQ_CONTROL_EVENT:
+		bq.controlEvents = append(bq.controlEvents, e.(*BigQueryControlEvent))
 	}
 	return nil
 }
@@ -117,6 +121,10 @@ func (bq *FakeBigQuery) VehicleEvents() []*BigQueryVehicleEvent {
 
 func (bq *FakeBigQuery) LongTermStopVisitEvents() []*BigQueryLongTermStopVisitEvent {
 	return bq.longTermStopVisitEvents
+}
+
+func (bq *FakeBigQuery) ControlEvents() []*BigQueryControlEvent {
+	return bq.controlEvents
 }
 
 /**** Test External Structure ****/
@@ -185,10 +193,12 @@ type BigQueryClient struct {
 	vehicleInserter           *bigquery.Inserter
 	partnerInserter           *bigquery.Inserter
 	longTermStopVisitInserter *bigquery.Inserter
+	controlInserter           *bigquery.Inserter
 	messages                  chan *BigQueryMessage
 	partnerEvents             chan *BigQueryPartnerEvent
 	vehicleEvents             chan *BigQueryVehicleEvent
 	longTermStopVisitEvents   chan *BigQueryLongTermStopVisitEvent
+	controlEvents             chan *BigQueryControlEvent
 	stop                      chan struct{}
 }
 
@@ -209,6 +219,7 @@ func NewBigQueryClient(dataset string) *BigQueryClient {
 		partnerEvents:           make(chan *BigQueryPartnerEvent, 500),
 		vehicleEvents:           make(chan *BigQueryVehicleEvent, 500),
 		longTermStopVisitEvents: make(chan *BigQueryLongTermStopVisitEvent, 500),
+		controlEvents:           make(chan *BigQueryControlEvent, 500),
 	}
 }
 
@@ -239,6 +250,8 @@ func (bq *BigQueryClient) WriteEvent(e BigQueryEvent) error {
 		return bq.writeVehicleEvent(e.(*BigQueryVehicleEvent))
 	case BQ_LONG_TERM_STOP_VISIT_EVENT:
 		return bq.writeLongTermStopVisitEvent(e.(*BigQueryLongTermStopVisitEvent))
+	case BQ_CONTROL_EVENT:
+		return bq.writeControlEvent(e.(*BigQueryControlEvent))
 	}
 	logger.Log.Debugf("Unknown BigQueryMessage type")
 	return nil
@@ -280,6 +293,15 @@ func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *Bi
 	return nil
 }
 
+func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) error {
+	select {
+	case bq.controlEvents <- controlEvent:
+	default:
+		logger.Log.Debugf("BigQuery control queue is full")
+	}
+	return nil
+}
+
 func (bq *BigQueryClient) run() {
 	bq.connect()
 
@@ -298,6 +320,8 @@ func (bq *BigQueryClient) run() {
 			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
 				bq.send(longTermStopVisitMessage, bq.longTermStopVisitInserter)
 			}
+		case controlMessage := <-bq.controlEvents:
+			bq.send(controlMessage, bq.controlInserter)
 		}
 	}
 }
@@ -333,6 +357,7 @@ func (bq *BigQueryClient) connect() {
 	bq.partnerInserter = dataset.Table(PARTNER_TABLE).Inserter()
 	bq.vehicleInserter = dataset.Table(VEHICLE_TABLE).Inserter()
 	bq.longTermStopVisitInserter = dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Inserter()
+	bq.controlInserter = dataset.Table(CONTROL_TABLE).Inserter()
 }
 
 func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
@@ -375,6 +400,10 @@ func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
 	}
 
 	if err := dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqLongTermStopVisitsSchema}); err != nil {
+		return nil, err
+	}
+
+	if err := dataset.Table(CONTROL_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqControlSchema}); err != nil {
 		return nil, err
 	}
 

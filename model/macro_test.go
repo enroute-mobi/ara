@@ -24,15 +24,15 @@ func Test_MacroBuilder_Ok(t *testing.T) {
 		Attributes:      sql.NullString{String: "{\"attribute_name\": \"DirectionName\", \"value\": \"Aller\"}", Valid: true},
 	}
 
-	cb := &contextBuilder{
+	cb := &macroContextBuilder{
 		childrenId: "",
 		macro:      sm,
 	}
 
 	builder := &macroBuilder{
 		manager:        manager,
-		initialContext: []*contextBuilder{cb},
-		contexes:       make(map[string]*contextBuilder),
+		initialContext: []*macroContextBuilder{cb},
+		contexes:       make(map[string]*macroContextBuilder),
 	}
 
 	err := builder.buildMacros()
@@ -55,15 +55,15 @@ func Test_MacroBuilder_NOk(t *testing.T) {
 		Attributes:      sql.NullString{String: "{\"value\": \"Aller\"}", Valid: true},
 	}
 
-	cb := &contextBuilder{
+	cb := &macroContextBuilder{
 		childrenId: "",
 		macro:      sm,
 	}
 
 	builder := &macroBuilder{
 		manager:        manager,
-		initialContext: []*contextBuilder{cb},
-		contexes:       make(map[string]*contextBuilder),
+		initialContext: []*macroContextBuilder{cb},
+		contexes:       make(map[string]*macroContextBuilder),
 	}
 
 	err := builder.buildMacros()
@@ -98,7 +98,7 @@ func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 		Attributes:      sql.NullString{String: "{\"attribute_name\": \"DirectionType\", \"value\": \"Outbound\"}", Valid: true},
 	}
 
-	cb := &contextBuilder{
+	cb := &macroContextBuilder{
 		childrenId: "",
 		macro:      smc,
 		updaters:   []*SelectMacro{smu},
@@ -106,8 +106,8 @@ func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 
 	builder := &macroBuilder{
 		manager:        manager,
-		initialContext: []*contextBuilder{cb},
-		contexes:       make(map[string]*contextBuilder),
+		initialContext: []*macroContextBuilder{cb},
+		contexes:       make(map[string]*macroContextBuilder),
 	}
 
 	err := builder.buildMacros()

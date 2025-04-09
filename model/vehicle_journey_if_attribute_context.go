@@ -1,6 +1,7 @@
 package model
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -8,7 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 )
 
-var vehicleJourneyIfAttributeContextFactories = map[string]contexFactory{
+var vehicleJourneyIfAttributeContextFactories = map[string]ContexFactory{
 	"DirectionName": newVehicleJourneyDirectionNameContext,
 }
 
@@ -17,13 +18,13 @@ type vehicleJourneyIfAttributeContextAttributes struct {
 	Value         string `json:"value"`
 }
 
-func NewVehicleJourneyIfAttributeContext(sm *SelectMacro) (context, error) {
-	if !sm.Attributes.Valid {
+func NewVehicleJourneyIfAttributeContext(attributes sql.NullString) (Context, error) {
+	if !attributes.Valid {
 		return nil, errors.New("empty Attributes")
 	}
 
 	var attrs vehicleJourneyIfAttributeContextAttributes
-	err := json.Unmarshal([]byte(sm.Attributes.String), &attrs)
+	err := json.Unmarshal([]byte(attributes.String), &attrs)
 	if err != nil {
 		return nil, fmt.Errorf("can't parse Attributes: %v", err)
 	}
@@ -36,7 +37,7 @@ func NewVehicleJourneyIfAttributeContext(sm *SelectMacro) (context, error) {
 	return f(attrs.Value)
 }
 
-func newVehicleJourneyDirectionNameContext(d contextAttributes) (context, error) {
+func newVehicleJourneyDirectionNameContext(d ContextAttributes) (Context, error) {
 	return func(mi ModelInstance) bool {
 		vj := mi.(*VehicleJourney)
 		return vj.Attributes[siri_attributes.DirectionName] == d.(string)

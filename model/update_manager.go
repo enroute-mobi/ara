@@ -3,6 +3,8 @@ package model
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model/hooks"
+	"bitbucket.org/enroute-mobi/ara/model/model_types"
 	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 
@@ -89,13 +91,17 @@ func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	situation.InfoLinks = event.InfoLinks
 
 	// Default is AfterCreate
-	var h hook
+	var h hooks.Type
 	if ok {
-		h = AfterSave
+		h = hooks.AfterSave
 	}
-	macros := manager.model.Macros().GetMacros(h, MacroSituationType)
+	macros := manager.model.Macros().GetMacros(h, model_types.Situation)
 	for i := range macros {
 		macros[i].Update(situation)
+	}
+	controls := manager.model.Controls().GetControls(h, model_types.Situation)
+	for i := range controls {
+		controls[i].Control(situation)
 	}
 
 	situation.Save()
@@ -127,13 +133,17 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 	stopArea.Updated(manager.Clock().Now())
 
 	// Default is AfterCreate
-	var h hook
+	var h hooks.Type
 	if found {
-		h = AfterSave
+		h = hooks.AfterSave
 	}
-	macros := manager.model.Macros().GetMacros(h, StopAreaType)
+	macros := manager.model.Macros().GetMacros(h, model_types.StopArea)
 	for i := range macros {
 		macros[i].Update(stopArea)
+	}
+	controls := manager.model.Controls().GetControls(h, model_types.StopArea)
+	for i := range controls {
+		controls[i].Control(stopArea)
 	}
 
 	manager.model.StopAreas().Save(stopArea)
@@ -176,13 +186,17 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 	line.Updated(manager.Clock().Now())
 
 	// Default is AfterCreate
-	var h hook
+	var h hooks.Type
 	if found {
-		h = AfterSave
+		h = hooks.AfterSave
 	}
-	macros := manager.model.Macros().GetMacros(h, LineType)
+	macros := manager.model.Macros().GetMacros(h, model_types.Line)
 	for i := range macros {
 		macros[i].Update(line)
+	}
+	controls := manager.model.Controls().GetControls(h, model_types.Line)
+	for i := range controls {
+		controls[i].Control(line)
 	}
 
 	manager.model.Lines().Save(line)
@@ -237,13 +251,17 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	}
 
 	// Default is AfterCreate
-	var h hook
+	var h hooks.Type
 	if found {
-		h = AfterSave
+		h = hooks.AfterSave
 	}
-	macros := manager.model.Macros().GetMacros(h, VehicleJourneyType)
+	macros := manager.model.Macros().GetMacros(h, model_types.VehicleJourney)
 	for i := range macros {
 		macros[i].Update(vj)
+	}
+	controls := manager.model.Controls().GetControls(h, model_types.VehicleJourney)
+	for i := range controls {
+		controls[i].Control(vj)
 	}
 
 	manager.model.VehicleJourneys().Save(vj)
@@ -345,13 +363,17 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	// Default is AfterCreate
-	var h hook
+	var h hooks.Type
 	if found {
-		h = AfterSave
+		h = hooks.AfterSave
 	}
-	macros := manager.model.Macros().GetMacros(h, StopVisitType)
+	macros := manager.model.Macros().GetMacros(h, model_types.StopVisit)
 	for i := range macros {
 		macros[i].Update(sv)
+	}
+	controls := manager.model.Controls().GetControls(h, model_types.StopVisit)
+	for i := range controls {
+		controls[i].Control(sv)
 	}
 
 	manager.model.StopVisits().Save(sv)
@@ -425,13 +447,17 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	}
 
 	// Default is AfterCreate
-	var h hook
+	var h hooks.Type
 	if found {
-		h = AfterSave
+		h = hooks.AfterSave
 	}
-	macros := manager.model.Macros().GetMacros(h, VehicleType)
+	macros := manager.model.Macros().GetMacros(h, model_types.Vehicle)
 	for i := range macros {
 		macros[i].Update(vehicle)
+	}
+	controls := manager.model.Controls().GetControls(h, model_types.Vehicle)
+	for i := range controls {
+		controls[i].Control(vehicle)
 	}
 
 	manager.model.Vehicles().Save(vehicle)
