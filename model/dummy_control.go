@@ -23,17 +23,13 @@ func NewDummyControler(sc *SelectControl) (controler, error) {
 		}
 
 		m := &audit.BigQueryControlEvent{
-			Criticity:    sc.Criticity.String,
-			ControlType:  "Dummy",
-			InternalCode: sc.InternalCode.String,
-			TargetModel: audit.TargetModel{
-				Class: sc.ModelType.String,
-				UUID:  string(mi.modelId()),
-			},
-			TranslationInfo: audit.TranslationInfo{
-				MessageKey:        fmt.Sprintf("dummy_%s", sc.ModelType.String),
-				MessageAttributes: messageAttribute,
-			},
+			Criticity:                        sc.Criticity.String,
+			ControlType:                      "Dummy",
+			InternalCode:                     sc.InternalCode.String,
+			TargetModelClass:                 sc.ModelType.String,
+			TargetModelUUID:                  string(mi.modelId()),
+			TranslationInfoMessageKey:        fmt.Sprintf("dummy_%s", sc.ModelType.String),
+			TranslationInfoMessageAttributes: messageAttribute,
 		}
 
 		audit.CurrentBigQuery(sc.ReferentialSlug).WriteEvent(m)

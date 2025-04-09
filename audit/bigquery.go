@@ -24,7 +24,7 @@ const (
 	PARTNER_TABLE              = "partners"
 	VEHICLE_TABLE              = "vehicles"
 	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
-	CONTROL_TABLE              = "controls"
+	CONTROL_TABLE              = "control_messages"
 )
 
 type BigQuery interface {

@@ -273,23 +273,15 @@ var bqLongTermStopVisitsSchema = bigquery.Schema{
 }
 
 type BigQueryControlEvent struct {
-	UUID            string          `bigquery:"uuid"`
-	Timestamp       time.Time       `bigquery:"timestamp"`
-	Criticity       string          `bigquery:"criticity"`
-	ControlType     string          `bigquery:"control_type"`
-	InternalCode    string          `bigquery:"internal_code"`
-	TargetModel     TargetModel     `bigquery:"target_model"`
-	TranslationInfo TranslationInfo `bigquery:"translation_info"`
-}
-
-type TargetModel struct {
-	Class string `bigquery:"class"`
-	UUID  string `bigquery:"uuid"`
-}
-
-type TranslationInfo struct {
-	MessageKey        string `bigquery:"message_key"`
-	MessageAttributes string `bigquery:"message_attributes"`
+	UUID                             string    `bigquery:"uuid"`
+	Timestamp                        time.Time `bigquery:"timestamp"`
+	Criticity                        string    `bigquery:"criticity"`
+	ControlType                      string    `bigquery:"control_type"`
+	InternalCode                     string    `bigquery:"internal_code"`
+	TargetModelClass                 string    `bigquery:"target_model_class"`
+	TargetModelUUID                  string    `bigquery:"target_model_uuid"`
+	TranslationInfoMessageKey        string    `bigquery:"translation_info_message_key"`
+	TranslationInfoMessageAttributes string    `bigquery:"translation_info_message_attributes"`
 }
 
 func (bq *BigQueryControlEvent) EventType() string        { return BQ_CONTROL_EVENT }
@@ -302,22 +294,10 @@ var bqControlSchema = bigquery.Schema{
 	{Name: "criticity", Required: false, Type: bigquery.StringFieldType},
 	{Name: "control_type", Required: false, Type: bigquery.StringFieldType},
 	{Name: "internal_code", Required: false, Type: bigquery.StringFieldType},
-	{Name: "target_model",
-		Required: false,
-		Type:     bigquery.RecordFieldType,
-		Schema: bigquery.Schema{
-			{Name: "class", Type: bigquery.StringFieldType},
-			{Name: "uuid", Type: bigquery.StringFieldType},
-		},
-	},
-	{Name: "translation_info",
-		Required: false,
-		Type:     bigquery.RecordFieldType,
-		Schema: bigquery.Schema{
-			{Name: "message_key", Type: bigquery.StringFieldType},
-			{Name: "message_attributes", Type: bigquery.StringFieldType},
-		},
-	},
+	{Name: "target_model_class", Required: false, Type: bigquery.StringFieldType},
+	{Name: "target_model_uuid", Required: false, Type: bigquery.StringFieldType},
+	{Name: "translation_info_message_key", Required: false, Type: bigquery.StringFieldType},
+	{Name: "translation_info_message_attributes", Required: false, Type: bigquery.StringFieldType},
 }
 
 var AraBigQuerySchemas = map[string]bigquery.Schema{

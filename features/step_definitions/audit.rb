@@ -1,15 +1,6 @@
 def an_audit_event_with_attributes(attributes)
   attributes = attributes.rows_hash if attributes.respond_to?(:rows_hash)
 
-  attributes.dup.each do |key, value|
-    if key =~ /(TargetModel|TranslationInfo)\[([^\]]+)\]/
-      a = $1
-      name = $2
-      attributes[a] ||= {}
-      attributes[a][name] = value
-      attributes.delete key
-    end
-  end
   # Transform specified values into integer, nil, regexp, etc
   attribute_matchers = attributes.map do |attribute, value|
       matcher =
@@ -49,4 +40,8 @@ end
 
 Then('an audit event should not exist with these attributes:') do |attributes|
   expect(BigQuery.received_events).to_not include(an_audit_event_with_attributes(attributes))
+end
+
+Then('a Control Message should exist with these attributes:') do |attributes|
+  step "an audit event should exist with these attributes:", attributes
 end

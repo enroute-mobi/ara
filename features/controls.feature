@@ -67,13 +67,13 @@ Feature: Manages Controls
       | remote_code_space | external              |
     And a minute has passed
     And a minute has passed
-    Then an audit event should exist with these attributes:
-      | ControlType                        | Dummy                |
-      | Criticity                          | warning              |
-      | InternalCode                       | dummy                |
-      | TargetModel[Class]                 | Situation            |
-      | TargetModel[UUID]                  |                      |
-      | Timestamp                          | 2017-01-01T12:02:00Z |
-      | TranslationInfo[MessageAttributes] | Nouveau pass Navigo  |
-      | TranslationInfo[MessageKey]        | dummy_Situation      |
-      | UUID                               |                      |
+    Then a Control Message should exist with these attributes:
+      | ControlType                      | Dummy                |
+      | Criticity                        | warning              |
+      | InternalCode                     | dummy                |
+      | TargetModelClass                 | Situation            |
+      | TargetModelUUID                  |                      |
+      | Timestamp                        | 2017-01-01T12:02:00Z |
+      | TranslationInfoMessageAttributes | Nouveau pass Navigo  |
+      | TranslationInfoMessageKey        | dummy_Situation      |
+      | UUID                             |                      |
