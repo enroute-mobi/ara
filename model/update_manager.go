@@ -101,7 +101,7 @@ func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	}
 	controls := manager.model.Controls().GetControls(h, model_types.Situation)
 	for i := range controls {
-		controls[i].Control(&situation)
+		controls[i].Control(situation)
 	}
 
 	situation.Save()
