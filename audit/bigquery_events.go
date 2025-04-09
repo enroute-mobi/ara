@@ -52,6 +52,14 @@ const (
 	PUSH_NOTIFICATION BigQueryMessageType = "push-notification"
 )
 
+var AraBigQuerySchemas = map[string]bigquery.Schema{
+	"bqMessageSchema":            bqMessageSchema,
+	"bqVehicleSchema":            bqVehicleSchema,
+	"bqPartnerSchema":            bqPartnerSchema,
+	"bqLongTermStopVisitsSchema": bqLongTermStopVisitsSchema,
+	"bqControlSchema":            bqControlSchema,
+}
+
 type BigQueryMessageType string
 type BigQueryEvent interface {
 	EventType() string
@@ -298,12 +306,4 @@ var bqControlSchema = bigquery.Schema{
 	{Name: "target_model_uuid", Required: false, Type: bigquery.StringFieldType},
 	{Name: "translation_info_message_key", Required: false, Type: bigquery.StringFieldType},
 	{Name: "translation_info_message_attributes", Required: false, Type: bigquery.StringFieldType},
-}
-
-var AraBigQuerySchemas = map[string]bigquery.Schema{
-	"bqMessageSchema":            bqMessageSchema,
-	"bqVehicleSchema":            bqVehicleSchema,
-	"bqPartnerSchema":            bqPartnerSchema,
-	"bqLongTermStopVisitsSchema": bqLongTermStopVisitsSchema,
-	"bqControlSchema":            bqControlSchema,
 }

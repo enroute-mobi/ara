@@ -27,6 +27,14 @@ const (
 	CONTROL_TABLE              = "control_messages"
 )
 
+var tablesSchemas = map[string]bigquery.Schema{
+	EXCHANGE_TABLE:             bqMessageSchema,
+	PARTNER_TABLE:              bqPartnerSchema,
+	VEHICLE_TABLE:              bqVehicleSchema,
+	LONG_TERM_STOP_VISIT_TABLE: bqLongTermStopVisitsSchema,
+	CONTROL_TABLE:              bqControlSchema,
+}
+
 type BigQuery interface {
 	state.Startable
 	state.Stopable
@@ -348,7 +356,7 @@ func (bq *BigQueryClient) connect() {
 		return
 	}
 
-	dataset, err := bq.findOrCreateDataset()
+	dataset, err := bq.findOrCreateDatasetAndTables()
 	if err != nil {
 		logger.Log.Printf("error while finding or creating the dataset: %v", err)
 		return
@@ -358,6 +366,22 @@ func (bq *BigQueryClient) connect() {
 	bq.vehicleInserter = dataset.Table(VEHICLE_TABLE).Inserter()
 	bq.longTermStopVisitInserter = dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Inserter()
 	bq.controlInserter = dataset.Table(CONTROL_TABLE).Inserter()
+}
+
+func (bq *BigQueryClient) findOrCreateDatasetAndTables() (*bigquery.Dataset, error) {
+	dataset, err := bq.findOrCreateDataset()
+	if err != nil {
+		return nil, err
+	}
+
+	for t, s := range tablesSchemas {
+		err = bq.findOrCreateTable(dataset, t, s)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return dataset, nil
 }
 
 func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
@@ -376,36 +400,32 @@ func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {
 		}
 	}
 
-	logger.Log.Printf("Creating New Dataset and tables")
+	logger.Log.Printf("Creating New Dataset")
 	dataset := bq.client.Dataset(bq.dataset)
 	if err := dataset.Create(bq.ctx, &bigquery.DatasetMetadata{Location: "EU"}); err != nil {
 		return nil, err
 	}
+
+	return dataset, nil
+}
+
+func (bq *BigQueryClient) findOrCreateTable(dataset *bigquery.Dataset, tableName string, schema bigquery.Schema) error {
+	t := dataset.Table(tableName)
+	if _, err := t.Metadata(bq.ctx); err == nil {
+		return nil
+	}
+
+	logger.Log.Printf("Creating New Table %s for Dataset %s", tableName, bq.dataset)
 
 	p := &bigquery.TimePartitioning{
 		Field:      "timestamp",
 		Expiration: 30 * 24 * time.Hour,
 	}
 
-	if err := dataset.Table(EXCHANGE_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqMessageSchema}); err != nil {
-		return nil, err
+	if err := t.Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: schema}); err != nil {
+		return err
 	}
 
-	if err := dataset.Table(PARTNER_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqPartnerSchema}); err != nil {
-		return nil, err
-	}
+	return nil
 
-	if err := dataset.Table(VEHICLE_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqVehicleSchema}); err != nil {
-		return nil, err
-	}
-
-	if err := dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqLongTermStopVisitsSchema}); err != nil {
-		return nil, err
-	}
-
-	if err := dataset.Table(CONTROL_TABLE).Create(bq.ctx, &bigquery.TableMetadata{TimePartitioning: p, Schema: bqControlSchema}); err != nil {
-		return nil, err
-	}
-
-	return dataset, nil
 }
