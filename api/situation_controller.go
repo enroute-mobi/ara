@@ -52,7 +52,8 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 				return allSituations[i].BroadcastPeriod().StartTime.Before(allSituations[j].BroadcastPeriod().StartTime)
 			})
 		default:
-			fmt.Errorf("invalid request: query parameter \"direction\": %s", params.Get("direction"))
+			http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+			return
 		}
 	default:
 		sort.Slice(allSituations, func(i, j int) bool {

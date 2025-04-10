@@ -46,7 +46,8 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 			return allStopAreas[i].Name < allStopAreas[j].Name
 		})
 	default:
-		fmt.Errorf("invalid request: query parameter \"direction\": %s", params.Get("direction"))
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
 	}
 
 	paginatedStopAreas, err := paginate(allStopAreas, params)
