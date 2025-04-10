@@ -312,7 +312,44 @@ func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *t
 	err = json.Unmarshal(data, &situations)
 	assert.NoError(err)
 	assert.Len(situations, 2, "All situations should be provided with page: 1 and per_page: 2")
-	assert.True(situations[0].ValidityPeriods[0].StartTime.Before(situations[1].ValidityPeriods[0].StartTime))
+	assert.True(
+		situations[0].
+			ValidityPeriods[0].
+			StartTime.
+			Before(situations[1].ValidityPeriods[0].StartTime),
+		"Situations should be ordered by ValidityPeriode ascending")
+
+	// Order by direction desc
+	params = url.Values{}
+	params.Add("page", "1")
+	params.Add("per_page", "2")
+	params.Add("order", "validity_periods_start")
+	params.Add("direction", "desc")
+
+	u, _ = URI("", path, params)
+
+	request, _ = http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "situations")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder = httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res = responseRecorder.Result()
+	defer res.Body.Close()
+	data, err = io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	err = json.Unmarshal(data, &situations)
+	assert.NoError(err)
+	assert.Len(situations, 2, "All situations should be provided with page: 1 and per_page: 2")
+	assert.True(situations[0].
+		ValidityPeriods[0].
+		StartTime.
+		After(situations[1].ValidityPeriods[0].StartTime),
+		"Situations should be ordered by ValidityPeriode descending")
 }
 
 func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_Not_Provided(t *testing.T) {

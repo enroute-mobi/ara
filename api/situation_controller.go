@@ -39,11 +39,21 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 
 	allSituations := controller.referential.Model().Situations().FindAll()
 	order := params.Get("order")
+	direction := params.Get("direction")
 	switch order {
 	case "validity_periods_start":
-		sort.Slice(allSituations, func(i, j int) bool {
-			return allSituations[i].BroadcastPeriod().StartTime.Before(allSituations[j].BroadcastPeriod().StartTime)
-		})
+		switch direction {
+		case "desc":
+			sort.Slice(allSituations, func(i, j int) bool {
+				return allSituations[i].BroadcastPeriod().StartTime.After(allSituations[j].BroadcastPeriod().StartTime)
+			})
+		case "asc", "":
+			sort.Slice(allSituations, func(i, j int) bool {
+				return allSituations[i].BroadcastPeriod().StartTime.Before(allSituations[j].BroadcastPeriod().StartTime)
+			})
+		default:
+			fmt.Errorf("invalid request: query parameter \"direction\": %s", params.Get("direction"))
+		}
 	default:
 		sort.Slice(allSituations, func(i, j int) bool {
 			return allSituations[i].RecordedAt.Before(allSituations[j].RecordedAt)
