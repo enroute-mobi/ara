@@ -13,10 +13,10 @@ import (
 func NewUnexpectedController(sc *SelectControl) (controller, error) {
 	if sc.Hook.String != "AfterCreate" {
 		logger.Log.Printf("******************* not after create")
-		return nil, errors.New("Unexpected controller must be defined AfterCreate")
+		return nil, errors.New("'unexpected' controller must be defined AfterCreate")
 	}
 	if !slices.Contains([]string{"StopArea", "Line", "VehicleJourney"}, sc.ModelType.String) {
-		return nil, fmt.Errorf("Don't know how to handle model type %s", sc.ModelType.String)
+		return nil, fmt.Errorf("don't know how to handle model type %s in 'unexpected' controller", sc.ModelType.String)
 	}
 
 	return func(mi ModelInstance) error {
