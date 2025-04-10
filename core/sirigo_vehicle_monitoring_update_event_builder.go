@@ -101,7 +101,7 @@ func (builder *SirigoVehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlV
 			OriginRef:       xmlVehicleActivity.OriginRef.String,
 			OriginName:      xmlVehicleActivity.OriginName.String,
 			DestinationRef:  xmlVehicleActivity.DestinationRef.String,
-			DirectionType:   builder.directionRef(xmlVehicleActivity.DirectionType.String),
+			DirectionType:   builder.directionRef(xmlVehicleActivity.DirectionRef.String),
 			DestinationName: xmlVehicleActivity.DestinationName.String,
 			Monitored:       xmlVehicleActivity.Monitored.Bool,
 			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy.String),
