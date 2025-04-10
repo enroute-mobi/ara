@@ -25,7 +25,7 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 		Attributes:      sql.NullString{String: attributes, Valid: true},
 	}
 
-	cb := &contextBuilder{
+	cb := &macroContextBuilder{
 		childrenId: "",
 		macro:      nil,
 		updaters:   []*SelectMacro{sm},
@@ -33,8 +33,8 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 
 	builder := &macroBuilder{
 		manager:        manager,
-		initialContext: []*contextBuilder{cb},
-		contexes:       make(map[string]*contextBuilder),
+		initialContext: []*macroContextBuilder{cb},
+		contexes:       make(map[string]*macroContextBuilder),
 	}
 
 	err := builder.buildMacros()
@@ -112,7 +112,7 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 		Attributes:      sql.NullString{String: attributes, Valid: true},
 	}
 
-	cb := &contextBuilder{
+	cb := &macroContextBuilder{
 		childrenId: "",
 		macro:      nil,
 		updaters:   []*SelectMacro{sm},
@@ -120,8 +120,8 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 
 	builder := &macroBuilder{
 		manager:        manager,
-		initialContext: []*contextBuilder{cb},
-		contexes:       make(map[string]*contextBuilder),
+		initialContext: []*macroContextBuilder{cb},
+		contexes:       make(map[string]*macroContextBuilder),
 	}
 
 	err := builder.buildMacros()
