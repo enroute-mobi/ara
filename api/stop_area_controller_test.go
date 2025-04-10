@@ -2,9 +2,13 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"path"
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -181,4 +185,98 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 
 	_, ok = controller.findStopArea(string(stopArea.Id()))
 	assert.True(ok, "Can't find StopArea by Id")
+}
+
+func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new stopAreas
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Name = "A"
+	referential.Model().StopAreas().Save(stopArea)
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.Name = "B"
+	referential.Model().StopAreas().Save(stopArea2)
+
+	all := referential.Model().StopAreas().FindAll()
+	for i := range all {
+		fmt.Printf("name: %s, Origins ==> %#v\n", all[i].Name, all[i].Origins)
+	}
+
+	assert.Len(all, 2)
+
+	// Create a request
+	path := path.Join("default", "stop_areas")
+
+	params := url.Values{}
+	params.Add("page", "1")
+	params.Add("per_page", "2")
+	params.Add("order", "name")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	fmt.Println(string(data))
+	var stopAreas []model.StopArea
+	err = json.Unmarshal(data, &stopAreas)
+	assert.NoError(err)
+	assert.Len(stopAreas, 2, "All stopAreas should be provided with page: 1 and per_page: 2")
+	// StopAreas should be ordered by Name ascending
+	assert.Equal("A", stopAreas[0].Name)
+	assert.Equal("B", stopAreas[1].Name)
+
+	// Order by direction desc
+	params = url.Values{}
+	params.Add("page", "1")
+	params.Add("per_page", "2")
+	params.Add("order", "name")
+	params.Add("direction", "desc")
+
+	u, _ = URI("", path, params)
+
+	request, _ = http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder = httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res = responseRecorder.Result()
+	defer res.Body.Close()
+	data, err = io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	err = json.Unmarshal(data, &stopAreas)
+	assert.NoError(err)
+	assert.Len(stopAreas, 2, "All stopAreas should be provided with page: 1 and per_page: 2")
+	// StopAreas should be ordered by Name descending
+	assert.Equal("B", stopAreas[0].Name)
+	assert.Equal("A", stopAreas[1].Name)
 }
