@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/remote"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/sirigo"
 )
 
 type SIRIRequestHandler interface {
@@ -37,7 +39,7 @@ func NewSIRIHandler(referential *core.Referential) *SIRIHandler {
 	return &SIRIHandler{referential: referential}
 }
 
-func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRequestHandler {
+func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope, rd io.Reader) SIRIRequestHandler {
 	switch envelope.BodyType() {
 	case "CheckStatus":
 		return &SIRICheckStatusRequestHandler{
@@ -81,7 +83,7 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 		}
 	case "NotifyVehicleMonitoring", "VehicleMonitoringDelivery":
 		return &SIRIVehicleMonitoringRequestDeliveriesResponseHandler{
-			xmlRequest:  sxml.NewXMLNotifyVehicleMonitoring(envelope.Body()),
+			xmlRequest:  sirigo.VehicleMonitoringNotificationParser().Parse(rd),
 			referential: handler.referential,
 		}
 	case "NotifySubscriptionTerminated":
@@ -176,7 +178,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		requestReader = request.Body
 	}
 
-	envelope, err := remote.NewAutodetectSIRIEnvelope(requestReader)
+	envelope, b, err := remote.NewAutodetectSIRIEnvelope(requestReader)
 	if err != nil {
 		SIRIError{
 			errCode:         "Client",
@@ -189,7 +191,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	requestHandler := handler.requestHandler(envelope)
+	requestHandler := handler.requestHandler(envelope, bytes.NewReader(b))
 	if requestHandler == nil {
 		SIRIError{
 			errCode:         "NotSupported",
