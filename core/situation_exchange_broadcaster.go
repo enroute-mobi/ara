@@ -122,6 +122,7 @@ func (sxb *SXBroadcaster) prepareSIRISituationExchangeNotify() {
 			MonitoringRefs:         make(map[string]struct{}),
 		}
 
+		broadcastPeriod := sxb.getBroadcastPeriod()
 		for _, situationId := range situationIds {
 			if _, ok := processedSituations[situationId]; ok {
 				continue
@@ -134,7 +135,7 @@ func (sxb *SXBroadcaster) prepareSIRISituationExchangeNotify() {
 				continue
 			}
 
-			builder.BuildSituationExchange(situation, delivery)
+			builder.BuildSituationExchange(situation, delivery, broadcastPeriod)
 		}
 
 		if len(delivery.Situations) == 0 {
@@ -165,6 +166,13 @@ func (sxb *SXBroadcaster) newBQEvent() *audit.BigQueryMessage {
 		Partner:   string(sxb.connector.Partner().Slug()),
 		Status:    "OK",
 	}
+}
+
+func (sxb *SXBroadcaster) getBroadcastPeriod() *model.TimeRange {
+	period := &model.TimeRange{}
+	period.StartTime = sxb.Clock().Now().Add(-sxb.connector.partner.SituationsTTL())
+
+	return period
 }
 
 func (sxb *SXBroadcaster) logSIRISituationExchangeNotify(message *audit.BigQueryMessage, response *siri.SIRINotifySituationExchange) {

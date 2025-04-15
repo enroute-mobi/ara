@@ -769,7 +769,6 @@ Feature: Support SIRI SituationExchange by subscription
       | Summary[Translations]#FR                                                           | Nouveau pass Navigo                           |
       | Summary[Translations]#EN                                                           | New pass Navigo                               |
       | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                     |
-      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                     |
       | Description[DefaultValue]                                                          | a very very very long message                 |
       | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8             |
       | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
