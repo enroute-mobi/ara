@@ -333,12 +333,12 @@ func (builder *BroadcastSituationExchangeBuilder) resolveStopAreaRef(stopAreaId 
 	return stopAreaCode.Value(), true
 }
 
-func (builder *BroadcastSituationExchangeBuilder) canBroadcast(situation *model.Situation, subscriptionBroadcastPerioderiod *model.TimeRange) bool {
+func (builder *BroadcastSituationExchangeBuilder) canBroadcast(situation *model.Situation, subscriptionBroadcastPeriod *model.TimeRange) bool {
 	if situation.Origin == string(builder.partner.Slug()) {
 		return false
 	}
 
-	if !situation.BroadcastPeriod().Overlaps(subscriptionBroadcastPerioderiod) {
+	if !situation.BroadcastPeriod().Overlaps(subscriptionBroadcastPeriod) {
 		return false
 	}
 
