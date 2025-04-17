@@ -35,9 +35,20 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 	logger.Log.Debugf("StopAreas Index")
 
 	allStopAreas := controller.referential.Model().StopAreas().FindAll()
-	sort.Slice(allStopAreas, func(i, j int) bool {
-		return allStopAreas[i].Name < allStopAreas[j].Name
-	})
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(allStopAreas, func(i, j int) bool {
+			return allStopAreas[i].Name > allStopAreas[j].Name
+		})
+	case "asc", "":
+		sort.Slice(allStopAreas, func(i, j int) bool {
+			return allStopAreas[i].Name < allStopAreas[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
 
 	paginatedStopAreas, err := paginate(allStopAreas, params)
 	if err != nil {

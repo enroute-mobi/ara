@@ -143,6 +143,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Origins != nil {
+		stopArea.Origins = NewStopAreaOrigins()
 		stopArea.Origins.SetOriginsFromMap(aux.Origins)
 	}
 
