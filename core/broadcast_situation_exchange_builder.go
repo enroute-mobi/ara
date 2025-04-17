@@ -31,8 +31,8 @@ func NewBroadcastSituationExchangeBuilder(partner *Partner, connector string) *B
 	}
 }
 
-func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation *model.Situation, delivery *siri.SIRISituationExchangeDelivery, subscriptionBroadcastPerioderiod *model.TimeRange) {
-	if !builder.canBroadcast(situation, subscriptionBroadcastPerioderiod) {
+func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation *model.Situation, delivery *siri.SIRISituationExchangeDelivery, subscriptionBroadcastPeriod *model.TimeRange) {
+	if !builder.canBroadcast(situation, subscriptionBroadcastPeriod) {
 		return
 	}
 
