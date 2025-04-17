@@ -42,7 +42,7 @@ func NewVehicleJourney(model Model) *VehicleJourney {
 	return vehicleJourney
 }
 
-func (vehicleJourney *VehicleJourney) modelId() ModelId {
+func (vehicleJourney *VehicleJourney) ModelId() ModelId {
 	return ModelId(vehicleJourney.id)
 }
 

@@ -10,7 +10,7 @@ type ModelId string
 type ModelInstance interface {
 	CodeConsumerInterface
 
-	modelId() ModelId
+	ModelId() ModelId
 }
 
 type Model interface {
