@@ -46,7 +46,7 @@ func NewStopVisit(model Model) *StopVisit {
 	return stopVisit
 }
 
-func (stopVisit *StopVisit) modelId() ModelId {
+func (stopVisit *StopVisit) ModelId() ModelId {
 	return ModelId(stopVisit.id)
 }
 

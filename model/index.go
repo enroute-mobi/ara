@@ -17,7 +17,7 @@ func NewIndex(extractor IndexableExtractor) *Index {
 }
 
 func (index *Index) Index(model ModelInstance) {
-	modelId := model.modelId()
+	modelId := model.ModelId()
 	indexable := index.extractor(model)
 
 	currentIndexable, ok := index.byIdentifier[modelId]

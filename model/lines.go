@@ -36,7 +36,7 @@ func NewLine(model Model) *Line {
 	return line
 }
 
-func (line *Line) modelId() ModelId {
+func (line *Line) ModelId() ModelId {
 	return ModelId(line.id)
 }
 

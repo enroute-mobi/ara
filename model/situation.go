@@ -445,7 +445,7 @@ func (t *TimeRange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (situation *Situation) modelId() ModelId {
+func (situation *Situation) ModelId() ModelId {
 	return ModelId(situation.id)
 }
 

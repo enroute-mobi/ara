@@ -1,23 +1,29 @@
 package model
 
-import "slices"
+import (
+	"slices"
+)
 
 type ControlId string
 
-type controler func(ModelInstance) error
+type controller func(ModelInstance) error
 
-// type controlerAttributes interface{}
-// type controlerFactory func(controlerAttributes) (controler, error)
+// type controllerAttributes interface{}
+// type controllerFactory func(controllerAttributes) (controller, error)
 
 const (
-	Dummy = "Dummy"
+	Dummy      = "Dummy"
+	Unexpected = "Unexpected"
 )
 
-var controlers = []string{Dummy}
+var allControllers = []string{
+	Dummy,
+	Unexpected,
+}
 
 type Control struct {
-	ctx        Context
-	controlers []controler
+	ctx         Context
+	controllers []controller
 
 	Criticity    string
 	InternalCode string
@@ -33,8 +39,8 @@ func NewControlWithContext(ctx Context) *Control {
 	}
 }
 
-func (c *Control) AddControler(controlers controler) {
-	c.controlers = append(c.controlers, controlers)
+func (c *Control) AddController(controllers controller) {
+	c.controllers = append(c.controllers, controllers)
 }
 
 func (c *Control) AddContext(ctx Context) {
@@ -54,8 +60,8 @@ func (c *Control) Control(mi ModelInstance) (ok bool, err error) {
 	if c.ctx != nil && !c.ctx(mi) {
 		return false, nil
 	}
-	for i := range c.controlers {
-		err := c.controlers[i](mi)
+	for i := range c.controllers {
+		err := c.controllers[i](mi)
 		if err != nil {
 			return false, err
 		}
@@ -63,14 +69,17 @@ func (c *Control) Control(mi ModelInstance) (ok bool, err error) {
 	return true, nil
 }
 
-func NewControlerFromDatabase(sc *SelectControl) (controler, error) {
-	if sc.Type == Dummy {
-		return NewDummyControler(sc)
+func NewControllerFromDatabase(sc *SelectControl) (controller, error) {
+	switch {
+	case sc.Type == Dummy:
+		return NewDummyController(sc)
+	case sc.Type == Unexpected:
+		return NewUnexpectedController(sc)
 	}
 
 	return nil, nil
 }
 
-func IsControler(c string) bool {
-	return slices.Contains(controlers, c)
+func IsController(c string) bool {
+	return slices.Contains(allControllers, c)
 }

@@ -47,7 +47,7 @@ func NewStopArea(model Model) *StopArea {
 	return stopArea
 }
 
-func (stopArea *StopArea) modelId() ModelId {
+func (stopArea *StopArea) ModelId() ModelId {
 	return ModelId(stopArea.id)
 }
 

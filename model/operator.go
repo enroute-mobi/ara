@@ -28,7 +28,7 @@ func NewOperator(model Model) *Operator {
 	return operator
 }
 
-func (operator *Operator) modelId() ModelId {
+func (operator *Operator) ModelId() ModelId {
 	return ModelId(operator.id)
 }
 
@@ -91,7 +91,7 @@ type MemoryOperators struct {
 	mutex *sync.RWMutex
 
 	byIdentifier map[OperatorId]*Operator
-	byCode   *CodeIndex
+	byCode       *CodeIndex
 }
 
 type Operators interface {
@@ -109,7 +109,7 @@ func NewMemoryOperators() *MemoryOperators {
 	return &MemoryOperators{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[OperatorId]*Operator),
-		byCode:   NewCodeIndex(),
+		byCode:       NewCodeIndex(),
 	}
 }
 
