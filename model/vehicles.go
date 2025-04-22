@@ -189,6 +189,14 @@ func (manager *MemoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 	return &Vehicle{}, false
 }
 
+func (manager *MemoryVehicles) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
+}
+
 func (manager *MemoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()

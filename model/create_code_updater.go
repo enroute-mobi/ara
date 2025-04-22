@@ -17,7 +17,7 @@ type createCodeUpdaterAttributes struct {
 	TargetPattern   string `json:"target_pattern"`
 }
 
-func NewCreateCodeUpdater(sm *SelectMacro) (updater, error) {
+func NewCreateCodeUpdater(m *MemoryModel, sm *SelectMacro) (updater, error) {
 	if !sm.Attributes.Valid {
 		return nil, errors.New("empty Attributes")
 	}
@@ -26,6 +26,11 @@ func NewCreateCodeUpdater(sm *SelectMacro) (updater, error) {
 	err := json.Unmarshal([]byte(sm.Attributes.String), &attrs)
 	if err != nil {
 		return nil, fmt.Errorf("can't parse Attributes: %v", err)
+	}
+
+	manager := manager(m, sm.ModelType.String)
+	if manager == nil {
+		return nil, fmt.Errorf("unsupported type %v", sm.Type)
 	}
 
 	return func(mi ModelInstance) error {
@@ -40,8 +45,28 @@ func NewCreateCodeUpdater(sm *SelectMacro) (updater, error) {
 		}
 
 		code := NewCode(attrs.TargetCodeSpace, strings.ReplaceAll(attrs.TargetPattern, valueReplace, sourceCode.Value()))
+		if manager.CodeExists(code) {
+			return fmt.Errorf("macro CreateCode should create code \"%s\":\"%s\" but it already exists", code.codeSpace, code.value)
+		}
+
 		mi.SetCode(code)
 
 		return nil
 	}, nil
+}
+
+func manager(m *MemoryModel, t string) ModelManager {
+	switch t {
+	case "StopArea":
+		return m.stopAreas
+	case "Line":
+		return m.lines
+	case "VehicleJourney":
+		return m.vehicleJourneys
+	case "StopVisit":
+		return m.stopVisits
+	case "Vehicle":
+		return m.vehicles
+	}
+	return nil
 }

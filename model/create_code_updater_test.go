@@ -11,7 +11,7 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 	assert := assert.New(t)
 
 	model := NewTestMemoryModel()
-	manager := NewMacroManager()
+	manager := model.macros
 	attributes := `{"source_code_space": "sae", "target_code_space": "regional", "target_pattern": "prefix:%{value}:suffix"}`
 
 	sm := &SelectMacro{
@@ -41,7 +41,6 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 	if len(err) != 0 {
 		t.Fatal("Macro should be created: ", err)
 	}
-	model.macros = manager
 
 	code1 := NewCode("sae", "test1")
 
@@ -98,7 +97,7 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 	assert := assert.New(t)
 
 	model := NewTestMemoryModel()
-	manager := NewMacroManager()
+	manager := model.macros
 	attributes := `{"source_code_space": "sae", "target_code_space": "regional", "target_pattern": "prefix:%{value}:suffix"}`
 
 	sm := &SelectMacro{
@@ -128,7 +127,6 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 	if len(err) != 0 {
 		t.Fatal("Macro should be created: ", err)
 	}
-	model.macros = manager
 
 	code1 := NewCode("sae", "test1")
 

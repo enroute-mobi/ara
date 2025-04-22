@@ -289,6 +289,14 @@ func (manager *MemoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
 	return &StopArea{}, false
 }
 
+func (manager *MemoryStopAreas) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
+}
+
 func (manager *MemoryStopAreas) FindByLineId(id LineId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 

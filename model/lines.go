@@ -250,6 +250,14 @@ func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
 	return &Line{}, false
 }
 
+func (manager *MemoryLines) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
+}
+
 func (manager *MemoryLines) FindAll() (lines []*Line) {
 	manager.mutex.RLock()
 

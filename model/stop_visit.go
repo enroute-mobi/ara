@@ -335,6 +335,14 @@ func (manager *MemoryStopVisits) FindByCode(code Code) (*StopVisit, bool) {
 	return &StopVisit{}, false
 }
 
+func (manager *MemoryStopVisits) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
+}
+
 func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopVisitOrder(vjId VehicleJourneyId, order int) *StopVisit {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()

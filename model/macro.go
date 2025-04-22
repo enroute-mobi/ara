@@ -63,7 +63,7 @@ func (m *Macro) Update(mi ModelInstance) (ok bool, err error) {
 	return true, nil
 }
 
-func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
+func NewUpdaterFromDatabase(m *MemoryModel, sm *SelectMacro) (updater, error) {
 	switch {
 	case sm.ModelType.String == "VehicleJourney" && sm.Type == SetAttribute:
 		return NewVehicleJourneySetAttributeUpdater(sm)
@@ -72,7 +72,7 @@ func NewUpdaterFromDatabase(sm *SelectMacro) (updater, error) {
 	case sm.ModelType.String == "Situation" && sm.Type == DefineSituationAffects:
 		return NewDefineSituationAffectsUpdater(sm)
 	case sm.Type == CreateCode:
-		return NewCreateCodeUpdater(sm)
+		return NewCreateCodeUpdater(m, sm)
 	}
 	return nil, nil
 }
