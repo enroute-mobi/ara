@@ -31,8 +31,8 @@ func NewBroadcastSituationExchangeBuilder(partner *Partner, connector string) *B
 	}
 }
 
-func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation *model.Situation, delivery *siri.SIRISituationExchangeDelivery) {
-	if !builder.canBroadcast(situation) {
+func (builder *BroadcastSituationExchangeBuilder) BuildSituationExchange(situation *model.Situation, delivery *siri.SIRISituationExchangeDelivery, subscriptionBroadcastPeriod *model.TimeRange) {
+	if !builder.canBroadcast(situation, subscriptionBroadcastPeriod) {
 		return
 	}
 
@@ -333,13 +333,12 @@ func (builder *BroadcastSituationExchangeBuilder) resolveStopAreaRef(stopAreaId 
 	return stopAreaCode.Value(), true
 }
 
-func (builder *BroadcastSituationExchangeBuilder) canBroadcast(situation *model.Situation) bool {
+func (builder *BroadcastSituationExchangeBuilder) canBroadcast(situation *model.Situation, subscriptionBroadcastPeriod *model.TimeRange) bool {
 	if situation.Origin == string(builder.partner.Slug()) {
 		return false
 	}
 
-	if !situation.GMValidUntil().IsZero() &&
-		situation.GMValidUntil().Before(builder.Clock().Now()) {
+	if !situation.BroadcastPeriod().Overlaps(subscriptionBroadcastPeriod) {
 		return false
 	}
 

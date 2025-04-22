@@ -178,8 +178,16 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) addSituations(sub
 	}
 }
 
+func (connector *SIRISituationExchangeSubscriptionBroadcaster) getSubscriptionBroadcastPeriod() *model.TimeRange {
+	period := &model.TimeRange{}
+	period.StartTime = connector.Clock().Now().Add(-connector.partner.SituationsTTL())
+
+	return period
+}
+
 func (connector *SIRISituationExchangeSubscriptionBroadcaster) addfilteredSituations(situation *model.Situation, sub *Subscription, r *SubscribedResource) {
-	if situation.GMValidUntil().Before(connector.Clock().Now()) {
+	subscriptionBroadcastPeriod := connector.getSubscriptionBroadcastPeriod()
+	if !situation.BroadcastPeriod().Overlaps(subscriptionBroadcastPeriod) {
 		return
 	}
 
