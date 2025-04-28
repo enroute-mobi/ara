@@ -17,7 +17,7 @@ func Test_NewAutodetectSIRIEnvelope(t *testing.T) {
 
 	// empty request
 	req := strings.NewReader("")
-	_, err := NewAutodetectSIRIEnvelope(req)
+	_, _, err := NewAutodetectSIRIEnvelope(req)
 	expectedError := errors.New("empty body")
 
 	assert.Equal(expectedError, err)
@@ -87,7 +87,7 @@ func newAutodetectSIRIEnvelopeFrom(name string) (*SIRIEnvelope, error) {
 	}
 	defer file.Close()
 
-	envelope, err := NewAutodetectSIRIEnvelope(file)
+	envelope, _, err := NewAutodetectSIRIEnvelope(file)
 
 	if err != nil {
 		return nil, err
