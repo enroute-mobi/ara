@@ -13,6 +13,10 @@ type ModelInstance interface {
 	ModelId() ModelId
 }
 
+type ModelManager interface {
+	CodeExists(Code) bool
+}
+
 type Model interface {
 	Date() Date
 	Referential() string
@@ -122,7 +126,10 @@ func (model *MemoryModel) refresh() {
 	model.vehicles = vehicles
 	model.vehicles.broadcastEvent = model.broadcastVeEvent
 
-	model.macros = NewMacroManager()
+	macros := NewMacroManager()
+	macros.model = model
+	model.macros = macros
+
 	model.controls = NewControlManager()
 }
 

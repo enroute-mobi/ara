@@ -18,6 +18,7 @@ type Macros interface {
 type MacroManager struct {
 	mutex *sync.RWMutex
 
+	model  *MemoryModel
 	macros macros
 }
 
@@ -57,7 +58,7 @@ func (mm *MacroManager) setMacro(h hooks.Type, t ModelType, m Macro) {
 
 // If we ask for AfterCreate, we'll also get AfterSave Macros
 func (mm MacroManager) GetMacros(h hooks.Type, t model_types.Model) (m []Macro) {
-	for i := 0; i < hooks.Total; i++ {
+	for i := h; i < hooks.Total; i++ {
 		m = append(m, mm.macros[i][t]...)
 	}
 	return
@@ -113,7 +114,7 @@ func (b *macroBuilder) buildUpdater(sm *SelectMacro) []error {
 	e := []error{}
 
 	m := NewMacro()
-	updater, err := NewUpdaterFromDatabase(sm)
+	updater, err := NewUpdaterFromDatabase(b.manager.model, sm)
 	if err != nil {
 		e = append(e, err)
 		return e
@@ -135,7 +136,7 @@ func (b *macroBuilder) handleContexes(c *macroContextBuilder, m *Macro) []error 
 		m.AddContext(context)
 	}
 	for _, u := range c.updaters {
-		updater, err := NewUpdaterFromDatabase(u)
+		updater, err := NewUpdaterFromDatabase(b.manager.model, u)
 		if err != nil {
 			e = append(e, err)
 			continue
