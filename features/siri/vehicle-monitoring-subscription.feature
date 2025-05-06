@@ -1064,11 +1064,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </Siri>
       """
       Then one Vehicle has the following attributes:
-        | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
-        | Bearing   | 171.0                                    |
-        | Latitude  | 48.99927561424598                        |
-        | Longitude | 1.6770970859674874                       |
+        | Codes        | "internal": "TRANSDEV:Vehicle::1501:LOC" |
+        | LineId       | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
+        | Bearing      | 171.0                                    |
+        | Latitude     | 48.99927561424598                        |
+        | Longitude    | 1.6770970859674874                       |
+        | LinkDistance | 340.0                                    |
+        | Percentage   | 73.0                                     |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                   |
         | Protocol        | siri                                      |
