@@ -816,7 +816,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         | StopAreas       | ["50000016"]                              |
         | Lines           | ["testLine"]                              |
 
-  @ARA-1101
+  @ARA-1101 @siri-valid
   Scenario: Update a Vehicle after a VehicleMonitoringDelivery in a subscription using the partner setting siri.direction_type should update the DirectionRef
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -937,6 +937,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
+      Then one Vehicle has the following attributes:
+        | Codes | "internal": "108" |
       Then the VehicleJourney "6ba7b814-9dad-11d1-a-00c04fd430c8" has the following attributes:
       | DirectionType | inbound |
 

@@ -6,7 +6,7 @@ toolchain go1.24.1
 
 require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
-	bitbucket.org/enroute-mobi/sirigo v0.0.2
+	bitbucket.org/enroute-mobi/sirigo v0.0.3-0.20250506090657-675d35bf1b3c
 	cloud.google.com/go v0.120.1
 	cloud.google.com/go/bigquery v1.67.0
 	github.com/getsentry/sentry-go v0.32.0

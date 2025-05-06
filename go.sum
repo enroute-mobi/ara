@@ -2,6 +2,8 @@ bitbucket.org/enroute-mobi/ara-external-models v0.0.9 h1:KRg4uG5DJyMsn56V1MWgF7q
 bitbucket.org/enroute-mobi/ara-external-models v0.0.9/go.mod h1:EXKNHGUaMYcZ83bHCoJJWjgCQelWTwW95oRV1vzKNnw=
 bitbucket.org/enroute-mobi/sirigo v0.0.2 h1:cnC2zIeijf1lj5lgRQyG7ZmlK+mtirmB1Wgaxz/kPIE=
 bitbucket.org/enroute-mobi/sirigo v0.0.2/go.mod h1:oP1Iv0zGH3VNZG6zr80KEW8abT8zcV9aB/BhEJzEIK8=
+bitbucket.org/enroute-mobi/sirigo v0.0.3-0.20250506090657-675d35bf1b3c h1:y+oocf2iOwuULXDR7JrGUHDqsEPokmCfw+14NzrnCdM=
+bitbucket.org/enroute-mobi/sirigo v0.0.3-0.20250506090657-675d35bf1b3c/go.mod h1:oP1Iv0zGH3VNZG6zr80KEW8abT8zcV9aB/BhEJzEIK8=
 cel.dev/expr v0.19.2 h1:V354PbqIXr9IQdwy4SYA4xa0HXaWq1BUPAGzugBY5V4=
 cel.dev/expr v0.19.2/go.mod h1:MrpN08Q+lEBs+bGYdLxxHkZoUSsCp0nSKTs0nTymJgw=
 cloud.google.com/go v0.120.1 h1:Z+5V7yd383+9617XDCyszmK5E4wJRJL+tquMfDj9hLM=
