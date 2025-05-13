@@ -1,49 +1,36 @@
-def lines_path(attributes = {})
-  url_for_model(attributes.merge(resource: 'line'))
-end
+Given(/^a Line exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, line|
+  referential = find_referential(slug)
+  line = referential.lines.create(model_attributes(line).transform_keys { |key| key.to_s.underscore })
 
-def line_path(id, attributes = {})
-  path = url_for_model(attributes.merge(resource: 'line', id: id))
-end
-
-Given(/^a Line exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, line|
-  response = RestClient.post lines_path(referential: referential), model_attributes(line).to_json, {content_type: :json, :Authorization => "Token token=#{$token}" }
-  debug response.body
+  raise 'Cannot create line' unless line.save
 end
 
 When(/^a Line is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, line|
   if referential.nil?
-    step "a Line exists with the following attributes:", line
+    step 'a Line exists with the following attributes:', line
   else
     step "a Line exists in Referential \"#{referential}\" with the following attributes:", line
   end
 end
 
-When(/^the Line "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, code, referential|
-  response = RestClient.get lines_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
-  responseArray = JSON.parse(response.body)
-  expectedLine = responseArray.find{|a| a["Codes"][kind] == code }
+When(/^the Line "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, value, slug|
+  line = find_model(slug, :lines, "#{kind}:#{value}")
 
-  RestClient.delete line_path(expectedLine["Id"]), {:Authorization => "Token token=#{$token}"}
+  raise 'Cannot destroy line' unless line.destroy
 end
 
-Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
-  response = RestClient.get lines_path(referential: referential), {:Authorization => "Token token=#{$token}"}
-  response_array = JSON.parse(response.body)
+Then(/^one Line(?: in Referential "([^"]+)")? has the following attributes:$/) do |slug, attributes|
+  referential = find_referential(slug)
 
-  called_method = has_attributes(response_array, attributes)
-
-  expect(called_method).to be_truthy
+  check_attributes(referential, :lines, attributes)
 end
 
-
-Then(/^a Line "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
-  response = RestClient.get(line_path("#{kind}:#{value}" ,referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"} ){|response, request, result| response }
+Then(/^a Line "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, slug|
+  line = find_model(slug, :lines, "#{kind}:#{value}")
 
   if condition.nil?
-    expect(response.code).to eq(200)
+    expect(line).not_to be_nil
   else
-    expect(response.code).to eq(404)
-    expect(response.body).to include("Line not found: #{kind}:#{value}")
+    expect(line).to be_nil
   end
 end
