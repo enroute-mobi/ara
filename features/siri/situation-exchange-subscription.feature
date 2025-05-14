@@ -605,7 +605,6 @@ Feature: Support SIRI SituationExchange by subscription
       And a Subscription exist with the following attributes:
         | Kind              | SituationExchangeCollect               |
         | ReferenceArray[0] | Line, "internal": "NINOXE:Line::3:LOC" |
-      Then show me ara subscriptions for partner "test"
       When I send this SIRI request
         """
      <?xml version='1.0' encoding='utf-8'?>

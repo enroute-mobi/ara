@@ -1,48 +1,36 @@
-def stop_areas_path(attributes = {})
-  url_for_model(attributes.merge(resource: 'stop_area'))
+Given(/^a StopArea exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, stop_area|
+  referential = find_referential(slug)
+  stop_area = referential.stop_areas.create(model_attributes(stop_area).transform_keys { |key| key.to_s.underscore.to_sym })
+
+  raise 'Cannot create stopArea' unless stop_area.save
 end
 
-def stop_area_path(id, attributes = {})
-  url_for_model(attributes.merge(resource: 'stop_area', id: id))
-end
-
-Given(/^a StopArea exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
-  response = RestClient.post stop_areas_path(referential: referential), model_attributes(stopArea).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  debug response.body
-end
-
-When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopArea|
+When(/^a StopArea is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_area|
   if referential.nil?
-    step "a StopArea exists with the following attributes:", stopArea
+    step "a StopArea exists with the following attributes:", stop_area
   else
-    step "a StopArea exists in Referential \"#{referential}\" with the following attributes:", stopArea
+    step "a StopArea exists in Referential \"#{referential}\" with the following attributes:", stop_area
   end
 end
 
-When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, value, referential|
-  response = RestClient.get stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
-  expectedStopArea = JSON.parse(response.body)
+When(/^the StopArea "([^"]+)":"([^"]+)"(?: in Referential "([^"]+)")? is destroyed$/) do |kind, value, slug|
+  stop_area = find_model(slug, :stop_areas, "#{kind}:#{value}")
 
-  RestClient.delete stop_area_path(expectedStopArea["Id"]), {:Authorization => "Token token=#{$token}"}
+  raise 'Cannot destroy stopArea' unless stop_area.destroy
 end
 
-Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
-  response = RestClient.get stop_areas_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response_array = api_attributes(response.body)
+Then(/^one StopArea(?: in Referential "([^"]+)")? has the following attributes:$/) do |slug, attributes|
+  referential = find_referential(slug)
 
-  called_method = has_attributes(response_array, attributes)
-
-  expect(called_method).to be_truthy
+  check_attributes(referential, :stop_areas, attributes)
 end
 
-Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
- # puts RestClient.get stop_areas_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
- response = RestClient.get(stop_area_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+Then(/^a StopArea "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, slug|
+  stop_area = find_model(slug, :stop_areas, "#{kind}:#{value}")
 
   if condition.nil?
-    expect(response.code).to eq(200)
+    expect(stop_area).not_to be_nil
   else
-    expect(response.code).to eq(404)
-    expect(response.body).to include("Stop area not found: #{kind}:#{value}")
+    expect(stop_area).to be_nil
   end
 end

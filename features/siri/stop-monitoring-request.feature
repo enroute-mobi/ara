@@ -1161,7 +1161,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1                                  |
       | Codes           | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | MonitoredAlways | false                                    |
+      | Monitored       | false                                    |
       | CollectedAlways | false                                    |
     When I send a SIRI GetStopMonitoring request with
       | RequestTimestamp  |   2017-01-01T07:54:00.977Z |
