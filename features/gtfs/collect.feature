@@ -448,10 +448,7 @@ Feature: Collect realtime data via GTFS-RT feeds
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Bearing          | 91.0                              |
-    Then No Vehicle exists with the following attributes:
-      | NextStopVisitId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
-    Then No Vehicle exists with the following attributes:
-      | NextStopVisitId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | NextStopVisitId  | nil                               |
 
   @ARA-1449
   Scenario: Collect GTFS VehiclePosition without occupancy should not change the occupancy status

@@ -3,6 +3,8 @@ def model_attributes(table)
 
   attributes.dup.each do |key, value|
     case value
+    when "nil"
+      attributes[key] = nil
     when /\A"\d+.\d+"\Z/
       # Don't convert integer between quotes
       attributes[key] = value[1..-2]

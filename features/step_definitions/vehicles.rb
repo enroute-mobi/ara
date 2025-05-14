@@ -1,14 +1,8 @@
-def vehicles_path(attributes = {})
-  url_for_model(attributes.merge(resource: 'vehicle'))
-end
+Given(/^a Vehicle exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, vehicle|
+  referential = find_referential(slug)
+  vehicle = referential.vehicles.create(model_attributes(vehicle).transform_keys { |key| key.to_s.underscore })
 
-def vehicle_path(id, attributes = {})
-  url_for_model(attributes.merge(resource: 'vehicle', id: id))
-end
-
-Given(/^a Vehicle exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle|
-  response = RestClient.post vehicles_path(referential: referential), model_attributes(vehicle).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  debug response.body
+  raise 'Cannot create vehicle' unless vehicle.save
 end
 
 When(/^a Vehicle is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle|
@@ -19,43 +13,25 @@ When(/^a Vehicle is created (?:in Referential "([^"]+)" )?with the following att
   end
 end
 
-When(/^the Vehicle "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
-  RestClient.put vehicle_path(identifier), model_attributes(attributes).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  # puts RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
-end
+When(/^the Vehicle "([^"]*)"(?: in Referential "([^"]+)")? is edited with the following attributes:$/) do |code, slug, attributes|
+  vehicle = find_model(slug, :vehicles, code)
+  vehicle.model_attributes = model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym }
 
-Then(/^the Vehicle "([^"]*)" has the following attributes:$/) do |identifier, attributes|
-  # puts RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response = RestClient.get vehicle_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
-  vehicleAttributes = api_attributes(response.body)
-  expect(vehicleAttributes).to include(model_attributes(attributes))
+  raise 'Cannot update vehicle' unless vehicle.save
 end
 
 Then(/^one Vehicle has the following attributes:$/) do |attributes|
-  # puts RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response = RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response_array = JSON.parse(response.body)
+  referential = find_referential(nil)
 
-  called_method = has_attributes(response_array, attributes)
-
-  expect(called_method).to be_truthy
+  check_attributes(referential, :vehicles, attributes)
 end
 
-
-Then(/^a Vehicle "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
-  response = RestClient.get(vehicle_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+Then(/^a Vehicle "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, slug|
+  vehicle = find_model(slug, :lines, "#{kind}:#{value}")
 
   if condition.nil?
-    expect(response.code).to eq(200)
+    expect(vehicle).not_to be_nil
   else
-    expect(response.code).to eq(404)
-    expect(response.body).to include("Stop visit not found: #{kind}:#{value}")
+    expect(vehicle).to be_nil
   end
-end
-
-Then(/^No Vehicle exists with the following attributes:$/) do |attributes|
-  response = RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response_array = JSON.parse(response.body)
-
-  expect(response_array).not_to include(a_hash_including(attributes))
 end
