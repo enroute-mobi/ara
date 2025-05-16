@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+	"net/http/pprof"
+	rpprof "runtime/pprof"
 	"slices"
 	"strings"
 	"time"
@@ -35,8 +37,20 @@ func NewServer(bind string) *Server {
 	return &server
 }
 
+func handleMemProfile(response http.ResponseWriter, request *http.Request) {
+	rpprof.WriteHeapProfile(response)
+}
+
 func (server *Server) ListenAndServe() error {
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("/debug/debug/pprof/", pprof.Index)
+	// mux.HandleFunc("/debug/debug/pprof/allocs", pprof.Alloc)
+	mux.HandleFunc("/debug/debug/pprof/heap", handleMemProfile)
+	mux.HandleFunc("/debug/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/debug/pprof/trace", pprof.Trace)
 
 	mux.HandleFunc("POST /{referential_slug}/graphql", server.handleGraphql)
 	mux.HandleFunc("POST /{referential_slug}/push", server.handlePush)
