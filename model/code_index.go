@@ -13,17 +13,14 @@ func NewCodeIndex() *CodeIndex {
 }
 
 func (index *CodeIndex) Index(model ModelInstance) {
-	currentIndexable, ok := index.byIdentifier[model.ModelId()]
-	if ok {
+	if currentIndexable, ok := index.byIdentifier[model.ModelId()]; ok {
 		for indexedCodeSpace, indexedCode := range currentIndexable {
 			modelCode, ok := model.Code(indexedCodeSpace)
 			if !ok || modelCode.Value() != indexedCode.Value() {
 				delete(index.byCode, indexedCode)
 			}
 		}
-	}
-
-	if index.byIdentifier[model.ModelId()] == nil {
+	} else {
 		index.byIdentifier[model.ModelId()] = make(Codes)
 	}
 
