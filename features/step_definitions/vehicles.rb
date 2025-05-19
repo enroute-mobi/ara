@@ -1,6 +1,6 @@
-Given(/^a Vehicle exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, vehicle|
+Given(/^a Vehicle exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, attributes|
   referential = find_referential(slug)
-  vehicle = referential.vehicles.create(model_attributes(vehicle).transform_keys { |key| key.to_s.underscore })
+  vehicle = referential.vehicles.create(model_attributes(attributes).transform_keys { |key| key.to_s.underscore })
 
   raise 'Cannot create vehicle' unless vehicle.save
 end
@@ -27,7 +27,7 @@ Then(/^one Vehicle has the following attributes:$/) do |attributes|
 end
 
 Then(/^a Vehicle "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, slug|
-  vehicle = find_model(slug, :lines, "#{kind}:#{value}")
+  vehicle = find_model(slug, :vehicle, "#{kind}:#{value}")
 
   if condition.nil?
     expect(vehicle).not_to be_nil

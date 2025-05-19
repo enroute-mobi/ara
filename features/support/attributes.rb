@@ -261,6 +261,25 @@ def api_attributes(json)
   attributes
 end
 
+def matcher_attributes(attributes, found_model)
+  parsed_attributes = model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym }
+
+  parsed_attributes = parsed_attributes.each_with_object({}) do |(key, value), attributes|
+    case value
+    when Float
+      value = a_value_within(0.00001).of(value)
+    when Array
+      value = match_array(value)
+    else
+      value
+    end
+
+    attributes[key] = value
+  end
+
+  expect(found_model).to have_attributes(parsed_attributes)
+end
+
 def check_attributes(referential, model, attributes)
   parsed_attributes = model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym }
 

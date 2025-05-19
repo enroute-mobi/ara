@@ -1,43 +1,36 @@
-def vehicle_journeys_path(attributes = {})
-	url_for_model(attributes.merge(resource: 'vehicle_journey'))
+Given(/^a VehicleJourney exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, attributes|
+  referential = find_referential(slug)
+  vehicle_journey = referential.vehicle_journeys.create(model_attributes(attributes).transform_keys { |key| key.to_s.underscore })
+
+  raise 'Cannot create VehicleJourney' unless vehicle_journey.save
 end
 
-def vehicle_journey_path(id, attributes = {})
-  url_for_model(attributes.merge(resource: 'vehicle_journey', id: id))
-end
+When(/^the VehicleJourney "([^"]*)"(?: in Referential "([^"]+)")? is edited with the following attributes:$/) do |identifier, slug, attributes|
+  vehicle_journey = find_model(slug, :vehicle_journeys, identifier)
+  vehicle_journey.model_attributes = model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym }
 
-Given(/^a VehicleJourney exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, vehicle_journey|
-  response = RestClient.post vehicle_journeys_path(referential: referential), model_attributes(vehicle_journey).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  debug response.body
-end
-
-When(/^the VehicleJourney "([^"]*)" is edited with the following attributes:$/) do |identifier, attributes|
-  RestClient.put vehicle_journey_path(identifier), model_attributes(attributes).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  # puts RestClient.get vehicles_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
+  raise 'Cannot update VehicleJourney' unless vehicle_journey.save
 end
 
 Then(/^the VehicleJourney "([^"]*)" has the following attributes:$/) do |identifier, attributes|
-  response = RestClient.get vehicle_journey_path(identifier), {content_type: :json, :Authorization => "Token token=#{$token}"}
-  vehicleJourneyAttributes = api_attributes(response.body)
-  expect(vehicleJourneyAttributes).to include(model_attributes(attributes))
+  vehicle_journey = find_model(nil, :vehicle_journeys, identifier)
+  expect(vehicle_journey).not_to be_nil
+
+  matcher_attributes(attributes, vehicle_journey)
 end
 
 Then(/^one VehicleJourney has the following attributes:$/) do |attributes|
-	response = RestClient.get vehicle_journeys_path, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response_array = JSON.parse(response.body)
+  referential = find_referential(nil)
 
-  called_method = has_attributes(response_array, attributes)
-
-  expect(called_method).to be_truthy
+  check_attributes(referential, :vehicle_journeys, attributes)
 end
 
-Then(/^a VehicleJourney "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, referential|
-  response = RestClient.get(vehicle_journey_path("#{kind}:#{value}", referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}){|response, request, result| response }
+Then(/^a VehicleJourney "([^"]+)":"([^"]+)" should( not)? exist(?: in Referential "([^"]+)")?$/) do |kind, value, condition, slug|
+  vehicle_journey = find_model(slug, :vehicle_journeys, "#{kind}:#{value}")
 
   if condition.nil?
-    expect(response.code).to eq(200)
+    expect(vehicle_journey).not_to be_nil
   else
-    expect(response.code).to eq(404)
-    expect(response.body).to include("Vehicle journey not found: #{kind}:#{value}")
+    expect(vehicle_journey).to be_nil
   end
 end
