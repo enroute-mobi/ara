@@ -1,28 +1,21 @@
-def stop_area_groups_path(attributes = {})
-  url_for_model(attributes.merge(resource: 'stop_area_group'))
+Given(/^a StopArea Group exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |slug, stop_area_group|
+  referential = find_referential(slug)
+  stop_area_group = referential.stop_area_groups.create(model_attributes(stop_area_group).transform_keys { |key| key.to_s.underscore })
+
+  raise 'Cannot create stop_area group' unless stop_area_group.save
 end
 
-def stop_area_group_path(id, attributes = {})
-  ufrl_for_model(attributes.merge(resource: 'stop_area_groups', id: id))
-end
-
-Given(/^a StopArea Group exists (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopAreaGroup|
-  response = RestClient.post stop_area_groups_path(referential: referential), model_attributes(stopAreaGroup).to_json, {content_type: :json, :Authorization => "Token token=#{$token}"}
-  debug response.body
-end
-
-
-When(/^a StopArea Group is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stopAreaGroup|
+When(/^a StopArea Group is created (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential, stop_area_group|
   if referential.nil?
-    step "a StopArea Group exists with the following attributes:", stopAreaGroup
+    step "a StopArea Group exists with the following attributes:", stop_area_group
   else
-    step "a StopArea Group exists in Referential \"#{referential}\" with the following attributes:", stopAreaGroup
+    step "a StopArea Group exists in Referential \"#{referential}\" with the following attributes:", stop_area_group
   end
 end
 
-Then(/^one StopArea Group(?: in Referential "([^"]+)")? has the following attributes:$/) do |referential, attributes|
-  response = RestClient.get stop_area_groups_path(referential: referential), {content_type: :json, :Authorization => "Token token=#{$token}"}
-  response_array = api_attributes(response.body)
+Then(/^the StopArea Group "([^"]*)" has the following attributes:$/) do |identifier, attributes|
+  stop_area_group = find_model(nil, :stop_area_groups, identifier)
+  expect(stop_area_group).not_to be_nil
 
-  expect(response_array).to include(model_attributes(attributes))
+  matcher_attributes(attributes, stop_area_group)
 end
