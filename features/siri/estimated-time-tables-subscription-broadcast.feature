@@ -2571,7 +2571,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" |
       | PassageOrder                |                                                                    1 |
       | StopAreaId                  |                                    6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | Vehiclejourneyid            |                                    6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | VehicleJourneyId            |                                    6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | VehicleAtStop               | false                                                                |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T12:00:00.000Z |
