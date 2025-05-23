@@ -19,7 +19,7 @@ end
 ParameterType(
   name: 'ara_resource',
   regexp: Regexp.new(
-    %w[StopArea Line Vehicle].join('|')
+    %w[StopArea Line Vehicle VehicleJourney].join('|')
   ),
   transformer: ->(s) { s }
 )
@@ -47,6 +47,16 @@ Then("one {ara_resource} in Referential {string} has the following attributes:")
   referential = find_referential(slug)
 
   check_attributes(referential, "#{collection.underscore}s", attributes)
+end
+
+Then("the {ara_resource} {string} has the following attributes:") do |collection, code_or_id, attributes|
+  step "the #{collection} \"#{code_or_id}\" in Referential \"test\" has the following attributes:", attributes
+end
+
+Then("the {ara_resource} {string} in Referential {string} has the following attributes:") do |collection, code_or_id, slug, attributes|
+  model = find_model(slug, "#{collection.underscore}s", code_or_id)
+
+  matcher_attributes(attributes, model)
 end
 
 When('the {ara_resource} {string}:{string} is destroyed') do |ara_resource, code_space, value|
