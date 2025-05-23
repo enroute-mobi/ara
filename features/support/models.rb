@@ -19,7 +19,7 @@ end
 ParameterType(
   name: 'ara_resource',
   regexp: Regexp.new(
-    %w[StopArea].join('|')
+    %w[StopArea Line].join('|')
   ),
   transformer: ->(s) { s }
 )
