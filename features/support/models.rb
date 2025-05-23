@@ -19,7 +19,7 @@ end
 ParameterType(
   name: 'ara_resource',
   regexp: Regexp.new(
-    %w[StopArea Line Vehicle VehicleJourney].join('|')
+    %w[StopArea Line Vehicle VehicleJourney Operator].join('|')
   ),
   transformer: ->(s) { s }
 )
@@ -33,6 +33,10 @@ Given("a {ara_resource} is created in Referential {string} with the following at
   model = referential.send("#{collection.underscore}s").create(model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym })
 
   raise "Cannot create #{collection}: #{model.errors}" unless model.save
+end
+
+When("an {ara_resource} exists with the following attributes:") do |collection, attributes|
+  step "a #{collection} is created with the following attributes:", attributes
 end
 
 When("a {ara_resource} exists with the following attributes:") do |collection, attributes|
