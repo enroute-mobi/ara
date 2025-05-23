@@ -19,7 +19,7 @@ end
 ParameterType(
   name: 'ara_resource',
   regexp: Regexp.new(
-    %w[StopArea Line].join('|')
+    %w[StopArea Line Vehicle].join('|')
   ),
   transformer: ->(s) { s }
 )
@@ -71,4 +71,15 @@ end
 Then("a {ara_resource} {string}:{string} should not exist in Referential {string}") do |collection, code_space, value, slug|
   model = find_model(slug, "#{collection.underscore}s", "#{code_space}:#{value}")
   expect(model).to be_nil
+end
+
+Then("the {ara_resource} {string} is edited with the following attributes:") do |collection, code_or_id, attributes|
+  step "the #{collection} \"#{code_or_id}\" is edited in Referential \"test\" with the following attributes:", attributes
+end
+
+Then("the {ara_resource} {string} is edited in Referential {string} with the following attributes:") do |collection, code_or_id, slug, attributes|
+  model = find_model(slug, "#{collection.underscore}s", code_or_id)
+  model.model_attributes = model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym }
+
+  raise "Cannot update #{collection}" unless model.save
 end
