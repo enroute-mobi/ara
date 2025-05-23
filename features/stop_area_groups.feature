@@ -1,14 +1,14 @@
-Feature: Manager StopArea Groups
+Feature: Manager StopAreaGroups
 
   Background:
     Given a Referential "test" is created
 
-  Scenario: Create a StopArea Groups
-    When a StopArea Group is created with the following attributes:
+  Scenario: Create a StopAreaGroups
+    When a StopAreaGroup is created with the following attributes:
       | Name      | Test       |
       | ShortName | short_name |
       | StopAreaIds | ["1234"]   |
-    Then the StopArea Group "6ba7b814-9dad-11d1-1-00c04fd430c8" has the following attributes:
+    Then the StopAreaGroup "6ba7b814-9dad-11d1-1-00c04fd430c8" has the following attributes:
       | Name        | Test                              |
       | ShortName   | short_name                        |
       | StopAreaIds | ["1234"]                          |
