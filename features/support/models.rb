@@ -19,7 +19,7 @@ end
 ParameterType(
   name: 'ara_resource',
   regexp: Regexp.new(
-    %w[StopArea Line Vehicle VehicleJourney Operator].join('|')
+    %w[StopArea Line Vehicle VehicleJourney Operator StopVisit].join('|')
   ),
   transformer: ->(s) { s }
 )
