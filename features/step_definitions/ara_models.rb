@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def find_referential(slug)
   slug ||= 'test'
   referential = TestAra.instance.server.referentials.find(slug)
@@ -19,7 +21,17 @@ end
 ParameterType(
   name: 'ara_resource',
   regexp: Regexp.new(
-    %w[StopArea Line Vehicle VehicleJourney Operator StopVisit ScheduledStopVisit LineGroup StopAreaGroup].join('|')
+    %w[
+      Line
+      LineGroup
+      Operator
+      ScheduledStopVisit
+      StopArea
+      StopAreaGroup
+      StopVisit
+      Vehicle
+      VehicleJourney
+    ].join('|')
   ),
   transformer: ->(s) { s }
 )
@@ -30,7 +42,9 @@ end
 
 Given("a {ara_resource} is created in Referential {string} with the following attributes:") do |collection, slug, attributes|
   referential = find_referential(slug)
-  model = referential.send("#{collection.underscore}s").create(model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym })
+  model = referential.send("#{collection.underscore}s").create(model_attributes(attributes).transform_keys do |key|
+    key.to_s.underscore.to_sym
+  end)
 
   raise "Cannot create #{collection}: #{model.errors}" unless model.save
 end
@@ -88,7 +102,8 @@ Then("a {ara_resource} {string}:{string} should not exist in Referential {string
 end
 
 Then("the {ara_resource} {string} is edited with the following attributes:") do |collection, code_or_id, attributes|
-  step "the #{collection} \"#{code_or_id}\" is edited in Referential \"test\" with the following attributes:", attributes
+  step "the #{collection} \"#{code_or_id}\" is edited in Referential \"test\" with the following attributes:",
+       attributes
 end
 
 Then("the {ara_resource} {string} is edited in Referential {string} with the following attributes:") do |collection, code_or_id, slug, attributes|
