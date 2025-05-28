@@ -140,7 +140,7 @@ Feature: Support SIRI subscription
             <Request>
               <ns5:SubscriptionRef>ExternalId</ns5:SubscriptionRef>
             </Request>
-            <Requestextension/>
+            <RequestExtension/>
           </ns1:DeleteSubscription>
         </S:Body>
       </S:Envelope>
