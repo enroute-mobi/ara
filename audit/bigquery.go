@@ -183,7 +183,7 @@ func (bq *TestBigQuery) WriteEvent(e BigQueryEvent) error {
 		bytes.NewBuffer(json),
 	)
 
-	logger.Log.Debugf("WriteEvent err %v", err)
+	logger.Log.Printf("BigQuery WriteEvent failed: %v", err)
 
 	return err
 }
