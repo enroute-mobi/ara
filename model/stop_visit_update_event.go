@@ -51,7 +51,7 @@ func (ue *StopVisitUpdateEvent) Attributes() Attributes {
 	ue.attributes.Set(siri_attributes.ActualQuayName, ue.SiriXML.ActualQuayName())
 	ue.attributes.Set(siri_attributes.AimedHeadwayInterval, ue.SiriXML.AimedHeadwayInterval())
 	ue.attributes.Set(siri_attributes.ArrivalPlatformName, ue.SiriXML.ArrivalPlatformName())
-	ue.attributes.Set(siri_attributes.ArrivalProximyTest, ue.SiriXML.ArrivalProximyTest())
+	ue.attributes.Set(siri_attributes.ArrivalProximityText, ue.SiriXML.ArrivalProximityText())
 	ue.attributes.Set(siri_attributes.DepartureBoardingActivity, ue.SiriXML.DepartureBoardingActivity())
 	ue.attributes.Set(siri_attributes.DeparturePlatformName, ue.SiriXML.DeparturePlatformName())
 	ue.attributes.Set(siri_attributes.DestinationDisplay, ue.SiriXML.DestinationDisplay())

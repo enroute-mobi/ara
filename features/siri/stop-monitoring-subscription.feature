@@ -75,8 +75,7 @@ Feature: Support SIRI StopMonitoring by subscription
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -84,49 +83,49 @@ Feature: Support SIRI StopMonitoring by subscription
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>Aller</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OperatorRef>NINOXE:Company:15563880:LOC</ns3:OperatorRef>
-                    <ns3:ProductCategoryRef>0</ns3:ProductCategoryRef>
-                    <ns3:VehicleFeatureRef>TRFC_M4_1</ns3:VehicleFeatureRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
-                    <ns3:OriginName>Magicien Noir</ns3:OriginName>
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:ProgressRate>normalProgress</ns3:ProgressRate>
-                    <ns3:Delay>P0Y0M0DT0H0M0.000S</ns3:Delay>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>delayed</ns3:ArrivalStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:DirectionRef>Aller</ns2:DirectionRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:OperatorRef>NINOXE:Company:15563880:LOC</ns2:OperatorRef>
+                    <ns2:ProductCategoryRef>0</ns2:ProductCategoryRef>
+                    <ns2:VehicleFeatureRef>TRFC_M4_1</ns2:VehicleFeatureRef>
+                    <ns2:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns2:OriginRef>
+                    <ns2:OriginName>Magicien Noir</ns2:OriginName>
+                    <ns2:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns2:DestinationRef>
+                    <ns2:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns2:OriginAimedDepartureTime>
+                    <ns2:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns2:DestinationAimedArrivalTime>
+                    <ns2:Monitored>true</ns2:Monitored>
+                    <ns2:ProgressRate>normalProgress</ns2:ProgressRate>
+                    <ns2:Delay>P0Y0M0DT0H0M0.000S</ns2:Delay>
+                    <ns2:CourseOfJourneyRef>201</ns2:CourseOfJourneyRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>false</ns2:VehicleAtStop>
+                      <ns2:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns2:AimedArrivalTime>
+                      <ns2:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns2:ExpectedArrivalTime>
+                      <ns2:ArrivalStatus>delayed</ns2:ArrivalStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
@@ -218,59 +217,57 @@ Feature: Support SIRI StopMonitoring by subscription
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>Left</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OperatorRef>NINOXE:Company:15563880:LOC</ns3:OperatorRef>
-                    <ns3:ProductCategoryRef>0</ns3:ProductCategoryRef>
-                    <ns3:VehicleFeatureRef>TRFC_M4_1</ns3:VehicleFeatureRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
-                    <ns3:OriginName>Magicien Noir</ns3:OriginName>
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:DestinationName>Cimetière des Sauvages</ns3:DestinationName>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:ProgressRate>normalProgress</ns3:ProgressRate>
-                    <ns3:Delay>P0Y0M0DT0H0M0.000S</ns3:Delay>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>delayed</ns3:ArrivalStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:DirectionRef>Left</ns2:DirectionRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:OperatorRef>NINOXE:Company:15563880:LOC</ns2:OperatorRef>
+                    <ns2:ProductCategoryRef>0</ns2:ProductCategoryRef>
+                    <ns2:VehicleFeatureRef>TRFC_M4_1</ns2:VehicleFeatureRef>
+                    <ns2:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns2:OriginRef>
+                    <ns2:OriginName>Magicien Noir</ns2:OriginName>
+                    <ns2:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns2:DestinationRef>
+                    <ns2:DestinationName>Cimetière des Sauvages</ns2:DestinationName>
+                    <ns2:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns2:OriginAimedDepartureTime>
+                    <ns2:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns2:DestinationAimedArrivalTime>
+                    <ns2:Monitored>true</ns2:Monitored>
+                    <ns2:ProgressRate>normalProgress</ns2:ProgressRate>
+                    <ns2:Delay>P0Y0M0DT0H0M0.000S</ns2:Delay>
+                    <ns2:CourseOfJourneyRef>201</ns2:CourseOfJourneyRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>false</ns2:VehicleAtStop>
+                      <ns2:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns2:AimedArrivalTime>
+                      <ns2:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns2:ExpectedArrivalTime>
+                      <ns2:ArrivalStatus>delayed</ns2:ArrivalStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
@@ -363,8 +360,7 @@ Feature: Support SIRI StopMonitoring by subscription
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -372,36 +368,35 @@ Feature: Support SIRI StopMonitoring by subscription
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>delayed</ns3:ArrivalStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>false</ns2:VehicleAtStop>
+                      <ns2:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns2:AimedArrivalTime>
+                      <ns2:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns2:ExpectedArrivalTime>
+                      <ns2:ArrivalStatus>delayed</ns2:ArrivalStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
@@ -476,8 +471,7 @@ Feature: Support SIRI StopMonitoring by subscription
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -485,50 +479,49 @@ Feature: Support SIRI StopMonitoring by subscription
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>Left</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OperatorRef>NINOXE:Company:15563880:LOC</ns3:OperatorRef>
-                    <ns3:ProductCategoryRef>0</ns3:ProductCategoryRef>
-                    <ns3:VehicleFeatureRef>TRFC_M4_1</ns3:VehicleFeatureRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
-                    <ns3:OriginName>Magicien Noir</ns3:OriginName>
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:DestinationName>Cimetière des Sauvages</ns3:DestinationName>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:ProgressRate>normalProgress</ns3:ProgressRate>
-                    <ns3:Delay>P0Y0M0DT0H0M0.000S</ns3:Delay>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>false</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>delayed</ns3:ArrivalStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:DirectionRef>Left</ns2:DirectionRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:OperatorRef>NINOXE:Company:15563880:LOC</ns2:OperatorRef>
+                    <ns2:ProductCategoryRef>0</ns2:ProductCategoryRef>
+                    <ns2:VehicleFeatureRef>TRFC_M4_1</ns2:VehicleFeatureRef>
+                    <ns2:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns2:OriginRef>
+                    <ns2:OriginName>Magicien Noir</ns2:OriginName>
+                    <ns2:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns2:DestinationRef>
+                    <ns2:DestinationName>Cimetière des Sauvages</ns2:DestinationName>
+                    <ns2:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns2:OriginAimedDepartureTime>
+                    <ns2:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns2:DestinationAimedArrivalTime>
+                    <ns2:Monitored>true</ns2:Monitored>
+                    <ns2:ProgressRate>normalProgress</ns2:ProgressRate>
+                    <ns2:Delay>P0Y0M0DT0H0M0.000S</ns2:Delay>
+                    <ns2:CourseOfJourneyRef>201</ns2:CourseOfJourneyRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>false</ns2:VehicleAtStop>
+                      <ns2:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns2:AimedArrivalTime>
+                      <ns2:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns2:ExpectedArrivalTime>
+                      <ns2:ArrivalStatus>delayed</ns2:ArrivalStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
@@ -623,12 +616,10 @@ Feature: Support SIRI StopMonitoring by subscription
               <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Notification>
               <ns2:StopMonitoringDelivery version="1.3">
                 <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
@@ -637,6 +628,7 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>Aller</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -794,11 +786,9 @@ Feature: Support SIRI StopMonitoring by subscription
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
-
             <Notification>
               <ns2:StopMonitoringDelivery version="1.3">
                 <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
@@ -807,6 +797,7 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>Aller</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -910,18 +901,17 @@ Feature: Support SIRI StopMonitoring by subscription
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
-
             <Notification>
               <ns2:StopMonitoringDelivery version="1.3">
-                <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
                 <ns2:MonitoredStopVisitCancellation>
+                  <ns2:RecordedAtTime>2017-06-19T16:04:25.983+02:00</ns2:RecordedAtTime>
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>Aller</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -1032,7 +1022,7 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | cancelled                |
@@ -1050,16 +1040,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -1086,7 +1074,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:DestinationDisplay>Cergy le haut &amp; arret &lt;RER&gt;</siri:DestinationDisplay>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -1094,12 +1082,14 @@ Feature: Support SIRI StopMonitoring by subscription
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
         <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+        <siri:VisitNumber>4</siri:VisitNumber>
         <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+        <siri:DirectionRef>Aller</siri:DirectionRef>
         <siri:VehicleJourneyRef>
           <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
         </siri:VehicleJourneyRef>
+        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
       </siri:MonitoredStopVisitCancellation>
       </siri:StopMonitoringDelivery>
       </Notification>
@@ -1210,7 +1200,7 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | cancelled                |
@@ -1228,16 +1218,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
-      </ServiceDeliveryInfo>
+       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -1263,7 +1251,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:StopPointName>Test</siri:StopPointName>
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -1271,12 +1259,14 @@ Feature: Support SIRI StopMonitoring by subscription
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
         <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+        <siri:VisitNumber>4</siri:VisitNumber>
         <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+        <siri:DirectionRef>Aller</siri:DirectionRef>
         <siri:VehicleJourneyRef>
           <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
         </siri:VehicleJourneyRef>
+        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
       </siri:MonitoredStopVisitCancellation>
       </siri:StopMonitoringDelivery>
       </Notification>
@@ -1377,7 +1367,7 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | cancelled                |
@@ -1395,16 +1385,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -1429,7 +1417,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:StopPointName>Test</siri:StopPointName>
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -1437,12 +1425,14 @@ Feature: Support SIRI StopMonitoring by subscription
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
         <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+        <siri:VisitNumber>4</siri:VisitNumber>
         <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+        <siri:DirectionRef>Aller</siri:DirectionRef>
         <siri:VehicleJourneyRef>
           <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
         </siri:VehicleJourneyRef>
+        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
       </siri:MonitoredStopVisitCancellation>
       </siri:StopMonitoringDelivery>
       </Notification>
@@ -1545,7 +1535,7 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | cancelled                |
@@ -1563,16 +1553,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -1597,7 +1585,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:StopPointName>Test</siri:StopPointName>
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -1605,12 +1593,14 @@ Feature: Support SIRI StopMonitoring by subscription
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
         <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+        <siri:VisitNumber>4</siri:VisitNumber>
         <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+        <siri:DirectionRef>Aller</siri:DirectionRef>
         <siri:VehicleJourneyRef>
           <siri:DataFrameRef>abcd</siri:DataFrameRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
         </siri:VehicleJourneyRef>
+        <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
       </siri:MonitoredStopVisitCancellation>
       </siri:StopMonitoringDelivery>
       </Notification>
@@ -1668,6 +1658,8 @@ Feature: Support SIRI StopMonitoring by subscription
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | ExternalId        | externalId                                         |
+      | SubscriberRef     | RELAIS                                             |
     And a StopArea exists with the following attributes:
       | Name      | Test                                     |
       | Codes     | "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -1716,11 +1708,11 @@ Feature: Support SIRI StopMonitoring by subscription
       <S:Body>
       <sw:DeleteSubscription xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <DeleteSubscriptionInfo>
-        <siri:RequestTimestamp>2006-01-02T15:04:05.000Z07:00</siri:RequestTimestamp>
+        <siri:RequestTimestamp>2006-01-02T15:04:05.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
         <siri:MessageIdentifier>MessageIdentifier</siri:MessageIdentifier>
       </DeleteSubscriptionInfo>
-      <Request version="2.0:FR-IDF-2.4">
+      <Request>
         <siri:All/>
       </Request>
       <RequestExtension/>
@@ -1746,7 +1738,7 @@ Feature: Support SIRI StopMonitoring by subscription
         <siri:TerminationResponseStatus>
           <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
           <siri:SubscriberRef>NINOXE:default</siri:SubscriberRef>
-          <siri:SubscriptionRef/>
+          <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
           <siri:Status>true</siri:Status>
         </siri:TerminationResponseStatus>
       </Answer>
@@ -1783,7 +1775,6 @@ Feature: Support SIRI StopMonitoring by subscription
             <Notification>
               <ns2:StopMonitoringDelivery version="1.3">
                 <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-33-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
@@ -1791,7 +1782,9 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:VisitNumber>2</ns2:VisitNumber>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>R</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -1815,12 +1808,10 @@ Feature: Support SIRI StopMonitoring by subscription
               <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Notification>
               <ns2:StopMonitoringDelivery version="1.3">
                 <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-33-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
@@ -1828,7 +1819,9 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:VisitNumber>2</ns2:VisitNumber>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>R</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -1858,7 +1851,6 @@ Feature: Support SIRI StopMonitoring by subscription
             <Notification>
               <ns2:StopMonitoringDelivery version="1.3">
                 <ns2:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RATPDEV:Concerto</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>Ara:Subscription::6ba7b814-9dad-11d1-33-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
@@ -1866,7 +1858,9 @@ Feature: Support SIRI StopMonitoring by subscription
                   <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:VisitNumber>4</ns2:VisitNumber>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>R</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -1966,65 +1960,58 @@ Feature: Support SIRI StopMonitoring by subscription
     And a minute has passed
     When I send this SIRI request
       """
+      <?xml version='1.0' encoding='utf-8'?>
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+              <sw:NotifyStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-              <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
-              <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
+              <siri:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</siri:ResponseTimestamp>
+              <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</siri:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Notification>
-              <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
-                <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
-                <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>Left</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>delayed</ns3:ArrivalStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns2:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</siri:ResponseTimestamp>
+                <siri:SubscriberRef>RELAIS</siri:SubscriberRef>
+                <siri:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:DirectionRef>Left</siri:DirectionRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>2016-09-22</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</siri:JourneyPatternRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Mago-Cime OMNI</siri:DirectionName>
+                    <siri:ExternalLineRef>NINOXE:Line:3:LOC</siri:ExternalLineRef>
+                    <siri:OriginRef>NINOXE:StopPoint:SP:42:LOC</siri:OriginRef>
+                    <siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
+                    <siri:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</siri:OriginAimedDepartureTime>
+                    <siri:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</siri:DestinationAimedArrivalTime>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:CourseOfJourneyRef>201</siri:CourseOfJourneyRef>
+                    <siri:VehicleRef>NINOXE:Vehicle:23:LOC</siri:VehicleRef>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
-          </ns6:NotifyStopMonitoring>
+          </sw:NotifyStopMonitoring>
         </soap:Body>
       </soap:Envelope>
       """
@@ -2034,65 +2021,58 @@ Feature: Support SIRI StopMonitoring by subscription
     And a minute has passed
     When I send this SIRI request
       """
+      <?xml version='1.0' encoding='utf-8'?>
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
-            <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-              <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
-              <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
+        <sw:NotifyStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+        <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</siri:ResponseTimestamp>
+              <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</siri:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Notification>
-              <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
-                <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
-                <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
-                <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:25:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>Left</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:42:LOC</ns3:OriginRef>
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>onTime</ns3:ArrivalStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
-              </ns2:StopMonitoringDelivery>
+              <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</siri:ResponseTimestamp>
+                <siri:SubscriberRef>RELAIS</siri:SubscriberRef>
+                <siri:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:MonitoredStopVisit>
+                  <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
+                  <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3</siri:ItemIdentifier>
+                  <siri:MonitoringRef>NINOXE:StopPoint:SP:25:LOC</siri:MonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:DirectionRef>Left</siri:DirectionRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>2016-09-22</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</siri:JourneyPatternRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Mago-Cime OMNI</siri:DirectionName>
+                    <siri:ExternalLineRef>NINOXE:Line:3:LOC</siri:ExternalLineRef>
+                    <siri:OriginRef>NINOXE:StopPoint:SP:42:LOC</siri:OriginRef>
+                    <siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
+                    <siri:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</siri:OriginAimedDepartureTime>
+                    <siri:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</siri:DestinationAimedArrivalTime>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:CourseOfJourneyRef>201</siri:CourseOfJourneyRef>
+                    <siri:VehicleRef>NINOXE:Vehicle:23:LOC</siri:VehicleRef>
+                    <siri:MonitoredCall>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                      <siri:Order>4</siri:Order>
+                      <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
+                      <siri:VehicleAtStop>true</siri:VehicleAtStop>
+                      <siri:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</siri:AimedArrivalTime>
+                      <siri:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</siri:ExpectedArrivalTime>
+                      <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+                    </siri:MonitoredCall>
+                  </siri:MonitoredVehicleJourney>
+                </siri:MonitoredStopVisit>
+              </siri:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
-          </ns6:NotifyStopMonitoring>
+          </sw:NotifyStopMonitoring>
         </soap:Body>
       </soap:Envelope>
       """
@@ -2114,10 +2094,11 @@ Feature: Support SIRI StopMonitoring by subscription
     And a minute has passed
     When I send this SIRI request
       """
-      <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
-      <SOAP-ENV:Header />
-      <SOAP-ENV:Body>
-      <ws:Subscribe>
+<?xml version='1.0' encoding='utf-8'?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+  <SOAP-ENV:Header />
+  <SOAP-ENV:Body>
+    <ws:Subscribe>
       <SubscriptionRequestInfo>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
@@ -2125,19 +2106,19 @@ Feature: Support SIRI StopMonitoring by subscription
         <siri:ConsumerAddress>https://ara-staging.af83.io/test/siri</siri:ConsumerAddress>
       </SubscriptionRequestInfo>
       <Request>
-        <StopMonitoringSubscriptionRequest>
-          <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
-          <SubscriptionIdentifier>1</SubscriptionIdentifier>
-          <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
-          <StopMonitoringRequest>
-            <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
-            <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
-            <MonitoringRef>coicogn2</MonitoringRef>
-            <StopVisitTypes>all</StopVisitTypes>
-          </StopMonitoringRequest>
-          <IncrementalUpdates>true</IncrementalUpdates>
-          <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
-        </StopMonitoringSubscriptionRequest>
+        <siri:StopMonitoringSubscriptionRequest>
+          <siri:SubscriberRef>RATPDEV:Concerto</siri:SubscriberRef>
+          <siri:SubscriptionIdentifier>1</siri:SubscriptionIdentifier>
+          <siri:InitialTerminationTime>2009-11-10T23:00:00.000Z</siri:InitialTerminationTime>
+          <siri:StopMonitoringRequest>
+           <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+           <siri:MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
+             <siri:MonitoringRef>coicogn2</siri:MonitoringRef>
+            <siri:StopVisitTypes>all</siri:StopVisitTypes>
+          </siri:StopMonitoringRequest>
+          <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+          <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+        </siri:StopMonitoringSubscriptionRequest>
       </Request>
       <RequestExtension />
       </ws:Subscribe>
@@ -2150,6 +2131,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | ExternalId      |                                 1 |
     When I send this SIRI request
       """
+      <?xml version='1.0' encoding='utf-8'?>
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <SOAP-ENV:Header />
       <SOAP-ENV:Body>
@@ -2161,19 +2143,19 @@ Feature: Support SIRI StopMonitoring by subscription
           <siri:ConsumerAddress>https://ara-staging.af83.io/test/siri</siri:ConsumerAddress>
         </SubscriptionRequestInfo>
         <Request>
-          <StopMonitoringSubscriptionRequest>
-            <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
-            <SubscriptionIdentifier>1</SubscriptionIdentifier>
-            <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
-            <StopMonitoringRequest>
-              <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
-              <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
-              <MonitoringRef>coicogn2</MonitoringRef>
-              <StopVisitTypes>all</StopVisitTypes>
-            </StopMonitoringRequest>
-            <IncrementalUpdates>true</IncrementalUpdates>
-            <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
-          </StopMonitoringSubscriptionRequest>
+          <siri:StopMonitoringSubscriptionRequest>
+          <siri:SubscriberRef>RATPDEV:Concerto</siri:SubscriberRef>
+          <siri:SubscriptionIdentifier>1</siri:SubscriptionIdentifier>
+          <siri:InitialTerminationTime>2009-11-10T23:00:00.000Z</siri:InitialTerminationTime>
+          <siri:StopMonitoringRequest>
+           <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+           <siri:MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
+             <siri:MonitoringRef>coicogn2</siri:MonitoringRef>
+            <siri:StopVisitTypes>all</siri:StopVisitTypes>
+          </siri:StopMonitoringRequest>
+          <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+          <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+        </siri:StopMonitoringSubscriptionRequest>
         </Request>
         <RequestExtension />
       </ws:Subscribe>
@@ -2190,6 +2172,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | ExternalId      |                                 1 |
     When I send this SIRI request
       """
+      <?xml version='1.0' encoding='utf-8'?>
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <SOAP-ENV:Header />
       <SOAP-ENV:Body>
@@ -2201,19 +2184,19 @@ Feature: Support SIRI StopMonitoring by subscription
           <siri:ConsumerAddress>https://ara-staging.af83.io/test/siri</siri:ConsumerAddress>
         </SubscriptionRequestInfo>
         <Request>
-          <StopMonitoringSubscriptionRequest>
-            <SubscriberRef>RATPDEV:Concerto</SubscriberRef>
-            <SubscriptionIdentifier>2</SubscriptionIdentifier>
-            <InitialTerminationTime>2009-11-10T23:00:00.000Z</InitialTerminationTime>
-            <StopMonitoringRequest>
-              <MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</MessageIdentifier>
-              <RequestTimestamp>2017-01-01T12:00:00.000Z</RequestTimestamp>
-              <MonitoringRef>coicogn2</MonitoringRef>
-              <StopVisitTypes>all</StopVisitTypes>
-            </StopMonitoringRequest>
-            <IncrementalUpdates>true</IncrementalUpdates>
-            <ChangeBeforeUpdates>PT1M</ChangeBeforeUpdates>
-          </StopMonitoringSubscriptionRequest>
+          <siri:StopMonitoringSubscriptionRequest>
+          <siri:SubscriberRef>RATPDEV:Concerto</siri:SubscriberRef>
+          <siri:SubscriptionIdentifier>2</siri:SubscriptionIdentifier>
+          <siri:InitialTerminationTime>2009-11-10T23:00:00.000Z</siri:InitialTerminationTime>
+          <siri:StopMonitoringRequest>
+           <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+           <siri:MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
+             <siri:MonitoringRef>coicogn2</siri:MonitoringRef>
+            <siri:StopVisitTypes>all</siri:StopVisitTypes>
+          </siri:StopMonitoringRequest>
+          <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+          <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+        </siri:StopMonitoringSubscriptionRequest>
         </Request>
         <RequestExtension />
       </ws:Subscribe>
@@ -2416,7 +2399,7 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "6ba7b814-9dad-11d1-9-00c04fd430c8" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T20:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -2431,16 +2414,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
-      </ServiceDeliveryInfo>
+       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:25:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:25:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemIdentifier>
@@ -2460,19 +2441,19 @@ Feature: Support SIRI StopMonitoring by subscription
           <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
           <siri:Monitored>true</siri:Monitored>
-          <siri:Occupancy>seatsAvailable</siri:Occupancy>
           <siri:VehicleLocation>
              <siri:Longitude>111.11111</siri:Longitude>
              <siri:Latitude>55.55</siri:Latitude>
           </siri:VehicleLocation>
           <siri:Bearing>121.55</siri:Bearing>
+          <siri:Occupancy>seatsAvailable</siri:Occupancy>
           <siri:MonitoredCall>
             <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
             <siri:Order>5</siri:Order>
             <siri:StopPointName>Test</siri:StopPointName>
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:ExpectedArrivalTime>2017-01-01T20:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -2568,7 +2549,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | Attribute[DestinationDisplay] | Cergy le haut & arret <RER>                                          |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -2583,16 +2564,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-8-00c04fd430c8</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -2619,7 +2598,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:DestinationDisplay>Cergy le haut &amp; arret &lt;RER&gt;</siri:DestinationDisplay>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -2722,7 +2701,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | Attribute[DestinationDisplay] | Cergy le haut & arret <RER>                                          |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -2737,16 +2716,14 @@ Feature: Support SIRI StopMonitoring by subscription
       <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
       <siri:ProducerRef>test</siri:ProducerRef>
       <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       </ServiceDeliveryInfo>
       <Notification>
       <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:40.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
       <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
       <siri:MonitoredStopVisit>
         <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
         <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -2773,7 +2750,7 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:VehicleAtStop>false</siri:VehicleAtStop>
             <siri:DestinationDisplay>Cergy le haut &amp; arret &lt;RER&gt;</siri:DestinationDisplay>
             <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-            <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+            <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
           </siri:MonitoredCall>
         </siri:MonitoredVehicleJourney>
       </siri:MonitoredStopVisit>
@@ -2891,7 +2868,7 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
       | ArrivalStatus              | cancelled                |
@@ -2907,16 +2884,14 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
             <siri:ProducerRef>test</siri:ProducerRef>
             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-b-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-            <siri:RequestMessageRef></siri:RequestMessageRef>
-          </ServiceDeliveryInfo>
+            </ServiceDeliveryInfo>
           <Notification>
             <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
               <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-              <siri:RequestMessageRef></siri:RequestMessageRef>
               <siri:SubscriberRef>subscriber</siri:SubscriberRef>
               <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-              <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
               <siri:Status>true</siri:Status>
+              <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
               <siri:MonitoredStopVisit>
                 <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                 <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -2943,7 +2918,7 @@ Feature: Support SIRI StopMonitoring by subscription
                     <siri:VehicleAtStop>false</siri:VehicleAtStop>
                     <siri:DestinationDisplay>Cergy le haut &amp; arret &lt;RER&gt;</siri:DestinationDisplay>
                     <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-                    <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                    <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                   </siri:MonitoredCall>
                 </siri:MonitoredVehicleJourney>
               </siri:MonitoredStopVisit>
@@ -2951,13 +2926,15 @@ Feature: Support SIRI StopMonitoring by subscription
                 <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                 <siri:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1</siri:ItemRef>
                 <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+                <siri:VisitNumber>4</siri:VisitNumber>
                 <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-                <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                <siri:DirectionRef>Aller</siri:DirectionRef>
                 <siri:VehicleJourneyRef>
                   <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
                   <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
                 </siri:VehicleJourneyRef>
-              </siri:MonitoredStopVisitCancellation>
+               <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+               </siri:MonitoredStopVisitCancellation>
             </siri:StopMonitoringDelivery>
           </Notification>
           <SiriExtension />
@@ -3082,10 +3059,10 @@ Feature: Support SIRI StopMonitoring by subscription
     And 10 seconds have passed
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     When the StopVisit "internal:NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-1" is edited with the following attributes:
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01.000Z |
-      | ArrivalStatus              | Delayed                  |
+      | ArrivalStatus              | delayed                  |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
@@ -3098,16 +3075,14 @@ Feature: Support SIRI StopMonitoring by subscription
             <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
             <siri:ProducerRef>test</siri:ProducerRef>
             <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-c-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
-            <siri:RequestMessageRef></siri:RequestMessageRef>
-          </ServiceDeliveryInfo>
+            </ServiceDeliveryInfo>
           <Notification>
             <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
               <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
-              <siri:RequestMessageRef></siri:RequestMessageRef>
               <siri:SubscriberRef>subscriber</siri:SubscriberRef>
               <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
-              <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
               <siri:Status>true</siri:Status>
+              <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
               <siri:MonitoredStopVisit>
                 <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                 <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</siri:ItemIdentifier>
@@ -3133,7 +3108,7 @@ Feature: Support SIRI StopMonitoring by subscription
                     <siri:StopPointName>Test</siri:StopPointName>
                     <siri:VehicleAtStop>false</siri:VehicleAtStop>
                     <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-                    <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                    <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                   </siri:MonitoredCall>
                 </siri:MonitoredVehicleJourney>
               </siri:MonitoredStopVisit>
@@ -3162,7 +3137,7 @@ Feature: Support SIRI StopMonitoring by subscription
                     <siri:StopPointName>Test</siri:StopPointName>
                     <siri:VehicleAtStop>false</siri:VehicleAtStop>
                     <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-                    <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                    <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                   </siri:MonitoredCall>
                 </siri:MonitoredVehicleJourney>
               </siri:MonitoredStopVisit>

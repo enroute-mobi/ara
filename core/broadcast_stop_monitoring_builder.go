@@ -71,6 +71,8 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		RecordedAtTime:         stopVisit.RecordedAt,
 		ItemRef:                itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
+		VisitNumber:            stopVisit.PassageOrder,
+		DirectionRef:           stopVisit.VehicleJourney().DirectionType,
 		LineRef:                lineCode.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
