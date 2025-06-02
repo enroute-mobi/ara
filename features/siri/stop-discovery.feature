@@ -323,6 +323,7 @@ Feature: Support SIRI StopPointsDiscovery
   <S:Body>
     <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
         <siri:Status>true</siri:Status>
         <siri:AnnotatedStopPointRef>
           <siri:StopPointRef>StopArea:A</siri:StopPointRef>
@@ -330,6 +331,7 @@ Feature: Support SIRI StopPointsDiscovery
           <siri:StopName>Stop A</siri:StopName>
         </siri:AnnotatedStopPointRef>
       </Answer>
+      <AnswerExtension/>
     </sw:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
@@ -341,6 +343,7 @@ Feature: Support SIRI StopPointsDiscovery
   <S:Body>
     <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
         <siri:Status>true</siri:Status>
         <siri:AnnotatedStopPointRef>
           <siri:StopPointRef>StopArea:B</siri:StopPointRef>
@@ -348,6 +351,7 @@ Feature: Support SIRI StopPointsDiscovery
           <siri:StopName>Stop B</siri:StopName>
         </siri:AnnotatedStopPointRef>
       </Answer>
+      <AnswerExtension/>
     </sw:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
@@ -367,8 +371,6 @@ Feature: Support SIRI StopPointsDiscovery
       <Answer>
         <siri:StopMonitoringDelivery>
           <siri:ResponseTimestamp>2017-01-01T12:02:00.000Z</siri:ResponseTimestamp>
-          <siri:RequestMessageRef>enRoute:Message::2345Fsdfrg35df:LOC</siri:RequestMessageRef>
-          <siri:MonitoringRef>StopArea:A</siri:MonitoringRef>
           <siri:Status>true</siri:Status>
           <siri:MonitoredStopVisit>
             <siri:RecordedAtTime>2017-01-01T11:47:15.600+01:00</siri:RecordedAtTime>
