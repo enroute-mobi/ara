@@ -678,14 +678,13 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>NINOXE:Line:2:LOC</siri:LineRef>
-					<siri:DirectionRef/>
-					<siri:OperatorRef/>
+					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>vehicleJourney</siri:DatedVehicleJourneyRef>
+					<siri:PublishedLineName>lineName</siri:PublishedLineName>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopArea1</siri:StopPointRef>
 							<siri:Order>1</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>1984-04-04T00:01:00.000Z</siri:AimedArrivalTime>
 							<siri:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</siri:ExpectedArrivalTime>
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -693,7 +692,6 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopArea2</siri:StopPointRef>
 							<siri:Order>2</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>1984-04-04T00:02:00.000Z</siri:AimedArrivalTime>
 							<siri:ExpectedArrivalTime>1984-04-04T00:02:00.000Z</siri:ExpectedArrivalTime>
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -705,14 +703,13 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-					<siri:DirectionRef/>
-					<siri:OperatorRef/>
+					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>vehicleJourney2</siri:DatedVehicleJourneyRef>
+					<siri:PublishedLineName>lineName2</siri:PublishedLineName>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopArea1</siri:StopPointRef>
 							<siri:Order>1</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>1984-04-04T00:01:00.000Z</siri:AimedArrivalTime>
 							<siri:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</siri:ExpectedArrivalTime>
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>

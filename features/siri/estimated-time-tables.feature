@@ -34,10 +34,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     When I send this SIRI request
@@ -61,7 +61,9 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -91,22 +93,22 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:VisitNumber>4</siri:VisitNumber>
                         <siri:StopPointName>Tutute</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
                   </siri:EstimatedVehicleJourney>
@@ -160,10 +162,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
@@ -175,7 +177,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:05:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:06:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
@@ -186,7 +188,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:10:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:11:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
@@ -227,7 +229,9 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -257,46 +261,43 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Tutute</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
                         <siri:Order>5</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
                         <siri:Order>6</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
                         <siri:Order>7</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:16:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</siri:ExpectedArrivalTime>
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -362,10 +363,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
@@ -377,7 +378,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:05:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:06:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
@@ -388,7 +389,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:10:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:11:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
@@ -423,7 +424,9 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -453,9 +456,10 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:RecordedCalls>
                       <siri:RecordedCall>
                           <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
@@ -472,32 +476,29 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Tutute</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
                         <siri:Order>5</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
                         <siri:Order>6</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
                   </siri:EstimatedVehicleJourney>
@@ -553,10 +554,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
@@ -568,7 +569,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:05:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:06:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
@@ -579,7 +580,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:10:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:11:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
@@ -613,7 +614,9 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -643,46 +646,43 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Tutute</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
                         <siri:Order>5</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
                         <siri:Order>6</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
                         <siri:Order>7</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:16:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</siri:ExpectedArrivalTime>
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -751,10 +751,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
@@ -766,7 +766,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:05:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:06:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
@@ -777,7 +777,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:10:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:11:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "external": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
@@ -806,12 +806,13 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -841,40 +842,38 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Test 1</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
                         <siri:Order>5</siri:Order>
                         <siri:StopPointName>Test 2</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
                         <siri:Order>6</siri:Order>
                         <siri:StopPointName>Test 3</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
                   </siri:EstimatedVehicleJourney>
@@ -906,12 +905,13 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:A:BUS:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:A:BUS:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -941,15 +941,15 @@ Feature: Support SIRI EstimatedTimetable
             <siri:EstimatedVehicleJourney>
               <siri:LineRef>NINOXE:Line:A:BUS:LOC</siri:LineRef>
               <siri:DirectionRef>Aller</siri:DirectionRef>
-              <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
               <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+              <siri:PublishedLineName>Ligne A Bus</siri:PublishedLineName>
               <siri:DestinationRef>a8989abce31bae21da02c1c2cf42dd855cd86a1d</siri:DestinationRef>
+              <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
               <siri:EstimatedCalls>
                 <siri:EstimatedCall>
                   <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
                   <siri:Order>7</siri:Order>
                   <siri:StopPointName>Test 4</siri:StopPointName>
-                  <siri:VehicleAtStop>false</siri:VehicleAtStop>
                   <siri:AimedArrivalTime>2017-01-01T15:16:00.000Z</siri:AimedArrivalTime>
                   <siri:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</siri:ExpectedArrivalTime>
                   <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -997,10 +997,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     When I send this SIRI request
       """
@@ -1022,8 +1022,10 @@ Feature: Support SIRI EstimatedTimetable
                     <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
                       <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
                       <ns2:Lines>
-                        <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
-                        </ns2:Lines>
+                        <ns2:LineDirection>
+                          <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                        </ns2:LineDirection>
+                      </ns2:Lines>
                     </Request>
                   <RequestExtension />
                 </ns7:GetEstimatedTimetable>
@@ -1052,22 +1054,22 @@ Feature: Support SIRI EstimatedTimetable
                               <siri:EstimatedVehicleJourney>
                                 <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                                   <siri:DirectionRef>Aller</siri:DirectionRef>
-                                  <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                                   <siri:DatedVehicleJourneyRef>ch:1:ServiceJourney:87_TAC:6ba7b814</siri:DatedVehicleJourneyRef>
+                                  <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                                   <siri:DestinationRef>a8989abce31bae21da02c1c2cf42dd855cd86a1d</siri:DestinationRef>
+                                  <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                                   <siri:EstimatedCalls>
                                     <siri:EstimatedCall>
                                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                                           <siri:Order>4</siri:Order>
                                           <siri:StopPointName>Tutute</siri:StopPointName>
-                                          <siri:VehicleAtStop>false</siri:VehicleAtStop>
                                           <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                                           <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                                           <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                                          <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                                          <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                                           <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                                           <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                                          <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                                          <siri:DepartureStatus>delayed</siri:DepartureStatus>
                                         </siri:EstimatedCall>
                                     </siri:EstimatedCalls>
                                 </siri:EstimatedVehicleJourney>
@@ -1119,10 +1121,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     When I send this SIRI request
       """
@@ -1144,8 +1146,10 @@ Feature: Support SIRI EstimatedTimetable
                     <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
                       <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
                       <ns2:Lines>
-                        <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
-                        </ns2:Lines>
+                        <ns2:LineDirection>
+                          <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                        </ns2:LineDirection>
+                      </ns2:Lines>
                     </Request>
                   <RequestExtension />
                 </ns7:GetEstimatedTimetable>
@@ -1174,22 +1178,22 @@ Feature: Support SIRI EstimatedTimetable
                             <siri:EstimatedVehicleJourney>
                               <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                                 <siri:DirectionRef>Aller</siri:DirectionRef>
-                                <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                                 <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::6ba7b814:LOC</siri:DatedVehicleJourneyRef>
+                                <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                                 <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                                <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                                 <siri:EstimatedCalls>
                                   <siri:EstimatedCall>
                                       <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                                         <siri:Order>4</siri:Order>
                                         <siri:StopPointName>Tutute</siri:StopPointName>
-                                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                                       </siri:EstimatedCall>
                                   </siri:EstimatedCalls>
                               </siri:EstimatedVehicleJourney>
@@ -1248,10 +1252,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     When I send this SIRI request
       """
@@ -1273,8 +1277,10 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
                 <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
                 <ns2:Lines>
-                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
-                  </ns2:Lines>
+                  <ns2:LineDirection>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  </ns2:LineDirection>
+                </ns2:Lines>
               </Request>
             <RequestExtension />
           </ns7:GetEstimatedTimetable>
@@ -1301,22 +1307,22 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:EstimatedJourneyVersionFrame>
                       <siri:RecordedAtTime>2017-01-01T12:00:00.000Z</siri:RecordedAtTime>
                         <siri:EstimatedVehicleJourney>
-                          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                            <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                             <siri:DirectionRef>Aller</siri:DirectionRef>
-                            <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                             <siri:DatedVehicleJourneyRef>VehicleJourney:6ba7b814</siri:DatedVehicleJourneyRef>
+                            <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                             <siri:DestinationRef>a8989abce31bae21da02c1c2cf42dd855cd86a1d</siri:DestinationRef>
+                            <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                             <siri:EstimatedCalls>
                               <siri:EstimatedCall>
                                   <siri:StopPointRef>NINOXE:StopPoint:SP:Referent:LOC</siri:StopPointRef>
                                     <siri:Order>4</siri:Order>
                                     <siri:StopPointName>Referent</siri:StopPointName>
-                                    <siri:VehicleAtStop>false</siri:VehicleAtStop>
                                     <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                                     <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
-                                    <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                                    <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                                     <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
-                                    <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                                    <siri:DepartureStatus>delayed</siri:DepartureStatus>
                                   </siri:EstimatedCall>
                               </siri:EstimatedCalls>
                           </siri:EstimatedVehicleJourney>
@@ -1381,7 +1387,9 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -1411,15 +1419,15 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                           <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
                           <siri:Order>7</siri:Order>
                           <siri:StopPointName>Test</siri:StopPointName>
-                          <siri:VehicleAtStop>false</siri:VehicleAtStop>
                           <siri:AimedArrivalTime>2017-01-01T14:16:00.000Z</siri:AimedArrivalTime>
                           <siri:ExpectedArrivalTime>2017-01-01T14:16:00.000Z</siri:ExpectedArrivalTime>
                           <siri:ArrivalStatus>cancelled</siri:ArrivalStatus>
@@ -1483,10 +1491,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
@@ -1498,7 +1506,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:05:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:06:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
@@ -1509,7 +1517,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:10:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:11:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
@@ -1538,12 +1546,13 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -1573,46 +1582,43 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Tutute</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
                         <siri:Order>5</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
                         <siri:Order>6</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
                         <siri:Order>7</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:16:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</siri:ExpectedArrivalTime>
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -1691,10 +1697,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       |                                             2017-01-01T15:00:00.000Z |
       | Schedule[expected]#Arrival    |                                             2017-01-01T15:01:00.000Z |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     |                                             2017-01-01T15:01:00.000Z |
       | Schedule[expected]#Departure  |                                             2017-01-01T15:02:00.000Z |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
@@ -1706,7 +1712,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:05:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:06:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:26:LOC-3" |
@@ -1717,7 +1723,7 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival     |                                             2017-01-01T15:10:00.000Z |
       | Schedule[expected]#Arrival  |                                             2017-01-01T15:11:00.000Z |
-      | ArrivalStatus               | Delayed                                                              |
+      | ArrivalStatus               | delayed                                                              |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes                       | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:27:LOC-4" |
@@ -1746,12 +1752,13 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
               <ns2:Lines>
-                <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                <ns2:LineDirection>
+                  <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                </ns2:LineDirection>
               </ns2:Lines>
             </Request>
             <RequestExtension />
@@ -1781,55 +1788,53 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Tutute</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
                         <siri:Order>5</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:05:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:06:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
                   </siri:EstimatedVehicleJourney>
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:26:LOC</siri:StopPointRef>
                         <siri:Order>6</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:10:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:11:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:27:LOC</siri:StopPointRef>
                         <siri:Order>7</siri:Order>
                         <siri:StopPointName>Test</siri:StopPointName>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:AimedArrivalTime>2017-01-01T15:16:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:16:00.000Z</siri:ExpectedArrivalTime>
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -1886,10 +1891,10 @@ Feature: Support SIRI EstimatedTimetable
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                   |
       | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                             |
       | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                             |
-      | ArrivalStatus                 | Delayed                                                              |
+      | ArrivalStatus                 | delayed                                                              |
       | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                             |
       | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                             |
-      | DepartureStatus               | Delayed                                                              |
+      | DepartureStatus               | delayed                                                              |
       | Attribute[DestinationDisplay] | Pouet-pouet                                                          |
       # id 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
@@ -1918,7 +1923,6 @@ Feature: Support SIRI EstimatedTimetable
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:00:00.000+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>EstimatedTimetable:Test:0</ns2:MessageIdentifier>
@@ -1955,23 +1959,23 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
-                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
                         <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
                         <siri:Order>4</siri:Order>
                         <siri:StopPointName>Tutute</siri:StopPointName>
                         <siri:Occupancy>fewSeatsAvailable</siri:Occupancy>
-                        <siri:VehicleAtStop>false</siri:VehicleAtStop>
                         <siri:DestinationDisplay>Pouet-pouet</siri:DestinationDisplay>
                         <siri:AimedArrivalTime>2017-01-01T15:00:00.000Z</siri:AimedArrivalTime>
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000Z</siri:ExpectedArrivalTime>
-                        <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+                        <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                         <siri:AimedDepartureTime>2017-01-01T15:01:00.000Z</siri:AimedDepartureTime>
                         <siri:ExpectedDepartureTime>2017-01-01T15:02:00.000Z</siri:ExpectedDepartureTime>
-                        <siri:DepartureStatus>Delayed</siri:DepartureStatus>
+                        <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                      </siri:EstimatedCalls>
                   </siri:EstimatedVehicleJourney>

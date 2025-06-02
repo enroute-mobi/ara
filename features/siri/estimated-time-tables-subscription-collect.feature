@@ -263,8 +263,6 @@ Feature: Support SIRI EstimatedTimetable
   <Notification>
     <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
@@ -272,17 +270,16 @@ Feature: Support SIRI EstimatedTimetable
         <siri:EstimatedVehicleJourney>
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
-          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
+          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
               <siri:Order>4</siri:Order>
               <siri:StopPointName>Test</siri:StopPointName>
-              <siri:VehicleAtStop>false</siri:VehicleAtStop>
               <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
-              <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+              <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
         </siri:EstimatedVehicleJourney>
@@ -308,7 +305,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
       | PassageOrder               | 4                                         |
       | VehicleAtStop              | false                                     |
-      | ArrivalStatus              | Delayed                                   |
+      | ArrivalStatus              | delayed                                   |
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
       | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8         |
       | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
@@ -408,8 +405,6 @@ Feature: Support SIRI EstimatedTimetable
   <Notification>
     <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
       <siri:ResponseTimestamp>2017-01-01T12:00:20.000Z</siri:ResponseTimestamp>
-      <siri:RequestMessageRef></siri:RequestMessageRef>
-      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
       <siri:SubscriptionRef>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:SubscriptionRef>
       <siri:Status>true</siri:Status>
       <siri:EstimatedJourneyVersionFrame>
@@ -417,17 +412,16 @@ Feature: Support SIRI EstimatedTimetable
         <siri:EstimatedVehicleJourney>
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
-          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
+          <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
               <siri:Order>4</siri:Order>
               <siri:StopPointName>Test</siri:StopPointName>
-              <siri:VehicleAtStop>false</siri:VehicleAtStop>
               <siri:ExpectedArrivalTime>2017-01-01T15:10:01.000Z</siri:ExpectedArrivalTime>
-              <siri:ArrivalStatus>Delayed</siri:ArrivalStatus>
+              <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
         </siri:EstimatedVehicleJourney>
@@ -443,7 +437,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
       | PassageOrder               | 4                                         |
       | VehicleAtStop              | false                                     |
-      | ArrivalStatus              | Delayed                                   |
+      | ArrivalStatus              | delayed                                   |
       | Schedule[expected]#Arrival | 2017-01-01T15:10:01Z                      |
 
   @ARA-1411 @siri-valid
