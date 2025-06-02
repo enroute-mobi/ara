@@ -4,7 +4,7 @@
 		<siri:RequestorRef>{{.RequestorRef}}</siri:RequestorRef>
 		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>
 	</DeleteSubscriptionInfo>
-	<Request version="2.0:FR-IDF-2.4">{{ if .CancelAll }}
+	<Request>{{ if .CancelAll }}
 		<siri:All/>{{ else }}
 		<siri:SubscriptionRef>{{.SubscriptionRef}}</siri:SubscriptionRef>{{ end }}
 	</Request>
