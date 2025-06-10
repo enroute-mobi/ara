@@ -97,13 +97,7 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	err = connector.(*core.PushCollector).HandlePushNotification(externalModel, message)
-	if err != nil {
-		handler.logError(message, startTime, err.Error())
-		http.Error(response, err.Error(), http.StatusBadRequest)
-		return
-	}
-
+	connector.(*core.PushCollector).HandlePushNotification(externalModel, message)
 	response.WriteHeader(http.StatusOK)
 }
 

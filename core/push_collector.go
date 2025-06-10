@@ -1,7 +1,6 @@
 package core
 
 import (
-	"errors"
 	"time"
 
 	em "bitbucket.org/enroute-mobi/ara-external-models"
@@ -21,7 +20,6 @@ type PushCollector struct {
 	vjWithStopVisit map[string]struct{}
 	persistence     time.Duration
 	subscriber      UpdateSubscriber
-	running         bool
 }
 
 type PushCollectorFactory struct{}
@@ -63,13 +61,7 @@ func (pc *PushCollector) refresh() {
 	pc.vjWithStopVisit = make(map[string]struct{})
 }
 
-func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel, message *audit.BigQueryMessage) error {
-	if pc.running {
-		return errors.New("can't handle a push request when one is already running")
-	}
-	pc.running = true
-	defer func() { pc.running = false }()
-
+func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel, message *audit.BigQueryMessage) {
 	t := clock.DefaultClock().Now()
 	pc.refresh()
 
@@ -85,8 +77,6 @@ func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel,
 	pc.partner.Pushed()
 
 	message.ProcessingTime = processingTime.Seconds()
-
-	return nil
 }
 
 func (pc *PushCollector) handleStopAreas(sas []*em.ExternalStopArea) (stopAreas []string) {
