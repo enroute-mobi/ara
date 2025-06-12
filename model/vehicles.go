@@ -43,7 +43,7 @@ func NewVehicle(model Model) *Vehicle {
 	return vehicle
 }
 
-func (vehicle *Vehicle) ModelId() ModelId {
+func (vehicle *Vehicle) modelId() ModelId {
 	return ModelId(vehicle.id)
 }
 

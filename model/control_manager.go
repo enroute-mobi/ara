@@ -57,7 +57,7 @@ func (mm *ControlManager) setControl(h hooks.Type, t ModelType, m Control) {
 
 // If we ask for AfterCreate, we'll also get AfterSave Controls
 func (mm ControlManager) GetControls(h hooks.Type, t model_types.Model) (m []Control) {
-	for i := h; i < hooks.Total; i++ {
+	for i := 0; i < hooks.Total; i++ {
 		m = append(m, mm.controls[i][t]...)
 	}
 	return
@@ -70,9 +70,9 @@ type controlBuilder struct {
 }
 
 type controlContextBuilder struct {
-	childrenId  string
-	control     *SelectControl
-	controllers []*SelectControl
+	childrenId string
+	control    *SelectControl
+	controlers []*SelectControl
 }
 
 func (b *controlBuilder) buildControls() []error {
@@ -80,9 +80,9 @@ func (b *controlBuilder) buildControls() []error {
 	for _, c := range b.initialContext {
 		if c.control != nil { // We are handling a context
 			e = append(e, b.buildContext(c)...)
-		} else { // We should only have one Controller at a time
-			for i := range c.controllers {
-				e = append(e, b.buildController(c.controllers[i])...)
+		} else { // We should only have one Controler at a time
+			for i := range c.controlers {
+				e = append(e, b.buildControler(c.controlers[i])...)
 			}
 		}
 	}
@@ -104,7 +104,7 @@ func (b *controlBuilder) buildContext(c *controlContextBuilder) []error {
 	return e
 }
 
-func (b *controlBuilder) buildController(sm *SelectControl) []error {
+func (b *controlBuilder) buildControler(sm *SelectControl) []error {
 	h, mt, errs := HookAndModelType(sm)
 	if len(errs) != 0 {
 		return errs
@@ -113,12 +113,12 @@ func (b *controlBuilder) buildController(sm *SelectControl) []error {
 	e := []error{}
 
 	m := NewControl()
-	updater, err := NewControllerFromDatabase(sm)
+	updater, err := NewControlerFromDatabase(sm)
 	if err != nil {
 		e = append(e, err)
 		return e
 	}
-	m.AddController(updater)
+	m.AddControler(updater)
 	b.manager.controls[h][mt] = append(b.manager.controls[h][mt], *m)
 
 	return e
@@ -134,13 +134,13 @@ func (b *controlBuilder) handleContexes(c *controlContextBuilder, m *Control) []
 		}
 		m.AddContext(context)
 	}
-	for _, u := range c.controllers {
-		updater, err := NewControllerFromDatabase(u)
+	for _, u := range c.controlers {
+		updater, err := NewControlerFromDatabase(u)
 		if err != nil {
 			e = append(e, err)
 			continue
 		}
-		m.AddController(updater)
+		m.AddControler(updater)
 	}
 	if c.childrenId != "" {
 		b.handleContexes(b.contexes[c.childrenId], m)
@@ -170,12 +170,12 @@ func (manager *ControlManager) Load(referentialSlug string) error {
 	for _, sm := range selectControls {
 		if !sm.ContextId.Valid {
 			context := &controlContextBuilder{
-				controllers: make([]*SelectControl, 0),
+				controlers: make([]*SelectControl, 0),
 			}
 			if IsContext(sm.Type) {
 				context.control = &sm
 			} else {
-				context.controllers = append(context.controllers, &sm)
+				context.controlers = append(context.controlers, &sm)
 			}
 			builder.initialContext = append(builder.initialContext, context)
 			builder.contexes[sm.Id] = context
@@ -191,7 +191,7 @@ func (manager *ControlManager) Load(referentialSlug string) error {
 			continue
 		}
 
-		parent.controllers = append(parent.controllers, &sm)
+		parent.controlers = append(parent.controlers, &sm)
 	}
 
 	errs := builder.buildControls()

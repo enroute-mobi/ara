@@ -6,7 +6,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 )
 
-func NewDummyController(sc *SelectControl) (controller, error) {
+func NewDummyControler(sc *SelectControl) (controler, error) {
 	return func(mi ModelInstance) error {
 		var messageAttribute string
 		switch sc.ModelType.String {
@@ -27,7 +27,7 @@ func NewDummyController(sc *SelectControl) (controller, error) {
 			ControlType:                      "Dummy",
 			InternalCode:                     sc.InternalCode.String,
 			TargetModelClass:                 sc.ModelType.String,
-			TargetModelUUID:                  string(mi.ModelId()),
+			TargetModelUUID:                  string(mi.modelId()),
 			TranslationInfoMessageKey:        fmt.Sprintf("dummy_%s", sc.ModelType.String),
 			TranslationInfoMessageAttributes: messageAttribute,
 		}
