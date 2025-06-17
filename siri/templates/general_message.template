@@ -5,17 +5,19 @@
 				<siri:InfoMessageVersion>{{ .InfoMessageVersion }}</siri:InfoMessageVersion>
 				<siri:InfoChannelRef>{{ .InfoChannelRef }}</siri:InfoChannelRef>
 				<siri:ValidUntilTime>{{ .ValidUntilTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ValidUntilTime>
-				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				xsi:type="stif:IDFGeneralMessageStructure">{{ range .AffectedRefs }}
-					<siri:{{ .Kind }}>{{ .Id }}</siri:{{ .Kind }}>{{end}}{{ range .LineSections }}
-					<siri:LineSection>{{ if .FirstStop }}
-						<siri:FirstStop>{{ .FirstStop }}</siri:FirstStop>{{end}}{{if .LastStop }}
-						<siri:LastStop>{{ .LastStop }}</siri:LastStop>{{end}}{{if .LineRef }}
+				<siri:Content xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="stif:IDFGeneralMessageStructure">{{ range .AffectedLineRefs}}
+				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ range .AffectedStopPointRefs }}
+				<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}{{ range .AffectedDestinationRefs }}
+				<siri:DestinationRef>{{ . }}</siri:DestinationRef>{{ end }}{{ range .AffectedRouteRefs }}
+				<RouteRef>{{ . }}</RouteRef>{{ end }}{{ range .LineSections }}
+					<LineSection>{{ if .FirstStop }}
+						<FirstStop>{{ .FirstStop }}</FirstStop>{{end}}{{if .LastStop }}
+						<LastStop>{{ .LastStop }}</LastStop>{{end}}{{if .LineRef }}
 						<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{end}}
-					</siri:LineSection>{{end}}{{range .Messages}}
-					<siri:Message>{{if .Type}}
-						<siri:MessageType>{{ .Type }}</siri:MessageType>{{end}}
+					</LineSection>{{end}}{{range .Messages}}
+					<Message>{{if .Type}}
+						<MessageType>{{ .Type }}</MessageType>{{end}}
 						{{ .BuildTranslatedStringXML }}
-					</siri:Message>{{end}}
+					</Message>{{end}}
 				</siri:Content>
 			</siri:GeneralMessage>

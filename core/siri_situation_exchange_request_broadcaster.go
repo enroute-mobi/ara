@@ -103,19 +103,17 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildSituation(deliver
 	}
 
 	if situation.Description != nil {
-		d := &siri.SIRITranslatedString{
-			Tag:              "Description",
-			TranslatedString: *situation.Description,
-		}
+		d := siri.NewSIRISXTranslatedString()
+		d.Tag = "Description"
+		d.TranslatedString = *situation.Description
 
 		ptSituationElement.Description = d
 	}
 
 	if situation.Summary != nil {
-		s := &siri.SIRITranslatedString{
-			Tag:              "Summary",
-			TranslatedString: *situation.Summary,
-		}
+		s := siri.NewSIRISXTranslatedString()
+		s.Tag = "Summary"
+		s.TranslatedString = *situation.Summary
 
 		ptSituationElement.Summary = s
 	}
@@ -229,18 +227,18 @@ func (connector *SIRISituationExchangeRequestBroadcaster) buildActionCommon(acti
 	siriActionCommon.PublicationWindows = actionCommon.PublicationWindows
 
 	if actionCommon.Prompt != nil {
-		p := &siri.SIRITranslatedString{
-			Tag:              "Prompt",
-			TranslatedString: *actionCommon.Prompt,
-		}
+		p := siri.NewSIRISXTranslatedString()
+		p.Tag = "Prompt"
+		p.TranslatedString = *actionCommon.Prompt
+
 		siriActionCommon.Prompt = p
 	}
 
 	if actionCommon.Description != nil {
-		d := &siri.SIRITranslatedString{
-			Tag:              "Description",
-			TranslatedString: *actionCommon.Description,
-		}
+		d := siri.NewSIRISXTranslatedString()
+		d.Tag = "Description"
+		d.TranslatedString = *actionCommon.Description
+
 		siriActionCommon.Description = d
 	}
 

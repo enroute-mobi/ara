@@ -9,8 +9,15 @@ import (
 )
 
 type SIRITranslatedString struct {
-	Tag string
+	Tag    string
+	Prefix string
 	model.TranslatedString
+}
+
+func NewSIRISXTranslatedString() *SIRITranslatedString {
+	return &SIRITranslatedString{
+		Prefix: "siri:",
+	}
 }
 
 func (t *SIRITranslatedString) BuildTranslatedStringXML() (string, error) {

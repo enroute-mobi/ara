@@ -40,14 +40,18 @@ func (connector *SIRIGeneralMessageRequestBroadcaster) Situations(request *sxml.
 	}
 
 	for _, message := range response.GeneralMessages {
-		for _, affectedRef := range message.AffectedRefs {
-			switch affectedRef.Kind {
-			case "LineRef":
-				lineRefs[affectedRef.Id] = struct{}{}
-			case "StopPointRef", "DestinationRef":
-				monitoringRefs[affectedRef.Id] = struct{}{}
-			}
+		for _, line := range message.AffectedLineRefs {
+			lineRefs[line] = struct{}{}
 		}
+
+		for _, stopArea := range message.AffectedStopPointRefs {
+			monitoringRefs[stopArea] = struct{}{}
+		}
+
+		for _, stopArea := range message.AffectedDestinationRefs {
+			monitoringRefs[stopArea] = struct{}{}
+		}
+
 		for _, affectedLineSection := range message.LineSections {
 			lineRefs[affectedLineSection.LineRef] = struct{}{}
 			monitoringRefs[affectedLineSection.FirstStop] = struct{}{}

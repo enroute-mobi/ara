@@ -78,6 +78,12 @@ func Test_NewAutodetectSIRIEnvelope(t *testing.T) {
   </CheckStatusRequest>`
 
 	assert.Equal(expected5, env5.body.String())
+
+	// GeneralMessage from IDFM
+	_, err6 := newAutodetectSIRIEnvelopeFrom("general-message-idfm")
+	if err6 != nil {
+		t.Errorf("cannot detect SIRI envelope: %s", err6)
+	}
 }
 
 func newAutodetectSIRIEnvelopeFrom(name string) (*SIRIEnvelope, error) {

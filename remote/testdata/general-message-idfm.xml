@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='utf-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+  <S:Body>
+    <sw:GetGeneralMessageResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <ServiceDeliveryInfo>
+        <siri:ResponseTimestamp>2017-03-29T16:48:00.993+02:00</siri:ResponseTimestamp>
+        <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+        <siri:Address>http://appli.chouette.mobi/siri_france/siri</siri:Address>
+        <siri:ResponseMessageIdentifier>b28e8207-f030-4932-966c-3e6099fad4ef</siri:ResponseMessageIdentifier>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <siri:GeneralMessageDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
+          <siri:ResponseTimestamp>2017-03-29T16:48:00.039+02:00</siri:ResponseTimestamp>
+          <siri:Status>true</siri:Status>
+          <siri:GeneralMessage formatRef="FRANCE">
+            <siri:RecordedAtTime>2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
+            <siri:ItemIdentifier>3477</siri:ItemIdentifier>
+            <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_1</siri:InfoMessageIdentifier>
+            <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+            <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
+            <siri:ValidUntilTime>2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
+            <siri:Content xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='stif:IDFGeneralMessageStructure'>
+              <siri:LineRef>1234</siri:LineRef>
+              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+              <siri:DestinationRef>destinationRef1</siri:DestinationRef>
+              <siri:DestinationRef>destinationRef2</siri:DestinationRef>
+              <RouteRef>Route:66:LOC</RouteRef>
+              <LineSection>
+                <FirstStop>NINOXE:StopPoint:SP:25:LOC</FirstStop>
+                <LastStop>NINOXE:StopPoint:SP:26:LOC</LastStop>
+                <siri:LineRef>1234</siri:LineRef>
+              </LineSection>
+              <Message>
+                <MessageType>shortMessage</MessageType>
+                <MessageText xml:lang='EN'>New pass Navigo</MessageText>
+                <MessageText xml:lang='FR'>Nouveau pass Navigo</MessageText>
+              </Message>
+              <Message>
+                <MessageType>textOnly</MessageType>
+                <MessageText>La nouvelle carte d'abonnement est disponible</MessageText>
+                <MessageText xml:lang='EN'>The new pass is available</MessageText>
+              </Message>
+            </siri:Content>
+          </siri:GeneralMessage>
+          <siri:GeneralMessage formatRef="FRANCE">
+            <siri:RecordedAtTime>2017-03-29T03:30:06.000+02:00</siri:RecordedAtTime>
+            <siri:ItemIdentifier>3478</siri:ItemIdentifier>
+            <siri:InfoMessageIdentifier>NINOXE:GeneralMessage:27_2</siri:InfoMessageIdentifier>
+            <siri:InfoMessageVersion>1</siri:InfoMessageVersion>
+            <siri:InfoChannelRef>Commercial</siri:InfoChannelRef>
+            <siri:ValidUntilTime>2017-03-29T20:50:06.000+02:00</siri:ValidUntilTime>
+            <siri:Content  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='stif:IDFGeneralMessageStructure'>
+              <siri:LineRef>5678</siri:LineRef>
+              <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+              <Message>
+                <MessageType>longMessage</MessageType>
+                <MessageText>carte d'abonnement</MessageText>
+              </Message>
+            </siri:Content>
+          </siri:GeneralMessage>
+        </siri:GeneralMessageDelivery>
+      </Answer>
+      <AnswerExtension />
+    </sw:GetGeneralMessageResponse>
+  </S:Body>
+</S:Envelope>

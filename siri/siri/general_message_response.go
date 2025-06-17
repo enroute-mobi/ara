@@ -46,9 +46,12 @@ type SIRIGeneralMessage struct {
 	InfoMessageVersion    int
 	InfoChannelRef        string
 
-	AffectedRefs []*SIRIAffectedRef
-	LineSections []*SIRILineSection
-	Messages     []*SIRIMessage
+	AffectedLineRefs        []string
+	AffectedStopPointRefs   []string
+	AffectedDestinationRefs []string
+	AffectedRouteRefs       []string
+	LineSections            []*SIRILineSection
+	Messages                []*SIRIMessage
 }
 
 type SIRIAffectedRef struct {
@@ -64,7 +67,7 @@ type SIRILineSection struct {
 
 type SIRIMessage struct {
 	SIRITranslatedString
-	Type    string
+	Type string
 }
 
 func (response *SIRIGeneralMessageResponse) BuildXML(envelopeType ...string) (string, error) {
