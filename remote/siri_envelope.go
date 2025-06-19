@@ -65,25 +65,25 @@ func newSOAPEnvelope(doc *xml.XmlDocument) (*SIRIEnvelope, error) {
 	return &SIRIEnvelope{body: nodes[0]}, nil
 }
 
-func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, []byte, error) {
+func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, error) {
 	// Attempt to read the body
 	content, err := io.ReadAll(body)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if len(content) == 0 {
-		return nil, nil, errors.New("empty body")
+		return nil, errors.New("empty body")
 	}
 
 	// Parse the XML and store the body
 	doc, err := xml.Parse(content, xml.DefaultEncodingBytes, nil, xml.StrictParseOption, xml.DefaultEncodingBytes)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	nodes, err := doc.Root().Search("//*[local-name()='Body']/*")
 	if err != nil {
-		return nil, nil, fmt.Errorf("cannot search for `Body` tag: %s", err)
+		return nil, fmt.Errorf("cannot search for `Body` tag: %s", err)
 	}
 
 	if len(nodes) == 0 {
@@ -93,12 +93,12 @@ func NewAutodetectSIRIEnvelope(body io.Reader) (*SIRIEnvelope, []byte, error) {
 			node = node.NextSibling()
 		}
 		if node == nil {
-			return nil, nil, errors.New("invalid raw xml: cannot find body")
+			return nil, errors.New("invalid raw xml: cannot find body")
 		}
-		return &SIRIEnvelope{body: node}, content, nil
+		return &SIRIEnvelope{body: node}, nil
 	}
 
-	return &SIRIEnvelope{body: nodes[0]}, content, nil
+	return &SIRIEnvelope{body: nodes[0]}, nil
 }
 
 func (envelope *SIRIEnvelope) BodyType() string {
