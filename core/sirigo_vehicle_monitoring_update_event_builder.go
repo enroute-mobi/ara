@@ -117,10 +117,6 @@ func (builder *SirigoVehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlV
 	_, ok = builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.VehicleRef.String]
 	if !ok {
 		vCode := model.NewCode(builder.remoteCodeSpace, xmlVehicleActivity.VehicleRef.String)
-		if vCode.Value() == "" {
-			vCode.SetValue(xmlVehicleActivity.VehicleMonitoringRef.String)
-		}
-
 		bearing := xmlVehicleActivity.Bearing.Float64
 		linkDistance := xmlVehicleActivity.LinkDistance.Float64
 		percentage := xmlVehicleActivity.Percentage.Float64
