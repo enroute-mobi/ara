@@ -439,7 +439,7 @@ Feature: Support SIRI subscription
       | internal | NINOXE:Line:3:LOC  |
       | internal | NINOXE:Line:C:Tram |
 
-  @ARA-1432 @siri-valid
+  @ARA-1432
   Scenario: Accept response to an EstimatedTimetable subscripτion with only one Subscription with missingg RequestMessageRef in ResponseStatus
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -480,7 +480,7 @@ Feature: Support SIRI subscription
       | Kind                      | EstimatedTimetableCollect |
       | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z    |
 
-  @ARA-1476 @siri-valid
+  @ARA-1476
   Scenario: Accept response to a StopMonitoring subscription with only one Subscription with missing RequestMessageRef in ResponseStatus
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -541,7 +541,7 @@ Feature: Support SIRI subscription
       | Kind                      | StopMonitoringCollect  |
       | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z |
 
-  @ARA-1476 @siri-valid
+  @ARA-1476
   Scenario: Accept response to a SituationExchange subscription with only one Subscription with missing RequestMessageRef in ResponseStatus
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -599,7 +599,7 @@ Feature: Support SIRI subscription
       | Kind                      | SituationExchangeCollect |
       | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z   |
 
-  @ARA-1454 @siri-valid
+  @ARA-1454
   Scenario: Handle TerminateSubscriptionRequest when receiving an notification with unknown subscription using raw envelope
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -696,7 +696,7 @@ Feature: Support SIRI subscription
       | Partner                 | test                      |
       | SubscriptionIdentifiers | ["DUMMY"]                 |
 
-  @ARA-1458 @siri-valid
+  @ARA-1458
   Scenario: Accept response to a VehicleMonitoring subscripτion with only one Subscription with missing RequestMessageRef in ResponseStatus
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """

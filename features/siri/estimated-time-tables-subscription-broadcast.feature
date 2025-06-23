@@ -617,7 +617,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </Siri>
       """
 
-  @ARA-1243 @siri-valid
+  @ARA-1243
   Scenario: Manage a raw ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration must order StopVisits by Order
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -799,7 +799,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | VehicleJourneys | ["NINOXE:VehicleJourney:201"]                                                                                         |
       | Lines           | ["NINOXE:Line:3:LOC"]                                                                                                 |
 
-  @ARA-1126 @siri-valid
+  @ARA-1126
   Scenario: Manage a raw ETT Notify after modification of a StopVisit with StopVisit departure time within the broadcast.recorded_calls.duration
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -1326,7 +1326,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </Siri>
       """
 
-  @ARA-1025 @siri-valid
+  @ARA-1025
   Scenario: Manage a raw ETT Notify after modification of a StopVisit
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -1702,7 +1702,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </Siri>
       """
 
-  @ARA-1219 @siri-valid
+  @ARA-1219
   Scenario: Check IsCompleteSequence if we son't broadcast an old StopVisit
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -1803,7 +1803,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </Siri>
       """
 
-  @ARA-1219 @siri-valid
+  @ARA-1219
   Scenario: Check IsCompleteSequence if we son't broadcast an old StopVisit
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -2153,7 +2153,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </S:Envelope>
       """
 
-  @ARA-1366 @siri-valid
+  @ARA-1366
   Scenario: Handle a raw SIRI EstimatedTimetable subscription to all lines with a StopVisit having a VehicleJourneyId not existing should not broadcast the associated EstimatedCall
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -2537,7 +2537,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </Siri>
       """
 
-  @ARA-1466 @siri-valid
+  @ARA-1466
   Scenario: Manage a raw ETT Notify after modification of StopVisit with status Cancelled in the future should be broadcasted in EstimatedCalls
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
@@ -2816,7 +2816,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </S:Envelope>
       """
 
-  @ARA-1534 @siri-valid
+  @ARA-1534
   Scenario: Manage a raw ETT Notify after modification of a StopVisit with Vehicle occupancy
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:

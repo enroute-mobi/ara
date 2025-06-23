@@ -815,6 +815,7 @@ Feature: Support SIRI StopMonitoring by subscription
       | Schedule[actual]#Arrival     |          2017-01-01T13:00:00Z |
       | Schedule[actual]#Departure   | 2017-05-15T13:26:10.116+02:00 |
 
+  @skip-siri-valid
   Scenario: 3737 - Manage a MonitoredStopVisitCancellation without RecordedAtTime
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """

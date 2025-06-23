@@ -3,7 +3,7 @@ Feature: Support SIRI SituationExchange by subscription
   Background:
       Given a Referential "test" is created
 
-  @ARA-1450 @siri-valid
+  @ARA-1450
   Scenario: Manage a SX Subscription
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
@@ -463,7 +463,7 @@ Feature: Support SIRI SituationExchange by subscription
       | StopAreas | ["STIF:StopPoint:Q:3534:", "STIF:StopPoint:Q:3533:", "NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
       | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                                                      |
 
-  @siri-valid @ARA-1582
+  @ARA-1582
   Scenario: Manage a SX Subscription with All affected Lines
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
@@ -655,7 +655,7 @@ Feature: Support SIRI SituationExchange by subscription
       | Type                    | DeleteSubscriptionRequest |
       | SubscriptionIdentifiers | ["wrong"]                 |
 
-  @ARA-1450 @siri-valid
+  @ARA-1450
   Scenario: Send Subscriptions requests
    Given a SIRI server on "http://localhost:8090"
       And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
@@ -691,7 +691,7 @@ Feature: Support SIRI SituationExchange by subscription
         | StopAreas | ["NINOXE:StopPoint:SP:24:LOC"]       |
         | Lines     | ["NINOXE:Line::3:LOC"]               |
 
-  @ARA-1451 @siri-valid
+  @ARA-1451
   Scenario: Handle SituationExchange subscription request to all Situations
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-situation-exchange-subscription-broadcaster] and the following settings:
@@ -738,7 +738,7 @@ Feature: Support SIRI SituationExchange by subscription
     Then Subscriptions exist with the following resources:
       | SituationResource | Situation |
 
-  @ARA-1451 @siri-valid
+  @ARA-1451
   Scenario: Brodcast a SituationExchange Notification after modification of a Situation
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-situation-exchange-subscription-broadcaster] and the following settings:
@@ -1127,7 +1127,7 @@ Feature: Support SIRI SituationExchange by subscription
       | StopAreas               | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:12:LOC"] |
       | Lines                   | ["1234", "NINOXE:Line:BP:LOC"]                               |
 
-  @ARA-1582 @siri-valid
+  @ARA-1582
   Scenario: Brodcast a SituationExchange Notification after modification of a Situation having All affected Lines
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-situation-exchange-subscription-broadcaster] and the following settings:
@@ -1229,7 +1229,7 @@ Feature: Support SIRI SituationExchange by subscription
       | SubscriptionIdentifiers | ["externalId"]                 |
       | StopAreas               | ["NINOXE:StopPoint:SP:24:LOC"] |
 
-  @ARA-1451 @siri-valid
+  @ARA-1451
   Scenario: Handle SituationExchange subscription request to an unknowm line
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-situation-exchange-subscription-broadcaster] and the following settings:

@@ -699,7 +699,7 @@ Feature: Support SIRI GeneralMessage for Situation
 </S:Envelope>
       """
 
-  @siri-valid @ARA-1443
+  @ARA-1443
   Scenario: Collect GeneralMessage with internal tags
     Given a SIRI server waits GeneralMessageRequest request on "http://localhost:8090" to respond with
       """

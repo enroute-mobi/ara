@@ -865,7 +865,7 @@ Feature: Support SIRI GeneralMessage by subscription
       | Kind            | GeneralMessageBroadcast           |
       | ExternalId      | 2                                 |
 
-  @ARA-1378
+  @skip-siri-valid @ARA-1378
   Scenario: Returns empty SOAP response on General Message notification
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
        """
@@ -984,7 +984,7 @@ Feature: Support SIRI GeneralMessage by subscription
       </S:Envelope>
       """
 
-  @ARA-1417 @siri-valid
+  @ARA-1417
   Scenario: Log SubscriptionIdentifiers for a GeneralMessageSubscriptionRequest
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
        """

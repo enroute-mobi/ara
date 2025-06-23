@@ -2,7 +2,7 @@ Feature: Support SIRI Situation Exchange by request
   Background:
       Given a Referential "test" is created
 
-  @siri-valid @ARA-1342
+  @ARA-1342
   Scenario: Handle a SIRI SituationExchange request
     Given a Situation exists with the following attributes:
       | Codes                                                                              | "external" : "test"                           |
@@ -439,7 +439,7 @@ Feature: Support SIRI Situation Exchange by request
       | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
       | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                      |
 
-  @siri-valid @ARA-1582
+  @ARA-1582
   Scenario: Handle a SIRI SituationExchange request with All affected Lines
     Given a Situation exists with the following attributes:
       | Codes                        | "external" : "test"               |
@@ -537,7 +537,7 @@ Feature: Support SIRI Situation Exchange by request
       </S:Envelope>
     """
 
-  @siri-valid @ARA-1342
+  @ARA-1342
   Scenario: Handle a SIRI SituationExchange request without any situation
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential  | NINOXE:default |
@@ -594,7 +594,7 @@ Feature: Support SIRI Situation Exchange by request
       | StopAreas | []                       |
       | Lines     | []                       |
 
-  @siri-valid @ARA-1582
+  @ARA-1582
   Scenario: Handle a SX response (ServiceDelivery) with All affected Lines
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
@@ -664,7 +664,7 @@ Feature: Support SIRI Situation Exchange by request
       | Summary[Translations]#FR     | Nouveau pass Navigo       |
       | Affects[AllLines]            |                           |
 
-  @siri-valid @ARA-1397
+  @ARA-1397
   Scenario: Handle a SX response (ServiceDelivery)
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
@@ -1117,7 +1117,7 @@ Feature: Support SIRI Situation Exchange by request
       | StopAreas | ["STIF:StopPoint:Q:3534:", "STIF:StopPoint:Q:3533:", "NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
       | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                                                      |
 
-  @ARA-1397 @siri-valid
+  @ARA-1397
   Scenario: SituationExchange collect should send GetSituationExchange request to partner
    Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
@@ -1139,7 +1139,7 @@ Feature: Support SIRI Situation Exchange by request
       | Type      | SituationExchangeRequest |
       | Lines     | nil                      |
 
-  @ARA-1461 @siri-valid
+  @ARA-1461
   Scenario: Manage a Request with a Line filter
     Given a SIRI server on "http://localhost:8090"
 And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
@@ -1178,7 +1178,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   </S:Envelope>
       """
 
-  @ARA-1461 @siri-valid
+  @ARA-1461
   Scenario: Manage a Request with a StopArea filter
     Given a SIRI server on "http://localhost:8090"
       And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
@@ -1217,7 +1217,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   </S:Envelope>
       """
 
-  @siri-valid @ARA-1471
+  @ARA-1471
   Scenario: Broadcast via a SIRI SX request a Situation without EndTime
     Given a Situation exists with the following attributes:
       | Codes                        | "external" : "test"               |
@@ -1303,7 +1303,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       """
 
 
-  @siri-valid @ARA-1472
+  @ARA-1472
   Scenario: Ensure a Situation is updated with a VersionedAtTime changed and Version remains the same
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
@@ -1382,7 +1382,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
 
-  @siri-valid @ARA-1472
+  @ARA-1472
   Scenario: Ensure a Situation is updated with a Version changed and no VersionAtTime
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
@@ -1459,7 +1459,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
 
 
-  @siri-valid @ARA-1443
+  @ARA-1443
   Scenario: Collect SituationExchange with internal tags
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
@@ -1522,7 +1522,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Codes        | "external" : "test" |
       | InternalTags | ["first","second"]  |
 
-  @siri-valid @ARA-1444
+  @ARA-1444
   Scenario: Broadcast via a SIRI SX request a Situation with matching internal tags
     Given a Situation exists with the following attributes:
       | Codes                        | "external" : "test"               |
@@ -1610,7 +1610,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       </S:Envelope>
       """
 
-  @siri-valid @ARA-1444
+  @ARA-1444
   Scenario: Do not broadcast a Situation with no matching internal tags
     Given a Situation exists with the following attributes:
       | Codes                        | "external" : "test"               |
@@ -1675,7 +1675,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       </S:Envelope>
       """
 
-  @siri-valid @ARA-1493
+  @ARA-1493
   Scenario: Handle referent lines in a SIRI SituationExchange request
     Given a Situation exists with the following attributes:
       | Codes                                                                              | "external" : "test"                           |
@@ -1891,7 +1891,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
       | Lines     | ["NINOXE:Line:3:LOC"]                                        |
 
-  @siri-valid @ARA-1591
+  @ARA-1591
   Scenario: SituationExchangeDelivery with Status false for one Delivery is logged as an Error status in BigQuery
     Given a SIRI server waits SituationExchangeRequest request on "http://localhost:8090" to respond with
       """
@@ -1934,7 +1934,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Status    | Error                    |
       | Type      | SituationExchangeRequest |
 
-  @ARA-1542
+  @skip-siri-valid @ARA-1542
   Scenario: Handle a SIRI SituationExchange with partner setting broadcast.situations.time_to_live outside broadcast period wihout RequestTimeStamp should not broadcast situation
     Given a Situation exists with the following attributes:
       | Codes                        | "external" : "test"               |

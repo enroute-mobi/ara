@@ -164,7 +164,7 @@ Feature: Support SIRI LinesDiscovery
     Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
     And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
 
-  @ARA-1298 @siri-vali
+  @ARA-1298
   Scenario: LinesDiscovery collect
     Given a SIRI server waits LinesDiscovery request on "http://localhost:8090" to respond with
       """
@@ -233,7 +233,7 @@ Feature: Support SIRI LinesDiscovery
     Then a Line "external":"NINOXE:Line:BP:6:LOC" should exist
     And a Line "external":"NINOXE:Line:BP:7:LOC" should exist
 
-  @ARA-1298 @siri-valid
+  @ARA-1298
   Scenario: Handle a SIRI LinesDiscovery request with Partner remote_code_space changed
     Given a Partner "test" exists with connectors [siri-lines-discovery-request-broadcaster] and the following settings:
       | local_credential  | test     |
@@ -339,7 +339,7 @@ Feature: Support SIRI LinesDiscovery
       </S:Envelope>
       """
 
-  @ARA-1410 @siri-valid
+  @ARA-1410
   Scenario: RAW LinesDiscovery collect
     Given a raw SIRI server waits LinesRequest request on "http://localhost:8090" to respond with
       """

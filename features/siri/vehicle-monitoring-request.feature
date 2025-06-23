@@ -52,7 +52,7 @@ Feature: Support SIRI VehicleMonitoring by request
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
 
-  @siri-valid @ARA-1234
+  @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                              | test     |
@@ -142,7 +142,7 @@ Feature: Support SIRI VehicleMonitoring by request
       </S:Envelope>
     """
 
-  @siri-valid @ARA-1234
+  @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with multiple connector setting siri-vehicle-monitoring-request-broadcaster.vehicle_journey_remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                      | test          |
@@ -234,7 +234,7 @@ Feature: Support SIRI VehicleMonitoring by request
       </S:Envelope>
       """
 
-  @siri-valid @ARA-1234
+  @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential  | test  |
@@ -317,7 +317,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]            |
         | ErrorDetails      | Line Test:Line:3:LOC not found |
 
-  @siri-valid @ARA-1590
+  @ARA-1590
   Scenario: Handle a SIRI VehicleMonitoring request with Referent Line with Fallback on vehicle remote codeSpace (RatpCap case)
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                           | test                |
@@ -512,7 +512,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Lines             | ["Referent-1"]                                                |
       | VehicleJourneys   | ["STIF:bievre-VehicleJourney", "STIF:mantois-VehicleJourney"] |
 
-  @siri-valid @ARA-1234
+  @ARA-1234
   Scenario: Send all the vehicles in respond to a SIRI VehicleMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
@@ -741,7 +741,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]                                                |
         | VehicleJourneys   | ["Test:VehicleJourney:202:LOC", "Test:VehicleJourney:201:LOC"]     |
 
-  @siri-valid @ARA-1384
+  @ARA-1384
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
@@ -884,7 +884,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]             |
         | VehicleJourneys   | ["Test:VehicleJourney:201:LOC"] |
 
-  @siri-valid @ARA-1384
+  @ARA-1384
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with unmatching code kind
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential  | test     |
@@ -967,7 +967,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | []                                        |
         | ErrorDetails      | Vehicle Test:Vehicle:201123:LOC not found |
 
-  @siri-valid @ARA-1384
+  @ARA-1384
   Scenario: Handle a SIRI VehicleMonitoring request without Vehicle or Line filter should return an Error
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
      | local_credential  | test     |
@@ -1049,7 +1049,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | []                                                               |
         | ErrorDetails      | VehicleMonitoringRequest must have one LineRef OR one VehicleRef |
 
-  @siri-valid @ARA-1234
+  @ARA-1234
   Scenario: Handle a SIRI VehicleMonitoring request with Vehicle filter with fallback on generic connector remote_code_space
    Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                              | test     |
@@ -1684,7 +1684,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | NextStopVisitId  | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
 
-  @ARA-1298 @siri-valid
+  @ARA-1298
   Scenario: Performs a SIRI VehicleMonitoring request to a Partner
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
       """
@@ -1770,7 +1770,7 @@ Feature: Support SIRI VehicleMonitoring by request
     And a minute has passed
     Then the SIRI server should have received 1 GetVehicleMonitoring request
 
-  @siri-valid @ARA-1298
+  @ARA-1298
   Scenario: Handle a SIRI VehicleMonitoring request with Partner remote_code_space changed
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
@@ -1976,7 +1976,7 @@ Feature: Support SIRI VehicleMonitoring by request
      </S:Envelope>
     """
 
-  @ARA-1363 @siri-valid
+  @ARA-1363
   Scenario: Handle a SIRI VehicleMonitoring request using the generator setting reference_vehicle_journey_identifier
     # Setting a Partner without default generators
     Given a Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
@@ -2084,7 +2084,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]                     |
         | VehicleJourneys   | ["ch:1:ServiceJourney:87_TAC:6ba7b814"] |
 
-  @ARA-1363 @siri-valid
+  @ARA-1363
   Scenario: Handle a SIRI VehicleMonitoring request using the default generator should send DatedVehicleJourneyRef according to default setting
     # Setting a "SIRI Partner" with default generators
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
@@ -2191,7 +2191,7 @@ Feature: Support SIRI VehicleMonitoring by request
         | Lines             | ["Test:Line:3:LOC"]                      |
         | VehicleJourneys   | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |
 
-  @siri-valid @ARA-1591
+  @ARA-1591
   Scenario: VehicleMonitoringDelivery with Status false for one Delivery is logged as an Error status in BigQuery
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
       """
