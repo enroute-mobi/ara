@@ -492,7 +492,6 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 			</siri:MonitoredStopVisit>
 		</siri:StopMonitoringDelivery>
 	</Answer>
-	<AnswerExtension/>
 </sw:GetSiriServiceResponse>`
 
 	assert.Equal(expectedResponseBody, responseBody)
