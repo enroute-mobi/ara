@@ -3,7 +3,6 @@ require 'siri/xsd'
 # Helper to validate a XML content and log them with details
 module Siri
   class Validator
-
     def self.enabled?
       @enabled ||= %w{true strict}.include?(ENV['SIRI_VALIDATE'])
     end
@@ -108,14 +107,6 @@ Before do
   Siri::Validator.logger = self
 end
 
-Around do |scenario, block|
-  unless Siri::Validator.strict_mode?
-    block.call
-  else
-    Siri::Validator.fail_on_error(scenario, block)
-  end
-end
-
-Around('@siri-valid') do |scenario, block|
+Around('not @skip-siri-valid') do |scenario, block|
   Siri::Validator.fail_on_error(scenario, block)
 end
