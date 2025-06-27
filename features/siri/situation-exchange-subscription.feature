@@ -7,31 +7,31 @@ Feature: Support SIRI SituationExchange by subscription
   Scenario: Manage a SX Subscription
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-situation-exchange-subscription-collector] and the following settings:
-        | remote_url                       | http://localhost:8090 |
-        | remote_credential                | test                  |
-        | local_credential                 | NINOXE:default        |
-        | remote_code_space                | internal              |
-        | collect.include_lines            | NINOXE:Line::3:LOC    |
-        | collect.situations.internal_tags | first,second          |
+      | remote_url                       | http://localhost:8090 |
+      | remote_credential                | test                  |
+      | local_credential                 | NINOXE:default        |
+      | remote_code_space                | internal              |
+      | collect.include_lines            | NINOXE:Line::3:LOC    |
+      | collect.situations.internal_tags | first,second          |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:BP:LOC" |
-      | Name  | Ligne BP Metro                   |
+      | Codes[internal] | NINOXE:Line:BP:LOC |
+      | Name            | Ligne BP Metro     |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test last stop                           |
-      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name            | Test last stop             |
+      | Codes[internal] | NINOXE:StopPoint:SP:25:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3534                            |
-      | Codes | "internal": "STIF:StopPoint:Q:3534:" |
+      | Name            | Test 3534              |
+      | Codes[internal] | STIF:StopPoint:Q:3534: |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3533                            |
-      | Codes | "internal": "STIF:StopPoint:Q:3533:" |
+      | Name            | Test 3533              |
+      | Codes[internal] | STIF:StopPoint:Q:3533: |
     And a Subscription exist with the following attributes:
       | Kind              | SituationExchangeCollect          |
       | ReferenceArray[0] | "SituationExchangeCollect": "all" |
@@ -337,7 +337,7 @@ Feature: Support SIRI SituationExchange by subscription
       </S:Envelope>
       """
     Then one Situation has the following attributes:
-      | Codes                                                                              | "internal" : "test"                           |
+      | Codes[internal]                                                                    | test                                          |
       | InternalTags                                                                       | ["first","second"]                            |
       | RecordedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
       | Version                                                                            | 1                                             |
@@ -372,7 +372,7 @@ Feature: Support SIRI SituationExchange by subscription
       | ImageRef    | http://www.example.com/image.png |
       | LinkContent | relatedSite                      |
     Then one Situation has the following attributes:
-      | Codes                        | "internal" : "test2"              |
+      | Codes[internal]              | test2                             |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 5                                 |
       | Keywords                     | ["Commercial", "Test2"]           |
@@ -475,11 +475,11 @@ Feature: Support SIRI SituationExchange by subscription
       | collect.situations.internal_tags | first,second          |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | SituationExchangeCollect          |
       | ReferenceArray[0] | "SituationExchangeCollect": "all" |
@@ -539,7 +539,7 @@ Feature: Support SIRI SituationExchange by subscription
       </S:Envelope>
       """
     Then one Situation has the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T01:02:03+02:00         |
       | Version                      | 1                                 |
       | VersionedAt                  | 2017-01-01T01:02:03+02:00         |
@@ -599,9 +599,9 @@ Feature: Support SIRI SituationExchange by subscription
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | NINOXE:Line::3:LOC    |
       And a Line exists with the following attributes:
-        | Name              | Test                            |
-        | Codes             | "internal":"NINOXE:Line::3:LOC" |
-        | CollectSituations | true                            |
+        | Name              | Test               |
+        | Codes[internal]   | NINOXE:Line::3:LOC |
+        | CollectSituations | true               |
       And a Subscription exist with the following attributes:
         | Kind              | SituationExchangeCollect               |
         | ReferenceArray[0] | Line, "internal": "NINOXE:Line::3:LOC" |
@@ -667,17 +667,17 @@ Feature: Support SIRI SituationExchange by subscription
         | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
       And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name              | Test                            |
-        | Codes             | "internal":"NINOXE:Line::3:LOC" |
-        | CollectSituations | true                            |
+        | Name              | Test               |
+        | Codes[internal]   | NINOXE:Line::3:LOC |
+        | CollectSituations | true               |
       And a Line exists with the following attributes:
-        | Name              | Test                             |
-        | Codes             | "internal":"NINOXE:Line::BP:LOC" |
-        | CollectSituations | true                             |
+        | Name              | Test                |
+        | Codes[internal]   | NINOXE:Line::BP:LOC |
+        | CollectSituations | true                |
       And a StopArea exists with the following attributes:
-        | Name              | Test                                     |
-        | Codes             | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-        | CollectSituations | true                                     |
+        | Name              | Test                       |
+        | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+        | CollectSituations | true                       |
       And a minute has passed
       And a minute has passed
       Then the SIRI server should have received a SituationExchangeSubscriptionRequest request with:
@@ -699,11 +699,11 @@ Feature: Support SIRI SituationExchange by subscription
        | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "another": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                  |
+      | Codes[another] | NINOXE:Line:3:LOC |
+      | Name           | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:A:BUS" |
-      | Name  | Ligne A Bus                     |
+      | Codes[internal] | NINOXE:Line:A:BUS |
+      | Name            | Ligne A Bus       |
     And a minute has passed
     When I send this SIRI request
       """
@@ -751,14 +751,14 @@ Feature: Support SIRI SituationExchange by subscription
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-      | Name              | Test              |
-      | Codes             | "internal":"1234" |
-      | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:BP:LOC" |
-      | Name  | Ligne BP Metro                   |
+      | Codes[internal] | NINOXE:Line:BP:LOC |
+      | Name            | Ligne BP Metro     |
     And a Situation exists with the following attributes:
-      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1"     |
+      | Codes[internal]                                                                    | NINOXE:GeneralMessage:27_1                    |
       | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Perturbation"]                              |
@@ -773,14 +773,14 @@ Feature: Support SIRI SituationExchange by subscription
       | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-8-00c04fd430c8             |
     And a Situation exists with the following attributes:
-      | Codes                        | "internal" : "NINOXE:SituationExchange:01_1" |
-      | RecordedAt                   | 2017-01-01T03:30:06+02:00                    |
-      | Version                      | 1                                            |
-      | Keywords                     | ["test"]                                     |
-      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00                    |
-      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00                    |
-      | Description[DefaultValue]    | An Another Very Long Message                 |
-      | Affects[Line]                | 6ba7b814-9dad-11d1-3-00c04fd430c8            |
+      | Codes[internal]              | NINOXE:SituationExchange:01_1     |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
+      | Version                      | 1                                 |
+      | Keywords                     | ["test"]                          |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]    | An Another Very Long Message      |
+      | Affects[Line]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     When the Situation "internal":"NINOXE:SituationExchange:01_1" is edited with an InfoLink with the following attributes:
       | Uri         | http://example.com               |
       | Label       | Label Sample                     |
@@ -857,13 +857,13 @@ Feature: Support SIRI SituationExchange by subscription
       | ScopeType                       | network                                                                                    |
       | Affects[Line]                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                                          |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+      | CollectSituations | true                       |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:12:LOC |
+      | CollectSituations | true                       |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-5-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                   | 2017-01-01T03:50:06+02:00              |
@@ -1140,13 +1140,13 @@ Feature: Support SIRI SituationExchange by subscription
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T01:02:03+02:00         |
       | Version                      | 1                                 |
       | VersionedAt                  | 2017-01-01T01:02:03+02:00         |
@@ -1237,28 +1237,28 @@ Feature: Support SIRI SituationExchange by subscription
        | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Name              | Test              |
-      | Codes             | "internal":"1234" |
-      | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Situation exists with the following attributes:
-      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                 |
-      | Version                                                                            | 1                                         |
-      | Keywords                                                                           | ["Perturbation"]                          |
-      | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00                 |
-      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                 |
-      | Description[DefaultValue]                                                          | a very very very long message             |
-      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Codes[internal]                                                                    | NINOXE:GeneralMessage:27_1        |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00         |
+      | Version                                                                            | 1                                 |
+      | Keywords                                                                           | ["Perturbation"]                  |
+      | ValidityPeriods[0]#StartTime                                                       | 2017-01-01T01:30:06+02:00         |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]                                                          | a very very very long message     |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+      | CollectSituations | true                       |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:12:LOC |
+      | CollectSituations | true                       |
     And a minute has passed
     When I send this SIRI request
       """

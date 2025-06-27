@@ -9,14 +9,14 @@ Feature: GraphQL API for vehicles
       | local_credential  | test_token |
       | remote_code_space | internal   |
     And a Vehicle exists with the following attributes:
-      | Codes          | "internal": "Test:Vehicle:1:LOC" |
-      | Longitude      | 1.234                            |
-      | Latitude       | 5.678                            |
-      | Bearing        | 123                              |
-      | Occupancy      | fewSeatsAvailable                |
-      | Percentage     | 15.6                             |
-      | RecordedAtTime | 2017-01-01T13:00:00.000Z         |
-      | ValidUntilTime | 2017-01-01T14:00:00.000Z         |
+      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Longitude       |                    1.234 |
+      | Latitude        |                    5.678 |
+      | Bearing         |                      123 |
+      | Occupancy       |        fewSeatsAvailable |
+      | Percentage      |                     15.6 |
+      | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
+      | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
     When I send this GraphQL query to the Referential "test" with token "test_token"
       """
       query {
@@ -48,14 +48,14 @@ Feature: GraphQL API for vehicles
       | local_credential  | test_token |
       | remote_code_space | internal   |
     And a Vehicle exists with the following attributes:
-      | Codes          | "internal": "Test:Vehicle:1:LOC" |
-      | Longitude      | 1.234                            |
-      | Latitude       | 5.678                            |
-      | Bearing        | 123                              |
-      | Occupancy      | fewSeatsAvailable                |
-      | Percentage     | 15.6                             |
-      | RecordedAtTime | 2017-01-01T13:00:00.000Z         |
-      | ValidUntilTime | 2017-01-01T14:00:00.000Z         |
+      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Longitude       |                    1.234 |
+      | Latitude        |                    5.678 |
+      | Bearing         |                      123 |
+      | Occupancy       |        fewSeatsAvailable |
+      | Percentage      |                     15.6 |
+      | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
+      | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
     When I send this GraphQL query to the Referential "test" with token "test_token"
       """
       query {
@@ -87,14 +87,14 @@ Feature: GraphQL API for vehicles
       | local_credential  | test_token |
       | remote_code_space | internal   |
     And a Vehicle exists with the following attributes:
-      | Codes          | "internal": "Test:Vehicle:1:LOC" |
-      | Longitude      | 1.234                            |
-      | Latitude       | 5.678                            |
-      | Bearing        | 123                              |
-      | Occupancy      | fewSeatsAvailable                |
-      | Percentage     | 15.6                             |
-      | RecordedAtTime | 2017-01-01T13:00:00.000Z         |
-      | ValidUntilTime | 2017-01-01T14:00:00.000Z         |
+      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Longitude       |                    1.234 |
+      | Latitude        |                    5.678 |
+      | Bearing         |                      123 |
+      | Occupancy       |        fewSeatsAvailable |
+      | Percentage      |                     15.6 |
+      | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
+      | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
     When I send this GraphQL query to the Referential "test" with token "test_token"
       """
       mutation {
@@ -127,14 +127,14 @@ Feature: GraphQL API for vehicles
       | remote_code_space          | internal                                      |
       | graphql.mutable_attributes | vehicle.occupancyStatus,vehicle.occupancyRate |
     And a Vehicle exists with the following attributes:
-      | Codes          | "internal": "Test:Vehicle:1:LOC" |
-      | Longitude      | 1.234                            |
-      | Latitude       | 5.678                            |
-      | Bearing        | 123                              |
-      | Occupancy      | fewSeatsAvailable                |
-      | Percentage     | 15.6                             |
-      | RecordedAtTime | 2017-01-01T13:00:00.000Z         |
-      | ValidUntilTime | 2017-01-01T14:00:00.000Z         |
+      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Longitude       |                    1.234 |
+      | Latitude        |                    5.678 |
+      | Bearing         |                      123 |
+      | Occupancy       |        fewSeatsAvailable |
+      | Percentage      |                     15.6 |
+      | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
+      | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
     When I send this GraphQL query to the Referential "test" with token "test_token"
       """
       mutation {

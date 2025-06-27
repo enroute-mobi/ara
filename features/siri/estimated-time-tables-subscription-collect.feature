@@ -14,11 +14,11 @@ Feature: Support SIRI EstimatedTimetable
       | local_credential      | ara                                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     And a Line exists with the following attributes:
-      | Name  | Test 2                        |
-      | Codes | "internal": "RLA_TRAM::A:LOC" |
+      | Name            | Test 2          |
+      | Codes[internal] | RLA_TRAM::A:LOC |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
@@ -35,8 +35,8 @@ Feature: Support SIRI EstimatedTimetable
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should not have received a EstimatedTimetableSubscriptionRequest request
@@ -53,8 +53,8 @@ Feature: Support SIRI EstimatedTimetable
       | collect.subscriptions.persistent | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 30 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
@@ -72,8 +72,8 @@ Feature: Support SIRI EstimatedTimetable
       | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should have received a EstimatedTimetableSubscriptionRequest request with:
@@ -126,8 +126,8 @@ Feature: Support SIRI EstimatedTimetable
       | remote_code_space | internal              |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test                   |
-      | Codes | "internal": "testLine" |
+      | Name            | Test     |
+      | Codes[internal] | testLine |
     And 10 seconds have passed
     Then one Subscription exists with the following attributes:
       | Kind | EstimatedTimetableCollect |
@@ -143,11 +143,11 @@ Feature: Support SIRI EstimatedTimetable
       | remote_code_space     | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
-      | Name  | Test1                   |
-      | Codes | "internal": "testLine1" |
+      | Name            | Test1     |
+      | Codes[internal] | testLine1 |
     And a Line exists with the following attributes:
-      | Name  | Test2                   |
-      | Codes | "internal": "testLine2" |
+      | Name            | Test2     |
+      | Codes[internal] | testLine2 |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect     |
       | ExternalId        | ExternalId                    |
@@ -240,8 +240,8 @@ Feature: Support SIRI EstimatedTimetable
       | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -293,22 +293,22 @@ Feature: Support SIRI EstimatedTimetable
       """
     And 30 seconds have passed
     Then one VehicleJourney has the following attributes:
-      | Codes         | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
-      | DirectionType | Aller                                   |
-      | Id            | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
+      | Codes[internal] | NINOXE:VehicleJourney:201         |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | DirectionType   | Aller                             |
+      | Id              | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
     And one StopArea has the following attributes:
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name  | Test                                     |
-      | Id    | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC        |
+      | Name            | Test                              |
+      | Id              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
-      | PassageOrder               | 4                                         |
-      | VehicleAtStop              | false                                     |
-      | ArrivalStatus              | delayed                                   |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
-      | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8         |
-      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:VehicleJourney:201-4       |
+      | PassageOrder               | 4                                 |
+      | VehicleAtStop              | false                             |
+      | ArrivalStatus              | delayed                           |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And an audit event should exist with these attributes:
       | Protocol        | siri                           |
       | Direction       | received                       |
@@ -365,25 +365,25 @@ Feature: Support SIRI EstimatedTimetable
       | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                             |
-      | Codes                    | "other": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8      |
-      | Monitored                | true                                   |
-      | Attribute[DirectionName] | Direction Name                         |
+      | Name                     | Passage 32                        |
+      | Codes[other]             | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name  | Test                                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
+      | Name            | Test                       |
     And a StopVisit exists with the following attributes:
-      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
-      | PassageOrder               | 4                                         |
-      | VehicleAtStop              | false                                     |
-      | ArrivalStatus              | onTime                                    |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
-      | VehicleJourneyId           | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
-      | StopAreaId                 | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:VehicleJourney:201-4       |
+      | PassageOrder               | 4                                 |
+      | VehicleAtStop              | false                             |
+      | ArrivalStatus              | onTime                            |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -434,11 +434,11 @@ Feature: Support SIRI EstimatedTimetable
 </S:Envelope>
       """
     Then the StopVisit "internal:NINOXE:VehicleJourney:201-4" has the following attributes:
-      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
-      | PassageOrder               | 4                                         |
-      | VehicleAtStop              | false                                     |
-      | ArrivalStatus              | delayed                                   |
-      | Schedule[expected]#Arrival | 2017-01-01T15:10:01Z                      |
+      | Codes[internal]            | NINOXE:VehicleJourney:201-4 |
+      | PassageOrder               | 4                           |
+      | VehicleAtStop              | false                       |
+      | ArrivalStatus              | delayed                     |
+      | Schedule[expected]#Arrival | 2017-01-01T15:10:01Z        |
 
   @ARA-1411
   Scenario: RAW EstimatedTimetable subscription collect should send EstimatedTimetableSubscriptionRequest to partner
@@ -452,8 +452,8 @@ Feature: Support SIRI EstimatedTimetable
       | siri.envelope         | raw                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw EstimatedTimetableSubscriptionRequest request with:
@@ -487,8 +487,8 @@ Feature: Support SIRI EstimatedTimetable
       | siri.envelope     | raw                   |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -539,21 +539,21 @@ Feature: Support SIRI EstimatedTimetable
       """
     And 30 seconds have passed
     Then one VehicleJourney has the following attributes:
-      | Codes         | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
-      | DirectionType | Aller                                   |
-      | Id            | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
+      | Codes[internal] | NINOXE:VehicleJourney:201         |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | DirectionType   | Aller                             |
+      | Id              | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
     And one StopArea has the following attributes:
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name  | Test                                     |
-      | Id    | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC        |
+      | Name            | Test                              |
+      | Id              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
-      | PassageOrder               | 4                                         |
-      | ArrivalStatus              | delayed                                   |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
-      | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8         |
-      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:VehicleJourney:201-4       |
+      | PassageOrder               | 4                                 |
+      | ArrivalStatus              | delayed                           |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And an audit event should exist with these attributes:
       | Protocol        | siri                           |
       | Direction       | received                       |
@@ -591,8 +591,8 @@ Feature: Support SIRI EstimatedTimetable
       | siri.envelope     | raw                   |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -662,41 +662,41 @@ Feature: Support SIRI EstimatedTimetable
       """
     And 30 seconds have passed
     Then one Line has the following attributes:
-      | Codes         | "internal": "NINOXE:Line:4:LOC" |
-      | Id            | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
+      | Codes[internal] | NINOXE:Line:4:LOC                 |
+      | Id              | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
     Then one VehicleJourney has the following attributes:
-      | Codes         | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId        | 6ba7b814-9dad-11d1-3-00c04fd430c8       |
-      | DirectionType | Aller                                   |
-      | Id            | 6ba7b814-9dad-11d1-a-00c04fd430c8       |
+      | Codes[internal] | NINOXE:VehicleJourney:201         |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | DirectionType   | Aller                             |
+      | Id              | 6ba7b814-9dad-11d1-a-00c04fd430c8 |
     And one VehicleJourney has the following attributes:
-      | Codes         | "internal": "NINOXE:VehicleJourney:202" |
-      | LineId        | 6ba7b814-9dad-11d1-9-00c04fd430c8       |
-      | DirectionType | Aller                                   |
-      | Id            | 6ba7b814-9dad-11d1-b-00c04fd430c8       |
+      | Codes[internal] | NINOXE:VehicleJourney:202         |
+      | LineId          | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | DirectionType   | Aller                             |
+      | Id              | 6ba7b814-9dad-11d1-b-00c04fd430c8 |
     And one StopArea has the following attributes:
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name  | Test                                     |
-      | Id    | 6ba7b814-9dad-11d1-8-00c04fd430c8        |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC        |
+      | Name            | Test                              |
+      | Id              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                      | "internal": "NINOXE:VehicleJourney:201-4" |
-      | PassageOrder               | 4                                         |
-      | ArrivalStatus              | delayed                                   |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
-      | VehicleJourneyId           | 6ba7b814-9dad-11d1-a-00c04fd430c8         |
-      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:VehicleJourney:201-4       |
+      | PassageOrder               | 4                                 |
+      | ArrivalStatus              | delayed                           |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-a-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                      | "internal": "NINOXE:VehicleJourney:202-3" |
-      | PassageOrder               | 3                                         |
-      | ArrivalStatus              | delayed                                   |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z                      |
-      | VehicleJourneyId           | 6ba7b814-9dad-11d1-b-00c04fd430c8         |
-      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:VehicleJourney:202-3       |
+      | PassageOrder               | 3                                 |
+      | ArrivalStatus              | delayed                           |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-b-00c04fd430c8 |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And an audit event should exist with these attributes:
-      | Protocol        | siri                           |
-      | Direction       | received                       |
-      | Status          | OK                             |
-      | Type            | NotifyEstimatedTimetable       |
-      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC"] |
-      | VehicleJourneys | ["NINOXE:VehicleJourney:201","NINOXE:VehicleJourney:202"]  |
-      | Lines           | ["NINOXE:Line:3:LOC","NINOXE:Line:4:LOC"]          |
+      | Protocol        | siri                                                      |
+      | Direction       | received                                                  |
+      | Status          | OK                                                        |
+      | Type            | NotifyEstimatedTimetable                                  |
+      | StopAreas       | ["NINOXE:StopPoint:SP:24:LOC"]                            |
+      | VehicleJourneys | ["NINOXE:VehicleJourney:201","NINOXE:VehicleJourney:202"] |
+      | Lines           | ["NINOXE:Line:3:LOC","NINOXE:Line:4:LOC"]                 |

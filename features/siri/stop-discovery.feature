@@ -6,38 +6,38 @@ Feature: Support SIRI StopPointsDiscovery
   @ARA-1095
   Scenario: Handle a SIRI StopPointsDiscovery request with ReferentID having wrong remoteCode kind
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
-      | local_credential     | test     |
+      | local_credential  | test     |
       | remote_code_space | internal |
-      | local_url            | address  |
+      | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name      | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name      | Line 2                          |
-      | Codes | "internal":"STIF:Line::C00273:" |
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
     And a StopArea exists with the following attributes:
-      | Name      | Stop1Referent                                                             |
-      | Codes | "internal": "NINOXE:StopPoint:BP:11:LOC"                                  |
-      | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | Name            | Stop1Referent                                                             |
+      | Codes[internal] | NINOXE:StopPoint:BP:11:LOC                                                |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name       | Stop2                                    |
-      | Codes  | "internal": "NINOXE:StopPoint:SP:22:LOC" |
-      | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8"]    |
-      | ReferentID | 6ba7b814-9dad-11d1-4-00c04fd430c8        |
+      | Name            | Stop2                                 |
+      | Codes[internal] | NINOXE:StopPoint:SP:22:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | ReferentID      | 6ba7b814-9dad-11d1-4-00c04fd430c8     |
     And a StopArea exists with the following attributes:
-      | Name      | Stop3Referent                                                              |
-      | Codes | "wrong": "NINOXE:StopPoint:BP:33:LOC"                                      |
-      | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | Name         | Stop3Referent                                                              |
+      | Codes[wrong] | NINOXE:StopPoint:BP:33:LOC                                                 |
+      | Lines        | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name       | Stop4                                    |
-      | Codes  | "internal": "NINOXE:StopPoint:BP:44:LOC" |
-      | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]    |
-      | ReferentID | 6ba7b814-9dad-11d1-6-00c04fd430c8        |
+      | Name            | Stop4                                 |
+      | Codes[internal] | NINOXE:StopPoint:BP:44:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8"] |
+      | ReferentID      | 6ba7b814-9dad-11d1-6-00c04fd430c8     |
     And a StopArea exists with the following attributes:
-      | Name       | Stop5                                    |
-      | Codes  | "internal": "NINOXE:StopPoint:BP:55:LOC" |
-      | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8"]    |
-      | ReferentID | 6ba7b814-9dad-11d1-6-00c04fd430c8        |
+      | Name            | Stop5                                 |
+      | Codes[internal] | NINOXE:StopPoint:BP:55:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | ReferentID      | 6ba7b814-9dad-11d1-6-00c04fd430c8     |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -102,40 +102,40 @@ Feature: Support SIRI StopPointsDiscovery
   @ARA-1095
   Scenario: Handle a SIRI StopPointsDiscovery request with ReferentID
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
-      | local_credential     | test     |
+      | local_credential  | test     |
       | remote_code_space | internal |
-      | local_url            | address  |
+      | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name      | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name      | Line 2                          |
-      | Codes | "internal":"STIF:Line::C00273:" |
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
     And a Line exists with the following attributes:
-      | Name      | Line 3                          |
-      | Codes | "internal":"STIF:Line::C00274:" |
+      | Name            | Line 3             |
+      | Codes[internal] | STIF:Line::C00274: |
     And a StopArea exists with the following attributes:
-      | Name      | Stop1Referent                                                                                                  |
-      | Codes | "internal": "NINOXE:StopPoint:BP:11:LOC"                                                                       |
-      | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
+      | Name            | Stop1Referent                                                                                                  |
+      | Codes[internal] | NINOXE:StopPoint:BP:11:LOC                                                                                     |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name       | Stop2                                 |
-      | Codes  | "internal": "NINOXE:StopPoint:SP:22:LOC"  |
-      | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
-      | ReferentID | 6ba7b814-9dad-11d1-5-00c04fd430c8     |
+      | Name            | Stop2                                 |
+      | Codes[internal] | NINOXE:StopPoint:SP:22:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | ReferentID      | 6ba7b814-9dad-11d1-5-00c04fd430c8     |
     And a StopArea exists with the following attributes:
-      | Name       | Stop3Referent                                                              |
-      | Codes  | "internal": "NINOXE:StopPoint:BP:33:LOC"                                   |
-      | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
+      | Name            | Stop3Referent                                                              |
+      | Codes[internal] | NINOXE:StopPoint:BP:33:LOC                                                 |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8", "6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name       | Stop4                                    |
-      | Codes  | "internal": "NINOXE:StopPoint:BP:44:LOC" |
-      | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]    |
-      | ReferentID | 6ba7b814-9dad-11d1-7-00c04fd430c8        |
+      | Name            | Stop4                                 |
+      | Codes[internal] | NINOXE:StopPoint:BP:44:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8"] |
+      | ReferentID      | 6ba7b814-9dad-11d1-7-00c04fd430c8     |
     And a StopArea exists with the following attributes:
-      | Name       | Stop5                                    |
-      | Codes  | "internal": "NINOXE:StopPoint:BP:55:LOC" |
-      | Lines      | ["6ba7b814-9dad-11d1-2-00c04fd430c8"]    |
+      | Name            | Stop5                                 |
+      | Codes[internal] | NINOXE:StopPoint:BP:55:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8"] |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -201,29 +201,29 @@ Feature: Support SIRI StopPointsDiscovery
 
   Scenario: 2464 3292 - Handle a SIRI StopPointsDiscovery request
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
-      | local_credential     | test     |
+      | local_credential  | test     |
       | remote_code_space | internal |
-      | local_url            | address  |
+      | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name      | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name      | Line 2                          |
-      | Codes | "internal":"STIF:Line::C00273:" |
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
     And a Line exists with the following attributes:
-      | Name      | Line 3                          |
-      | Codes | "internal":"STIF:Line::C00274:" |
+      | Name            | Line 3             |
+      | Codes[internal] | STIF:Line::C00274: |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                                                      |
-      | Codes | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
-      | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | Name            | Test                                                                      |
+      | Codes[internal] | NINOXE:StopPoint:BP:6:LOC                                                 |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name      | Test 2                                   |
-      | Codes | "internal": "NINOXE:StopPoint:SP:16:LOC" |
+      | Name            | Test 2                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:16:LOC |
     And a StopArea exists with the following attributes:
-      | Name      | Test 3                                  |
-      | Codes | "internal": "NINOXE:StopPoint:BP:7:LOC" |
-      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
+      | Name            | Test 3                                |
+      | Codes[internal] | NINOXE:StopPoint:BP:7:LOC             |
+      | Lines           | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -309,7 +309,7 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090      |
       | remote_credential          | test                       |
-      | remote_code_space       | internal                   |
+      | remote_code_space          | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     Then a StopArea "internal":"NINOXE:StopPoint:BP:6:LOC" should exist
@@ -398,15 +398,15 @@ Feature: Support SIRI StopPointsDiscovery
 </S:Envelope>
       """
     And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                        | http://localhost:8090      |
-      | remote_credential                 | test                       |
-      | remote_code_space              | internal                   |
-      | collect.use_discovered_stop_areas | true                       |
+      | remote_url                        | http://localhost:8090 |
+      | remote_credential                 | test                  |
+      | remote_code_space                 | internal              |
+      | collect.use_discovered_stop_areas | true                  |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                        | http://localhost:8091      |
-      | remote_credential                 | test                       |
-      | remote_code_space              | internal                   |
-      | collect.use_discovered_stop_areas | true                       |
+      | remote_url                        | http://localhost:8091 |
+      | remote_credential                 | test                  |
+      | remote_code_space                 | internal              |
+      | collect.use_discovered_stop_areas | true                  |
     When 2 minutes have passed
     And 2 minutes have passed
     Then the "A" SIRI server should have received a GetStopMonitoring request with:
@@ -502,20 +502,20 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8090 |
       | remote_credential                 | test                  |
-      | remote_code_space              | internal              |
+      | remote_code_space                 | internal              |
       | collect.use_discovered_stop_areas | true                  |
       | collect.priority                  | 2                     |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8091 |
       | remote_credential                 | test                  |
-      | remote_code_space              | internal              |
+      | remote_code_space                 | internal              |
       | collect.exclude_stop_areas        | StopArea:A            |
       | collect.priority                  | 1                     |
       | collect.use_discovered_stop_areas | true                  |
     When a minute has passed
     Then one StopArea has the following attributes:
-      | Codes | "internal": "StopArea:A" |
-      | Monitored | true                     |
+      | Codes[internal] | StopArea:A |
+      | Monitored       | true       |
 
 
   @ARA-1030
@@ -612,20 +612,20 @@ Feature: Support SIRI StopPointsDiscovery
     And a Partner "partner_a" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8090 |
       | remote_credential                 | test                  |
-      | remote_code_space              | internal              |
+      | remote_code_space                 | internal              |
       | collect.exclude_lines             | Test:line:1:LOC       |
       | collect.priority                  | 1                     |
       | collect.use_discovered_stop_areas | true                  |
     And a Partner "partner_b" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                        | http://localhost:8091 |
       | remote_credential                 | test                  |
-      | remote_code_space              | internal              |
+      | remote_code_space                 | internal              |
       | collect.priority                  | 2                     |
       | collect.use_discovered_stop_areas | true                  |
     When a minute has passed
     Then one StopArea has the following attributes:
-      | Codes | "internal": "StopArea:A"   |
-      | Monitored | true                       |
+      | Codes[internal] | StopArea:A |
+      | Monitored       | true       |
 
   @ARA-1298
   Scenario: StopPointsDiscovery collect with Partner remote_code_space changed
@@ -658,15 +658,15 @@ Feature: Support SIRI StopPointsDiscovery
 </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-points-discovery-request-collector] and the following settings:
-      | remote_url                 | http://localhost:8090      |
-      | remote_credential          | test                       |
-      | remote_code_space       | internal                   |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | remote_code_space | internal              |
     And a minute has passed
     Then a StopArea "internal":"NINOXE:StopPoint:BP:6:LOC" should exist
     And a StopArea "internal":"NINOXE:StopPoint:BP:7:LOC" should exist
     And the Partner "test" is updated with the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
       | remote_code_space | external              |
     And a SIRI server waits StopPointsDiscovery request on "http://localhost:8090" to respond with
       """
@@ -705,29 +705,29 @@ Feature: Support SIRI StopPointsDiscovery
   @ARA-1298
   Scenario: Handle a SIRI StopPointsDiscovery request with Partner remote_code_space changed
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
-      | local_credential     | test     |
+      | local_credential  | test     |
       | remote_code_space | internal |
-      | local_url            | address  |
+      | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name      | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name      | Line 2                          |
-      | Codes | "internal":"STIF:Line::C00273:" |
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
     And a Line exists with the following attributes:
-      | Name      | Line 3                          |
-      | Codes | "external":"STIF:Line::C00274:"         |
+      | Name            | Line 3             |
+      | Codes[external] | STIF:Line::C00274: |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                                                      |
-      | Codes | "internal": "NINOXE:StopPoint:BP:6:LOC"                                   |
-      | Lines     | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+      | Name            | Test                                                                      |
+      | Codes[internal] | NINOXE:StopPoint:BP:6:LOC                                                 |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name      | Test 2                                   |
-      | Codes | "internal": "NINOXE:StopPoint:SP:16:LOC" |
+      | Name            | Test 2                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:16:LOC |
     And a StopArea exists with the following attributes:
-      | Name      | Test 3                                  |
-      | Codes | "external": "NINOXE:StopPoint:BP:7:LOC" |
-      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
+      | Name            | Test 3                                |
+      | Codes[external] | NINOXE:StopPoint:BP:7:LOC             |
+      | Lines           | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -773,9 +773,9 @@ Feature: Support SIRI StopPointsDiscovery
       </S:Envelope>
       """
     And the Partner "test" is updated with the following settings:
-      | local_credential     | test     |
+      | local_credential  | test     |
       | remote_code_space | external |
-      | local_url            | address  |
+      | local_url         | address  |
     And a minute has passed
     When I send this SIRI request
       """
@@ -828,43 +828,45 @@ Feature: Support SIRI StopPointsDiscovery
       | remote_code_space | external |
       | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name  | Line Referent 1             |
-      | Codes | "external":"Referent-1"  |
+      | Name            | Line Referent 1 |
+      | Codes[external] | Referent-1      |
     And a Line exists with the following attributes:
-      | Name       | Line 1                            |
-      | Codes      | "internal":"Line-1"               |
-      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
+      | Name            | Line 1                            |
+      | Codes[internal] | Line-1                            |
+      | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
     And a Line exists with the following attributes:
-      | Name  | Line Referent 2         |
-      | Codes | "external":"Referent-2" |
+      | Name            | Line Referent 2 |
+      | Codes[external] | Referent-2      |
     And a Line exists with the following attributes:
-      | Name       | Line 2                            |
-      | Codes      | "internal":"Line-2"               |
-      | ReferentId | 6ba7b814-9dad-11d1-4-00c04fd430c8 | # Line Referent 2
+      | Name            | Line 2                            |
+      | Codes[internal] | Line-2                            |
+      | ReferentId      | 6ba7b814-9dad-11d1-4-00c04fd430c8 | # Line Referent 2
     And a Line exists with the following attributes:
-      | Name       | Line 3                            |
-      | Codes      | "internal":"Line-3"               |
-      | ReferentId | 6ba7b814-9dad-11d1-4-00c04fd430c8 | # Line Referent 2
+      | Name            | Line 3                            |
+      | Codes[internal] | Line-3                            |
+      | ReferentId      | 6ba7b814-9dad-11d1-4-00c04fd430c8 | # Line Referent 2
     And a Line exists with the following attributes:
-      | Name  | Line 4                                   |
-      | Codes | "internal":"Line-4", "external":"Line-4" |
+      | Name            | Line 4 |
+      | Codes[internal] | Line-4 |
+      | Codes[external] | Line-4 |
     And a StopArea exists with the following attributes:
-      | Name  | Stop Referent                      |
-      | Codes | "external": "Stop-Referent-1"  |
+      | Name            | Stop Referent   |
+      | Codes[external] | Stop-Referent-1 |
     And a StopArea exists with the following attributes:
-      | Name       | Stop 1                                                                     |
-      | Codes      | "internal": "Stop-1"                                                       |
-      | Lines      | ["6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-7-00c04fd430c8"] | # Line 1, Line 4
-      | ReferentID | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          | # Stop Referent
+      | Name            | Stop 1                                                                     |
+      | Codes[internal] | Stop-1                                                                     |
+      | Lines           | ["6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-7-00c04fd430c8"] | # Line 1, Line 4
+      | ReferentID      | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          | # Stop Referent
     And a StopArea exists with the following attributes:
-      | Name       | Stop 2                                                                     |
-      | Codes      | "internal": "Stop-2"                                                       |
-      | Lines      | ["6ba7b814-9dad-11d1-5-00c04fd430c8", "6ba7b814-9dad-11d1-6-00c04fd430c8"] | # Line 2, Line 3
-      | ReferentID | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          | # Stop Referent
+      | Name            | Stop 2                                                                     |
+      | Codes[internal] | Stop-2                                                                     |
+      | Lines           | ["6ba7b814-9dad-11d1-5-00c04fd430c8", "6ba7b814-9dad-11d1-6-00c04fd430c8"] | # Line 2, Line 3
+      | ReferentID      | 6ba7b814-9dad-11d1-8-00c04fd430c8                                          | # Stop Referent
     And a StopArea exists with the following attributes:
-      | Name  | Stop 3                                                                                                          |
-      | Codes | "internal": "Stop-3", "external": "Stop-3"                                                                      |
-      | Lines | ["6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-5-00c04fd430c8", "6ba7b814-9dad-11d1-7-00c04fd430c8"] | # Line 1, Line 2, Line 4
+      | Name            | Stop 3                                                                                                          |
+      | Codes[internal] | Stop-3                                                                                                          |
+      | Codes[external] | Stop-3                                                                                                          |
+      | Lines           | ["6ba7b814-9dad-11d1-3-00c04fd430c8", "6ba7b814-9dad-11d1-5-00c04fd430c8", "6ba7b814-9dad-11d1-7-00c04fd430c8"] | # Line 1, Line 2, Line 4
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">

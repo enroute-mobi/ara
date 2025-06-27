@@ -6,9 +6,9 @@ Feature: Support SIRI subscription
   Scenario: 4377 - Change status of subscription with termination request
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-stop-monitoring-subscription-broadcaster] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
@@ -116,7 +116,7 @@ Feature: Support SIRI subscription
       | remote_url                                            | http://localhost:8090 |
       | remote_credential                                     | ara                   |
       | local_credential                                      | NINOXE:default        |
-      | remote_code_space                                  | internal              |
+      | remote_code_space                                     | internal              |
       | broadcast.siri.ignore_terminate_subscription_requests | true                  |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringBroadcast                            |
@@ -195,7 +195,7 @@ Feature: Support SIRI subscription
       | remote_url                                            | http://localhost:8090 |
       | remote_credential                                     | ara                   |
       | local_credential                                      | NINOXE:default        |
-      | remote_code_space                                  | internal              |
+      | remote_code_space                                     | internal              |
       | siri.envelope                                         | raw                   |
       | broadcast.siri.ignore_terminate_subscription_requests | true                  |
     And a Subscription exist with the following attributes:
@@ -274,16 +274,15 @@ Feature: Support SIRI subscription
       | Partner      | test                                                     |
       | ErrorDetails | Subscription Termination is disabled for this Subscriber |
 
-
   @ARA-1066
   Scenario: Remove all subscriptions at once with termination request using raw envelope
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ara                   |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ara                   |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
-      | siri.envelope        | raw                   |
+      | siri.envelope     | raw                   |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
@@ -339,11 +338,11 @@ Feature: Support SIRI subscription
   Scenario: Remove one subscription with termination request using raw envelope
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ara                   |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ara                   |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
-      | siri.envelope        | raw                   |
+      | siri.envelope     | raw                   |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast           |
       | ExternalId        | externalId                            |
@@ -388,11 +387,11 @@ Feature: Support SIRI subscription
   Scenario: Handle TerminateSubscriptionRequest on an unnown subscription using raw envelope
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ara                   |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ara                   |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
-      | siri.envelope        | raw                   |
+      | siri.envelope     | raw                   |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast            |
       | ExternalId        | externalId                             |
@@ -467,8 +466,8 @@ Feature: Support SIRI subscription
       | collect.include_lines | NINOXE:Line:3:LOC     |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name   | Test                            |
-      | Codes  | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -528,8 +527,8 @@ Feature: Support SIRI subscription
       | collect.include_stop_areas | NINOXE:StopArea:A:LOC |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
-      | Name  | Test                                 |
-      | Codes | "internal": "NINOXE:StopArea:A:LOC"  |
+      | Name            | Test                  |
+      | Codes[internal] | NINOXE:StopArea:A:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringCollect                         |
       | SubscriberRef     | subscriber                                    |
@@ -588,11 +587,11 @@ Feature: Support SIRI subscription
       | remote_code_space          | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
-        | Kind              | SituationExchangeCollect               |
-        | ReferenceArray[0] | Line, "internal": "NINOXE:Line::3:LOC" |
+      | Kind              | SituationExchangeCollect               |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line::3:LOC" |
     And a minute has passed
     And a minute has passed
     Then one Subscription exists with the following attributes:
@@ -627,8 +626,8 @@ Feature: Support SIRI subscription
       | siri.envelope     | raw                   |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |
@@ -724,8 +723,8 @@ Feature: Support SIRI subscription
       | collect.include_lines | NINOXE:Line:3:LOC     |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name   | Test                            |
-      | Codes  | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect              |
       | SubscriberRef     | subscriber                            |

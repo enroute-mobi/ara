@@ -40,19 +40,19 @@ Feature: Support GTFS-RT feeds
 
   Scenario: Retrieve Vehicle Positions
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                              2345 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "4567" |
+      | Codes[internal] | 4567 |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "3456"                |
+      | Codes[internal]  | 3456                              |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential     | secret   |
+      | local_credential  | secret   |
       | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
@@ -65,16 +65,16 @@ Feature: Support GTFS-RT feeds
   @ARA-872
   Scenario: Retrieve Vehicle Positions with unmatching code kind
     Given a Line exists with the following attributes:
-      | Name      | Test            |
-      | Codes | "other": "1234" |
+      | Name         | Test |
+      | Codes[other] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                              2345 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "other": "3456"                   |
+      | Codes[other]     |                              3456 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential     | secret   |
+      | local_credential  | secret   |
       | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
@@ -83,16 +83,16 @@ Feature: Support GTFS-RT feeds
   @ARA-872
   Scenario: Retrieve Vehicle Positions with connector setting gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                              2345 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "other": "3456"                   |
+      | Codes[other]     |                              3456 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential                                                   | secret   |
+      | local_credential                                                | secret   |
       | remote_code_space                                               | internal |
       | gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
@@ -105,13 +105,13 @@ Feature: Support GTFS-RT feeds
   @ARA-1044
   Scenario: Retrieve Vehicle Positions with connector setting gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "other": "2345"                   |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[other] |                              2345 |
+      | LineId       | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "internal": "3456"                |
+      | Codes[internal]  |                              3456 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | local_credential                                                           | secret   |
@@ -127,16 +127,16 @@ Feature: Support GTFS-RT feeds
   @ARA-1044
   Scenario: Retrieve Vehicle Positions with multiple setting gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "other": "2345"                   |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[other] |                              2345 |
+      | LineId       | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "internal": "3456"                |
+      | Codes[internal]  |                              3456 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential                                                           | secret        |
+      | local_credential                                                        | secret        |
       | remote_code_space                                                       | internal      |
       | gtfs-rt-vehicle-positions-broadcaster.vehicle_journey_remote_code_space | other, other2 |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
@@ -149,16 +149,16 @@ Feature: Support GTFS-RT feeds
   @ARA-1044
   Scenario: Retrieve Vehicle Positions with global setting vehicle_remote_code_space
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                              2345 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "other": "3456"                   |
+      | Codes[other]     |                              3456 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential             | secret   |
+      | local_credential          | secret   |
       | remote_code_space         | internal |
       | vehicle_remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
@@ -171,16 +171,16 @@ Feature: Support GTFS-RT feeds
   @ARA-1044
   Scenario: Retrieve Vehicle Positions with fallback on generic connector settings
     Given a Line exists with the following attributes:
-      | Name      | Test            |
-      | Codes | "other": "1234" |
+      | Name         | Test |
+      | Codes[other] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "other": "2345"                   |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[other] |                              2345 |
+      | LineId       | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "other": "3456"                   |
+      | Codes[other]     |                              3456 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential                                           | secret   |
+      | local_credential                                        | secret   |
       | remote_code_space                                       | internal |
       | gtfs-rt-vehicle-positions-broadcaster.remote_code_space | other    |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
@@ -193,17 +193,17 @@ Feature: Support GTFS-RT feeds
   @ARA-1077
   Scenario: Retrieve Vehicle Positions with OccupancyStatus
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     Given a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] | 2345                              |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     Given a Vehicle exists with the following attributes:
-      | Codes        | "internal": "3456"                |
+      | Codes[internal]  | 3456                              |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Occupancy        | fewSeatsAvailable                 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential     | secret   |
+      | local_credential  | secret   |
       | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
@@ -285,13 +285,13 @@ Feature: Support GTFS-RT feeds
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector, gtfs-rt-vehicle-positions-broadcaster] and the following settings:
       | remote_url            | http://localhost:8090 |
       | remote_credential     | test                  |
-      | remote_code_space  | internal              |
+      | remote_code_space     | internal              |
       | local_credential      | secret                |
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     And I send a GTFS-RT request to the Referential "test" with token "secret"
@@ -305,32 +305,32 @@ Feature: Support GTFS-RT feeds
   @ARA-1298
   Scenario: Retrieve Vehicle Positions with Partner remote_code_space changed
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "external": "external:1234" |
+      | Name            | Test          |
+      | Codes[external] | external:1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                              2345 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a VehicleJourney exists with the following attributes:
-      | Codes | "external": "external:2345"       |
-      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Codes[external] | external:2345                     |
+      | LineId          | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "4567" |
+      | Codes[internal] | 4567 |
     And a StopArea exists with the following attributes:
-      | Codes | "external": "external:4567" |
+      | Codes[external] | external:4567 |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "3456"                |
+      | Codes[internal]  | 3456                              |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And a Vehicle exists with the following attributes:
-      | Codes        | "external": "external:3456"       |
+      | Codes[external]  | external:3456                     |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a Partner "test" exists with connectors [gtfs-rt-vehicle-positions-broadcaster] and the following settings:
-      | local_credential              | secret   |
-      | remote_code_space          | internal |
+      | local_credential  | secret   |
+      | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
@@ -352,53 +352,53 @@ Feature: Support GTFS-RT feeds
   @ARA-1298
   Scenario: Retrieve Tip Updates with Partner remote_code_space changed
     Given a Line exists with the following attributes:
-      | Name      | Test               |
-      | Codes | "internal": "1234" |
+      | Name            | Test |
+      | Codes[internal] | 1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "2345"                |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                              2345 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "4567" |
+      | Codes[internal] | 4567  |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "3456"                |
+      | Codes[internal]  | 3456                              |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a StopVisit exists with the following attributes:
-      | Codes                       | "internal": "2345-4567-4"          |
-      | PassageOrder                    | 4                                  |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleAtStop                   | true                               |
+      | Codes[internal]             | 2345-4567-4                        |
+      | PassageOrder                | 4                                  |
+      | StopAreaId                  | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | VehicleJourneyId            | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleAtStop               | true                               |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
-      | Schedule[actual]#Arrival        | 2017-01-01T14:55:00.000+02:00      |
-      | Schedule[actual]#Departure      | 2017-01-01T14:59:00.000+02:00      |
-      | DepartureStatus                 | onTime                             |
-      | ArrivalStatus                   | onTime                             |
+      | Schedule[actual]#Arrival    | 2017-01-01T14:55:00.000+02:00      |
+      | Schedule[actual]#Departure  | 2017-01-01T14:59:00.000+02:00      |
+      | DepartureStatus             | onTime                             |
+      | ArrivalStatus               | onTime                             |
     And a Line exists with the following attributes:
-      | Name      | Test                        |
-      | Codes | "external": "external:1234" |
+      | Name            | Test          |
+      | Codes[external] | external:1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes | "external": "external:2345"       |
-      | LineId    | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+      | Codes[external] | external:2345                     |
+      | LineId          | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "external": "external:4567" |
+      | Codes[external] | external:4567  |
     And a Vehicle exists with the following attributes:
-      | Codes        | "external": "external:3456"         |
+      | Codes[external]  | external:3456                     |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And a StopVisit exists with the following attributes:
-      | Codes                       | "external": "external:2345-4567-4"          |
-      | PassageOrder                    | 4                                           |
-      | StopAreaId                      | 6ba7b814-9dad-11d1-8-00c04fd430c8           |
-      | VehicleJourneyId                | 6ba7b814-9dad-11d1-7-00c04fd430c8           |
-      | VehicleAtStop                   | true                                        |
+      | Codes[external]             | external:2345-4567-4                        |
+      | PassageOrder                | 4                                           |
+      | StopAreaId                  | 6ba7b814-9dad-11d1-8-00c04fd430c8           |
+      | VehicleJourneyId            | 6ba7b814-9dad-11d1-7-00c04fd430c8           |
+      | VehicleAtStop               | true                                        |
       | Reference[OperatorRef]#Code | "external": "external:CdF:Company::410:LOC" |
-      | Schedule[actual]#Arrival        | 2017-01-01T14:55:00.000+02:00               |
-      | Schedule[actual]#Departure      | 2017-01-01T14:59:00.000+02:00               |
-      | DepartureStatus                 | onTime                                      |
-      | ArrivalStatus                   | onTime                                      |
+      | Schedule[actual]#Arrival    | 2017-01-01T14:55:00.000+02:00               |
+      | Schedule[actual]#Departure  | 2017-01-01T14:59:00.000+02:00               |
+      | DepartureStatus             | onTime                                      |
+      | ArrivalStatus               | onTime                                      |
     And a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
-      | local_credential     | secret   |
+      | local_credential  | secret   |
       | remote_code_space | internal |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
@@ -406,7 +406,7 @@ Feature: Support GTFS-RT feeds
       | trip_id    | 2345 |
       | route_id   | 1234 |
     When the Partner "test" is updated with the following settings:
-      | local_credential     | secret   |
+      | local_credential  | secret   |
       | remote_code_space | external |
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
@@ -416,16 +416,16 @@ Feature: Support GTFS-RT feeds
 
   Scenario: Retrieve Service Alerts
     Given a Line exists with the following attributes:
-      | Name  | Test1              |
-      | Codes | "internal": "LINE1"    |
+      | Name            | Test1 |
+      | Codes[internal] | LINE1 |
     And a Line exists with the following attributes:
-      | Name  | Test2              |
-      | Codes | "internal": "LINE2" |
+      | Name            | Test2 |
+      | Codes[internal] | LINE2 |
     And a StopArea exists with the following attributes:
-      | Name  | Test1               |
-      | Codes | "internal": "STOP1" |
+      | Name            | Test1 |
+      | Codes[internal] | STOP1 |
     And a Situation exists with the following attributes:
-      | Codes                                                          | "internal" : "test"                           |
+      | Codes[internal]                                                | test                                          |
       | RecordedAt                                                     | 2017-01-01T03:30:06+02:00                     |
       | Version                                                        | 1                                             |
       | Keywords                                                       | ["Commercial", "Test"]                        |
@@ -473,7 +473,7 @@ Feature: Support GTFS-RT feeds
   @ARA-1554
   Scenario: Broadcast only ServiceAlert with matching internal tags
     Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 1                                 |
       | ReportType                   | general                           |
@@ -484,8 +484,8 @@ Feature: Support GTFS-RT feeds
       | Description[DefaultValue]    | Description Sample                |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Stop Area Sample     |
-      | Codes | "external": "sample" |
+      | Name            | Stop Area Sample |
+      | Codes[external] | sample           |
     And a SIRI Partner "test" exists with connectors [gtfs-rt-service-alerts-broadcaster] and the following settings:
       | local_credential                   | secret        |
       | remote_code_space                  | external      |
@@ -495,8 +495,8 @@ Feature: Support GTFS-RT feeds
 
   @ARA-1554
   Scenario: Do NOT broadcast ServiceAlert with unmatching internal tags
-        Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+    Given a Situation exists with the following attributes:
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 1                                 |
       | ReportType                   | general                           |
@@ -507,8 +507,8 @@ Feature: Support GTFS-RT feeds
       | Description[DefaultValue]    | Description Sample                |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Stop Area Sample     |
-      | Codes | "external": "sample" |
+      | Name            | Stop Area Sample |
+      | Codes[external] | sample           |
     And a SIRI Partner "test" exists with connectors [gtfs-rt-service-alerts-broadcaster] and the following settings:
       | local_credential                   | secret        |
       | remote_code_space                  | external      |

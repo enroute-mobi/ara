@@ -9,14 +9,14 @@ Feature: Support SIRI LinesDiscovery
       | remote_code_space | internal |
       | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name  | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name  | Line 2                          |
-      | Codes | "internal":"STIF:Line::C00273:" |
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
     And a Line exists with the following attributes:
-      | Name  | Line 3                          |
-      | Codes | "internal":"STIF:Line::C00274:" |
+      | Name            | Line 3             |
+      | Codes[internal] | STIF:Line::C00274: |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -75,15 +75,15 @@ Feature: Support SIRI LinesDiscovery
       | remote_code_space | internal |
       | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name  | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name       | Line 2                            |
-      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Codes      | "internal":"STIF:Line::C00273:"   |
+      | Name            | Line 2                            |
+      | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Codes[internal] | STIF:Line::C00273:                |
     And a Line exists with the following attributes:
-      | Name  | Line 3                          |
-      | Codes | "internal":"STIF:Line::C00274:" |
+      | Name            | Line 3             |
+      | Codes[internal] | STIF:Line::C00274: |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -240,14 +240,14 @@ Feature: Support SIRI LinesDiscovery
       | remote_code_space | internal |
       | local_url         | address  |
     And a Line exists with the following attributes:
-      | Name  | Line 1                          |
-      | Codes | "internal":"STIF:Line::C00272:" |
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
     And a Line exists with the following attributes:
-      | Name  | Line 2                          |
-      | Codes | "internal":"STIF:Line::C00273:" |
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
     And a Line exists with the following attributes:
-      | Name  | Line 3                          |
-      | Codes | "external":"STIF:Line::C00274:" |
+      | Name            | Line 3             |
+      | Codes[external] | STIF:Line::C00274: |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
