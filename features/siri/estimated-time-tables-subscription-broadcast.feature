@@ -339,6 +339,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
@@ -428,6 +429,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>L3M</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -514,6 +516,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -599,6 +602,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -746,6 +750,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
         </FramedVehicleJourneyRef>
         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+        <DestinationName>La fin.</DestinationName>
         <OperatorRef>CdF:Company::410:LOC</OperatorRef>
         <RecordedCalls>
           <RecordedCall>
@@ -879,6 +884,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -927,6 +933,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
           <RecordedCalls>
             <RecordedCall>
@@ -985,6 +992,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
           <RecordedCalls>
             <RecordedCall>
@@ -1074,6 +1082,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
@@ -1125,6 +1134,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:RecordedCalls>
             <siri:RecordedCall>
@@ -1309,6 +1319,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </FramedVehicleJourneyRef>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+      <DestinationName>La fin.</DestinationName>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
@@ -1395,6 +1406,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </FramedVehicleJourneyRef>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+      <DestinationName>La fin.</DestinationName>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
@@ -1518,6 +1530,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
@@ -1685,6 +1698,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </FramedVehicleJourneyRef>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+      <DestinationName>La fin.</DestinationName>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
@@ -1785,6 +1799,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::420:LOC</OperatorRef>
           <EstimatedCalls>
             <EstimatedCall>
@@ -1891,6 +1906,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::420:LOC</OperatorRef>
           <EstimatedCalls>
             <EstimatedCall>
@@ -2239,6 +2255,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </FramedVehicleJourneyRef>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+      <DestinationName>La fin.</DestinationName>
       <OperatorRef>CdF:Company::410:LOC</OperatorRef>
       <EstimatedCalls>
         <EstimatedCall>
@@ -2328,6 +2345,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>ch:1:ServiceJourney:87_TAC:6ba7b814</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -2424,6 +2442,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>RATPDev:VehicleJourney::6ba7b814:LOC</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -2523,6 +2542,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DatedVehicleJourneyRef>VehicleJourney:6ba7b814</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+         <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
            <EstimatedCall>
@@ -2610,6 +2630,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
              </FramedVehicleJourneyRef>
              <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+             <DestinationName>La fin.</DestinationName>
              <OperatorRef>CdF:Company::410:LOC</OperatorRef>
              <EstimatedCalls>
                <EstimatedCall>
@@ -2702,6 +2723,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
@@ -2799,6 +2821,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
+          <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
             <siri:EstimatedCall>
@@ -2898,6 +2921,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                 </FramedVehicleJourneyRef>
                 <VehicleMode>bus</VehicleMode>
                 <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+                <DestinationName>La fin.</DestinationName>
                 <OperatorRef>CdF:Company::410:LOC</OperatorRef>
                 <EstimatedCalls>
                   <EstimatedCall>

@@ -8,7 +8,8 @@
 						<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
 					</FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
 					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}{{ if .PublishedLineName }}
-					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ end }}{{ if .References.OperatorRef }}
+					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ end }}{{ if .Attributes.DestinationName }}
+					<DestinationName>{{ .Attributes.DestinationName}}</DestinationName>{{ end }}{{ if .References.OperatorRef }}
 					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
 					<RecordedCalls>{{ range .RecordedCalls }}
 						<RecordedCall>
