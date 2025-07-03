@@ -3,6 +3,7 @@ package siri
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -65,5 +66,5 @@ func (request *SIRIGeneralMessageRequest) BuildGeneralMessageRequestXML() (strin
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
-	return buffer.String(), nil
+	return strings.TrimSpace(buffer.String()), nil
 }

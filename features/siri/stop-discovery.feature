@@ -423,6 +423,7 @@ Feature: Support SIRI StopPointsDiscovery
   <S:Body>
     <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
         <siri:Status>true</siri:Status>
         <siri:AnnotatedStopPointRef>
           <siri:StopPointRef>StopArea:A</siri:StopPointRef>
@@ -430,6 +431,7 @@ Feature: Support SIRI StopPointsDiscovery
           <siri:StopName>Stop A</siri:StopName>
         </siri:AnnotatedStopPointRef>
       </Answer>
+      <AnswerExtension/>
     </sw:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
@@ -441,6 +443,7 @@ Feature: Support SIRI StopPointsDiscovery
   <S:Body>
     <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
         <siri:Status>true</siri:Status>
         <siri:AnnotatedStopPointRef>
           <siri:StopPointRef>StopArea:A</siri:StopPointRef>
@@ -448,6 +451,7 @@ Feature: Support SIRI StopPointsDiscovery
           <siri:StopName>Stop A</siri:StopName>
         </siri:AnnotatedStopPointRef>
       </Answer>
+      <AnswerExtension/>
     </sw:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
@@ -523,6 +527,7 @@ Feature: Support SIRI StopPointsDiscovery
   <S:Body>
     <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
         <siri:Status>true</siri:Status>
         <siri:AnnotatedStopPointRef>
           <siri:StopPointRef>StopArea:A</siri:StopPointRef>
@@ -533,6 +538,7 @@ Feature: Support SIRI StopPointsDiscovery
           </siri:Lines>
         </siri:AnnotatedStopPointRef>
       </Answer>
+      <AnswerExtension/>
     </sw:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
@@ -544,6 +550,7 @@ Feature: Support SIRI StopPointsDiscovery
   <S:Body>
     <sw:StopPointsDiscoveryResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
       <Answer version="2.0">
+      <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
         <siri:Status>true</siri:Status>
         <siri:AnnotatedStopPointRef>
           <siri:StopPointRef>StopArea:A</siri:StopPointRef>
@@ -554,7 +561,8 @@ Feature: Support SIRI StopPointsDiscovery
           </siri:Lines>
         </siri:AnnotatedStopPointRef>
       </Answer>
-    </sw:StopPointsDiscoveryResponse>
+      <AnswerExtension/>
+      </sw:StopPointsDiscoveryResponse>
   </S:Body>
 </S:Envelope>
       """

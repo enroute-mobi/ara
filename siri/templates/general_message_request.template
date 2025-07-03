@@ -1,11 +1,15 @@
 <siri:RequestTimestamp>{{ .RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:RequestTimestamp>
 		<siri:MessageIdentifier>{{ .MessageIdentifier }}</siri:MessageIdentifier>{{ range .InfoChannelRef }}
 		<siri:InfoChannelRef>{{ . }}</siri:InfoChannelRef>{{ end }}
-		<siri:Extensions>{{ if .XsdInWsdl }}
+		<siri:Extensions>{{ if .LineRef}}{{ if .XsdInWsdl }}
 			<siri:IDFGeneralMessageRequestFilter>{{ else }}
 			<sws:IDFGeneralMessageRequestFilter>{{ end }}{{ range .LineRef }}
-				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ range .StopPointRef }}
+				<siri:LineRef>{{ . }}</siri:LineRef>{{ end }}{{ if .XsdInWsdl }}
+			</siri:IDFGeneralMessageRequestFilter>{{ else }}
+			</sws:IDFGeneralMessageRequestFilter>{{ end }}{{ end }}{{ if .StopPointRef }}{{ if .XsdInWsdl }}
+			<siri:IDFGeneralMessageRequestFilter>{{ else }}
+			<sws:IDFGeneralMessageRequestFilter>{{ end }}{{ range .StopPointRef }}
 				<siri:StopPointRef>{{ . }}</siri:StopPointRef>{{ end }}{{ if .XsdInWsdl }}
 			</siri:IDFGeneralMessageRequestFilter>{{ else }}
-			</sws:IDFGeneralMessageRequestFilter>{{ end }}
+			</sws:IDFGeneralMessageRequestFilter>{{ end }}{{ end }}
 		</siri:Extensions>
