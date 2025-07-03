@@ -2,6 +2,7 @@ Feature: Support SIRI request
   Background:
     Given a Referential "test" is created
 
+  @skip-siri-valid
   Scenario: Handle a empty SIRI request
     When I send this SIRI request
       """
@@ -19,6 +20,7 @@ Feature: Support SIRI request
 </S:Envelope>
       """
 
+  @skip-siri-valid
   Scenario: Handle an invalid SIRI request
     When I send this SIRI request
       """

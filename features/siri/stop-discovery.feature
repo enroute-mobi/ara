@@ -627,7 +627,7 @@ Feature: Support SIRI StopPointsDiscovery
       | Codes | "internal": "StopArea:A"   |
       | Monitored | true                       |
 
-  @ARA-1298 @siri-valid
+  @ARA-1298
   Scenario: StopPointsDiscovery collect with Partner remote_code_space changed
     Given a SIRI server waits StopPointsDiscovery request on "http://localhost:8090" to respond with
       """
@@ -702,7 +702,7 @@ Feature: Support SIRI StopPointsDiscovery
     Then a StopArea "external":"NINOXE:StopPoint:BP:6:LOC" should exist
     And a StopArea "external":"NINOXE:StopPoint:BP:7:LOC" should exist
 
-  @ARA-1298 @siri-valid
+  @ARA-1298
   Scenario: Handle a SIRI StopPointsDiscovery request with Partner remote_code_space changed
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential     | test     |
@@ -821,7 +821,7 @@ Feature: Support SIRI StopPointsDiscovery
 </S:Envelope>
       """
 
-  @ARA-1545 @siri-valid
+  @ARA-1545
   Scenario: Handle a SIRI StopPointsDiscovery request with StopArea ReferentId and Lines ReferentId
     Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
       | local_credential  | test     |

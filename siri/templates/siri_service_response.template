@@ -9,5 +9,4 @@
 		{{ .BuildGeneralMessageDeliveryXML }}{{ end }}{{ range .EstimatedTimetableDeliveries }}
 		{{ .BuildEstimatedTimetableDeliveryXML }}{{ end }}
 	</Answer>
-	<AnswerExtension />
 </sw:GetSiriServiceResponse>

@@ -76,7 +76,7 @@ Feature: Support SIRI GetSIRI
                       <m0:RequestTimestamp>2001-12-17T09:30:47Z</m0:RequestTimestamp>
                       <m0:RequestorRef>RATPDEV:Concerto</m0:RequestorRef>
                       <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
-                      <m0:DelegatorRef/>
+                      <m0:DelegatorRef>TEST</m0:DelegatorRef>
                       <m0:StopMonitoringRequest version="2.0:FR-IDF-2.4">
                           <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
                           <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
@@ -179,7 +179,6 @@ Feature: Support SIRI GetSIRI
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension/>
           </sw:GetSiriServiceResponse>
         </S:Body>
       </S:Envelope>
@@ -264,7 +263,7 @@ Feature: Support SIRI GetSIRI
                       <m0:RequestTimestamp>2001-12-17T09:30:47Z</m0:RequestTimestamp>
                       <m0:RequestorRef>RATPDEV:Concerto</m0:RequestorRef>
                       <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
-                      <m0:DelegatorRef/>
+                      <m0:DelegatorRef>TEST</m0:DelegatorRef>
                       <m0:StopMonitoringRequest version="2.0:FR-IDF-2.4">
                           <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
                           <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
@@ -339,7 +338,6 @@ Feature: Support SIRI GetSIRI
                 </siri:ErrorCondition>
               </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension/>
           </sw:GetSiriServiceResponse>
         </S:Body>
       </S:Envelope>
@@ -419,7 +417,7 @@ Feature: Support SIRI GetSIRI
                       <m0:RequestTimestamp>2001-12-17T09:30:47Z</m0:RequestTimestamp>
                       <m0:RequestorRef>RATPDEV:Concerto</m0:RequestorRef>
                       <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
-                      <m0:DelegatorRef/>
+                      <m0:DelegatorRef>TEST</m0:DelegatorRef>
                       <m0:StopMonitoringRequest version="2.0:FR-IDF-2.4">
                           <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
                           <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
@@ -478,7 +476,6 @@ Feature: Support SIRI GetSIRI
           </siri:MonitoredStopVisit>
         </siri:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension/>
     </sw:GetSiriServiceResponse>
   </S:Body>
 </S:Envelope>
@@ -497,7 +494,7 @@ Feature: Support SIRI GetSIRI
                       <m0:RequestTimestamp>2001-12-17T09:30:47Z</m0:RequestTimestamp>
                       <m0:RequestorRef>RATPDEV:Concerto</m0:RequestorRef>
                       <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
-                      <m0:DelegatorRef/>
+                      <m0:DelegatorRef>TEST</m0:DelegatorRef>
                       <m0:StopMonitoringRequest version="2.0:FR-IDF-2.4">
                           <m0:RequestTimestamp>2017-01-10T16:30:47Z</m0:RequestTimestamp>
                           <m0:MessageIdentifier>GetSIRIStopMonitoring:Test:0</m0:MessageIdentifier>
@@ -560,7 +557,6 @@ Feature: Support SIRI GetSIRI
                </siri:MonitoredStopVisit>
              </siri:StopMonitoringDelivery>
            </Answer>
-           <AnswerExtension />
            </sw:GetSiriServiceResponse>
          </S:Body>
        </S:Envelope>

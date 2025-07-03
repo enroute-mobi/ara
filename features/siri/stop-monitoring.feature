@@ -1396,7 +1396,7 @@ Feature: Support SIRI StopMonitoring
 </S:Envelope>
       """
 
-@ARA-1317 @siri-valid
+@ARA-1317
 Scenario: Update Partner Collect Settings
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
@@ -1466,7 +1466,7 @@ Scenario: Update Partner Collect Settings
     And a minute has passed
     Then the SIRI server should have received 1 GetStopMonitoring request
 
-@ARA-1298 @siri-valid
+@ARA-1298
 Scenario: Update Partner Collect remote_code_space
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """

@@ -440,7 +440,7 @@ Feature: Support SIRI EstimatedTimetable
       | ArrivalStatus              | delayed                                   |
       | Schedule[expected]#Arrival | 2017-01-01T15:10:01Z                      |
 
-  @ARA-1411 @siri-valid
+  @ARA-1411
   Scenario: RAW EstimatedTimetable subscription collect should send EstimatedTimetableSubscriptionRequest to partner
    Given a raw SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-collector] and the following settings:
@@ -459,7 +459,7 @@ Feature: Support SIRI EstimatedTimetable
    Then the SIRI server should have received a raw EstimatedTimetableSubscriptionRequest request with:
      | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
-  @ARA-1411 @siri-valid
+  @ARA-1411
   Scenario: Create ara models after a RAW EstimatedTimetableDelivery in a subscription
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -563,7 +563,7 @@ Feature: Support SIRI EstimatedTimetable
       | VehicleJourneys | ["NINOXE:VehicleJourney:201"]  |
       | Lines           | ["NINOXE:Line:3:LOC"]          |
 
-  @wip @ARA-1465 @siri-valid
+  @wip @ARA-1465
   Scenario: Create ara models after an EstimatedTimetableDelivery with multiple Estimated VehicleJourneys in a subscription
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """

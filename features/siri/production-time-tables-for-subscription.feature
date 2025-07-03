@@ -1,4 +1,3 @@
-@siri-valid
 Feature: Support SIRI ProductionTimetable by subscription
 
   Background:

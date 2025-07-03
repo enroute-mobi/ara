@@ -265,7 +265,7 @@ Feature: Support SIRI StopMonitoring by request
     Then one StopVisit has the following attributes:
       | Codes | "internal": "SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC-6" |
 
-  @siri-valid
+ 
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
@@ -373,7 +373,7 @@ Feature: Support SIRI StopMonitoring by request
       | VehicleJourneys    | ["NINOXE:VehicleJourney:201"] |
       | Lines              | ["NINOXE:Line:3:LOC"]         |
 
-  @siri-valid
+ 
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner which respond with multiple deliveries
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
@@ -987,7 +987,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DistanceFromStop                          | 800                                                                  | StopVisit#Attribute[DistanceFromStop]                 |   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:NumberOfStopsAway                         | 1                                                                    | StopVisit#Attribute[NumberOfStopsAway]                |   |
 
-  @siri-valid
+ 
   Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
@@ -3241,7 +3241,7 @@ Feature: Support SIRI StopMonitoring by request
       </S:Envelope>
       """
 
-  @siri-valid @ARA-1591
+  @ARA-1591
   Scenario: StopMonitoringDelivery with Status false for one Delivery is logged as an Error status in BigQuery
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """

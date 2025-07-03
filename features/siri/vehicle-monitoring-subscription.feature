@@ -76,7 +76,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
       | //siri:LineRef | RLA_Bus:Line::05:LOC |
 
-  @ARA-1236 @siri-valid
+  @ARA-1236
   Scenario: Send a VehicleMonitoring notification when a vehicle changes
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
@@ -236,7 +236,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Vehicles                | ["Test:Vehicle:201123:LOC", "Test:Vehicle:999:LOC"] |
       | VehicleJourneys         | ["Test:VehicleJourney:201:LOC"]                     |
 
-  @ARA-1236 @siri-valid
+  @ARA-1236
   Scenario: Delete and recreate SIRI VehicleMonitoring request for subscription when receiving subscription with same existing number
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
        | remote_url                        | http://localhost:8090 |
@@ -353,7 +353,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Kind            | VehicleMonitoringBroadcast        |
       | ExternalId      | test2                             |
 
-  @ARA-1236 @siri-valid
+  @ARA-1236
   Scenario: Handle a SIRI VehicleMonitoring request for subscription to all lines
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
        | remote_url        | http://localhost:8090 |
@@ -400,7 +400,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Status                  | OK                                   |
       | SubscriptionIdentifiers | ["test1"]                            |
 
-  @ARA-1236 @siri-valid
+  @ARA-1236
   Scenario: Handle a SIRI VehicleMonitoring request for subscription for all existing lines in a referential only with same remote_code_space
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
@@ -449,7 +449,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
     Then No Subscriptions exist with the following resources:
       | internal | NINOXE:Line:3:LOC |
 
-  @ARA-1236 @siri-valid
+  @ARA-1236
   Scenario: Handle a SIRI VehicleMonitoring request for subscription to a line not existing in a referential
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
@@ -533,7 +533,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Status    | Error                                |
       | Lines     | ["testLine"]                         |
 
-   @ARA-1236 @siri-valid
+   @ARA-1236
   Scenario: Handle a SIRI VehicleMonitoring request for subscription to a single line
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
@@ -940,7 +940,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       Then the VehicleJourney "6ba7b814-9dad-11d1-a-00c04fd430c8" has the following attributes:
       | DirectionType | inbound |
 
-  @ARA-1414 @ARA-1474 @siri-valid
+  @ARA-1414 @ARA-1474
   Scenario: RAW VehicleMonitoring subscription collect should send VehicleMonitoringSubscriptionRequest to partner
    Given a raw SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-vehicle-monitoring-subscription-collector] and the following settings:
@@ -962,7 +962,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
    Then the SIRI server should have received a raw VehicleMonitoringSubscriptionRequest request with:
      | //siri:LineRef | ["RLA_Bus:Line::05:LOC","RLA_Bus:Line::06:LOC"] |
 
-  @ARA-1414 @siri-valid
+  @ARA-1414
   Scenario: Create Ara models after a RAW VehicleMonitoringDelivery in a subscription
     Given a raw SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -1078,7 +1078,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         | StopAreas       | ["50000016"]                              |
         | Lines           | ["testLine"]                              |
 
-  @ARA-1363 @siri-valid
+  @ARA-1363
   Scenario: Send a VehicleMonitoring notification when a vehicle changes using the generator setting reference_vehicle_journey_identifier
     Given a SIRI server on "http://localhost:8090"
     # Setting a Partner without default generators
@@ -1171,7 +1171,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Vehicles                | ["Test:Vehicle:201123:LOC"]             |
       | VehicleJourneys         | ["ch:1:ServiceJourney:87_TAC:6ba7b814"] |
 
-  @ARA-1363 @siri-valid
+  @ARA-1363
   Scenario: Send a VehicleMonitoring notification when a vehicle changes using the default generator should send DatedVehicleJourneyRef according to default setting
     Given a SIRI server on "http://localhost:8090"
     # Setting a "SIRI Partner" with default generators
@@ -1263,7 +1263,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Vehicles                | ["Test:Vehicle:201123:LOC"]              |
       | VehicleJourneys         | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |
 
-  @ARA-1476 @siri-valid
+  @ARA-1476
   Scenario: Handle multiple Lines in Subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
