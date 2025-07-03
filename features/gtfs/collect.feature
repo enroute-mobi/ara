@@ -37,11 +37,11 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space | internal              |
     When a minute has passed
     Then one StopArea has the following attributes:
-      | Codes | "internal": "StopArea:A" |
+      | Codes[internal] | StopArea:A |
     And one StopVisit has the following attributes:
-      | Codes           | "internal": "Trip:A-1" |
-      | ArrivalStatus   | cancelled              |
-      | DepartureStatus | cancelled              |
+      | Codes[internal] | Trip:A-1  |
+      | ArrivalStatus   | cancelled |
+      | DepartureStatus | cancelled |
 
   @ARA-878
   Scenario: Collect GTFS TripUpdate (with stop_id)
@@ -97,28 +97,28 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space | internal              |
     When a minute has passed
     Then one StopArea has the following attributes:
-      | Codes | "internal": "StopArea:A" |
+      | Codes[internal] | StopArea:A |
     And one StopArea has the following attributes:
-      | Codes | "internal": "StopArea:B" |
+      | Codes[internal] | StopArea:B |
     And one StopArea has the following attributes:
-      | Codes | "internal": "StopArea:C" |
+      | Codes[internal] | StopArea:C |
     And one Line has the following attributes:
-      | Codes | "internal": "Line:1" |
+      | Codes[internal] | Line:1 |
     And one VehicleJourney has the following attributes:
-      | Codes  | "internal": "Trip:A"              |
-      | LineId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Codes[internal] | Trip:A                            |
+      | LineId          | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                        | "internal": "Trip:A-1"    |
+      | Codes[internal]              | Trip:A-1                  |
       | PassageOrder                 | 1                         |
       | Schedule[expected]#Departure | 2017-01-01T13:00:00+01:00 |
       | Schedule[expected]#Arrival   | 2017-01-01T13:00:00+01:00 |
     And one StopVisit has the following attributes:
-      | Codes                        | "internal": "Trip:A-2"    |
+      | Codes[internal]              | Trip:A-2                  |
       | PassageOrder                 | 2                         |
       | Schedule[expected]#Arrival   | 2017-01-01T13:01:00+01:00 |
       | Schedule[expected]#Departure | 2017-01-01T13:01:30+01:00 |
     And one StopVisit has the following attributes:
-      | Codes                        | "internal": "Trip:A-3"    |
+      | Codes[internal]              | Trip:A-3                  |
       | PassageOrder                 | 3                         |
       | Schedule[expected]#Arrival   | 2017-01-01T13:02:30+01:00 |
       | Schedule[expected]#Departure | 2017-01-01T13:02:30+01:00 |
@@ -170,30 +170,30 @@ Feature: Collect realtime data via GTFS-RT feeds
       }
       """
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "StopArea:A" |
+      | Codes[internal] | "StopArea:A" |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "StopArea:B" |
+      | Codes[internal] | "StopArea:B" |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "StopArea:C" |
+      | Codes[internal] | "StopArea:C" |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Line:1" |
+      | Codes[internal] | "Line:1" |
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "Trip:A"              |
+      | Codes[internal]  | "Trip:A"              |
       | LineId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And a StopVisit exists with the following attributes:
-      | Codes                      | "internal": "Trip:A-1"            |
+      | Codes[internal]            | Trip:A-1                          |
       | PassageOrder               | 1                                 |
       | VehicleJourneyId           | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | StopAreaId                 | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       | Schedule[expected]#Arrival | 2017-01-01T12:50:00+01:00         |
     And a StopVisit exists with the following attributes:
-      | Codes                      | "internal": "Trip:A-2"            |
+      | Codes[internal]            | Trip:A-2                          |
       | PassageOrder               | 2                                 |
       | VehicleJourneyId           | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | StopAreaId                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Schedule[expected]#Arrival | 2017-01-01T12:55:00+01:00         |
     And a StopVisit exists with the following attributes:
-      | Codes                      | "internal": "Trip:A-3"            |
+      | Codes[internal]            | Trip:A-3                          |
       | PassageOrder               | 3                                 |
       | VehicleJourneyId           | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | StopAreaId                 | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
@@ -203,19 +203,19 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space | internal              |
     When a minute has passed
     And one StopVisit has the following attributes:
-      | Codes                        | "internal": "Trip:A-1"            |
+      | Codes[internal]              | Trip:A-1                          |
       | PassageOrder                 | 1                                 |
       | Schedule[expected]#Departure | 2017-01-01T13:00:00+01:00         |
       | Schedule[expected]#Arrival   | 2017-01-01T13:00:00+01:00         |
       | StopAreaId                   | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                        | "internal": "Trip:A-2"            |
+      | Codes[internal]              | Trip:A-2                          |
       | PassageOrder                 | 2                                 |
       | Schedule[expected]#Arrival   | 2017-01-01T13:01:00+01:00         |
       | Schedule[expected]#Departure | 2017-01-01T13:01:30+01:00         |
       | StopAreaId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes                        | "internal": "Trip:A-3"            |
+      | Codes[internal]              | Trip:A-3                          |
       | PassageOrder                 | 3                                 |
       | Schedule[expected]#Arrival   | 2017-01-01T13:02:30+01:00         |
       | Schedule[expected]#Departure | 2017-01-01T13:02:30+01:00         |
@@ -254,23 +254,23 @@ Feature: Collect realtime data via GTFS-RT feeds
         }
       """
     And a Line exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "270856"              |
-      | LineId | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                            270856 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
     And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
       | remote_url        | http://localhost:8090 |
       | remote_code_space | internal              |
     When a minute has passed
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "bus-234"             |
+      | Codes[internal]  | bus-234                           |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Occupancy        | fewSeatsAvailable                 |
     And one VehicleJourney has the following attributes:
-      | Codes     | "internal": "270856" |
-      | Occupancy | fewSeatsAvailable    |
+      | Codes[internal] |            270856 |
+      | Occupancy       | fewSeatsAvailable |
 
   @ARA-1047
   Scenario: Collect GTFS VehiclePosition (with stop_id)
@@ -305,18 +305,18 @@ Feature: Collect realtime data via GTFS-RT feeds
         }
       """
     And a Line exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "270856"              |
-      | LineId | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                            270856 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
     And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
       | remote_url        | http://localhost:8090 |
       | remote_code_space | internal              |
     When a minute has passed
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "bus-234"             |
+      | Codes[internal]  | bus-234                           |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Bearing          | 91.0                              |
@@ -354,17 +354,17 @@ Feature: Collect realtime data via GTFS-RT feeds
         }
       """
     And a Line exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
       # 6ba7b814-9dad-11d1-1-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "270856"              |
-      | LineId | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                            270856 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       # 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes                   | "internal": "270856-1234"         |
+      | Codes[internal]         | 270856-1234                       |
       | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       | VehicleJourneyId        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -375,7 +375,7 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space | internal              |
     When a minute has passed
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "bus-234"             |
+      | Codes[internal]  | bus-234                           |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Bearing          | 91.0                              |
@@ -414,17 +414,17 @@ Feature: Collect realtime data via GTFS-RT feeds
         }
       """
     And a Line exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
       # 6ba7b814-9dad-11d1-1-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "270856"              |
-      | LineId | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal] |                            270856 |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       # 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes                   | "internal": "270856-1234-6"       |
+      | Codes[internal]         | 270856-1234-6                     |
       | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       | VehicleJourneyId        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -432,7 +432,7 @@ Feature: Collect realtime data via GTFS-RT feeds
       | Schedule[aimed]#Arrival | 2017-01-01T12:55:00.000+02:00     |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes                   | "internal": "270856-1234-22"      |
+      | Codes[internal]         | 270856-1234-22                    |
       | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
       | VehicleJourneyId        | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -444,7 +444,7 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space | internal              |
     When a minute has passed
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "bus-234"             |
+      | Codes[internal]  | bus-234                           |
       | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Bearing          | 91.0                              |
@@ -482,15 +482,15 @@ Feature: Collect realtime data via GTFS-RT feeds
         }
       """
     And a Line exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes     | "internal": "270856"              |
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
-      | Occupancy | fewSeatsAvailable                 |
+      | Codes[internal] | 270856                            |
+      | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Occupancy       | fewSeatsAvailable                 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "1234" |
+      | Codes[internal] | 1234 |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "bus-234"             |
+      | Codes[internal]  | bus-234                           |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Occupancy        | fewSeatsAvailable                 |
     And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
@@ -498,12 +498,12 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space | internal              |
     When a minute has passed
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "bus-234"             |
+      | Codes[internal]  | bus-234                           |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Occupancy        | fewSeatsAvailable                 |
     Then one VehicleJourney has the following attributes:
-      | Codes     | "internal": "270856" |
-      | Occupancy | fewSeatsAvailable    |
+      | Codes[internal] |            270856 |
+      | Occupancy       | fewSeatsAvailable |
 
     Scenario: Collect GTFS ServiceAlert
     Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
@@ -553,14 +553,14 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_url        | http://localhost:8090 |
       | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Tram:A" |
+      | Codes[internal] | Tram:A |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Bus:A" |
+      | Codes[internal] | Bus:A |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "94" |
+      | Codes[internal] | 94 |
     When a minute has passed
     Then one Situation has the following attributes:
-      | Codes                                                          | "internal" : "entity_id"                                   |
+      | Codes[internal]                                                | entity_id                                                  |
       | Origin                                                         | gtfs                                                       |
       | RecordedAt                                                     | 2017-01-01T12:01:00Z                                       |
       | Version                                                        | 5542761353770188895                                        |
@@ -635,14 +635,14 @@ Feature: Collect realtime data via GTFS-RT feeds
       | remote_code_space                | internal              |
       | collect.situations.internal_tags | first,second          |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Tram:A" |
+      | Codes[internal] | Tram:A |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Bus:A" |
+      | Codes[internal] | Bus:A |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "94" |
+      | Codes[internal] | 94 |
     When a minute has passed
     Then one Situation has the following attributes:
-      | Codes                                                          | "internal" : "entity_id"                                   |
+      | Codes[internal]                                                | entity_id                                                  |
       | Origin                                                         | gtfs                                                       |
       | InternalTags                                                   | ["first","second"]                                         |
       | RecordedAt                                                     | 2017-01-01T12:01:00Z                                       |

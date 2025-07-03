@@ -164,8 +164,8 @@ Feature: Manages Controls
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name  | Test 1                                   |
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test 1                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then a Control Message should exist with these attributes:

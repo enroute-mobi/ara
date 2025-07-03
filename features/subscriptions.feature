@@ -11,13 +11,13 @@ Feature: Subscription Management
       | local_credential     | NINOXE:default        |
       | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
-      | CodeSpace                  | StopMonitoringBroadcast                            |
+      | CodeSpace             | StopMonitoringBroadcast                            |
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | SubscribeResourcesNow | true                                               |
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
-      | CodeSpace                  | StopMonitoringBroadcast                            |
+      | CodeSpace             | StopMonitoringBroadcast                            |
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       | SubscribeResourcesNow | true                                               |
@@ -43,7 +43,7 @@ Feature: Subscription Management
       | local_credential     | NINOXE:default        |
       | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
-      | CodeSpace                  | StopMonitoringBroadcast                            |
+      | CodeSpace             | StopMonitoringBroadcast                            |
       | ExternalId            | ExternalId                                         |
       | ReferenceArray[0]     | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
       | ReferenceArray[1]     | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |

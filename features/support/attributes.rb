@@ -83,6 +83,13 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    if key =~ /Codes\[([^\]]+)\]/
+      name = $1
+      attributes["Codes"] ||= {}
+      attributes["Codes"][name] = value
+      attributes.delete key
+    end
+
     if key =~ /Attribute\[([^\]]+)\]/
       name = $1
       attributes["Attributes"] ||= {}
@@ -227,10 +234,6 @@ def model_attributes(table)
 
       attributes.delete key
     end
-  end
-
-  if codes = (attributes["Codes"] || attributes["Codes"])
-    attributes["Codes"] = JSON.parse("{ #{codes} }")
   end
 
   if settings = attributes["Settings"]

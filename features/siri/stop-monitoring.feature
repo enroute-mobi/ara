@@ -62,25 +62,28 @@ Feature: Support SIRI StopMonitoring
 </soap:Envelope>
         """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ratpdev               |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ratpdev               |
       | remote_code_space | internal              |
     And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
-      | local_credential     | STIF                                           |
+      | local_credential  | STIF                                           |
       | remote_code_space | external                                       |
-      | remote_credential    | RATPDev                                        |
-      | local_url            | https://api.concerto.ratpdev.com/concerto/siri |
+      | remote_credential | RATPDev                                        |
+      | local_url         | https://api.concerto.ratpdev.com/concerto/siri |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Ligne 415                                                         |
-      | Codes | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
+      | Name            | Ligne 415          |
+      | Codes[internal] | CdF:Line::415:LOC  |
+      | Codes[external] | STIF:Line::C00001: |
     And a StopArea exists with the following attributes:
-      | Name      | Arletty                                                             |
-      | Codes | "internal": "boaarle", "external": "STIF:StopPoint:Q:eeft52df543d:" |
+      | Name            | Arletty                        |
+      | Codes[internal] | boaarle                        |
+      | Codes[external] | STIF:StopPoint:Q:eeft52df543d: |
     And a StopArea exists with the following attributes:
-      | Name            | Test 2                                                               |
-      | Codes       | "internal": "boabonn", "external": "STIF:StopPoint:Q:875fdetgyh765:" |
-      | CollectedAlways | false                                                                |
+      | Name            | Test 2                          |
+      | Codes[internal] | boabonn                         |
+      | Codes[external] | STIF:StopPoint:Q:875fdetgyh765: |
+      | CollectedAlways | false                           |
     And a minute has passed
     When I send this SIRI request
       """
@@ -227,22 +230,24 @@ Feature: Support SIRI StopMonitoring
 </soap:Envelope>
         """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ratpdev               |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ratpdev               |
       | remote_code_space | internal              |
     And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                           | STIF                                           |
-      | remote_code_space                       | external                                       |
+      | remote_code_space                          | external                                       |
       | remote_credential                          | RATPDev                                        |
       | local_url                                  | https://api.concerto.ratpdev.com/concerto/siri |
       | broadcast.no_destinationref_rewriting_from | ineo                                           |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Ligne 415                                                         |
-      | Codes | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
+      | Name             | Ligne 415          |
+      | Codes[internal]  | CdF:Line::415:LOC  |
+      | Codes[external]  | STIF:Line::C00001: |
     And a StopArea exists with the following attributes:
-      | Name      | Arletty                                                             |
-      | Codes | "internal": "boaarle", "external": "STIF:StopPoint:Q:eeft52df543d:" |
+      | Name            | Arletty                        |
+      | Codes[internal] | boaarle                        |
+      | Codes[external] | STIF:StopPoint:Q:eeft52df543d: |
     And a minute has passed
     When I send this SIRI request
       """
@@ -389,22 +394,24 @@ Feature: Support SIRI StopMonitoring
 </soap:Envelope>
         """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ratpdev               |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ratpdev               |
       | remote_code_space | internal              |
     And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
       | local_credential                         | STIF                                           |
-      | remote_code_space                     | external                                       |
+      | remote_code_space                        | external                                       |
       | remote_credential                        | RATPDev                                        |
       | local_url                                | https://api.concerto.ratpdev.com/concerto/siri |
       | broadcast.no_dataframeref_rewriting_from | ineo                                           |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Ligne 415                                                         |
-      | Codes | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
+      | Name            | Ligne 415          |
+      | Codes[internal] | CdF:Line::415:LOC  |
+      | Codes[external] | STIF:Line::C00001: |
     And a StopArea exists with the following attributes:
-      | Name      | Arletty                                                             |
-      | Codes | "internal": "boaarle", "external": "STIF:StopPoint:Q:eeft52df543d:" |
+      | Name            | Arletty                        |
+      | Codes[internal] | boaarle                        |
+      | Codes[external] | STIF:StopPoint:Q:eeft52df543d: |
     And a minute has passed
     When I send this SIRI request
       """
@@ -551,24 +558,27 @@ Feature: Support SIRI StopMonitoring
 </soap:Envelope>
         """
      And a Partner "ineo" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ratpdev               |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ratpdev               |
       | remote_code_space | internal              |
     And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
-      | local_credential     | STIF     |
+      | local_credential  | STIF     |
       | remote_code_space | external |
-      | remote_credential    | RATPDev  |
+      | remote_credential | RATPDev  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Ligne 415                                                         |
-      | Codes | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
+      | Name            | Ligne 415          |
+      | Codes[internal] | CdF:Line::415:LOC  |
+      | Codes[external] | STIF:Line::C00001: |
     And a StopArea exists with the following attributes:
-      | Name      | Arletty                                                                |
-      | Codes | "internal": "boaarle", "external": "RATPDev:StopPoint:Q:eeft52df543d:" |
+      | Name            | Arletty                           |
+      | Codes[internal] | boaarle                           |
+      | Codes[external] | RATPDev:StopPoint:Q:eeft52df543d: |
     And a StopArea exists with the following attributes:
-      | Name            | Test 2                                                                  |
-      | Codes       | "internal": "boabonn", "external": "RATPDev:StopPoint:Q:875fdetgyh765:" |
-      | CollectedAlways | false                                                                   |
+      | Name            | Test 2                             |
+      | Codes[internal] | boabonn                            |
+      | Codes[external] | RATPDev:StopPoint:Q:875fdetgyh765: |
+      | CollectedAlways | false                              |
     And a minute has passed
     And the SIRI server waits a GetStopMonitoring request to respond with
       """
@@ -832,13 +842,13 @@ Feature: Support SIRI StopMonitoring
       </soap:Envelope>
         """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | Test                  |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | Test                  |
       | remote_code_space | internal              |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name      | Arletty               |
-      | Codes | "internal": "boaarle" |
+      | Name            | Arletty |
+      | Codes[internal] | boaarle |
     And a minute has passed
     And the SIRI server waits a GetStopMonitoring request to respond with
       # include a MonitoredStopVisit/ItemIdentifier A at 14:00
@@ -855,7 +865,7 @@ Feature: Support SIRI StopMonitoring
               <ns5:ResponseMessageIdentifier>NAVINEO:SM:RQ:107</ns5:ResponseMessageIdentifier>
               <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+ <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:siri="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:StopMonitoringDelivery version="1.3">
                 <ns5:ResponseTimestamp>2017-01-01T12:02:00.000+01:00</ns5:ResponseTimestamp>
                 <ns5:RequestMessageRef>StopMonitoring:Test:0</ns5:RequestMessageRef>
@@ -936,27 +946,27 @@ Feature: Support SIRI StopMonitoring
     When the SIRI server has received 2 GetStopMonitoring requests
     Then one StopVisit has the following attributes:
       # "internal": "A"
-      | Codes       | "internal": "StopVisit:A" |
-      | DepartureStatus | onTime                    |
-      | ArrivalStatus   | onTime                    |
+      | Codes[internal] | StopVisit:A |
+      | DepartureStatus | onTime      |
+      | ArrivalStatus   | onTime      |
     Then one StopVisit has the following attributes:
       # "internal": "B"
-      | Codes   | "internal": "StopVisit:B" |
-      | Collected   | false                     |
-      | CollectedAt | 2017-01-01T12:02:00Z      |
+      | Codes[internal] | StopVisit:B          |
+      | Collected       | false                |
+      | CollectedAt     | 2017-01-01T12:02:00Z |
     Then one StopVisit has the following attributes:
       # "internal": "C"
-      | Codes       | "internal": "StopVisit:C" |
-      | DepartureStatus | onTime                    |
-      | ArrivalStatus   | onTime                    |
+      | Codes[internal] | StopVisit:C |
+      | DepartureStatus | onTime      |
+      | ArrivalStatus   | onTime      |
     And 10 seconds have passed
     Then one StopVisit has the following attributes:
       # "internal": "B"
-      | Codes       | "internal": "StopVisit:B" |
-      | Collected       | false                     |
-      | CollectedAt     | 2017-01-01T12:02:00Z      |
-      | DepartureStatus | departed                  |
-      | ArrivalStatus   | arrived                   |
+      | Codes[internal] | StopVisit:B          |
+      | Collected       | false                |
+      | CollectedAt     | 2017-01-01T12:02:00Z |
+      | DepartureStatus | departed             |
+      | ArrivalStatus   | arrived              |
 
   Scenario: 2939 - Partner Setting collect.include_stop_areas is used to select the best Partner
     Given a SIRI server "first" waits GetStopMonitoring request on "http://localhost:8090" to respond with
@@ -1076,18 +1086,18 @@ Feature: Support SIRI StopMonitoring
     And a Partner "first" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                 | http://localhost:8090 |
       | collect.include_stop_areas | first                 |
-      | remote_code_space       | external              |
+      | remote_code_space          | external              |
       | remote_credential          | dummy                 |
     And a Partner "second" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
       | remote_url                 | http://localhost:8091 |
       | collect.include_stop_areas | second                |
-      | remote_code_space       | external              |
+      | remote_code_space          | external              |
       | remote_credential          | dummy                 |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Codes | "external": "first" |
+      | Codes[external] | first |
     And a StopArea exists with the following attributes:
-      | Codes | "external": "second" |
+      | Codes[external] | second |
     When a minute has passed
     Then the "first" SIRI server should have received a GetStopMonitoring request with:
       | //siri:MonitoringRef | first |
@@ -1210,18 +1220,18 @@ Feature: Support SIRI StopMonitoring
       </soap:Envelope>
         """
     And a Partner "first" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | collect.priority     | 1                     |
+      | remote_url        | http://localhost:8090 |
+      | collect.priority  | 1                     |
       | remote_code_space | external              |
-      | remote_credential    | dummy                 |
+      | remote_credential | dummy                 |
     And a Partner "second" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8091 |
-      | collect.priority     | 2                     |
+      | remote_url        | http://localhost:8091 |
+      | collect.priority  | 2                     |
       | remote_code_space | external              |
-      | remote_credential    | dummy                 |
+      | remote_credential | dummy                 |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Codes | "external": "single" |
+      | Codes[external] | single |
     When a minute has passed
     Then the "first" SIRI server should not have received a GetStopMonitoring request
     Then the "second" SIRI server should have received a GetStopMonitoring request with:
@@ -1230,11 +1240,13 @@ Feature: Support SIRI StopMonitoring
   @ARA-1031
   Scenario: Collect and broadcast with SIRI StopMonitoring an already defined Vehicle Journey
     Given a Line exists with the following attributes:
-      | Name      | Ligne 415                                                         |
-      | Codes | "internal": "CdF:Line::415:LOC", "external": "STIF:Line::C00001:" |
+      | Name            | Ligne 415          |
+      | Codes[internal] | CdF:Line::415:LOC  |
+      | Codes[external] | STIF:Line::C00001: |
     And a VehicleJourney exists with the following attributes:
-      | Codes | "internal": "1STD721687165983", "external":"public"|
-      | LineId    | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | Codes[internal]   | 1STD721687165983                  |
+      | Codes[external]   | public                            |
+      | LineId            | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
     And a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
         """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -1293,22 +1305,24 @@ Feature: Support SIRI StopMonitoring
 </soap:Envelope>
         """
     And a Partner "ineo" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | ratpdev               |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | ratpdev               |
       | remote_code_space | internal              |
     And a SIRI Partner "stif" exists with connectors [siri-stop-monitoring-request-broadcaster] and the following settings:
-      | local_credential     | STIF                                           |
+      | local_credential  | STIF                                           |
       | remote_code_space | external                                       |
-      | remote_credential    | RATPDev                                        |
-      | local_url            | https://api.concerto.ratpdev.com/concerto/siri |
+      | remote_credential | RATPDev                                        |
+      | local_url         | https://api.concerto.ratpdev.com/concerto/siri |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name      | Arletty                                                             |
-      | Codes | "internal": "boaarle", "external": "STIF:StopPoint:Q:eeft52df543d:" |
+      | Name            | Arletty                        |
+      | Codes[internal] | boaarle                        |
+      | Codes[external] | STIF:StopPoint:Q:eeft52df543d: |
     And a StopArea exists with the following attributes:
-      | Name            | Test 2                                                               |
-      | Codes       | "internal": "boabonn", "external": "STIF:StopPoint:Q:875fdetgyh765:" |
-      | CollectedAlways | false                                                                |
+      | Name            | Test 2                          |
+      | Codes[internal] | boabonn                         |
+      | Codes[external] | STIF:StopPoint:Q:875fdetgyh765: |
+      | CollectedAlways | false                           |
     And a minute has passed
     When I send this SIRI request
       """
@@ -1449,18 +1463,18 @@ Scenario: Update Partner Collect Settings
       </soap:Envelope>
         """
     And a StopArea exists with the following attributes:
-      | Codes | "external": "target" |
+      | Codes[external] | target |
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                     | http://localhost:8090 |
-      | collect.include_stop_areas     | other                 |
-      | remote_code_space           | external              |
-      | remote_credential              | dummy                 |
+      | remote_url                 | http://localhost:8090 |
+      | collect.include_stop_areas | other                 |
+      | remote_code_space          | external              |
+      | remote_credential          | dummy                 |
     And a minute has passed
     And a minute has passed
     And the Partner "test" is updated with the following settings:
       | remote_url                 | http://localhost:8090 |
       | collect.include_stop_areas | target                |
-      | remote_code_space       | external              |
+      | remote_code_space          | external              |
       | remote_credential          | dummy                 |
     When a minute has passed
     And a minute has passed
@@ -1519,19 +1533,19 @@ Scenario: Update Partner Collect remote_code_space
       </soap:Envelope>
         """
     And a StopArea exists with the following attributes:
-      | Codes | "external": "target" |
+      | Codes[external] | target |
     And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
-      | remote_url                     | http://localhost:8090 |
-      | collect.include_stop_areas     | target                |
-      | remote_code_space           | internal              |
-      | remote_credential              | dummy                 |
+      | remote_url                 | http://localhost:8090 |
+      | collect.include_stop_areas | target                |
+      | remote_code_space          | internal              |
+      | remote_credential          | dummy                 |
     And a minute has passed
     And a minute has passed
     Then the SIRI server should not have received a GetStopMonitoring request
     And the Partner "test" is updated with the following settings:
       | remote_url                 | http://localhost:8090 |
       | collect.include_stop_areas | target                |
-      | remote_code_space       | external              |
+      | remote_code_space          | external              |
       | remote_credential          | dummy                 |
     When a minute has passed
     And a minute has passed

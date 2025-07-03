@@ -85,14 +85,14 @@ Feature: Manages Macros
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name  | Test 1                                   |
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test 1                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
-      | Codes                          | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
-      | Schedule[expected]#ArrivalTime |                                            2017-01-01T12:54:00+02:00 |
-      | Schedule[aimed]#ArrivalTime    |                                            2017-01-01T12:54:00+02:00 |
+      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | Schedule[expected]#ArrivalTime | 2017-01-01T12:54:00+02:00                              |
+      | Schedule[aimed]#ArrivalTime    | 2017-01-01T12:54:00+02:00                              |
 
   @nostart @database
   Scenario: Handle a Schedule Macro
@@ -176,14 +176,14 @@ Feature: Manages Macros
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
     And a minute has passed
     And a StopArea exists with the following attributes:
-      | Name  | Test 1                                   |
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test 1                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one VehicleJourney has the following attributes:
-      | Codes                    | "internal": "NINOXE:VehicleJourney:201" |
-      | Attribute[DirectionName] | Aller                                   |
-      | DirectionType            | outbound                                |
+      | Codes[internal]          | NINOXE:VehicleJourney:201 |
+      | Attribute[DirectionName] | Aller                     |
+      | DirectionType            | outbound                  |
 
   @nostart @database
   Scenario: Handle a Situation Macro
@@ -286,28 +286,28 @@ Feature: Manages Macros
       | remote_credential | ineo                  |
       | remote_code_space | external              |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[external] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:BP:LOC" |
-      | Name  | Ligne BP Metro                   |
+      | Codes[external] | NINOXE:Line:BP:LOC |
+      | Name            | Ligne BP Metro     |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test last stop                           |
-      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name            | Test last stop             |
+      | Codes[external] | NINOXE:StopPoint:SP:25:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3534                            |
-      | Codes | "external": "STIF:StopPoint:Q:3534:" |
+      | Name            | Test 3534              |
+      | Codes[external] | STIF:StopPoint:Q:3534" |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3533                            |
-      | Codes | "external": "STIF:StopPoint:Q:3533:" |
+      | Name            | Test 3533              |
+      | Codes[external] | STIF:StopPoint:Q:3533: |
     And a minute has passed
     When a minute has passed
     And the SIRI server has received a GetSituationExchange request
     Then one Situation has the following attributes:
-      | Codes                                                                            | "external" : "test2"                 |
+      | Codes[external]                                                                  | test2                                |
       | Affects[Line]                                                                    | 6ba7b814-9dad-11d1-0001-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-0001-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-0003-00c04fd430c8 |
       | Affects[Line=6ba7b814-9dad-11d1-0001-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-0004-00c04fd430c8 |

@@ -14,8 +14,8 @@ Feature: Support SIRI VehicleMonitoring by request
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
 
@@ -30,8 +30,8 @@ Feature: Support SIRI VehicleMonitoring by request
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    Then the SIRI server should not have received a GetVehicleMonitoring request
 
@@ -47,8 +47,8 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    Then the SIRI server should have received 1 GetVehicleMonitoring request
 
@@ -59,23 +59,23 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space                                             | internal |
       | siri-vehicle-monitoring-request-broadcaster.remote_code_space | other    |
     Given a Line exists with the following attributes:
-      | Codes | "other": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro              |
+      | Codes[other] | Test:Line:3:LOC |
+      | Name         | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                             |
-      | Codes                    | "other": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
-      | Monitored                | true                                   |
-      | Attribute[DirectionName] | Direction Name                         |
+      | Name                     | Passage 32                        |
+      | Codes[other]             | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "other": "Test:Vehicle:201123:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-      | Longitude        | 1.234                              |
-      | Latitude         | 5.678                              |
-      | Bearing          | 123                                |
-      | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
-      | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+      | Codes[other]     | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 123                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
    When I send this SIRI request
      """
      <?xml version='1.0' encoding='UTF-8'?>
@@ -149,24 +149,24 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space                                                     | internal      |
       | siri-vehicle-monitoring-request-broadcaster.vehicle_remote_code_space | other, other2 |
     Given a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                |
-      | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                | true                                      |
-      | Attribute[DirectionName] | Direction Name                            |
+      | Name                     | Passage 32                        |
+      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "other": "Test:Vehicle:201123:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-      | Longitude        | 1.234                              |
-      | Latitude         | 5.678                              |
-      | Bearing          | 123                                |
-      | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
-      | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
-      | Occupancy        | seatsAvailable                     |
+      | Codes[other]     | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 123                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | Occupancy        | seatsAvailable                    |
    When I send this SIRI request
      """
      <?xml version='1.0' encoding='UTF-8'?>
@@ -240,23 +240,23 @@ Feature: Support SIRI VehicleMonitoring by request
      | local_credential  | test  |
      | remote_code_space | wrong |
    Given a Line exists with the following attributes:
-     | Codes | "internal": "Test:Line:3:LOC" |
-     | Name  | Ligne 3 Metro                 |
+     | Codes[internal] | Test:Line:3:LOC |
+     | Name            | Ligne 3 Metro   |
    And a VehicleJourney exists with the following attributes:
-     | Name                     | Passage 32                                |
-     | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
-     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-     | Monitored                | true                                      |
-     | Attribute[DirectionName] | Direction Name                            |
+     | Name                     | Passage 32                        |
+     | Codes[internal]          | Test:VehicleJourney:201:LOC       |
+     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | Monitored                | true                              |
+     | Attribute[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
-     | Codes            | "other": "Test:Vehicle:201123:LOC" |
-     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-     | Longitude        | 1.234                              |
-     | Latitude         | 5.678                              |
-     | Bearing          | 123                                |
-     | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
-     | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+     | Codes[other]     | Test:Vehicle:201123:LOC           |
+     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+     | Longitude        | 1.234                             |
+     | Latitude         | 5.678                             |
+     | Bearing          | 123                               |
+     | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+     | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
    When I send this SIRI request
      """
     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -324,23 +324,24 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space                                                          | internal            |
       | siri-vehicle-monitoring-request-broadcaster.vehicle_remote_code_space      | rdmantois, rdbievre |
     Given a Line exists with the following attributes:
-      | Codes | "internal": "Referent-1" |
-      | Name  | Line Referent 1          |
+      | Codes[internal] | Referent-1      |
+      | Name            | Line Referent 1 |
     # 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a Line exists with the following attributes:
-      | Codes      | "rdbievre": "Line-1"              |
-      | Name       | Ligne 1                           |
-      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
+      | Codes[rdbievre] | Line-1                            |
+      | Name            | Ligne 1                           |
+      | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                                                    |
-      | Codes                    | "rdbievre": "bievre-VehicleJourney", "internal": "STIF:bievre-VehicleJourney" |
-      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8                                             |
-      | Monitored                | true                                                                          |
-      | Attribute[DirectionName] | Direction Name                                                                |
-    # 6ba7b814-9dad-11d1-4-00c04fd430c8
+      | Name                     | Passage 32                        |
+      | Codes[rdbievre]          | bievre-VehicleJourney             |
+      | Codes[internal]          | STIF:bievre-VehicleJourney        |
+      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
+      # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes            | "rdbievre": "bievre-Vehicle"      |
+      | Codes[rdbievre]  | bievre-Vehicle                    |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -353,40 +354,41 @@ Feature: Support SIRI VehicleMonitoring by request
       | NextStopVisitId  | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
     # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes      | "internal": "Stop-1"              |
-      | Name       | Stop 1                            |
-      | ReferentId | 6ba7b814-9dad-11d1-b-00c04fd430c8 | # Stop Referent
+      | Codes[internal] | Stop-1                            |
+      | Name            | Stop 1                            |
+      | ReferentId      | 6ba7b814-9dad-11d1-b-00c04fd430c8 | # Stop Referent
     # 6ba7b814-9dad-11d1-6-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes                         | "internal": "bievre-VehicleJourney-bievre-Vehicle" |
-      | PassageOrder                  | 4                                                  |
-      | VehicleAtStop                 | false                                              |
-      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8                  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                  |
-      | VehicleAtStop                 | false                                              |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                 |
-      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                           |
-      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                           |
-      | ArrivalStatus                 | delayed                                            |
-      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                           |
-      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                           |
-      | DepartureStatus               | delayed                                            |
-      | Attribute[DestinationDisplay] | Pouet-pouet                                        |
+      | Codes[internal]               | bievre-VehicleJourney-bievre-Vehicle |
+      | PassageOrder                  | 4                                    |
+      | VehicleAtStop                 | false                                |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8    |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8    |
+      | VehicleAtStop                 | false                                |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"   |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z             |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z             |
+      | ArrivalStatus                 | delayed                              |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z             |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z             |
+      | DepartureStatus               | delayed                              |
+      | Attribute[DestinationDisplay] | Pouet-pouet                          |
     # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a Line exists with the following attributes:
-      | Codes      | "rdmantois": "Line-2"             |
-      | Name       | Line 2                            |
-      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
+      | Codes[rdmantois] | Line-2                            |
+      | Name             | Line 2                            |
+      | ReferentId       | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
     # 6ba7b814-9dad-11d1-8-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                                                        |
-      | Codes                    | "rdmantois": "mantois-VehicleJourney", "internal": "STIF:mantois-VehicleJourney"  |
-      | LineId                   | 6ba7b814-9dad-11d1-8-00c04fd430c8                                                 |
-      | Monitored                | true                                                                              |
-      | Attribute[DirectionName] | Another Direction Name                                                            |
+      | Name                     | Passage 32                        |
+      | Codes[rdmantois]         | mantois-VehicleJourney            |
+      | Codes[internal]          | STIF:mantois-VehicleJourney       |
+      | LineId                   | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Another Direction Name            |
     # 6ba7b814-9dad-11d1-9-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes            | "rdmantois": "mantois-Vehicle"    |
+      | Codes[rdmantois] | mantois-Vehicle                   |
       | LineId           | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
       | Longitude        | 3.232                             |
@@ -398,8 +400,8 @@ Feature: Support SIRI VehicleMonitoring by request
       | DriverRef        | "567"                             |
     # 6ba7b814-9dad-11d1-a-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "Stop-Referent-1" |
-      | Name  | Stop Referent                 |
+      | Codes[internal] | Stop-Referent-1 |
+      | Name            | Stop Referent   |
     When I send this SIRI request
       """
       <?xml version='1.0' encoding='UTF-8'?>
@@ -519,28 +521,28 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                                |
-      | Codes     | "internal": "Test:VehicleJourney:201:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored | true                                      |
+      | Name            | Passage 32                        |
+      | Codes[internal] | Test:VehicleJourney:201:LOC       |
+      | LineId          | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored       | true                              |
     And a VehicleJourney exists with the following attributes:
-      | Name                              | Passage 33                                |
-      | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
-      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                         | true                                      |
-      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
-      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
-      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
-      | OriginName                        | Origin Name                               |
-      | DestinationName                   | Destination Name                          |
-      | DirectionName                     | Direction Name                            |
-      | DirectionType                     | outbound                                  |
-      | Attribute[JourneyPatternName]     | Journey Pattern Name                      |
+      | Name                              | Passage 33                               |
+      | Codes[internal]                   | Test:VehicleJourney:202:LOC              |
+      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8        |
+      | Monitored                         | true                                     |
+      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination" |
+      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"      |
+      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"      |
+      | OriginName                        | Origin Name                              |
+      | DestinationName                   | Destination Name                         |
+      | DirectionName                     | Direction Name                           |
+      | DirectionType                     | outbound                                 |
+      | Attribute[JourneyPatternName]     | Journey Pattern Name                     |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -552,7 +554,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes[internal]  | Test:Vehicle:2:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -564,7 +566,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes[internal]  | Test:Vehicle:3:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -577,24 +579,24 @@ Feature: Support SIRI VehicleMonitoring by request
       | Percentage       | 21                                |
       | NextStopVisitId  | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name  | Carabacel                                |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
+      | Name            | Carabacel                  |
       # 6ba7b814-9dad-11d1-8-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes                         | "internal": "Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1" |
-      | PassageOrder                  | 4                                                                      |
-      | VehicleAtStop                 | false                                                                  |
-      | StopAreaId                    | 6ba7b814-9dad-11d1-8-00c04fd430c8                                      |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                                      |
-      | VehicleAtStop                 | false                                                                  |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                     |
-      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                               |
-      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                               |
-      | ArrivalStatus                 | delayed                                                                |
-      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                               |
-      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                               |
-      | DepartureStatus               | delayed                                                                |
-      | Attribute[DestinationDisplay] | Pouet-pouet                                                            |
+      | Codes[internal]               | Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                  | 4                                                        |
+      | VehicleAtStop                 | false                                                    |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-8-00c04fd430c8                        |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                        |
+      | VehicleAtStop                 | false                                                    |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                       |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                 |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                 |
+      | ArrivalStatus                 | delayed                                                  |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                 |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                 |
+      | DepartureStatus               | delayed                                                  |
+      | Attribute[DestinationDisplay] | Pouet-pouet                                              |
       # 6ba7b814-9dad-11d1-9-00c04fd430c8
     When I send this SIRI request
       """
@@ -748,28 +750,28 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                                |
-      | Codes     | "internal": "Test:VehicleJourney:201:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored | true                                      |
+      | Name            | Passage 32                        |
+      | Codes[internal] | Test:VehicleJourney:201:LOC       |
+      | LineId          | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored       | true                              |
     And a VehicleJourney exists with the following attributes:
-      | Name                              | Passage 33                                |
-      | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
-      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                         | true                                      |
-      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
-      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
-      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
-      | OriginName                        | Origin Name                               |
-      | DestinationName                   | Destination Name                          |
-      | DirectionName                     | Direction Name                            |
-      | DirectionType                     | outbound                                  |
-      | Attribute[JourneyPatternName]     | Journey Pattern Name                      |
+      | Name                              | Passage 33                               |
+      | Codes[internal]                   | Test:VehicleJourney:202:LOC              |
+      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8        |
+      | Monitored                         | true                                     |
+      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination" |
+      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"      |
+      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"      |
+      | OriginName                        | Origin Name                              |
+      | DestinationName                   | Destination Name                         |
+      | DirectionName                     | Direction Name                           |
+      | DirectionType                     | outbound                                 |
+      | Attribute[JourneyPatternName]     | Journey Pattern Name                     |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -781,7 +783,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:2:LOC"  |
+      | Codes[internal]  | Test:Vehicle:2:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -793,7 +795,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 34                                |
       | Percentage       | 55                                |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:3:LOC"  |
+      | Codes[internal]  | Test:Vehicle:3:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -890,23 +892,23 @@ Feature: Support SIRI VehicleMonitoring by request
      | local_credential  | test     |
      | remote_code_space | internal |
    Given a Line exists with the following attributes:
-     | Codes | "internal": "Test:Line:3:LOC" |
-     | Name  | Ligne 3 Metro                 |
+     | Codes[internal] | Test:Line:3:LOC |
+     | Name            | Ligne 3 Metro   |
    And a VehicleJourney exists with the following attributes:
-     | Name                     | Passage 32                                |
-     | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
-     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-     | Monitored                | true                                      |
-     | Attribute[DirectionName] | Direction Name                            |
+     | Name                     | Passage 32                        |
+     | Codes[internal]          | Test:VehicleJourney:201:LOC       |
+     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | Monitored                | true                              |
+     | Attribute[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
-     | Codes            | "other": "Test:Vehicle:201123:LOC" |
-     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-     | Longitude        | 1.234                              |
-     | Latitude         | 5.678                              |
-     | Bearing          | 123                                |
-     | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
-     | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+     | Codes[other]     | Test:Vehicle:201123:LOC           |
+     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+     | Longitude        | 1.234                             |
+     | Latitude         | 5.678                             |
+     | Bearing          | 123                               |
+     | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+     | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
    When I send this SIRI request
      """
     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -973,23 +975,23 @@ Feature: Support SIRI VehicleMonitoring by request
      | local_credential  | test     |
      | remote_code_space | internal |
    Given a Line exists with the following attributes:
-     | Codes | "internal": "Test:Line:3:LOC" |
-     | Name  | Ligne 3 Metro                 |
+     | Codes[internal] | Test:Line:3:LOC |
+     | Name            | Ligne 3 Metro   |
    And a VehicleJourney exists with the following attributes:
-     | Name                     | Passage 32                                |
-     | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
-     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-     | Monitored                | true                                      |
-     | Attribute[DirectionName] | Direction Name                            |
+     | Name                     | Passage 32                        |
+     | Codes[internal]          | Test:VehicleJourney:201:LOC       |
+     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | Monitored                | true                              |
+     | Attribute[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
-     | Codes            | "internal": "Test:Vehicle:201123:LOC" |
-     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
-     | Longitude        | 1.234                                 |
-     | Latitude         | 5.678                                 |
-     | Bearing          | 123                                   |
-     | RecordedAtTime   | 2017-01-01T13:00:00.000Z              |
-     | ValidUntilTime   | 2017-01-01T14:00:00.000Z              |
+     | Codes[internal]  | Test:Vehicle:201123:LOC           |
+     | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+     | Longitude        | 1.234                             |
+     | Latitude         | 5.678                             |
+     | Bearing          | 123                               |
+     | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+     | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
    When I send this SIRI request
      """
     <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -1056,23 +1058,23 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space                                             | internal |
       | siri-vehicle-monitoring-request-broadcaster.remote_code_space | other    |
     Given a Line exists with the following attributes:
-      | Codes | "other": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro              |
+      | Codes[other] | Test:Line:3:LOC |
+      | Name         | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                             |
-      | Codes                    | "other": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8      |
-      | Monitored                | true                                   |
-      | Attribute[DirectionName] | Direction Name                         |
+      | Name                     | Passage 32                        |
+      | Codes[other]             | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "other": "Test:Vehicle:201123:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-      | Longitude        | 1.234                              |
-      | Latitude         | 5.678                              |
-      | Bearing          | 123                                |
-      | RecordedAtTime   | 2017-01-01T13:00:00.000Z           |
-      | ValidUntilTime   | 2017-01-01T14:00:00.000Z           |
+      | Codes[other]     | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 123                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
    When I send this SIRI request
      """
      <?xml version='1.0' encoding='UTF-8'?>
@@ -1215,33 +1217,33 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
-      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name  | Carabacel                                     |
+      | Codes[internal] | RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | Name            | Carabacel                       |
     And one Line has the following attributes:
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
-      | Name  | Test 1                             |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
+      | Name            | Test 1               |
     And one VehicleJourney has the following attributes:
-      | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
-      | OriginName                        | Deloye / Dubouchage                               |
-      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
-      | DestinationName                   | Rimiez Saint-George                               |
-      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
-      | Monitored                         | false                                             |
+      | Codes[internal]                   | RLA_Bus:VehicleJourney::2978464:LOC              |
+      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"    |
+      | OriginName                        | Deloye / Dubouchage                              |
+      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"    |
+      | DestinationName                   | Rimiez Saint-George                              |
+      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC" |
+      | Monitored                         | false                                            |
     And one Vehicle has the following attributes:
-      | Codes          | "internal": "RLA290"          |
-      | Longitude      | 7.276192074052043             |
-      | Latitude       | 43.70347861870634             |
-      | DriverRef      | "5753"                        |
-      | Bearing        | 287.0                         |
-      | LinkDistance   | 349.0                         |
-      | Percentage     | 70.0                          |
-      | ValidUntilTime | 2021-08-02T08:50:27.733+02:00 |
+      | Codes[internal] |                        RLA290 |
+      | Longitude       |             7.276192074052043 |
+      | Latitude        |             43.70347861870634 |
+      | DriverRef       |                        "5753" |
+      | Bearing         |                         287.0 |
+      | LinkDistance    |                         349.0 |
+      | Percentage      |                          70.0 |
+      | ValidUntilTime  | 2021-08-02T08:50:27.733+02:00 |
     And an audit event should exist with these attributes:
       | Protocol        | siri                                    |
       | Direction       | sent                                    |
@@ -1333,33 +1335,33 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
-      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name  | Carabacel                                     |
+      | Codes[internal] | RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | Name            | Carabacel                       |
     And one Line has the following attributes:
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
-      | Name  | Test 1                             |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
+      | Name            | Test 1               |
     And one VehicleJourney has the following attributes:
-      | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
-      | OriginName                        | Deloye / Dubouchage                               |
-      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
-      | DestinationName                   | Rimiez Saint-George                               |
-      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
-      | Monitored                         | false                                             |
+      | Codes[internal]                   | RLA_Bus:VehicleJourney::2978464:LOC              |
+      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"    |
+      | OriginName                        | Deloye / Dubouchage                              |
+      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"    |
+      | DestinationName                   | Rimiez Saint-George                              |
+      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC" |
+      | Monitored                         | false                                            |
     And one Vehicle has the following attributes:
-      | Codes          | "internal": "RLA290"          |
-      | Longitude      | 7.276192074052043             |
-      | Latitude       | 43.70347861870634             |
-      | DriverRef      | "5753"                        |
-      | Bearing        | 287.0                         |
-      | LinkDistance   | 349.0                         |
-      | Percentage     | 70.0                          |
-      | ValidUntilTime | 2021-08-02T08:50:27.733+02:00 |
+      | Codes[internal] |                        RLA290 |
+      | Longitude       |             7.276192074052043 |
+      | Latitude        |             43.70347861870634 |
+      | DriverRef       |                        "5753" |
+      | Bearing         |                         287.0 |
+      | LinkDistance    |                         349.0 |
+      | Percentage      |                          70.0 |
+      | ValidUntilTime  | 2021-08-02T08:50:27.733+02:00 |
 
   Scenario: Collect Vehicle Position with collect.default_srs_name setting
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
@@ -1437,33 +1439,33 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.default_srs_name | EPSG:2154             |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one StopArea has the following attributes:
-      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name  | Carabacel                                     |
+      | Codes[internal] | RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | Name            | Carabacel                       |
     And one Line has the following attributes:
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
-      | Name  | Test 1                             |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
+      | Name            | Test 1               |
     And one VehicleJourney has the following attributes:
-      | Codes                             | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"     |
-      | OriginName                        | Deloye / Dubouchage                               |
-      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"     |
-      | DestinationName                   | Rimiez Saint-George                               |
-      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC"  |
-      | Monitored                         | false                                             |
+      | Codes[internal]                   | RLA_Bus:VehicleJourney::2978464:LOC              |
+      | Reference[OriginRef]#Code         | "internal": "RLA_Bus:StopPoint:BP:DELOY0:LOC"    |
+      | OriginName                        | Deloye / Dubouchage                              |
+      | Reference[DestinationRef]#Code    | "internal": "RLA_Bus:StopPoint:BP:RIMIE9:LOC"    |
+      | DestinationName                   | Rimiez Saint-George                              |
+      | Reference[JourneyPatternRef]#Code | "internal": "RLA_Bus:JourneyPattern::L05P99:LOC" |
+      | Monitored                         | false                                            |
     And one Vehicle has the following attributes:
-      | Codes          | "internal": "RLA290"          |
-      | Longitude      | 7.276192074052043             |
-      | Latitude       | 43.70347861870634             |
-      | DriverRef      | "5753"                        |
-      | Bearing        | 287.0                         |
-      | LinkDistance   | 349.0                         |
-      | Percentage     | 70.0                          |
-      | ValidUntilTime | 2021-08-02T08:50:27.733+02:00 |
+      | Codes[internal] |                        RLA290 |
+      | Longitude       |             7.276192074052043 |
+      | Latitude        |             43.70347861870634 |
+      | DriverRef       |                        "5753" |
+      | Bearing         |                         287.0 |
+      | LinkDistance    |                         349.0 |
+      | Percentage      |                          70.0 |
+      | ValidUntilTime  | 2021-08-02T08:50:27.733+02:00 |
 
   Scenario: Collect vehicle next Stop in SIRI VehicleMonitoring delivery
     Given a SIRI server waits GetVehicleMonitoring request on "http://localhost:8090" to respond with
@@ -1540,27 +1542,27 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | LineId | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
+      | Codes[internal] | RLA_Bus:VehicleJourney::2978464:LOC |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8   |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name  | Carabacel                                     |
+      | Codes[internal] | RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | Name            | Carabacel                       |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes            | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | PassageOrder     | 6                                                    |
-      | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                    |
+      | Codes[internal]  | RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | PassageOrder     | 6                                      |
+      | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8      |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8      |
       # 6ba7b814-9dad-11d1-6-00c04fd430c8
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "RLA290"              |
+      | Codes[internal]  | RLA290                            |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1641,35 +1643,35 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Codes  | "internal": "RLA_Bus:VehicleJourney::2978464:LOC" |
-      | LineId | 6ba7b814-9dad-11d1-3-00c04fd430c8                 |
+      | Codes[internal] | RLA_Bus:VehicleJourney::2978464:LOC  |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8    |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | Name  | Carabacel                                     |
+      | Codes[internal] | RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | Name            | Carabacel                       |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "RLA_Bus:StopPoint:BP:CAL05:LOC" |
-      | Name  | Vieux Port                                   |
+      | Codes[internal] | RLA_Bus:StopPoint:BP:CAL05:LOC |
+      | Name            | Vieux Port                     |
       # 6ba7b814-9dad-11d1-6-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes            | "internal": "RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC" |
-      | PassageOrder     | 6                                                    |
-      | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8                    |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                    |
+      | Codes[internal]  | RLA920-RLA_Bus:StopPoint:BP:PASTO8:LOC |
+      | PassageOrder     | 6                                      |
+      | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8      |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8      |
       # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes            | "internal": "RLA920-RLA_Bus:StopPoint:BP:CAL05:LOC" |
-      | PassageOrder     | 7                                                   |
-      | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8                   |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8                   |
+      | Codes[internal]  | RLA920-RLA_Bus:StopPoint:BP:CAL05:LOC |
+      | PassageOrder     | 7                                     |
+      | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8     |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8     |
       # 6ba7b814-9dad-11d1-8-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "RLA290"              |
+      | Codes[internal]  | RLA290                            |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
@@ -1678,7 +1680,7 @@ Feature: Support SIRI VehicleMonitoring by request
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     Then one Vehicle has the following attributes:
-      | Codes            | "internal": "RLA290"              |
+      | Codes[internal]  | RLA290                            |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | StopAreaId       | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
@@ -1754,7 +1756,7 @@ Feature: Support SIRI VehicleMonitoring by request
 </soap:Envelope>
       """
     And a Line exists with the following attributes:
-      | Codes | "external": "RLA_Bus:Line::05:LOC" |
+      | Codes[external] | RLA_Bus:Line::05:LOC |
     And a Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-collector] and the following settings:
       | remote_url        | http://localhost:8090 |
       | remote_credential | test                  |
@@ -1777,35 +1779,35 @@ Feature: Support SIRI VehicleMonitoring by request
       | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
       # Id 6ba7b814-9dad-11d1-2-00c04fd430c8
     And a Line exists with the following attributes:
-      | Codes | "external": "Test:Line:A:BUS:LOC" |
-      | Name  | Ligne A Bus                       |
+      | Codes[external] | Test:Line:A:BUS:LOC |
+      | Name            | Ligne A Bus         |
       # Id 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                                |
-      | Codes     | "external": "Test:VehicleJourney:201:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Monitored | true                                      |
+      | Name            | Passage 32                        |
+      | Codes[external] | Test:VehicleJourney:201:LOC       |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored       | true                              |
       # Id 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name                              | Passage 33                                |
-      | Codes                             | "internal": "Test:VehicleJourney:202:LOC" |
-      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                         | true                                      |
-      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination"  |
-      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"       |
-      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"       |
-      | OriginName                        | Origin Name                               |
-      | DestinationName                   | Destination Name                          |
-      | DirectionName                     | Direction Name                            |
-      | DirectionType                     | outbound                                  |
-      | Attribute[JourneyPatternName]     | Journey Pattern Name                      |
+      | Name                              | Passage 33                               |
+      | Codes[internal]                   | Test:VehicleJourney:202:LOC              |
+      | LineId                            | 6ba7b814-9dad-11d1-2-00c04fd430c8        |
+      | Monitored                         | true                                     |
+      | Reference[DestinationRef]#Code    | "internal": "Test:StopPoint:Destination" |
+      | Reference[JourneyPatternRef]#Code | "internal": "Test:JourneyPattern:1"      |
+      | Reference[OriginRef]#Code         | "internal": "Test:StopPoint:Origin"      |
+      | OriginName                        | Origin Name                              |
+      | DestinationName                   | Destination Name                         |
+      | DirectionName                     | Direction Name                           |
+      | DirectionType                     | outbound                                 |
+      | Attribute[JourneyPatternName]     | Journey Pattern Name                     |
       # Id 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -1817,7 +1819,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance     | 12                                |
       | Percentage       | 42                                |
     And a Vehicle exists with the following attributes:
-      | Codes            | "external": "Test:Vehicle:2:LOC"  |
+      | Codes[external]  | Test:Vehicle:2:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -1981,19 +1983,20 @@ Feature: Support SIRI VehicleMonitoring by request
     # Setting a Partner without default generators
     Given a Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                | test                             |
-      | remote_code_space                            | internal                         |
+      | remote_code_space                               | internal                         |
       | sort_payload_for_test                           | true                             |
       | generators.reference_vehicle_journey_identifier | ch:1:ServiceJourney:87_TAC:%{id} |
     Given a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                                                        |
-      | Codes | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
-      | Monitored | true                                                              |
+      | Name            | Passage 32                        |
+      | Codes[_default] | 6ba7b814                          |
+      | Codes[external] | Test:VehicleJourney:201:LOC       |
+      | LineId          | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored       | true                              |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -2089,18 +2092,19 @@ Feature: Support SIRI VehicleMonitoring by request
     # Setting a "SIRI Partner" with default generators
     Given a SIRI Partner "test" exists with connectors [siri-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential      | test     |
-      | remote_code_space  | internal |
+      | remote_code_space     | internal |
       | sort_payload_for_test | true     |
     Given a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name      | Passage 32                                                        |
-      | Codes | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
-      | LineId    | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
-      | Monitored | true                                                              |
+      | Name            | Passage 32                        |
+      | Codes[_default] | 6ba7b814                          |
+      | Codes[external] | Test:VehicleJourney:201:LOC       |
+      | LineId          | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored       | true                              |
     And a Vehicle exists with the following attributes:
-      | Codes        | "internal": "Test:Vehicle:1:LOC"  |
+      | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |
@@ -2226,8 +2230,8 @@ Feature: Support SIRI VehicleMonitoring by request
       | collect.include_lines | RLA_Bus:Line::05:LOC  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     And an audit event should exist with these attributes:

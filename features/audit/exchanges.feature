@@ -9,9 +9,9 @@ Feature: Audit API exchanges
       """
       """
     And a Partner "test" exists with connectors [siri-check-status-client] and the following settings:
-      | remote_url            | http://localhost:8090      |
-      | remote_credential     | test                       |
-      | remote_code_space  | internal                   |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | remote_code_space | internal              |
     When a minute has passed
     Then an audit event should exist with these attributes:
       | NewStatus   | up            |
@@ -44,7 +44,7 @@ Feature: Audit API exchanges
       | Partner            | test                  |
       | Status             | OK                    |
       | RequestIdentifier  | enRoute:Message::test |
-      | ResponseIdentifier | /{test-uuid}/ |
+      | ResponseIdentifier | /{test-uuid}/         |
       | ProcessingTime     | 0                     |
 
   Scenario: Not audit SIRI CheckStatus Request for unknown partner
@@ -77,19 +77,19 @@ Feature: Audit API exchanges
       """
       """
     And a Partner "test" exists with connectors [siri-check-status-client] and the following settings:
-      | remote_url                 | http://localhost:8090      |
-      | remote_credential          | test                       |
-      | remote_code_space       | internal                   |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | remote_code_space | internal              |
     When a minute has passed
     Then an audit event should exist with these attributes:
-      | Type               | CheckStatusRequest    |
-      | Protocol           | siri                  |
-      | Direction          | sent                  |
-      | Status             | OK                    |
-      | Partner            | test                  |
-      | RequestIdentifier  | /{test-uuid}/         |
+      | Type               | CheckStatusRequest                   |
+      | Protocol           | siri                                 |
+      | Direction          | sent                                 |
+      | Status             | OK                                   |
+      | Partner            | test                                 |
+      | RequestIdentifier  | /{test-uuid}/                        |
       | ResponseIdentifier | c464f588-5128-46c8-ac3f-8b8a465692ab |
-      | ProcessingTime     | 0                     |
+      | ProcessingTime     | 0                                    |
 
   Scenario: Audit a StopMonitoring Subscription request
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
@@ -124,16 +124,16 @@ Feature: Audit API exchanges
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-stop-monitoring-subscription-collector] and the following settings:
-      | remote_url                         | http://localhost:8090          |
-      | remote_credential                  | remote_credential              |
-      | local_credential                   | local_credential               |
-      | remote_code_space               | internal                       |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | remote_credential     |
+      | local_credential  | local_credential      |
+      | remote_code_space | internal              |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
-      | Name      | Test                                      |
-      | Codes | "internal": "enRoute:StopPoint:SP:24:LOC" |
+      | Name            | Test                        |
+      | Codes[internal] | enRoute:StopPoint:SP:24:LOC |
     When I wait that a Subscription has been created with the following attributes:
-      | Kind      | StopMonitoringCollect |
+      | Kind | StopMonitoringCollect |
     Then an audit event should exist with these attributes:
       | Type                    | StopMonitoringSubscriptionRequest     |
       | Protocol                | siri                                  |
@@ -175,10 +175,10 @@ Feature: Audit API exchanges
 </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
-      | remote_url                         | http://localhost:8090          |
-      | remote_credential                  | remote_credential              |
-      | local_credential                   | local_credential               |
-      | remote_code_space               | internal                       |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | remote_credential     |
+      | local_credential  | local_credential      |
+      | remote_code_space | internal              |
     When I send this SIRI request to the Referential "test"
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -249,13 +249,13 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type                    | DeleteSubscriptionRequest            |
-      | Protocol                | siri                                 |
-      | Direction               | sent                                 |
-      | Status                  | OK                                   |
-      | Partner                 | test                                 |
-      | SubscriptionIdentifiers | ["dummy"]                            |
-      | ProcessingTime          | 0                                    |
+      | Type                    | DeleteSubscriptionRequest |
+      | Protocol                | siri                      |
+      | Direction               | sent                      |
+      | Status                  | OK                        |
+      | Partner                 | test                      |
+      | SubscriptionIdentifiers | ["dummy"]                 |
+      | ProcessingTime          | 0                         |
 
   @ARA-880
   Scenario: Audit a referential with hyphen in the slug
@@ -279,8 +279,8 @@ Feature: Audit API exchanges
 </S:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type               | CheckStatusRequest |
-      | Dataset            | cucumber_test_with_hyphen   |
+      | Type    | CheckStatusRequest        |
+      | Dataset | cucumber_test_with_hyphen |
 
   @ARA-880
   Scenario: Audit a referential without hyphen in the slug
@@ -304,24 +304,24 @@ Feature: Audit API exchanges
 </S:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type               | CheckStatusRequest           |
-      | Dataset            | cucumber_test_without_hyphen |
+      | Type    | CheckStatusRequest           |
+      | Dataset | cucumber_test_without_hyphen |
 
   @ARA-1060
   Scenario: Audit a recevied SIRI EstimatedTimetableSubscriptionRequest
     Given a SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-estimated-timetable-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
-       | remote_code_space | internal              |
-       | siri.envelope        | raw                   |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
+      | siri.envelope     | raw                   |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:A:BUS" |
-      | Name      | Ligne A Bus                     |
+      | Codes[internal] | NINOXE:Line:A:BUS |
+      | Name            | Ligne A Bus       |
     When I send this SIRI request
       """
 <?xml version="1.0" encoding="utf-8"?>
@@ -356,26 +356,26 @@ Feature: Audit API exchanges
        | remote_url                         | http://localhost:8090 |
        | remote_credential                  | ara                   |
        | local_credential                   | test                  |
-       | remote_code_space               | internal              |
+       | remote_code_space                  | internal              |
        | siri.envelope                      | raw                   |
        | broadcast.subscriptions.persistent | true                  |
     And a StopArea exists with the following attributes:
-      | Name      | Test 24                                  |
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+      | Name            | Test 24                               |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     And a StopArea exists with the following attributes:
-      | Name      | Test 25                                  |
-      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
-      | Lines     | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]    |
+      | Name            | Test 25                               |
+      | Codes[internal] | NINOXE:StopPoint:SP:25:LOC            |
+      | Lines           | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name      | Ligne 3 Metro                   |
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a VehicleJourney exists with the following attributes:
-      | Name                               | Passage 32                              |
-      | Codes                          | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                             | 6ba7b814-9dad-11d1-4-00c04fd430c8       |
-      | DirectionType                      | outbound                                |
-      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"              |
+      | Name                           | Passage 32                        |
+      | Codes[internal]                | NINOXE:VehicleJourney:201         |
+      | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | DirectionType                  | outbound                          |
+      | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableBroadcast            |
       | ExternalId        | SpecialExternalId                      |
@@ -404,11 +404,11 @@ Feature: Audit API exchanges
 </Siri>
       """
     Then an audit event should exist with these attributes:
-      | Type                                 | ProductionTimetableSubscriptionRequest  |
-      | Direction                            | received                                |
-      | Protocol                             | siri                                    |
-      | Partner                              | test                                    |
-      | Status                               | Error                                   |
+      | Type      | ProductionTimetableSubscriptionRequest |
+      | Direction | received                               |
+      | Protocol  | siri                                   |
+      | Partner   | test                                   |
+      | Status    | Error                                  |
 
   @ARA-1152
   Scenario: Audit a send EstimatedTimetable subscription request
@@ -451,14 +451,14 @@ Feature: Audit API exchanges
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name      | Test                   |
-      | Codes | "internal": "testLine" |
+      | Name            | Test     |
+      | Codes[internal] | testLine |
     And a minute has passed
     And a minute has passed
     And  an audit event should exist with these attributes:
@@ -576,16 +576,16 @@ Feature: Audit API exchanges
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_code_space               | internal                       |
+      | remote_code_space                  | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
       | siri.direction_type                | Aller,Retour                   |
     And 30 seconds have passed
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
     And a StopArea exists with the following attributes:
-      | Name      | Test                                     |
-      | Codes | "internal": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name            | Test                       |
+      | Codes[internal] | NINOXE:StopPoint:SP:25:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | StopMonitoringCollect                              |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
@@ -593,11 +593,11 @@ Feature: Audit API exchanges
       | Kind              | StopMonitoringCollect                              |
       | ReferenceArray[1] | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                              |
-      | Codes                | "internal": "NINOXE:VehicleJourney:201" |
-      | LineId                   | 6ba7b814-9dad-11d1-c-00c04fd430c8       |
-      | Monitored                | true                                    |
-      | Attribute[DirectionName] | A Direction Name                        |
+      | Name                     | Passage 32                        |
+      | Codes[internal]          | NINOXE:VehicleJourney:201         |
+      | LineId                   | 6ba7b814-9dad-11d1-c-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | A Direction Name                  |
     And a minute has passed
     When I send this SIRI request
       """
@@ -712,14 +712,14 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
     And an audit event should exist with these attributes:
-      | Protocol           | siri                                    |
-      | Direction          | received                                |
-      | ResponseIdentifier | /{uuid}/                                |
-      | Status             | OK                                      |
-      | Type               | NotifyStopMonitoring                    |
+      | Protocol           | siri                                                         |
+      | Direction          | received                                                     |
+      | ResponseIdentifier | /{uuid}/                                                     |
+      | Status             | OK                                                           |
+      | Type               | NotifyStopMonitoring                                         |
       | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
-      | VehicleJourneys    | ["NINOXE:VehicleJourney:201", "NINOXE:VehicleJourney:202"] |
-      | Lines              | ["NINOXE:Line:3:LOC", "NINOXE:Line:8:LOC"] |
+      | VehicleJourneys    | ["NINOXE:VehicleJourney:201", "NINOXE:VehicleJourney:202"]   |
+      | Lines              | ["NINOXE:Line:3:LOC", "NINOXE:Line:8:LOC"]                   |
 
   @ARA-1385
   Scenario: Audit a VehicleMonitoringDelivery in a subscription with multiple VehicleMonitoringDeliveries
@@ -765,15 +765,15 @@ Feature: Audit API exchanges
       | remote_url                         | http://localhost:8090          |
       | remote_credential                  | test                           |
       | local_credential                   | NINOXE:default                 |
-      | remote_code_space               | internal                       |
+      | remote_code_space                  | internal                       |
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                   |
-      | Codes | "internal": "testLine" |
+      | Name            | Test     |
+      | Codes[internal] | testLine |
     And a Line exists with the following attributes:
-      | Name      | Test1                  |
-      | Codes | "internal": "testLine1" |
+      | Name            | Test1     |
+      | Codes[internal] | testLine1 |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -912,11 +912,11 @@ Feature: Audit API exchanges
       </soap:Envelope>
       """
       Then one Vehicle has the following attributes:
-        | Codes | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    |        6ba7b814-9dad-11d1-3-00c04fd430c8 |
-        | Bearing   |                                    171.0 |
-        | Latitude  |                        48.99927561424598 |
-        | Longitude |                       1.6770970859674874 |
+        | Codes[internal] |        TRANSDEV:Vehicle::1501:LOC |
+        | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+        | Bearing         |                             171.0 |
+        | Latitude        |                 48.99927561424598 |
+        | Longitude       |                1.6770970859674874 |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                                                            |
         | Protocol        | siri                                                                               |
@@ -969,17 +969,17 @@ Feature: Audit API exchanges
   </S:Envelope>
       """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-estimated-timetable-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name      | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Line exists with the following attributes:
-      | Name      | Test                            |
-      | Codes | "internal": "NINOXE:Line:4:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:4:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | EstimatedTimetableCollect             |
       | SubscriberRef     | subscriber                            |

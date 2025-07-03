@@ -5,7 +5,7 @@ Feature: Support SIRI Situation Exchange by request
   @ARA-1342
   Scenario: Handle a SIRI SituationExchange request
     Given a Situation exists with the following attributes:
-      | Codes                                                                              | "external" : "test"                           |
+      | Codes[external]                                                                    | test                                          |
       | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
@@ -115,23 +115,23 @@ Feature: Support SIRI Situation Exchange by request
       | ScopeType                       | network                                                                                    |
       | Affects[Line]                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                                          |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[external] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:BP:LOC" |
-      | Name  | Ligne BP Metro                   |
+      | Codes[external] | NINOXE:Line:BP:LOC |
+      | Name            | Ligne BP Metro     |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test last stop                           |
-      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name            | Test last stop             |
+      | Codes[external] | NINOXE:StopPoint:SP:25:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3534                            |
-      | Codes | "external": "STIF:StopPoint:Q:3534:" |
+      | Name            | Test 3534               |
+      | Codes[external] | STIF:StopPoint:Q:3534:  |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3533                            |
-      | Codes | "external": "STIF:StopPoint:Q:3533:" |
+      | Name            | Test 3533              |
+      | Codes[external] | STIF:StopPoint:Q:3533: |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential  | NINOXE:default |
       | remote_code_space | external       |
@@ -442,7 +442,7 @@ Feature: Support SIRI Situation Exchange by request
   @ARA-1582
   Scenario: Handle a SIRI SituationExchange request with All affected Lines
     Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 1                                 |
       | Keywords                     | ["Commercial", "Test"]            |
@@ -456,8 +456,8 @@ Feature: Support SIRI Situation Exchange by request
       | Affects[AllLines]            |                                   |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential  | NINOXE:default |
       | remote_code_space | external       |
@@ -653,7 +653,7 @@ Feature: Support SIRI Situation Exchange by request
     And a minute has passed
     When a minute has passed
     Then one Situation has the following attributes:
-      | Codes                        | "external" : "test"       |
+      | Codes[external]              | test                      |
       | RecordedAt                   | 2017-01-01T01:02:03+02:00 |
       | Version                      | 1                         |
       | VersionedAt                  | 2017-01-01T01:02:03+02:00 |
@@ -972,27 +972,27 @@ Feature: Support SIRI Situation Exchange by request
       | remote_credential | ineo                  |
       | remote_code_space | external              |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[external] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:BP:LOC" |
-      | Name  | Ligne BP Metro                   |
+      | Codes[external] | NINOXE:Line:BP:LOC |
+      | Name            | Ligne BP Metro     |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test last stop                           |
-      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name            | Test last stop             |
+      | Codes[external] | NINOXE:StopPoint:SP:25:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3534                            |
-      | Codes | "external": "STIF:StopPoint:Q:3534:" |
+      | Name            | Test 3534              |
+      | Codes[external]  | STIF:StopPoint:Q:3534: |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3533                            |
-      | Codes | "external": "STIF:StopPoint:Q:3533:" |
+      | Name            | Test 3533              |
+      | Codes[external] | STIF:StopPoint:Q:3533: |
     And a minute has passed
     When a minute has passed
     Then one Situation has the following attributes:
-      | Codes                                                                              | "external" : "test"                           |
+      | Codes[external]                                                                    | test                                          |
       | RecordedAt                                                                         | 2017-01-01T01:02:03+02:00                     |
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
@@ -1026,7 +1026,7 @@ Feature: Support SIRI Situation Exchange by request
       | ImageRef    | http://www.example.com/image.png |
       | LinkContent | relatedSite                      |
     Then one Situation has the following attributes:
-      | Codes                        | "external" : "test2"              |
+      | Codes[external]              | test2                             |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 5                                 |
       | Keywords                     | ["Commercial", "Test2"]           |
@@ -1128,8 +1128,8 @@ Feature: Support SIRI Situation Exchange by request
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received 1 GetSituationExchange request
@@ -1149,11 +1149,11 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | collect.filter_situations | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name              | Test               |
-      | Codes             | "internal": "1234" |
-      | CollectSituations | true               |
-      And 10 seconds have passed
-      And the SIRI server has received a GetGeneralMessage request
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
+    And 10 seconds have passed
+    And the SIRI server has received a GetGeneralMessage request
     Then the SIRI server should receive this response
       """
 <?xml version='1.0' encoding='utf-8'?>
@@ -1182,18 +1182,18 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   Scenario: Manage a Request with a StopArea filter
     Given a SIRI server on "http://localhost:8090"
       And a Partner "test" exists with connectors [siri-check-status-client,siri-situation-exchange-request-collector] and the following settings:
-      | remote_url                | http://localhost:8090 |
-      | remote_credential         | test                  |
-      | remote_code_space         | internal              |
-      | collect.filter_situations | true                  |
-    And a minute has passed
-    And a StopArea exists with the following attributes:
-        | Name              | Test              |
-        | Codes             | "internal":"1234" |
-        | CollectSituations | true              |
+        | remote_url                | http://localhost:8090 |
+        | remote_credential         | test                  |
+        | remote_code_space         | internal              |
+        | collect.filter_situations | true                  |
+      And a minute has passed
+      And a StopArea exists with the following attributes:
+        | Name              | Test |
+        | Codes[internal]   | 1234 |
+        | CollectSituations | true |
       And 10 seconds have passed
       And the SIRI server has received a GetGeneralMessage request
-    Then the SIRI server should receive this response
+      Then the SIRI server should receive this response
       """
 <?xml version='1.0' encoding='utf-8'?>
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
@@ -1220,18 +1220,18 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   @ARA-1471
   Scenario: Broadcast via a SIRI SX request a Situation without EndTime
     Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
-      | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
-      | Version                      | 1                                 |
-      | ReportType                   | general                           |
-      | Progress                     | published                         |
-      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00         |
+      | Codes[external]              | test                      |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00 |
+      | Version                      | 1                         |
+      | ReportType                   | general                   |
+      | Progress                     | published                 |
+      | ValidityPeriods[0]#StartTime | 2017-01-01T01:30:06+02:00 |
       # | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00         |
       | Description[DefaultValue]    | Description Sample                |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Stop Area Sample                     |
-      | Codes | "external": "sample" |
+      | Name            | Stop Area Sample |
+      | Codes[external] | sample           |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential  | NINOXE:default |
       | remote_code_space | external       |
@@ -1358,10 +1358,10 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | remote_credential | ineo                  |
       | remote_code_space | external              |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:00+02:00         |
       | VersionedAt                  | 2017-01-01T03:30:00+02:00         |
       | Version                      | 1                                 |
@@ -1373,7 +1373,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
     When a minute has passed
     And a minute has passed
     Then one Situation has the following attributes:
-      | Codes                        | "external" : "test"                           |
+      | Codes[external]              | test                                          |
       | RecordedAt                   | 2017-01-01T12:00:00+02:00                     |
       | VersionedAt                  | 2017-01-01T12:00:00+02:00                     |
       | Version                      | 1                                             |
@@ -1436,10 +1436,10 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | remote_credential | ineo                  |
       | remote_code_space | external              |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:00+02:00         |
       | Version                      | 1                                 |
       | ReportType                   | general                           |
@@ -1450,7 +1450,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
     When a minute has passed
     And a minute has passed
     Then one Situation has the following attributes:
-      | Codes                        | "external" : "test"                           |
+      | Codes[external]              | test                                          |
       | RecordedAt                   | 2017-01-01T03:30:00+02:00                     |
       | Version                      | 2                                             |
       | Progress                     | closed                                        |
@@ -1514,18 +1514,18 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | remote_code_space                | external              |
       | collect.situations.internal_tags | first,second          |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     When a minute has passed
     And a minute has passed
     Then one Situation has the following attributes:
-      | Codes        | "external" : "test" |
-      | InternalTags | ["first","second"]  |
+      | Codes[external] | test               |
+      | InternalTags    | ["first","second"] |
 
   @ARA-1444
   Scenario: Broadcast via a SIRI SX request a Situation with matching internal tags
     Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 1                                 |
       | ReportType                   | general                           |
@@ -1536,8 +1536,8 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Description[DefaultValue]    | Description Sample                |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Stop Area Sample     |
-      | Codes | "external": "sample" |
+      | Name            | Stop Area Sample |
+      | Codes[external] | sample           |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential                   | NINOXE:default |
       | remote_code_space                  | external       |
@@ -1613,7 +1613,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   @ARA-1444
   Scenario: Do not broadcast a Situation with no matching internal tags
     Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 1                                 |
       | ReportType                   | general                           |
@@ -1624,8 +1624,8 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Description[DefaultValue]    | Description Sample                |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Stop Area Sample     |
-      | Codes | "external": "sample" |
+      | Name            | Stop Area Sample |
+      | Codes[external] | sample           |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential                   | NINOXE:default |
       | remote_code_space                  | external       |
@@ -1678,7 +1678,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   @ARA-1493
   Scenario: Handle referent lines in a SIRI SituationExchange request
     Given a Situation exists with the following attributes:
-      | Codes                                                                              | "external" : "test"                           |
+      | Codes[external]                                                                    | test                                          |
       | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                     |
       | Version                                                                            | 1                                             |
       | Keywords                                                                           | ["Commercial", "Test"]                        |
@@ -1715,24 +1715,24 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Affects[StopArea=6ba7b814-9dad-11d1-5-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Affects[StopArea=6ba7b814-9dad-11d1-5-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And a Line exists with the following attributes:
-      | Codes | "external": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[external] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:4:LOC" |
-      | Name  | Ligne 3 Metro                   |
-      | ReferentId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Codes[internal] | NINOXE:Line:4:LOC                 |
+      | Name            | Ligne 3 Metro                     |
+      | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test last stop                           |
-      | Codes | "external": "NINOXE:StopPoint:SP:25:LOC" |
+      | Name            | Test last stop             |
+      | Codes[external] | NINOXE:StopPoint:SP:25:LOC |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3534                            |
-      | Codes | "external": "STIF:StopPoint:Q:3534:" |
+      | Name            | Test 3534              |
+      | Codes[external] | STIF:StopPoint:Q:3534: |
     And a StopArea exists with the following attributes:
-      | Name  | Test 3533                            |
-      | Codes | "external": "STIF:StopPoint:Q:3533:" |
+      | Name            | Test 3533              |
+      | Codes[external] | STIF:StopPoint:Q:3533: |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
       | local_credential  | NINOXE:default |
       | remote_code_space | external       |
@@ -1937,7 +1937,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
   @skip-siri-valid @ARA-1542
   Scenario: Handle a SIRI SituationExchange with partner setting broadcast.situations.time_to_live outside broadcast period wihout RequestTimeStamp should not broadcast situation
     Given a Situation exists with the following attributes:
-      | Codes                        | "external" : "test"               |
+      | Codes[external]              | test                              |
       | RecordedAt                   | 2017-01-01T03:30:06+02:00         |
       | Version                      | 1                                 |
       | Keywords                     | ["Commercial", "Test"]            |
@@ -1951,12 +1951,12 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
       | Affects[AllLines]            |                                   |
       | Affects[StopArea]            | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name  | Test                                     |
-      | Codes | "external": "NINOXE:StopPoint:SP:24:LOC" |
+      | Name            | Test                       |
+      | Codes[external] | NINOXE:StopPoint:SP:24:LOC |
     And a SIRI Partner "test" exists with connectors [siri-situation-exchange-request-broadcaster] and the following settings:
-      | local_credential  | NINOXE:default |
-      | remote_code_space | external       |
-      | broadcast.situations.time_to_live | 5m |
+      | local_credential                  | NINOXE:default |
+      | remote_code_space                 | external       |
+      | broadcast.situations.time_to_live | 5m             |
     When I send this SIRI request
       """
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">

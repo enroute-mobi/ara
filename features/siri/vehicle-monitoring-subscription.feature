@@ -14,8 +14,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
@@ -32,8 +32,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | local_credential      | ara                   |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should not have received a VehicleMonitoringSubscription request
@@ -50,8 +50,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | collect.subscriptions.persistent | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 30 seconds have passed
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
@@ -69,8 +69,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
    And a minute has passed
    And 10 seconds have passed
    Then the SIRI server should have received a VehicleMonitoringSubscriptionRequest request with:
@@ -86,44 +86,44 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_code_space     | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                |
-      | Codes                    | "internal": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8         |
-      | Monitored                | true                                      |
-      | Attribute[DirectionName] | Direction Name                            |
+      | Name                     | Passage 32                        |
+      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:201123:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
-      | Occupancy        | seatsAvailable                        |
+      | Codes[internal]  | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Occupancy        | seatsAvailable                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:999:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
-      | Occupancy        | manySeatsAvailable                 |
-      | NextStopVisitId  | 6ba7b814-9dad-11d1-7-00c04fd430c8  |
+      | Codes[internal]  | Test:Vehicle:999:LOC              |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Occupancy        | manySeatsAvailable                |
+      | NextStopVisitId  | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Codes | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | Name  | Carabacel                                |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
+      | Name            | Carabacel                  |
       # 6ba7b814-9dad-11d1-6-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes                         | "internal": "Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1" |
-      | PassageOrder                  | 4                                                                      |
-      | VehicleAtStop                 | false                                                                  |
-      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8                                      |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                                      |
-      | VehicleAtStop                 | false                                                                  |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                                     |
-      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                               |
-      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                               |
-      | ArrivalStatus                 | delayed                                                                |
-      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                               |
-      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                               |
-      | DepartureStatus               | delayed                                                                |
-      | Attribute[DestinationDisplay] | Pouet-pouet                                                            |
+      | Codes[internal]               | Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                  | 4                                                        |
+      | VehicleAtStop                 | false                                                    |
+      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8                        |
+      | VehicleJourneyId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                        |
+      | VehicleAtStop                 | false                                                    |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                       |
+      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                 |
+      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                 |
+      | ArrivalStatus                 | delayed                                                  |
+      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                 |
+      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                 |
+      | DepartureStatus               | delayed                                                  |
+      | Attribute[DestinationDisplay] | Pouet-pouet                                              |
       # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringBroadcast          |
@@ -409,11 +409,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "another": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                  |
+      | Codes[another] | NINOXE:Line:3:LOC |
+      | Name           | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:A:BUS" |
-      | Name  | Ligne A Bus                     |
+      | Codes[internal] | NINOXE:Line:A:BUS |
+      | Name            | Ligne A Bus       |
     And a minute has passed
     When I send this SIRI request
       """
@@ -458,11 +458,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "another": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                  |
+      | Codes[another] | NINOXE:Line:3:LOC |
+      | Name           | Ligne 3 Metro     |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:A:BUS" |
-      | Name  | Ligne A Bus                     |
+      | Codes[internal] | NINOXE:Line:A:BUS |
+      | Name            | Ligne A Bus       |
     And a minute has passed
     When I send this SIRI request
       """
@@ -542,8 +542,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
        | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     And a Line exists with the following attributes:
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                   |
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a minute has passed
     When I send this SIRI request
       """
@@ -657,8 +657,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                            |
-      | Codes | "internal": "NINOXE:Line:3:LOC" |
+      | Name            | Test              |
+      | Codes[internal] | NINOXE:Line:3:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect              |
       | SubscriberRef     | subscriber                            |
@@ -716,8 +716,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                   |
-      | Codes | "internal": "testLine" |
+      | Name            | Test     |
+      | Codes[internal] | testLine |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -800,11 +800,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
       </soap:Envelope>
       """
       Then one Vehicle has the following attributes:
-        | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
-        | Bearing   | 171.0                                    |
-        | Latitude  | 48.99927561424598                        |
-        | Longitude | 1.6770970859674874                       |
+        | Codes[internal] |        TRANSDEV:Vehicle::1501:LOC |
+        | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+        | Bearing         |                             171.0 |
+        | Latitude        |                 48.99927561424598 |
+        | Longitude       |                1.6770970859674874 |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                   |
         | Protocol        | siri                                      |
@@ -865,8 +865,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | siri.direction_type                | Aller, Retour                  |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                   |
-      | Codes | "internal": "testLine" |
+      | Name            | Test     |
+      | Codes[internal] | testLine |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -952,11 +952,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | siri.envelope         | raw                                       |
     And a minute has passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::05:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::05:LOC |
     And a Line exists with the following attributes:
-      | Name  | Test 1                             |
-      | Codes | "internal": "RLA_Bus:Line::06:LOC" |
+      | Name            | Test 1               |
+      | Codes[internal] | RLA_Bus:Line::06:LOC |
    And a minute has passed
    And 20 seconds have passed
    Then the SIRI server should have received a raw VehicleMonitoringSubscriptionRequest request with:
@@ -990,8 +990,8 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | siri.envelope     | raw                   |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test                   |
-      | Codes | "internal": "testLine" |
+      | Name            | Test     |
+      | Codes[internal] | testLine |
     And a Subscription exist with the following attributes:
       | Kind                  | VehicleMonitoringCollect     |
       | ReferenceArray[0]     | Line, "internal": "testLine" |
@@ -1062,11 +1062,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
      </Siri>
       """
       Then one Vehicle has the following attributes:
-        | Codes     | "internal": "TRANSDEV:Vehicle::1501:LOC" |
-        | LineId    | 6ba7b814-9dad-11d1-3-00c04fd430c8        |
-        | Bearing   | 171.0                                    |
-        | Latitude  | 48.99927561424598                        |
-        | Longitude | 1.6770970859674874                       |
+        | Codes[internal] |        TRANSDEV:Vehicle::1501:LOC |
+        | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+        | Bearing         |                             171.0 |
+        | Latitude        |                 48.99927561424598 |
+        | Longitude       |                1.6770970859674874 |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                   |
         | Protocol        | siri                                      |
@@ -1090,18 +1090,19 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | sort_payload_for_test                           | true                             |
       | generators.reference_vehicle_journey_identifier | ch:1:ServiceJourney:87_TAC:%{id} |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                                        |
-      | Codes                    | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
-      | Monitored                | true                                                              |
-      | Attribute[DirectionName] | Direction Name                                                    |
+      | Name                     | Passage 32                        |
+      | Codes[_default]          | 6ba7b814                          |
+      | Codes[external]          | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:201123:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+      | Codes[internal]  | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringBroadcast          |
       | SubscriberRef     | Subscriber                          |
@@ -1182,18 +1183,19 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_code_space     | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
-      | Codes | "internal": "Test:Line:3:LOC" |
-      | Name  | Ligne 3 Metro                 |
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                                                        |
-      | Codes                    | "_default": "6ba7b814", "external": "Test:VehicleJourney:201:LOC" |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8                                 |
-      | Monitored                | true                                                              |
-      | Attribute[DirectionName] | Direction Name                                                    |
+      | Name                     | Passage 32                        |
+      | Codes[_default]          | 6ba7b814                          |
+      | Codes[external]          | Test:VehicleJourney:201:LOC       |
+      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                | true                              |
+      | Attribute[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes            | "internal": "Test:Vehicle:201123:LOC" |
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+      | Codes[internal]  | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringBroadcast          |
       | SubscriberRef     | Subscriber                          |
@@ -1310,11 +1312,11 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_code_space | internal              |
     And 30 seconds have passed
     And a Line exists with the following attributes:
-      | Name  | Test 1                          |
-      | Codes | "internal": "NINOXE:Line:A:LOC" |
+      | Name            | Test 1            |
+      | Codes[internal] | NINOXE:Line:A:LOC |
     And a Line exists with the following attributes:
-      | Name  | Test 2                             |
-      | Codes | "internal": "NINOXE:Line:B:LOC"    |
+      | Name            | Test 2            |
+      | Codes[internal] | NINOXE:Line:B:LOC |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect              |
       | ReferenceArray[0] | Line, "internal": "NINOXE:Line:A:LOC" |

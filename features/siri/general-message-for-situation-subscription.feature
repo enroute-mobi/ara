@@ -47,35 +47,35 @@ Feature: Support SIRI GeneralMessage by subscription
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_code_space            | internal              |
+        | remote_code_space               | internal              |
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | NINOXE:Line::3:LOC    |
       And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name              | Test                            |
-        | Codes         | "internal":"NINOXE:Line::3:LOC" |
-        | CollectSituations | true                            |
+        | Name              | Test               |
+        | Codes[internal]   | NINOXE:Line::3:LOC |
+        | CollectSituations | true               |
       And a Line exists with the following attributes:
-        | Name              | Test                            |
-        | Codes             | "internal":"NINOXE:Line::4:LOC" |
-        | CollectSituations | true                            |
+        | Name              | Test               |
+        | Codes[internal]   | NINOXE:Line::4:LOC |
+        | CollectSituations | true               |
       And a StopArea exists with the following attributes:
-        | Name              | Test                                    |
-        | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-        | CollectSituations | true                                    |
+        | Name              | Test                       |
+        | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+        | CollectSituations | true                       |
       And a StopArea exists with the following attributes:
-        | Name              | Test                                    |
-        | Codes         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-        | CollectSituations | true                                    |
+        | Name              | Test                       |
+        | Codes[internal]   | NINOXE:StopPoint:SP:12:LOC |
+        | CollectSituations | true                       |
       And 10 seconds have passed
       And 5 seconds have passed
       And a Situation exists with the following attributes:
-        | Codes                  | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
-        | Version                    | 1                                         |
-        | Keywords                   | ["Perturbation"]                          |
-        | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
-        | Description[DefaultValue]  | Les autres non                            |
+        | Codes[internal]            | NINOXE:GeneralMessage:27_1 |
+        | RecordedAt                 | 2017-01-01T03:30:06+02:00  |
+        | Version                    | 1                          |
+        | Keywords                   | ["Perturbation"]           |
+        | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00  |
+        | Description[DefaultValue]  | Les autres non             |
     When I send this SIRI request
       """
     <?xml version='1.0' encoding='utf-8'?>
@@ -138,26 +138,26 @@ Feature: Support SIRI GeneralMessage by subscription
     </S:Envelope>
       """
     Then one Situation has the following attributes:
-      | Codes                                                                         | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | Keywords                                                                      | ["Commercial"]                            |
-      | ReportType                                                                    | general                                   |
-      | Progress                                                                      | published                                 |
-      | ValidityPeriods[0]#StartTime                                                  | 2017-03-01T03:30:06+01:00                 |
-      | ValidityPeriods[0]#EndTime                                                    | 2017-03-29T03:30:06+01:00                 |
-      | Version                                                                       | 2                                         |
-      | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Codes[internal]                                                               | NINOXE:GeneralMessage:27_1        |
+      | Keywords                                                                      | ["Commercial"]                    |
+      | ReportType                                                                    | general                           |
+      | Progress                                                                      | published                         |
+      | ValidityPeriods[0]#StartTime                                                  | 2017-03-01T03:30:06+01:00         |
+      | ValidityPeriods[0]#EndTime                                                    | 2017-03-29T03:30:06+01:00         |
+      | Version                                                                       | 2                                 |
+      | Affects[Line]                                                                 | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/LastStop  | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-3-00c04fd430c8]/AffectedSections[0]/FirstStop | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     Then one Situation has the following attributes:
-      | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
-      | Keywords                     | ["Commercial"]                            |
-      | ReportType                   | general                                   |
-      | Progress                     | published                                 |
-      | ValidityPeriods[0]#StartTime | 2017-03-01T03:30:06+01:00                 |
-      | ValidityPeriods[0]#EndTime   | 2017-03-29T03:30:06+01:00                 |
-      | Version                      | 2                                         |
-      | Affects[StopArea]            | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-      | Affects[Line]                | 6ba7b814-9dad-11d1-4-00c04fd430c8         |
+      | Codes[internal]              | NINOXE:GeneralMessage:27_2        |
+      | Keywords                     | ["Commercial"]                    |
+      | ReportType                   | general                           |
+      | Progress                     | published                         |
+      | ValidityPeriods[0]#StartTime | 2017-03-01T03:30:06+01:00         |
+      | ValidityPeriods[0]#EndTime   | 2017-03-29T03:30:06+01:00         |
+      | Version                      | 2                                 |
+      | Affects[StopArea]            | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Affects[Line]                | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
     And an audit event should exist with these attributes:
       | Protocol  | siri                                                         |
       | Direction | received                                                     |
@@ -206,15 +206,15 @@ Feature: Support SIRI GeneralMessage by subscription
       </S:Envelope>
     """
     And a Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-collector] and the following settings:
-      | remote_url           | http://localhost:8090 |
-      | remote_credential    | test                  |
-      | local_credential     | NINOXE:default        |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
       | remote_code_space | internal              |
     And 30 seconds have passed
     And a Subscription exist with the following attributes:
       | Kind | GeneralMessageCollect |
     And a Situation exists with the following attributes:
-      | Codes                      | "internal" : "2"          |
+      | Codes[internal]            | 2                         |
       | RecordedAt                 | 2017-01-01T03:30:06+02:00 |
       | Version                    | 1                         |
       | Channel                    | Perturbations             |
@@ -256,47 +256,47 @@ Feature: Support SIRI GeneralMessage by subscription
     </soap:Envelope>
     """
     Then one Situation has the following attributes:
-      | Codes                        | "internal" : "2"              |
-      | Progress                     | closed                        |
-      | RecordedAt                   | 2017-05-15T13:26:10.116+02:00 |
-      | Version                      | 1                             |
-      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00     |
-      | Description[DefaultValue]    | Les autres non                |
+      | Codes[internal]            | 2                             |
+      | Progress                   | closed                        |
+      | RecordedAt                 | 2017-05-15T13:26:10.116+02:00 |
+      | Version                    | 1                             |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00     |
+      | Description[DefaultValue]  | Les autres non                |
 
   Scenario: Brodcast a GeneralMessage Notification after modification of a Situation
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
-       | remote_code_space | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | GeneralMessageBroadcast                     |
       | ExternalId        | externalId                                  |
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-        | Name              | Test              |
-        | Codes         | "internal":"1234" |
-        | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Situation exists with the following attributes:
-      | Codes                                                                           | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                                                                          | 2017-01-01T03:30:06+02:00                 |
-      | Version                                                                             | 1                                         |
-      | Keywords                                                                            | ["Perturbation"]                          |
-      | ValidityPeriods[0]#EndTime                                                          | 2017-01-01T20:30:06+02:00                 |
-      | Description[DefaultValue]                                                           | a very very very long message             |
-      | Affects[Line]                                                                       | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Affects[StopArea]                                                                   | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId  | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Codes[internal]                                                                    | NINOXE:GeneralMessage:27_1        |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00         |
+      | Version                                                                            | 1                                 |
+      | Keywords                                                                           | ["Perturbation"]                  |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]                                                          | a very very very long message     |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-        | Name              | Test                                    |
-        | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-        | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+      | CollectSituations | true                       |
     And a StopArea exists with the following attributes:
-        | Name              | Test                                    |
-        | Codes         | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-        | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:12:LOC |
+      | CollectSituations | true                       |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
@@ -358,37 +358,37 @@ Feature: Support SIRI GeneralMessage by subscription
   Scenario: Brodcast a GeneralMessageCancellation Notification after modification of a Situation with Progress closed
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-broadcaster] and the following settings:
-       | remote_url        | http://localhost:8090 |
-       | remote_credential | test                  |
-       | local_credential  | NINOXE:default        |
-       | remote_code_space | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | GeneralMessageBroadcast                     |
       | ExternalId        | externalId                                  |
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-      | Name              | Test              |
-      | Codes             | "internal":"1234" |
-      | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Situation exists with the following attributes:
-      | Codes                                                                              | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00                 |
-      | Version                                                                            | 1                                         |
-      | Keywords                                                                           | ["Perturbation"]                          |
-      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00                 |
-      | Description[DefaultValue]                                                          | a very very very long message             |
-      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
-      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8         |
+      | Codes[internal]                                                                    | NINOXE:GeneralMessage:27_1        |
+      | RecordedAt                                                                         | 2017-01-01T03:30:06+02:00         |
+      | Version                                                                            | 1                                 |
+      | Keywords                                                                           | ["Perturbation"]                  |
+      | ValidityPeriods[0]#EndTime                                                         | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]                                                          | a very very very long message     |
+      | Affects[Line]                                                                      | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[StopArea]                                                                  | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | Affects[Line=6ba7b814-9dad-11d1-2-00c04fd430c8]/AffectedDestinations[0]/StopAreaId | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+      | CollectSituations | true                       |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:12:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:12:LOC |
+      | CollectSituations | true                       |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt | 2017-01-01T03:50:06+02:00 |
@@ -427,28 +427,28 @@ Feature: Support SIRI GeneralMessage by subscription
   Scenario: Brodcast a GeneralMessage Notification when keywords does not contains Perturbation/Information/Commercial but ReportType is type incident should broadcast as Pertubation
     Given a SIRI server on "http://localhost:8090"
     And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-general-message-subscription-broadcaster] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
-       | remote_code_space | internal              |
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
     And a Subscription exist with the following attributes:
       | Kind              | GeneralMessageBroadcast                     |
       | ExternalId        | externalId                                  |
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-      | Name              | Test              |
-      | Codes         | "internal":"1234" |
-      | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Situation exists with the following attributes:
-      | Codes                  | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
-      | Version                    | 1                                         |
-      | Keywords                   | ["Other"]                                 |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
-      | ReportType                 | incident                                  |
-      | Description[DefaultValue]  | a very very very long message             |
-      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:GeneralMessage:27_1        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00         |
+      | Version                    | 1                                 |
+      | Keywords                   | ["Other"]                         |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00         |
+      | ReportType                 | incident                          |
+      | Description[DefaultValue]  | a very very very long message     |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
     And 20 seconds have passed
     Then the SIRI server should receive this response
     """
@@ -642,9 +642,9 @@ Feature: Support SIRI GeneralMessage by subscription
   Scenario: Send DeleteSubscriptionRequests
     Given a SIRI server on "http://localhost:8090"
       And a Partner "test" exists with connectors [siri-general-message-subscription-collector] and the following settings:
-       | remote_url           | http://localhost:8090 |
-       | remote_credential    | test                  |
-       | local_credential     | NINOXE:default        |
+       | remote_url        | http://localhost:8090 |
+       | remote_credential | test                  |
+       | local_credential  | NINOXE:default        |
        | remote_code_space | internal              |
     When I send this SIRI request
       """
@@ -741,12 +741,12 @@ Feature: Support SIRI GeneralMessage by subscription
        | remote_url                         | http://localhost:8090 |
        | remote_credential                  | test                  |
        | local_credential                   | NINOXE:default        |
-       | remote_code_space               | internal              |
+       | remote_code_space                  | internal              |
        | broadcast.subscriptions.persistent | true                  |
-      And a Line exists with the following attributes:
-        | Name              | Test              |
-        | Codes             | "internal":"1234" |
-        | CollectSituations | true              |
+    And a Line exists with the following attributes:
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a minute has passed
     When I send this SIRI request
       """
@@ -818,11 +818,11 @@ Feature: Support SIRI GeneralMessage by subscription
       """
     Then No Subscription exists with the following attributes:
       | SubscriptionRef | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
-      | Kind       | GeneralMessageBroadcast           |
+      | Kind            | GeneralMessageBroadcast           |
       | ExternalId      | 1                                 |
     Then one Subscription exists with the following attributes:
       | SubscriptionRef | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | Kind       | GeneralMessageBroadcast           |
+      | Kind            | GeneralMessageBroadcast           |
       | ExternalId      | 1                                 |
     When I send this SIRI request
     """
@@ -909,25 +909,25 @@ Feature: Support SIRI GeneralMessage by subscription
       | remote_url                               | http://localhost:8090 |
       | remote_credential                        | test                  |
       | local_credential                         | NINOXE:default        |
-      | remote_code_space                     | internal              |
+      | remote_code_space                        | internal              |
       | collect.filter_general_messages          | true                  |
       | collect.include_lines                    | 1234                  |
       | siri.soap.empty_response_on_notification | true                  |
     And 30 seconds have passed
-      And a Line exists with the following attributes:
-        | Name              | Test              |
-        | Codes             | "internal":"1234" |
-        | CollectSituations | true              |
-      And 10 seconds have passed
-      And 5 seconds have passed
-      And a Situation exists with the following attributes:
-        | Codes               | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | RecordedAt              | 2017-01-01T03:30:06+02:00                 |
-        | Version                 | 1                                         |
-        | Channel                 | Perturbations                             |
-        | ValidUntil              | 2017-01-01T20:30:06+02:00                 |
-        | Messages[0]#MessageType | longMessage                               |
-        | Messages[0]#MessageText | Les autres non                            |
+    And a Line exists with the following attributes:
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
+    And 10 seconds have passed
+    And 5 seconds have passed
+    And a Situation exists with the following attributes:
+      | Codes[internal]         | NINOXE:GeneralMessage:27_1 |
+      | RecordedAt              | 2017-01-01T03:30:06+02:00  |
+      | Version                 | 1                          |
+      | Channel                 | Perturbations              |
+      | ValidUntil              | 2017-01-01T20:30:06+02:00  |
+      | Messages[0]#MessageType | longMessage                |
+      | Messages[0]#MessageText | Les autres non             |
     When I send this SIRI request
       """
      <?xml version='1.0' encoding='utf-8'?>
@@ -973,8 +973,8 @@ Feature: Support SIRI GeneralMessage by subscription
      </S:Envelope>
       """
     Then a Situation exists with the following attributes:
-        | Codes | "internal" : "NINOXE:GeneralMessage:27_1" |
-        | Channel   | Commercial                                |
+      | Codes[internal] | NINOXE:GeneralMessage:27_1 |
+      | Channel         | Commercial                 |
     And I should receive this SIRI response
       """
       <?xml version='1.0' encoding='UTF-8'?> 
@@ -1028,25 +1028,25 @@ Feature: Support SIRI GeneralMessage by subscription
         | remote_url                      | http://localhost:8090 |
         | remote_credential               | test                  |
         | local_credential                | NINOXE:default        |
-        | remote_code_space            | internal              |
+        | remote_code_space               | internal              |
         | collect.filter_general_messages | true                  |
         | collect.include_lines           | NINOXE:Line::3:LOC    |
       And a Line exists with the following attributes:
-        | Name              | Test                            |
-        | Codes         | "internal":"NINOXE:Line::3:LOC" |
-        | CollectSituations | true                            |
+        | Name              | Test               |
+        | Codes[internal]   | NINOXE:Line::3:LOC |
+        | CollectSituations | true               |
       And a Subscription exist with the following attributes:
         | Kind              | GeneralMessageCollect                  |
         | ReferenceArray[0] | Line, "internal": "NINOXE:Line::3:LOC" |
       And 30 seconds have passed
       And a minute has passed
       And an audit event should exist with these attributes:
-      | Protocol                | siri                                  |
-      | Direction               | sent                                  |
-      | Status                  | OK                                    |
-      | Type                    | GeneralMessageSubscriptionRequest     |
-      | Lines                   | ["NINOXE:Line::3:LOC"]                |
-      | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+        | Protocol                | siri                                  |
+        | Direction               | sent                                  |
+        | Status                  | OK                                    |
+        | Type                    | GeneralMessageSubscriptionRequest     |
+        | Lines                   | ["NINOXE:Line::3:LOC"]                |
+        | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-3-00c04fd430c8"] |
 
   @ARA-1443
   Scenario: Collect GeneralMessage with internal tags
@@ -1098,13 +1098,13 @@ Feature: Support SIRI GeneralMessage by subscription
         | collect.situations.internal_tags | first,second          |
       And 30 seconds have passed
       And a Line exists with the following attributes:
-        | Name              | Test                            |
-        | Codes             | "internal":"NINOXE:Line::4:LOC" |
-        | CollectSituations | true                            |
+        | Name              | Test               |
+        | Codes[internal]   | NINOXE:Line::4:LOC |
+        | CollectSituations | true               |
       And a StopArea exists with the following attributes:
-        | Name              | Test                                    |
-        | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-        | CollectSituations | true                                    |
+        | Name              | Test                       |
+        | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+        | CollectSituations | true                       |
       And 10 seconds have passed
       And 5 seconds have passed
       When I send this SIRI request
@@ -1149,8 +1149,8 @@ Feature: Support SIRI GeneralMessage by subscription
      </S:Envelope>
       """
     Then one Situation has the following attributes:
-      | Codes                        | "internal" : "NINOXE:GeneralMessage:27_2" |
-      | InternalTags                 | ["first","second"]                        |
+      | Codes[internal] | NINOXE:GeneralMessage:27_2 |
+      | InternalTags    | ["first","second"]         |
 
   @ARA-1444    
   Scenario: Broadcast a GeneralMessage Notification after modification of a Situation with matching InternalTags
@@ -1167,23 +1167,23 @@ Feature: Support SIRI GeneralMessage by subscription
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-      | Name              | Test              |
-      | Codes             | "internal":"1234" |
-      | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Situation exists with the following attributes:
-      | Codes                      | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
-      | Version                    | 1                                         |
-      | InternalTags               | ["first","second"]                        |
-      | Keywords                   | ["Perturbation"]                          |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
-      | Description[DefaultValue]  | a very very very long message             |
-      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Affects[StopArea]          | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:GeneralMessage:27_1        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00         |
+      | Version                    | 1                                 |
+      | InternalTags               | ["first","second"]                |
+      | Keywords                   | ["Perturbation"]                  |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]  | a very very very long message     |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[StopArea]          | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-        | Name              | Test                                    |
-        | Codes         | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-        | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+      | CollectSituations | true                       |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
@@ -1248,23 +1248,23 @@ Feature: Support SIRI GeneralMessage by subscription
       | SubscriberRef     | subscriber                                  |
       | ReferenceArray[0] | Situation, "SituationResource": "Situation" |
     And a Line exists with the following attributes:
-      | Name              | Test              |
-      | Codes             | "internal":"1234" |
-      | CollectSituations | true              |
+      | Name              | Test |
+      | Codes[internal]   | 1234 |
+      | CollectSituations | true |
     And a Situation exists with the following attributes:
-      | Codes                      | "internal" : "NINOXE:GeneralMessage:27_1" |
-      | RecordedAt                 | 2017-01-01T03:30:06+02:00                 |
-      | Version                    | 1                                         |
-      | InternalTags               | ["wrong"]                                 |
-      | Keywords                   | ["Perturbation"]                          |
-      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00                 |
-      | Description[DefaultValue]  | a very very very long message             |
-      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8         |
-      | Affects[StopArea]          | 6ba7b814-9dad-11d1-5-00c04fd430c8         |
+      | Codes[internal]            | NINOXE:GeneralMessage:27_1        |
+      | RecordedAt                 | 2017-01-01T03:30:06+02:00         |
+      | Version                    | 1                                 |
+      | InternalTags               | ["wrong"]                         |
+      | Keywords                   | ["Perturbation"]                  |
+      | ValidityPeriods[0]#EndTime | 2017-01-01T20:30:06+02:00         |
+      | Description[DefaultValue]  | a very very very long message     |
+      | Affects[Line]              | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Affects[StopArea]          | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
     And a StopArea exists with the following attributes:
-      | Name              | Test                                    |
-      | Codes             | "internal":"NINOXE:StopPoint:SP:24:LOC" |
-      | CollectSituations | true                                    |
+      | Name              | Test                       |
+      | Codes[internal]   | NINOXE:StopPoint:SP:24:LOC |
+      | CollectSituations | true                       |
     And 10 seconds have passed
     When the Situation "6ba7b814-9dad-11d1-4-00c04fd430c8" is edited with the following attributes:
       | RecordedAt                 | 2017-01-01T03:50:06+02:00              |
