@@ -36,6 +36,8 @@ type SIRIStopMonitoringDelivery struct {
 type SIRICancelledStopVisit struct {
 	RecordedAtTime         time.Time
 	ItemRef                string
+	DirectionRef           string
+	VisitNumber            int
 	MonitoringRef          string
 	LineRef                string
 	DataFrameRef           string

@@ -11,9 +11,11 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
+	assert := assert.New(t)
 	// logger.Log.Debug = true
 
 	fakeClock := clock.NewFakeClock()
@@ -38,9 +40,9 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	partner := referential.Partners().New("Un Partner tout autant cool")
 	settings := map[string]string{
 		"remote_code_space": "internal",
-		"remote_credential":    "external",
-		"local_credential":     "local",
-		"remote_url":           ts.URL,
+		"remote_credential": "external",
+		"local_credential":  "local",
+		"remote_url":        ts.URL,
 	}
 	partner.SetUUIDGenerator(uuidGenerator)
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -69,7 +71,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 
 	reference := model.Reference{
 		Code: &code,
-		Type:     "Line",
+		Type: "Line",
 	}
 
 	subscription := partner.Subscriptions().New(EstimatedTimetableBroadcast)
@@ -86,7 +88,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	operatorCode := model.NewCode("test", "1234")
 	operatorRef := model.Reference{
 		Code: &operatorCode,
-		Type:     "OperatorRef",
+		Type: "OperatorRef",
 	}
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
@@ -125,12 +127,10 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 		<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 		<siri:ProducerRef>external</siri:ProducerRef>
 		<siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-5-00c04fd430c8</siri:ResponseMessageIdentifier>
-		<siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Notification>
 		<siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
-			<siri:RequestMessageRef>MessageIdentifier</siri:RequestMessageRef>
 			<siri:SubscriberRef>subscriber</siri:SubscriberRef>
 			<siri:SubscriptionRef>externalId</siri:SubscriptionRef>
 			<siri:Status>true</siri:Status>
@@ -138,14 +138,13 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:LineRef>
-					<siri:DirectionRef/>
-					<siri:OperatorRef>123456789</siri:OperatorRef>
+					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:DatedVehicleJourneyRef>
+					<siri:OperatorRef>123456789</siri:OperatorRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:StopPointRef>
 							<siri:Order>0</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
 				</siri:EstimatedVehicleJourney>
@@ -157,7 +156,5 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 </S:Body>
 </S:Envelope>`
 
-	if string(response) != expected {
-		t.Errorf("Got diffrent xml than expected, got: %v\nwant :%v", string(response), expected)
-	}
+	assert.Equal(expected, string(response))
 }

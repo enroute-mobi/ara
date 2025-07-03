@@ -5,7 +5,7 @@ const (
 	AimedHeadwayInterval        = "AimedHeadwayInterval"
 	AlertCause                  = "AlertCause"
 	ArrivalPlatformName         = "ArrivalPlatformName"
-	ArrivalProximyTest          = "ArrivalProximyTest"
+	ArrivalProximityText        = "ArrivalProximityText"
 	ArrivalStatus               = "ArrivalStatus"
 	Bearing                     = "Bearing"
 	ChangeBeforeUpdates         = "ChangeBeforeUpdates"

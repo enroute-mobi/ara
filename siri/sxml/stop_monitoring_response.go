@@ -55,7 +55,7 @@ type XMLMonitoredVehicleJourney struct {
 	actualQuayName              string
 	aimedHeadwayInterval        string
 	arrivalPlatformName         string
-	arrivalProximyTest          string
+	arrivalProximityText        string
 	departureBoardingActivity   string
 	departurePlatformName       string
 	distanceFromStop            string
@@ -274,11 +274,11 @@ func (vj *XMLMonitoredVehicleJourney) ArrivalPlatformName() string {
 	return vj.arrivalPlatformName
 }
 
-func (vj *XMLMonitoredVehicleJourney) ArrivalProximyTest() string {
-	if vj.arrivalProximyTest == "" {
-		vj.arrivalProximyTest = vj.findStringChildContent(siri_attributes.ArrivalProximyTest)
+func (vj *XMLMonitoredVehicleJourney) ArrivalProximityText() string {
+	if vj.arrivalProximityText == "" {
+		vj.arrivalProximityText = vj.findStringChildContent(siri_attributes.ArrivalProximityText)
 	}
-	return vj.arrivalProximyTest
+	return vj.arrivalProximityText
 }
 
 func (vj *XMLMonitoredVehicleJourney) DepartureBoardingActivity() string {

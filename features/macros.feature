@@ -61,7 +61,6 @@ Feature: Manages Macros
                 <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
                 <siri:VehicleAtStop>false</siri:VehicleAtStop>
                 <siri:ExpectedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ExpectedArrivalTime>
-                <siri:ActualArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ActualArrivalTime>
                 <siri:ArrivalStatus>arrived</siri:ArrivalStatus>
                 <siri:ArrivalBoardingActivity>alighting</siri:ArrivalBoardingActivity>
                 <siri:ArrivalStopAssignment>
@@ -93,7 +92,6 @@ Feature: Manages Macros
     Then one StopVisit has the following attributes:
       | Codes                          | "internal": "NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3" |
       | Schedule[expected]#ArrivalTime |                                            2017-01-01T12:54:00+02:00 |
-      | Schedule[actual]#ArrivalTime   |                                            2017-01-01T12:54:00+02:00 |
       | Schedule[aimed]#ArrivalTime    |                                            2017-01-01T12:54:00+02:00 |
 
   @nostart @database
@@ -152,8 +150,8 @@ Feature: Manages Macros
                 <siri:Order>4</siri:Order>
                 <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
                 <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                <siri:AimedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:AimedArrivalTime>
                 <siri:ExpectedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ExpectedArrivalTime>
-                <siri:ActualArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ActualArrivalTime>
                 <siri:ArrivalStatus>arrived</siri:ArrivalStatus>
                 <siri:ArrivalBoardingActivity>alighting</siri:ArrivalBoardingActivity>
                 <siri:ArrivalStopAssignment>

@@ -4,7 +4,6 @@
 		<siri:ProducerRef>{{ .ProducerRef }}</siri:ProducerRef>{{ if .Address }}
 		<siri:Address>{{ .Address }}</siri:Address>{{ end }}
 		<siri:ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</siri:ResponseMessageIdentifier>
-		<siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
 	</ServiceDeliveryInfo>
 	<Notification>{{ range .Deliveries }}
 		{{ .BuildNotifyStopMonitoringDeliveryXML }}{{ end }}

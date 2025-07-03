@@ -14,7 +14,7 @@ func Test_DeleteSubscriptionRequest_BuildXML(t *testing.T) {
 		<siri:RequestorRef>requestor</siri:RequestorRef>
 		<siri:MessageIdentifier>mid</siri:MessageIdentifier>
 	</DeleteSubscriptionInfo>
-	<Request version="2.0:FR-IDF-2.4">
+	<Request>
 		<siri:All/>
 	</Request>
 	<RequestExtension/>

@@ -97,8 +97,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                   <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-2</siri:ItemIdentifier>
@@ -248,8 +248,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                   <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-4</siri:ItemIdentifier>
@@ -382,8 +382,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                   <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
@@ -517,8 +517,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                   <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
@@ -656,8 +656,8 @@ Feature: Support SIRI StopMonitoring by request
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:Status>true</siri:Status>
+                <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                   <siri:ItemIdentifier>NINOXE:VehicleJourney:202-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
@@ -781,9 +781,9 @@ Feature: Support SIRI StopMonitoring by request
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
-        <ns2:MaximumStopVisits>2</ns2:MaximumStopVisits>
         <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
         <ns2:StopVisitTypes>all</ns2:StopVisitTypes>
+        <ns2:MaximumStopVisits>2</ns2:MaximumStopVisits>
       </Request>
       <RequestExtension />
     </ns7:GetStopMonitoring>
@@ -806,8 +806,8 @@ Feature: Support SIRI StopMonitoring by request
             <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
-              <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
               <siri:Status>true</siri:Status>
+              <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
               <siri:MonitoredStopVisit>
                 <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
                 <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>

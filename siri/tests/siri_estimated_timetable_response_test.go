@@ -5,9 +5,12 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
+	assert := assert.New(t)
+
 	expectedXML := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
@@ -26,15 +29,14 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
-					<siri:OperatorRef>operator1</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
-					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
+					<siri:OperatorRef>operator1</siri:OperatorRef>
+					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint1</siri:StopPointRef>
 							<siri:Order>1</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>2016-09-21T20:14:46.000Z</siri:AimedArrivalTime>
 							<siri:ArrivalStatus>astatus1</siri:ArrivalStatus>
 							<siri:AimedDepartureTime>2016-09-21T20:14:46.000Z</siri:AimedDepartureTime>
@@ -43,7 +45,6 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint2</siri:StopPointRef>
 							<siri:Order>2</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>2016-09-21T20:14:46.000Z</siri:AimedArrivalTime>
 							<siri:ArrivalStatus>astatus2</siri:ArrivalStatus>
 							<siri:AimedDepartureTime>2016-09-21T20:14:46.000Z</siri:AimedDepartureTime>
@@ -57,15 +58,14 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line2</siri:LineRef>
 					<siri:DirectionRef>direction2</siri:DirectionRef>
-					<siri:OperatorRef>operator2</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref2</siri:DatedVehicleJourneyRef>
-					<siri:OriginRef>origin2</siri:OriginRef>
 					<siri:DestinationRef>destination2</siri:DestinationRef>
+					<siri:OperatorRef>operator2</siri:OperatorRef>
+					<siri:OriginRef>origin2</siri:OriginRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint3</siri:StopPointRef>
 							<siri:Order>3</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>2016-09-21T20:14:46.000Z</siri:AimedArrivalTime>
 							<siri:ArrivalStatus>astatus3</siri:ArrivalStatus>
 							<siri:AimedDepartureTime>2016-09-21T20:14:46.000Z</siri:AimedDepartureTime>
@@ -76,15 +76,14 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line3</siri:LineRef>
 					<siri:DirectionRef>direction3</siri:DirectionRef>
-					<siri:OperatorRef>operator3</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref3</siri:DatedVehicleJourneyRef>
-					<siri:OriginRef>origin3</siri:OriginRef>
 					<siri:DestinationRef>destination3</siri:DestinationRef>
+					<siri:OperatorRef>operator3</siri:OperatorRef>
+					<siri:OriginRef>origin3</siri:OriginRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint4</siri:StopPointRef>
 							<siri:Order>4</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>2016-09-21T20:14:46.000Z</siri:AimedArrivalTime>
 							<siri:ArrivalStatus>astatus4</siri:ArrivalStatus>
 							<siri:AimedDepartureTime>2016-09-21T20:14:46.000Z</siri:AimedDepartureTime>
@@ -199,15 +198,13 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 	response.EstimatedJourneyVersionFrames = []*siri.SIRIEstimatedJourneyVersionFrame{journeyVersion1, journeyVersion2}
 
 	xml, err := response.BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if expectedXML != xml {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
-	}
+	assert.NoError(err)
+	assert.Equal(expectedXML, xml)
 }
 
 func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
+	assert := assert.New(t)
+
 	expectedXML := `<sw:GetEstimatedTimetableResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<siri:ResponseTimestamp>2016-09-21T20:14:46.000Z</siri:ResponseTimestamp>
@@ -226,10 +223,10 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
-					<siri:OperatorRef>operator1</siri:OperatorRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
-					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
+					<siri:OperatorRef>operator1</siri:OperatorRef>
+					<siri:OriginRef>origin1</siri:OriginRef>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
@@ -270,10 +267,6 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 	response.EstimatedJourneyVersionFrames = []*siri.SIRIEstimatedJourneyVersionFrame{journeyVersion1}
 
 	xml, err := response.BuildXML()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if expectedXML != xml {
-		t.Errorf("Wrong XML for Request:\n got:\n%v\nwant:\n%v", xml, expectedXML)
-	}
+	assert.NoError(err)
+	assert.Equal(expectedXML, xml)
 }

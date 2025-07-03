@@ -8,8 +8,8 @@
     <Answer>{{ range .ResponseStatus }}
         <siri:ResponseStatus>
             <siri:ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ResponseTimestamp>
-            <siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>
-            <siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>
+            <siri:RequestMessageRef>{{ .RequestMessageRef }}</siri:RequestMessageRef>{{ if .SubscriberRef }}
+            <siri:SubscriberRef>{{ .SubscriberRef }}</siri:SubscriberRef>{{ end }}
             <siri:SubscriptionRef>{{ .SubscriptionRef }}</siri:SubscriptionRef>
             <siri:Status>{{ .Status }}</siri:Status>{{ if not .Status }}
 						<siri:ErrorCondition>{{ if eq .ErrorType "OtherError" }}

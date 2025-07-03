@@ -71,6 +71,8 @@ func (builder *BroadcastStopMonitoringBuilder) BuildCancelledStopVisit(stopVisit
 		RecordedAtTime:         stopVisit.RecordedAt,
 		ItemRef:                itemIdentifier,
 		MonitoringRef:          builder.MonitoringRef,
+		VisitNumber:            stopVisit.PassageOrder,
+		DirectionRef:           stopVisit.VehicleJourney().DirectionType,
 		LineRef:                lineCode.Value(),
 		DatedVehicleJourneyRef: datedVehicleJourneyRef,
 		DataFrameRef:           builder.dataFrameRef(stopVisit, vehicleJourney.Origin),
@@ -140,19 +142,11 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	}
 
 	if stopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_CANCELLED && builder.StopVisitTypes != "departures" {
-		monitoredStopVisit.AimedArrivalTime = stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime()
-		monitoredStopVisit.ExpectedArrivalTime = stopVisit.Schedules.Schedule(schedules.Expected).ArrivalTime()
-		if monitoredStopVisit.Monitored {
-			monitoredStopVisit.ActualArrivalTime = stopVisit.Schedules.Schedule(schedules.Actual).ArrivalTime()
-		}
+		builder.BuildArrivalSchedules(stopVisit, monitoredStopVisit)
 	}
 
 	if stopVisit.DepartureStatus != model.STOP_VISIT_DEPARTURE_CANCELLED && builder.StopVisitTypes != "arrivals" {
-		monitoredStopVisit.AimedDepartureTime = stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime()
-		monitoredStopVisit.ExpectedDepartureTime = stopVisit.Schedules.Schedule(schedules.Expected).DepartureTime()
-		if monitoredStopVisit.Monitored {
-			monitoredStopVisit.ActualDepartureTime = stopVisit.Schedules.Schedule(schedules.Actual).DepartureTime()
-		}
+		builder.BuildDepartureSchedules(stopVisit, monitoredStopVisit)
 	}
 
 	vehicleJourneyRefCopy := vehicleJourney.References.Copy()
@@ -183,6 +177,54 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 
 	return monitoredStopVisit
+}
+
+func (builder *BroadcastStopMonitoringBuilder) BuildArrivalSchedules(stopVisit *model.StopVisit, siriStopVisit *siri.SIRIMonitoredStopVisit) {
+	if !stopVisit.Schedules.Schedule(schedules.Expected).ArrivalTime().IsZero() {
+		siriStopVisit.ExpectedArrivalTime = stopVisit.Schedules.Schedule(schedules.Expected).ArrivalTime()
+		if !stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime().IsZero() {
+			siriStopVisit.AimedArrivalTime = stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime()
+			return
+		}
+		return
+	}
+
+	if !stopVisit.Schedules.Schedule(schedules.Actual).ArrivalTime().IsZero() {
+		siriStopVisit.ActualArrivalTime = stopVisit.Schedules.Schedule(schedules.Actual).ArrivalTime()
+		if !stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime().IsZero() {
+			siriStopVisit.AimedArrivalTime = stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime()
+			return
+		}
+		return
+	}
+
+	if !stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime().IsZero() {
+		siriStopVisit.AimedArrivalTime = stopVisit.Schedules.Schedule(schedules.Aimed).ArrivalTime()
+	}
+}
+
+func (builder *BroadcastStopMonitoringBuilder) BuildDepartureSchedules(stopVisit *model.StopVisit, siriStopVisit *siri.SIRIMonitoredStopVisit) {
+	if !stopVisit.Schedules.Schedule(schedules.Expected).DepartureTime().IsZero() {
+		siriStopVisit.ExpectedDepartureTime = stopVisit.Schedules.Schedule(schedules.Expected).DepartureTime()
+		if !stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime().IsZero() {
+			siriStopVisit.AimedDepartureTime = stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime()
+			return
+		}
+		return
+	}
+
+	if !stopVisit.Schedules.Schedule(schedules.Actual).DepartureTime().IsZero() {
+		siriStopVisit.ActualDepartureTime = stopVisit.Schedules.Schedule(schedules.Actual).DepartureTime()
+		if !stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime().IsZero() {
+			siriStopVisit.AimedDepartureTime = stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime()
+			return
+		}
+		return
+	}
+
+	if !stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime().IsZero() {
+		siriStopVisit.AimedDepartureTime = stopVisit.Schedules.Schedule(schedules.Aimed).DepartureTime()
+	}
 }
 
 func (builder *BroadcastStopMonitoringBuilder) directionType(direction string) (dir string) {

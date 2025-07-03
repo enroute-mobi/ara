@@ -410,8 +410,8 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
-			<siri:MonitoringRef>stopArea1</siri:MonitoringRef>
 			<siri:Status>true</siri:Status>
+			<siri:MonitoringRef>stopArea1</siri:MonitoringRef>
 			<siri:MonitoredStopVisit>
 				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:ItemIdentifier>first</siri:ItemIdentifier>
@@ -452,8 +452,8 @@ func Test_SIRIHandler_SiriService(t *testing.T) {
 		<siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
 			<siri:ResponseTimestamp>1984-04-04T00:00:00.000Z</siri:ResponseTimestamp>
 			<siri:RequestMessageRef>GetSIRIStopMonitoring:Test:0</siri:RequestMessageRef>
-			<siri:MonitoringRef>stopArea2</siri:MonitoringRef>
 			<siri:Status>true</siri:Status>
+			<siri:MonitoringRef>stopArea2</siri:MonitoringRef>
 			<siri:MonitoredStopVisit>
 				<siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:ItemIdentifier>fourth</siri:ItemIdentifier>
@@ -678,14 +678,13 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>NINOXE:Line:2:LOC</siri:LineRef>
-					<siri:DirectionRef/>
-					<siri:OperatorRef/>
+					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>vehicleJourney</siri:DatedVehicleJourneyRef>
+					<siri:PublishedLineName>lineName</siri:PublishedLineName>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopArea1</siri:StopPointRef>
 							<siri:Order>1</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>1984-04-04T00:01:00.000Z</siri:AimedArrivalTime>
 							<siri:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</siri:ExpectedArrivalTime>
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -693,7 +692,6 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopArea2</siri:StopPointRef>
 							<siri:Order>2</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>1984-04-04T00:02:00.000Z</siri:AimedArrivalTime>
 							<siri:ExpectedArrivalTime>1984-04-04T00:02:00.000Z</siri:ExpectedArrivalTime>
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
@@ -705,14 +703,13 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
-					<siri:DirectionRef/>
-					<siri:OperatorRef/>
+					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>vehicleJourney2</siri:DatedVehicleJourneyRef>
+					<siri:PublishedLineName>lineName2</siri:PublishedLineName>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopArea1</siri:StopPointRef>
 							<siri:Order>1</siri:Order>
-							<siri:VehicleAtStop>false</siri:VehicleAtStop>
 							<siri:AimedArrivalTime>1984-04-04T00:01:00.000Z</siri:AimedArrivalTime>
 							<siri:ExpectedArrivalTime>1984-04-04T00:01:00.000Z</siri:ExpectedArrivalTime>
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>

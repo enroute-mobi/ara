@@ -89,55 +89,51 @@ Feature: Audit API exchanges
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
-                <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>aller</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:24:LOC</ns3:OriginRef>
-                    <ns3:OriginName>Origin</ns3:OriginName>
-                    <ns3:DestinationName>Mago-Cime OMNI</ns3:DestinationName>                    
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>arrived</ns3:ArrivalStatus>
-                      <ns3:DepartureStatus>departed</ns3:DepartureStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                 <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:DirectionRef>aller</ns2:DirectionRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:OriginRef>NINOXE:StopPoint:SP:24:LOC</ns2:OriginRef>
+                    <ns2:OriginName>Origin</ns2:OriginName>
+                    <ns2:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns2:DestinationRef>
+                    <ns2:DestinationName>Mago-Cime OMNI</ns2:DestinationName>
+                    <ns2:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns2:OriginAimedDepartureTime>
+                    <ns2:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns2:DestinationAimedArrivalTime>
+                    <ns2:Monitored>true</ns2:Monitored>
+                    <ns2:CourseOfJourneyRef>201</ns2:CourseOfJourneyRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>true</ns2:VehicleAtStop>
+                      <ns2:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns2:AimedArrivalTime>
+                      <ns2:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns2:ExpectedArrivalTime>
+                      <ns2:ArrivalStatus>arrived</ns2:ArrivalStatus>
+                      <ns2:DepartureStatus>departed</ns2:DepartureStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
@@ -250,8 +246,7 @@ Feature: Audit API exchanges
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -259,46 +254,45 @@ Feature: Audit API exchanges
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>aller</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:24:LOC</ns3:OriginRef>
-                    <ns3:OriginName>Origin</ns3:OriginName>
-                    <ns3:DestinationName>Mago-Cime OMNI</ns3:DestinationName>                    
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:ActualArrivalTime>2017-01-01T13:05:00.000+02:00</ns3:ActualArrivalTime>
-                      <ns3:ActualDepartureTime>2017-01-01T13:22:00.000+02:00</ns3:ActualDepartureTime>
-                      <ns3:ArrivalStatus>cancelled</ns3:ArrivalStatus>
-                      <ns3:DepartureStatus>cancelled</ns3:DepartureStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:DirectionRef>aller</ns2:DirectionRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:OriginRef>NINOXE:StopPoint:SP:24:LOC</ns2:OriginRef>
+                    <ns2:OriginName>Origin</ns2:OriginName>
+                    <ns2:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns2:DestinationRef>
+                    <ns2:DestinationName>Mago-Cime OMNI</ns2:DestinationName>
+                    <ns2:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns2:OriginAimedDepartureTime>
+                    <ns2:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns2:DestinationAimedArrivalTime>
+                    <ns2:Monitored>true</ns2:Monitored>
+                    <ns2:CourseOfJourneyRef>201</ns2:CourseOfJourneyRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>true</ns2:VehicleAtStop>
+                      <ns2:ActualArrivalTime>2017-01-01T13:05:00.000+02:00</ns2:ActualArrivalTime>
+                      <ns2:ArrivalStatus>cancelled</ns2:ArrivalStatus>
+                      <ns2:ActualDepartureTime>2017-01-01T13:22:00.000+02:00</ns2:ActualDepartureTime>
+                      <ns2:DepartureStatus>cancelled</ns2:DepartureStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
@@ -486,8 +480,7 @@ Feature: Audit API exchanges
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -495,15 +488,16 @@ Feature: Audit API exchanges
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
-                <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
+                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
                 <ns2:MonitoredStopVisitCancellation>
                   <ns2:RecordedAtTime>2017-05-15T13:26:10.116+02:00</ns2:RecordedAtTime>
                   <ns2:ItemRef>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1</ns2:ItemRef>
                   <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:VisitNumber>4</ns2:VisitNumber>
                   <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                  <ns2:DirectionRef>Aller</ns2:DirectionRef>
                 </ns2:MonitoredStopVisitCancellation>
               </ns2:StopMonitoringDelivery>
             </Notification>
@@ -632,8 +626,7 @@ Feature: Audit API exchanges
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>
-              2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
+              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
               <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
               <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
@@ -641,46 +634,45 @@ Feature: Audit API exchanges
             <Notification>
               <ns2:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-                <ns2:RequestMessageRef>StopMonitoring:TestDelivery:0</ns2:RequestMessageRef>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
                 <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns2:Status>true</ns2:Status>
-                <ns3:MonitoredStopVisit>
-                  <ns3:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns3:RecordedAtTime>
-                  <ns3:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns3:ItemIdentifier>
-                  <ns3:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns3:MonitoringRef>
-                  <ns3:MonitoredVehicleJourney>
-                    <ns3:LineRef>NINOXE:Line:3:LOC</ns3:LineRef>
-                    <ns3:DirectionRef>aller</ns3:DirectionRef>
-                    <ns3:FramedVehicleJourneyRef>
-                      <ns3:DataFrameRef>2016-09-22</ns3:DataFrameRef>
-                      <ns3:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns3:DatedVehicleJourneyRef>
-                    </ns3:FramedVehicleJourneyRef>
-                    <ns3:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns3:JourneyPatternRef>
-                    <ns3:PublishedLineName>Ligne 3 Metro</ns3:PublishedLineName>
-                    <ns3:DirectionName>Mago-Cime OMNI</ns3:DirectionName>
-                    <ns3:ExternalLineRef>NINOXE:Line:3:LOC</ns3:ExternalLineRef>
-                    <ns3:OriginRef>NINOXE:StopPoint:SP:24:LOC</ns3:OriginRef>
-                    <ns3:OriginName>Origin</ns3:OriginName>
-                    <ns3:DestinationName>Mago-Cime OMNI</ns3:DestinationName>                    
-                    <ns3:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns3:DestinationRef>
-                    <ns3:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns3:OriginAimedDepartureTime>
-                    <ns3:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns3:DestinationAimedArrivalTime>
-                    <ns3:Monitored>true</ns3:Monitored>
-                    <ns3:CourseOfJourneyRef>201</ns3:CourseOfJourneyRef>
-                    <ns3:VehicleRef>NINOXE:Vehicle:23:LOC</ns3:VehicleRef>
-                    <ns3:MonitoredCall>
-                      <ns3:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns3:StopPointRef>
-                      <ns3:Order>4</ns3:Order>
-                      <ns3:StopPointName>Elf Sylvain - Métro (R)</ns3:StopPointName>
-                      <ns3:VehicleAtStop>true</ns3:VehicleAtStop>
-                      <ns3:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns3:AimedArrivalTime>
-                      <ns3:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns3:ExpectedArrivalTime>
-                      <ns3:ArrivalStatus>arrived</ns3:ArrivalStatus>
-                      <ns3:DepartureStatus>departed</ns3:DepartureStatus>
-                    </ns3:MonitoredCall>
-                  </ns3:MonitoredVehicleJourney>
-                </ns3:MonitoredStopVisit>
+                <ns2:MonitoredStopVisit>
+                  <ns2:RecordedAtTime>2016-09-22T07:56:53.000+02:00</ns2:RecordedAtTime>
+                  <ns2:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</ns2:ItemIdentifier>
+                  <ns2:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</ns2:MonitoringRef>
+                  <ns2:MonitoredVehicleJourney>
+                    <ns2:LineRef>NINOXE:Line:3:LOC</ns2:LineRef>
+                    <ns2:DirectionRef>aller</ns2:DirectionRef>
+                    <ns2:FramedVehicleJourneyRef>
+                      <ns2:DataFrameRef>2016-09-22</ns2:DataFrameRef>
+                      <ns2:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</ns2:DatedVehicleJourneyRef>
+                    </ns2:FramedVehicleJourneyRef>
+                    <ns2:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</ns2:JourneyPatternRef>
+                    <ns2:PublishedLineName>Ligne 3 Metro</ns2:PublishedLineName>
+                    <ns2:DirectionName>Mago-Cime OMNI</ns2:DirectionName>
+                    <ns2:ExternalLineRef>NINOXE:Line:3:LOC</ns2:ExternalLineRef>
+                    <ns2:OriginRef>NINOXE:StopPoint:SP:24:LOC</ns2:OriginRef>
+                    <ns2:OriginName>Origin</ns2:OriginName>
+                    <ns2:DestinationRef>NINOXE:StopPoint:SP:62:LOC</ns2:DestinationRef>
+                    <ns2:DestinationName>Mago-Cime OMNI</ns2:DestinationName>
+                    <ns2:OriginAimedDepartureTime>2016-09-22T07:50:00.000+02:00</ns2:OriginAimedDepartureTime>
+                    <ns2:DestinationAimedArrivalTime>2016-09-22T08:02:00.000+02:00</ns2:DestinationAimedArrivalTime>
+                    <ns2:Monitored>true</ns2:Monitored>
+                    <ns2:CourseOfJourneyRef>201</ns2:CourseOfJourneyRef>
+                    <ns2:VehicleRef>NINOXE:Vehicle:23:LOC</ns2:VehicleRef>
+                    <ns2:MonitoredCall>
+                      <ns2:StopPointRef>NINOXE:StopPoint:SP:24:LOC</ns2:StopPointRef>
+                      <ns2:Order>4</ns2:Order>
+                      <ns2:StopPointName>Elf Sylvain - Métro (R)</ns2:StopPointName>
+                      <ns2:VehicleAtStop>true</ns2:VehicleAtStop>
+                      <ns2:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</ns2:AimedArrivalTime>
+                      <ns2:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</ns2:ExpectedArrivalTime>
+                      <ns2:ArrivalStatus>arrived</ns2:ArrivalStatus>
+                      <ns2:DepartureStatus>departed</ns2:DepartureStatus>
+                    </ns2:MonitoredCall>
+                  </ns2:MonitoredVehicleJourney>
+                </ns2:MonitoredStopVisit>
               </ns2:StopMonitoringDelivery>
             </Notification>
             <SiriExtension />
