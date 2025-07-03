@@ -232,7 +232,9 @@ func (builder *BroadcastGeneralMessageBuilder) buildAffectedLine(message *siri.S
 	}
 
 	for _, affectedRoute := range affect.(*model.AffectedLine).AffectedRoutes {
-		message.AffectedRouteRefs = append(message.AffectedRouteRefs, affectedRoute.RouteRef)
+		if affectedRoute.RouteRef != "" {
+			message.AffectedRouteRefs = append(message.AffectedRouteRefs, affectedRoute.RouteRef)
+		}
 	}
 }
 
