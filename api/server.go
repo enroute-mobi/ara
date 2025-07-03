@@ -207,7 +207,7 @@ func (server *Server) handleReferentialModelCreate(response http.ResponseWriter,
 		return
 	}
 
-	logger.Log.Debugf("%s controller Delete request: %v", model, request)
+	logger.Log.Debugf("%s controller Create request: %v", model, request)
 
 	body := getRequestBody(response, request)
 	if body == nil {

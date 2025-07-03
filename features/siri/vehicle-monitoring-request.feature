@@ -1677,7 +1677,7 @@ Feature: Support SIRI VehicleMonitoring by request
       # 6ba7b814-9dad-11d1-9-00c04fd430c8
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
-    Then the Vehicle "6ba7b814-9dad-11d1-9-00c04fd430c8" has the following attributes:
+    Then one Vehicle has the following attributes:
       | Codes            | "internal": "RLA290"              |
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |

@@ -13,7 +13,7 @@ Given(/^the table "([^"]*)" has the following data:$/) do |table_name, datas|
 end
 
 When(/^I start Ara$/) do
-  Ara.instance.start
+  TestAra.instance.start
 end
 
 Then('the table {string} has rows with the following values:') do |table_name, values|

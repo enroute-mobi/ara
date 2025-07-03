@@ -1,13 +1,18 @@
 require 'fileutils'
 require 'tmpdir'
+require 'ara'
 
 $server = 'http://localhost:8081'
 $adminToken = "6ceab96a-8d97-4f2a-8d69-32569a38fc64"
 $token = "testtoken"
 
-class Ara
+class TestAra
   def self.instance
     @ara ||= new
+  end
+
+  def server
+    @server ||= Ara::Server.new(host: $server, token: $adminToken)
   end
 
   def root
@@ -91,7 +96,7 @@ class Ara
   end
 
   def self.load(referential_slug, file)
-    Ara.instance.run("load #{file} #{referential_slug}")
+    TestAra.instance.run("load #{file} #{referential_slug}")
   end
 
   def self.load_content(referential_slug, content)
@@ -142,13 +147,13 @@ class Ara
 end
 
 Before('@database') do
-  Ara.instance.fakeuuid_legacy = false
+  TestAra.instance.fakeuuid_legacy = false
 end
 
 Before('not @nostart') do
-  Ara.instance.start
+  TestAra.instance.start
 end
 
 After do
-  Ara.stop
+  TestAra.stop
 end

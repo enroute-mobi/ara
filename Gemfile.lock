@@ -1,4 +1,12 @@
 GIT
+  remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
+  revision: 0ac4fb8aab31ec721892cc17b345ec119d056830
+  specs:
+    ara (3.5.4)
+      faraday
+      json
+
+GIT
   remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
   revision: a529cd303e4c1d8a09929d569aa4eb570ca342b5
   specs:
@@ -69,12 +77,19 @@ GEM
     diff-lcs (1.6.1)
     domain_name (0.6.20240107)
     drb (2.2.1)
+    faraday (2.13.1)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.0)
+      net-http (>= 0.5.0)
     ffi (1.17.2)
     http-accept (1.7.0)
     http-cookie (1.0.8)
       domain_name (~> 0.5)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    json (2.11.3)
     license_finder (7.2.1)
       bundler
       csv (~> 3.2)
@@ -96,6 +111,8 @@ GEM
     mini_portile2 (2.8.8)
     minitest (5.25.5)
     multi_test (1.1.0)
+    net-http (0.6.0)
+      uri
     netrc (0.11.0)
     nokogiri (1.18.8)
       mini_portile2 (~> 2.8.2)
@@ -139,6 +156,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  ara!
   bundler-audit
   cucumber
   gtfs-rt!

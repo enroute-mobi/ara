@@ -718,7 +718,7 @@ Feature: Support SIRI StopMonitoring by request
     And a Line exists with the following attributes:
       | Codes        | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
-      | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
+      | OperatorRef  | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Codes                                  | "internal": "NINOXE:VehicleJourney:201"         |
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
@@ -865,7 +865,7 @@ Feature: Support SIRI StopMonitoring by request
     And a Line exists with the following attributes:
       | Codes        | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
-      | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
+      | OperatorRef  | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Codes                                  | "internal": "NINOXE:VehicleJourney:201"         |
       | Name                                   | Magicien Noir - Cimetière (OMNI)                |
@@ -1161,7 +1161,7 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name            | arrêt 1                                  |
       | Codes           | "internal": "NINOXE:StopPoint:SP:24:LOC" |
-      | MonitoredAlways | false                                    |
+      | Monitored       | false                                    |
       | CollectedAlways | false                                    |
     When I send a SIRI GetStopMonitoring request with
       | RequestTimestamp  |   2017-01-01T07:54:00.977Z |
@@ -1961,7 +1961,7 @@ Feature: Support SIRI StopMonitoring by request
     And a Line exists with the following attributes:
       | Codes        | "internal": "NINOXE:Line:3:LOC"           |
       | Name         | Ligne 3 Metro                             |
-      | OperationRef | "internal": "NINOXE:Company:15563880:LOC" |
+      | OperatorRef  | "internal": "NINOXE:Company:15563880:LOC" |
     And a VehicleJourney exists with the following attributes:
       | Codes                    | "internal": "NINOXE:VehicleJourney:201" |
       | Name                     | Magicien Noir - Cimetière (OMNI)        |

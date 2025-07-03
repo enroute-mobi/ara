@@ -33,7 +33,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00     |
       | VehicleAtStop                 | false                             |
       | Attribute[DestinationDisplay] | Méliès - Croix Bonnet             |
-      | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"|
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
       | Codes | "internal": "cladebr" |
@@ -55,7 +55,7 @@ Feature: Support SIRI GetSIRI
       | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
       | ArrivalStatus                 | onTime                            |
       | DepartureStatus               | onTime                            |
-      | Codes                     | "internal": "SIRI:34863800"       |
+      | Codes                         | "internal": "SIRI:34863800"       |
       | PassageOrder                  | 11                                |
       | RecordedAt                    | 2017-01-12T10:52:46.050+01:00     |
       | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00     |
@@ -64,7 +64,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00     |
       | VehicleAtStop                 | false                             |
       | Attribute[DestinationDisplay] | PARIS - Porte d'Orléans           |
-      | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"|
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
@@ -122,6 +122,7 @@ Feature: Support SIRI GetSIRI
                       <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
                     </siri:FramedVehicleJourneyRef>
                     <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
                     <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
@@ -159,6 +160,7 @@ Feature: Support SIRI GetSIRI
                     <siri:JourneyPatternRef>CdF:JourneyPattern::L475P53:LOC</siri:JourneyPatternRef>
                     <siri:PublishedLineName>Ligne 475</siri:PublishedLineName>
                     <siri:DirectionName>Aller</siri:DirectionName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:9dd925e2cd515383ad6d975e761cea71ea1a79e7:LOC</siri:DestinationRef>
                     <siri:DestinationName>PARIS - Porte d'Orléans</siri:DestinationName>
                     <siri:Monitored>true</siri:Monitored>
@@ -223,7 +225,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00     |
       | VehicleAtStop                 | false                             |
       | Attribute[DestinationDisplay] | Méliès - Croix Bonnet             |
-      | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"|
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
       | Codes | "internal": "cladebr" |
@@ -253,7 +255,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00     |
       | VehicleAtStop                 | false                             |
       | Attribute[DestinationDisplay] | PARIS - Porte d'Orléans           |
-      | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"|
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
@@ -309,6 +311,7 @@ Feature: Support SIRI GetSIRI
                       <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
                     </siri:FramedVehicleJourneyRef>
                     <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+                    <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                     <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
                     <siri:Monitored>true</siri:Monitored>
                     <siri:MonitoredCall>
@@ -374,7 +377,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00     |
       | VehicleAtStop                 | false                             |
       | Attribute[DestinationDisplay] | Méliès - Croix Bonnet             |
-      | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"|
     And a StopArea exists with the following attributes:
       | Name      | Test 2                |
       | Codes | "external": "cladebr"         |
@@ -405,7 +408,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00     |
       | VehicleAtStop                 | false                             |
       | Attribute[DestinationDisplay] | PARIS - Porte d'Orléans           |
-      | Reference["OperatorRef"]      | CdF:Company::410:LOC.             |
+      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"|
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
@@ -457,6 +460,7 @@ Feature: Support SIRI GetSIRI
                 <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
               </siri:FramedVehicleJourneyRef>
               <siri:PublishedLineName>Ligne 415</siri:PublishedLineName>
+              <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
               <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
               <siri:Monitored>true</siri:Monitored>
               <siri:MonitoredCall>
@@ -537,6 +541,7 @@ Feature: Support SIRI GetSIRI
                    <siri:JourneyPatternRef>CdF:JourneyPattern::L475P53:LOC</siri:JourneyPatternRef>
                    <siri:PublishedLineName>Ligne 475</siri:PublishedLineName>
                    <siri:DirectionName>Aller</siri:DirectionName>
+                   <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
                    <siri:DestinationRef>9dd925e2cd515383ad6d975e761cea71ea1a79e7</siri:DestinationRef>
                    <siri:DestinationName>PARIS - Porte d'Orléans</siri:DestinationName>
                    <siri:Monitored>true</siri:Monitored>
