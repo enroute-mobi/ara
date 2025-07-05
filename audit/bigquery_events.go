@@ -50,6 +50,8 @@ const (
 	SITUATION_EXCHANGE_SUBSCRIPTION_REQUEST   BigQueryMessageType = "SituationExchangeSubscriptionRequest"
 
 	PUSH_NOTIFICATION BigQueryMessageType = "push-notification"
+
+	GraphQLRequest BigQueryMessageType = "GraphQLRequest"
 )
 
 var AraBigQuerySchemas = map[string]bigquery.Schema{
