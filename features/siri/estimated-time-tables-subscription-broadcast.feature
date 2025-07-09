@@ -297,6 +297,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | DirectionType                  | Aller                             |
       | Attribute[OriginName]          | Le début                          |
       | Attribute[DestinationName]     | La fin.                           |
+      | Reference[OriginRef]#Code      | "external": "ThisIsTheBeginning"  |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -338,6 +339,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+          <siri:OriginRef>RATPDev:StopPoint:Q:437bd677531592a8d5138228dd571274689b24e0:LOC</siri:OriginRef>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
