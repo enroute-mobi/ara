@@ -30,10 +30,10 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
+					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
 					<siri:DestinationName>destination 1</siri:DestinationName>
 					<siri:OperatorRef>operator1</siri:OperatorRef>
-					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint1</siri:StopPointRef>
@@ -60,10 +60,10 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>line2</siri:LineRef>
 					<siri:DirectionRef>direction2</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref2</siri:DatedVehicleJourneyRef>
+					<siri:OriginRef>origin2</siri:OriginRef>
 					<siri:DestinationRef>destination2</siri:DestinationRef>
 					<siri:DestinationName>destination 2</siri:DestinationName>
 					<siri:OperatorRef>operator2</siri:OperatorRef>
-					<siri:OriginRef>origin2</siri:OriginRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint3</siri:StopPointRef>
@@ -79,10 +79,10 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>line3</siri:LineRef>
 					<siri:DirectionRef>direction3</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref3</siri:DatedVehicleJourneyRef>
+					<siri:OriginRef>origin3</siri:OriginRef>
 					<siri:DestinationRef>destination3</siri:DestinationRef>
 					<siri:DestinationName>destination 3</siri:DestinationName>
 					<siri:OperatorRef>operator3</siri:OperatorRef>
-					<siri:OriginRef>origin3</siri:OriginRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
 							<siri:StopPointRef>stopPoint4</siri:StopPointRef>
@@ -227,10 +227,10 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
+					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
 					<siri:DestinationName>destination 1</siri:DestinationName>
 					<siri:OperatorRef>operator1</siri:OperatorRef>
-					<siri:OriginRef>origin1</siri:OriginRef>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>

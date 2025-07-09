@@ -4,11 +4,11 @@
 					<siri:LineRef>{{ .LineRef }}</siri:LineRef>
 					<siri:DirectionRef>{{ if .DirectionType }}{{ .DirectionType }}{{ else }}unknown{{ end }}</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .PublishedLineName }}
-					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ end }}{{ if .References.DestinationRef }}
+					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ end }}{{ if .References.OriginRef }}
+					<siri:OriginRef>{{ .References.OriginRef }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
 					<siri:DestinationRef>{{ .References.DestinationRef }}</siri:DestinationRef>{{ end }}{{ if .Attributes.DestinationName }}
 					<siri:DestinationName>{{ .Attributes.DestinationName}}</siri:DestinationName>{{ end }}{{ if .References.OperatorRef }}
-					<siri:OperatorRef>{{ .References.OperatorRef }}</siri:OperatorRef>{{ end }}{{ if .References.OriginRef }}
-					<siri:OriginRef>{{ .References.OriginRef }}</siri:OriginRef>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
+					<siri:OperatorRef>{{ .References.OperatorRef }}</siri:OperatorRef>{{ end }}{{ if ne (len .RecordedCalls) 0 }}
 					<siri:RecordedCalls>{{ range .RecordedCalls }}
 						<siri:RecordedCall>
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>
