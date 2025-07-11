@@ -51,7 +51,7 @@ const (
 
 	PUSH_NOTIFICATION BigQueryMessageType = "push-notification"
 
-	GraphQLRequest BigQueryMessageType = "GraphQLRequest"
+	GRAPHQL_REQUEST BigQueryMessageType = "GraphQLRequest"
 )
 
 var AraBigQuerySchemas = map[string]bigquery.Schema{

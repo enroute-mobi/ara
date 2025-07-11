@@ -87,7 +87,7 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 func (handler *GraphqlHandler) newBQMessage(slug, remoteAddress string) *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
 		Protocol:  "graphql",
-		Type:      audit.GraphQLRequest,
+		Type:      audit.GRAPHQL_REQUEST,
 		Direction: "received",
 		Partner:   slug,
 		IPAddress: remoteAddress,
