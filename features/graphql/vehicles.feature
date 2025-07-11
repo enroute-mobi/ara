@@ -9,11 +9,11 @@ Feature: GraphQL API for vehicles
       | local_credential  | test_token |
       | remote_code_space | internal   |
     And a Vehicle exists with the following attributes:
-      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Codes[internal] | Test:Vehicle:1:LOC       |
       | Longitude       |                    1.234 |
       | Latitude        |                    5.678 |
       | Bearing         |                      123 |
-      | Occupancy       |        fewSeatsAvailable |
+      | Occupancy       | fewSeatsAvailable        |
       | Percentage      |                     15.6 |
       | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
       | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
@@ -34,13 +34,21 @@ Feature: GraphQL API for vehicles
       """
     Then the GraphQL response should contain one Vehicle with these attributes:
       | code            | Test:Vehicle:1:LOC   |
-      | longitude       | 1.234                |
-      | latitude        | 5.678                |
-      | bearing         | 123                  |
+      | longitude       |                1.234 |
+      | latitude        |                5.678 |
+      | bearing         |                  123 |
       | occupancyStatus | fewSeatsAvailable    |
-      | occupancyRate   | 15.6                 |
+      | occupancyRate   |                 15.6 |
       | recordedAt      | 2017-01-01T13:00:00Z |
       | validUntil      | 2017-01-01T14:00:00Z |
+    And an audit event should exist with these attributes:
+      | Type               | GraphQLRequest                                                                                                                                                                                                                         |
+      | Direction          | received                                                                                                                                                                                                                               |
+      | Protocol           | graphql                                                                                                                                                                                                                                |
+      | Partner            | test                                                                                                                                                                                                                                   |
+      | Status             | OK                                                                                                                                                                                                                                     |
+      | RequestRawMessage  | query { vehicle(code: "Test:Vehicle:1:LOC") { code longitude latitude bearing occupancyStatus occupancyRate recordedAt validUntil } }                                                                                                  |
+      | ResponseRawMessage | {"data":{"vehicle":{"code":"Test:Vehicle:1:LOC","longitude":1.234,"latitude":5.678,"bearing":123,"occupancyStatus":"fewSeatsAvailable","occupancyRate":15.6,"recordedAt":"2017-01-01T13:00:00Z","validUntil":"2017-01-01T14:00:00Z"}}} |
 
   @ARA-1439
   Scenario: Handle a Vehicles Graphql query
@@ -48,11 +56,11 @@ Feature: GraphQL API for vehicles
       | local_credential  | test_token |
       | remote_code_space | internal   |
     And a Vehicle exists with the following attributes:
-      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Codes[internal] | Test:Vehicle:1:LOC       |
       | Longitude       |                    1.234 |
       | Latitude        |                    5.678 |
       | Bearing         |                      123 |
-      | Occupancy       |        fewSeatsAvailable |
+      | Occupancy       | fewSeatsAvailable        |
       | Percentage      |                     15.6 |
       | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
       | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
@@ -73,11 +81,11 @@ Feature: GraphQL API for vehicles
       """
     Then the GraphQL response should contain a Vehicle with these attributes:
       | code            | Test:Vehicle:1:LOC   |
-      | longitude       | 1.234                |
-      | latitude        | 5.678                |
-      | bearing         | 123                  |
+      | longitude       |                1.234 |
+      | latitude        |                5.678 |
+      | bearing         |                  123 |
       | occupancyStatus | fewSeatsAvailable    |
-      | occupancyRate   | 15.6                 |
+      | occupancyRate   |                 15.6 |
       | recordedAt      | 2017-01-01T13:00:00Z |
       | validUntil      | 2017-01-01T14:00:00Z |
 
@@ -87,11 +95,11 @@ Feature: GraphQL API for vehicles
       | local_credential  | test_token |
       | remote_code_space | internal   |
     And a Vehicle exists with the following attributes:
-      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Codes[internal] | Test:Vehicle:1:LOC       |
       | Longitude       |                    1.234 |
       | Latitude        |                    5.678 |
       | Bearing         |                      123 |
-      | Occupancy       |        fewSeatsAvailable |
+      | Occupancy       | fewSeatsAvailable        |
       | Percentage      |                     15.6 |
       | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
       | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
@@ -112,11 +120,11 @@ Feature: GraphQL API for vehicles
       """
     Then the GraphQL response should contain an updated Vehicle with these attributes:
       | code            | Test:Vehicle:1:LOC   |
-      | longitude       | 1.234                |
-      | latitude        | 5.678                |
-      | bearing         | 123                  |
+      | longitude       |                1.234 |
+      | latitude        |                5.678 |
+      | bearing         |                  123 |
       | occupancyStatus | fewSeatsAvailable    |
-      | occupancyRate   | 15.6                 |
+      | occupancyRate   |                 15.6 |
       | recordedAt      | 2017-01-01T13:00:00Z |
       | validUntil      | 2017-01-01T14:00:00Z |
 
@@ -127,11 +135,11 @@ Feature: GraphQL API for vehicles
       | remote_code_space          | internal                                      |
       | graphql.mutable_attributes | vehicle.occupancyStatus,vehicle.occupancyRate |
     And a Vehicle exists with the following attributes:
-      | Codes[internal] |       Test:Vehicle:1:LOC |
+      | Codes[internal] | Test:Vehicle:1:LOC       |
       | Longitude       |                    1.234 |
       | Latitude        |                    5.678 |
       | Bearing         |                      123 |
-      | Occupancy       |        fewSeatsAvailable |
+      | Occupancy       | fewSeatsAvailable        |
       | Percentage      |                     15.6 |
       | RecordedAtTime  | 2017-01-01T13:00:00.000Z |
       | ValidUntilTime  | 2017-01-01T14:00:00.000Z |
@@ -152,10 +160,10 @@ Feature: GraphQL API for vehicles
       """
     Then the GraphQL response should contain an updated Vehicle with these attributes:
       | code            | Test:Vehicle:1:LOC   |
-      | longitude       | 1.234                |
-      | latitude        | 5.678                |
-      | bearing         | 123                  |
+      | longitude       |                1.234 |
+      | latitude        |                5.678 |
+      | bearing         |                  123 |
       | occupancyStatus | seatsAvailable       |
-      | occupancyRate   | 0.65                 |
+      | occupancyRate   |                 0.65 |
       | recordedAt      | 2017-01-01T13:00:00Z |
       | validUntil      | 2017-01-01T14:00:00Z |

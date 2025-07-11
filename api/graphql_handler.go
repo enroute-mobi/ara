@@ -46,7 +46,10 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 
 	startTime := handler.referential.Clock().Now()
 	message := handler.newBQMessage(string(partner.Slug()), handler.HandleRemoteAddress(request))
-	defer audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	defer func() {
+		message.ProcessingTime = handler.referential.Clock().Since(startTime).Seconds()
+		audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(message)
+	}()
 
 	var params struct {
 		Query         string                 `json:"query"`
@@ -60,6 +63,9 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 		return
 	}
 
+	message.RequestSize = request.ContentLength
+	message.RequestRawMessage = params.Query
+
 	schema := graphql.MustParseSchema(gql.Schema, &gql.Resolver{Partner: partner})
 	r := schema.Exec(request.Context(), params.Query, params.OperationName, params.Variables)
 	responseJSON, err := json.Marshal(r)
@@ -70,10 +76,8 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 		return
 	}
 
-	processingTime := handler.referential.Clock().Since(startTime)
-
-	message.RequestRawMessage = params.Query
-	message.ProcessingTime = processingTime.Seconds()
+	message.Status = "OK"
+	message.ResponseRawMessage = string(responseJSON)
 
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(http.StatusOK)
@@ -83,15 +87,14 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 func (handler *GraphqlHandler) newBQMessage(slug, remoteAddress string) *audit.BigQueryMessage {
 	return &audit.BigQueryMessage{
 		Protocol:  "graphql",
+		Type:      audit.GRAPHQL_REQUEST,
 		Direction: "received",
-		Status:    "OK",
 		Partner:   slug,
 		IPAddress: remoteAddress,
 	}
 }
 
 func (handler *GraphqlHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
-	m.ProcessingTime = handler.referential.Clock().Since(startTime).Seconds()
 	m.Status = "Error"
 	errorString := fmt.Sprintf(format, values...)
 
