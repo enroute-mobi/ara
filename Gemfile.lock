@@ -1,6 +1,7 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: 0ac4fb8aab31ec721892cc17b345ec119d056830
+  revision: 64bcc52a9194912cc56d5b20993cb2c12e90682a
+  branch: ARA-1730-create-facility-model
   specs:
     ara (3.5.4)
       faraday

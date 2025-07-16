@@ -32,6 +32,7 @@ type Model interface {
 	Vehicles() Vehicles
 	Macros() Macros
 	Controls() Controls
+	Facilities() Facilities
 }
 
 type MemoryModel struct {
@@ -47,6 +48,7 @@ type MemoryModel struct {
 	operators           *MemoryOperators
 	macros              *MacroManager
 	controls            *ControlManager
+	facilities          *MemoryFacilities
 	SMEventsChan        chan StopMonitoringBroadcastEvent
 	GMEventsChan        chan SituationBroadcastEvent
 	SXEventsChan        chan SituationBroadcastEvent
@@ -129,6 +131,10 @@ func (model *MemoryModel) refresh() {
 	macros := NewMacroManager()
 	macros.model = model
 	model.macros = macros
+
+	facilities := NewMemoryFacilities()
+	facilities.model = model
+	model.facilities = facilities
 
 	model.controls = NewControlManager()
 }
@@ -256,6 +262,10 @@ func (model *MemoryModel) Macros() Macros {
 
 func (model *MemoryModel) Controls() Controls {
 	return model.controls
+}
+
+func (model *MemoryModel) Facilities() Facilities {
+	return model.facilities
 }
 
 func (model *MemoryModel) Load() error {

@@ -26,6 +26,7 @@ var newWithReferentialControllerMap = map[string](func(*core.Referential) Restfu
 	"situations":            NewSituationController,
 	"operators":             NewOperatorController,
 	"vehicles":              NewVehicleController,
+	"facilities":            NewFacilityController,
 }
 
 const (
