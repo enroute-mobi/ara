@@ -46,7 +46,23 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 		manager.updateNotCollected(event.(*NotCollectedUpdateEvent))
 	case SITUATION_EVENT:
 		manager.updateSituation(event.(*SituationUpdateEvent))
+	case FACILITY_EVENT:
+		manager.updateFacility(event.(*FacilityUpdateEvent))
 	}
+}
+
+func (manager *UpdateManager) updateFacility(event *FacilityUpdateEvent) {
+	facility, ok := manager.model.Facilities().FindByCode(event.Code)
+	if !ok {
+		facility = manager.model.Facilities().New()
+		facility.Origin = event.Origin
+		facility.SetCode(event.Code)
+		facility.SetCode(NewCode(Default, event.Code.HashValue()))
+	}
+
+	facility.Status = FacilityStatus(event.Status)
+
+	facility.Save()
 }
 
 func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {

@@ -17,6 +17,8 @@ const (
 	AnnotatedLineRef                       = "AnnotatedLineRef"
 	EstimatedTimetableDelivery             = "EstimatedTimetableDelivery"
 	EstimatedJourneyVersionFrame           = "EstimatedJourneyVersionFrame"
+	FacilityMonitoringDelivery             = "FacilityMonitoringDelivery"
+	FacilityCondition                      = "FacilityCondition"
 	GeneralMessageDelivery                 = "GeneralMessageDelivery"
 	GeneralMessageCancellation             = "GeneralMessageCancellation"
 	SituationExchangeDelivery              = "SituationExchangeDelivery"

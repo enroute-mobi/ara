@@ -23,6 +23,7 @@ const (
 	SIRI_STOP_MONITORING_SUBSCRIPTION_COLLECTOR    = "siri-stop-monitoring-subscription-collector"
 	SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER  = "siri-stop-monitoring-subscription-broadcaster"
 	TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER  = "siri-stop-monitoring-subscription-broadcaster-test"
+	SIRI_FACILITY_MONITORING_REQUEST_COLLECTOR     = "siri-facility-monitoring-request-collector"
 	SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR         = "siri-general-message-request-collector"
 	SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER       = "siri-general-message-request-broadcaster"
 	SIRI_GENERAL_MESSAGE_SUBSCRIPTION_COLLECTOR    = "siri-general-message-subscription-collector"
@@ -121,6 +122,8 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRIStopMonitoringSubscriptionBroadcasterFactory{}
 	case TEST_STOP_MONITORING_SUBSCRIPTION_BROADCASTER:
 		return &TestSIRIStopMonitoringSubscriptionBroadcasterFactory{}
+	case SIRI_FACILITY_MONITORING_REQUEST_COLLECTOR:
+		return &SIRIFacilityMonitoringRequestCollectorFactory{}
 	case SIRI_GENERAL_MESSAGE_REQUEST_COLLECTOR:
 		return &SIRIGeneralMessageRequestCollectorFactory{}
 	case SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER:

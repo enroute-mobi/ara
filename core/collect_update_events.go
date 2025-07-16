@@ -11,6 +11,7 @@ type CollectUpdateEvents struct {
 	StopVisits      map[string]map[string]*model.StopVisitUpdateEvent
 	Vehicles        map[string]*model.VehicleUpdateEvent
 	Situations      []*model.SituationUpdateEvent
+	Facilities      map[string]*model.FacilityUpdateEvent
 	Cancellations   []*model.NotCollectedUpdateEvent
 	*CollectedRefs
 }
@@ -37,6 +38,7 @@ func NewCollectUpdateEvents() *CollectUpdateEvents {
 		VehicleJourneys: make(map[string]*model.VehicleJourneyUpdateEvent),
 		StopVisits:      make(map[string]map[string]*model.StopVisitUpdateEvent),
 		Vehicles:        make(map[string]*model.VehicleUpdateEvent),
+		Facilities:      make(map[string]*model.FacilityUpdateEvent),
 	}
 	collectedUpdateEvents.CollectedRefs = NewCollectedRefs()
 	return collectedUpdateEvents

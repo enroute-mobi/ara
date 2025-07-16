@@ -18,6 +18,7 @@ type CollectManagerInterface interface {
 	UpdateLine(ctx context.Context, request *LineUpdateRequest)
 	UpdateVehicle(ctx context.Context, request *VehicleUpdateRequest)
 	UpdateSituation(request *SituationUpdateRequest)
+	UpdateFacility(request *FacilityUpdateRequest)
 
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
 	BroadcastUpdateEvent(event model.UpdateEvent)
@@ -64,6 +65,7 @@ func (manager *TestCollectManager) BroadcastUpdateEvent(event model.UpdateEvent)
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
 func (manager *TestCollectManager) UpdateLine(context.Context, *LineUpdateRequest)       {}
 func (manager *TestCollectManager) UpdateVehicle(context.Context, *VehicleUpdateRequest) {}
+func (manager *TestCollectManager) UpdateFacility(*FacilityUpdateRequest)                {}
 
 // TEST END
 
@@ -243,6 +245,21 @@ func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *Vehic
 		}
 		requestCollector.RequestVehicleUpdate(request)
 		return
+	}
+}
+
+func (manager *CollectManager) UpdateFacility(request *FacilityUpdateRequest) {
+	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+			continue
+		}
+
+		requestConnector := partner.FacilityMonitoringRequestCollector()
+
+		logger.Log.Debugf("Request FacilityUpdate for Partner %v", partner.Slug())
+		if requestConnector != nil {
+			requestConnector.RequestFacilityUpdate(request)
+		}
 	}
 }
 
