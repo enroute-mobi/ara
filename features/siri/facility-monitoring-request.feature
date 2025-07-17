@@ -47,3 +47,127 @@ Feature: Support SIRI FacilityMonitoring by request
       | Direction | sent                      |
       | Status    | OK                        |
       | Type      | FacilityMonitoringRequest |
+
+  Scenario: Handle a SIRI FacilityMonitoring request
+    Given a SIRI Partner "test" exists with connectors [siri-facility-monitoring-request-broadcaster] and the following settings:
+      | local_credential  | test     |
+      | remote_code_space | internal |
+    And a Facility exists with the following attributes:
+      | Codes[internal] | NINOXE:Facility:ABC1:LOC |
+      | Status          | available                |
+    When I send this SIRI request
+    """
+    <?xml version='1.0' encoding='utf-8'?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <sw:GetFacilityMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceRequestInfo>
+            <siri:RequestTimestamp>2016-09-22T07:54:52.977Z</siri:RequestTimestamp>
+            <siri:RequestorRef>test</siri:RequestorRef>
+            <siri:MessageIdentifier>FacilityMonitoring:Test:0</siri:MessageIdentifier>
+          </ServiceRequestInfo>
+          <Request>
+            <siri:RequestTimestamp>2016-09-22T07:54:52.977Z</siri:RequestTimestamp>
+            <siri:FacilityRef>NINOXE:Facility:ABC1:LOC</siri:FacilityRef>
+          </Request>
+          <RequestExtension/>
+        </sw:GetFacilityMonitoring>
+      </soap:Body>
+    </soap:Envelope>
+    """
+    Then I should receive this SIRI response
+    """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetFacilityMonitoringResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>FacilityMonitoring:Test:0</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:FacilityMonitoringDelivery version='2.0:FR-IDF-2.4'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>FacilityMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:FacilityCondition>
+                  <siri:FacilityRef>NINOXE:Facility:ABC1:LOC</siri:FacilityRef>
+                  <siri:FacilityStatus>
+                    <siri:Status>available</siri:Status>
+                  </siri:FacilityStatus>
+                </siri:FacilityCondition>
+              </siri:FacilityMonitoringDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetFacilityMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+    """
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                           |
+      | Direction       | received                       |
+      | Status          | OK                             |
+      | Type            | FacilityMonitoringRequest      |
+
+  Scenario: Handle a SIRI FacilityMonitoring request on an unknown Facility
+    Given a SIRI Partner "test" exists with connectors [siri-facility-monitoring-request-broadcaster] and the following settings:
+      | local_credential  | test     |
+      | remote_code_space | internal |
+    And a Facility exists with the following attributes:
+      | Codes[internal] | NINOXE:Facility:ABC1:LOC |
+      | Status          | available                |
+    When I send this SIRI request
+    """
+    <?xml version='1.0' encoding='utf-8'?>
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <soap:Body>
+        <sw:GetFacilityMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+          <ServiceRequestInfo>
+            <siri:RequestTimestamp>2016-09-22T07:54:52.977Z</siri:RequestTimestamp>
+            <siri:RequestorRef>test</siri:RequestorRef>
+            <siri:MessageIdentifier>FacilityMonitoring:Test:0</siri:MessageIdentifier>
+          </ServiceRequestInfo>
+          <Request>
+            <siri:RequestTimestamp>2016-09-22T07:54:52.977Z</siri:RequestTimestamp>
+            <siri:FacilityRef>UNKNOWN</siri:FacilityRef>
+          </Request>
+          <RequestExtension/>
+        </sw:GetFacilityMonitoring>
+      </soap:Body>
+    </soap:Envelope>
+    """
+    Then I should receive this SIRI response
+    """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetFacilityMonitoringResponse xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>FacilityMonitoring:Test:0</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:FacilityMonitoringDelivery version='2.0:FR-IDF-2.4'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>FacilityMonitoring:Test:0</siri:RequestMessageRef>
+                <siri:ErrorCondition>
+                  <siri:InvalidDataReferencesError>
+                    <siri:ErrorText>Facility not found: 'UNKNOWN'</siri:ErrorText>
+                  </siri:InvalidDataReferencesError>
+                </siri:ErrorCondition>
+              </siri:FacilityMonitoringDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetFacilityMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+    """
+    And an audit event should exist with these attributes:
+      | Protocol     | siri                                                      |
+      | Direction    | received                                                  |
+      | Type         | FacilityMonitoringRequest                                 |
+      | Status       | Error                                                     |
+      | ErrorDetails | InvalidDataReferencesError: Facility not found: 'UNKNOWN' |
