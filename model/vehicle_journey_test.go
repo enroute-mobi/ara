@@ -278,3 +278,16 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
 	}
 }
+
+func Test_VehicleJourney_GtfsDirectionId(t *testing.T) {
+	assert := assert.New(t)
+	vehicleJourney := &VehicleJourney{}
+
+	assert.Nil(vehicleJourney.GtfsDirectionId())
+
+	vehicleJourney.DirectionType = VEHICLE_DIRECTION_INBOUND
+	assert.Equal(uint32(0), *vehicleJourney.GtfsDirectionId())
+
+	vehicleJourney.DirectionType = VEHICLE_DIRECTION_OUTBOUND
+	assert.Equal(uint32(1), *vehicleJourney.GtfsDirectionId())
+}

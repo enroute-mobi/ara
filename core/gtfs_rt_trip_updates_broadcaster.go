@@ -21,7 +21,7 @@ type TripUpdatesBroadcaster struct {
 	connector
 
 	vjRemoteCodeSpaces []string
-	cache                 *cache.CachedItem
+	cache              *cache.CachedItem
 }
 
 type TripUpdatesBroadcasterFactory struct{}
@@ -102,6 +102,10 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			tripDescriptor := &gtfs.TripDescriptor{
 				TripId:  &tripId,
 				RouteId: &routeId,
+			}
+
+			if directionId := vj.GtfsDirectionId(); directionId != nil {
+				tripDescriptor.DirectionId = directionId
 			}
 
 			// Fill the FeedEntity

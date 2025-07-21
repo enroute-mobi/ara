@@ -9,9 +9,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
+	assert := assert.New(t)
+
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
@@ -38,6 +41,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	vjId := model.NewCode("codeSpace", "vjId")
 	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
+	vehicleJourney.DirectionType = model.VEHICLE_DIRECTION_OUTBOUND
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
@@ -79,10 +83,8 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	gtfsFeed := &gtfs.FeedMessage{}
 
 	connector.HandleGtfs(gtfsFeed)
+	assert.Len(gtfsFeed.Entity, 2)
 
-	if l := len(gtfsFeed.Entity); l != 2 {
-		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 2", l)
-	}
 	var entity *gtfs.FeedEntity
 	if len(gtfsFeed.Entity[0].TripUpdate.StopTimeUpdate) == 1 && len(gtfsFeed.Entity[1].TripUpdate.StopTimeUpdate) == 2 {
 		entity = gtfsFeed.Entity[0]
@@ -92,36 +94,19 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 		t.Fatalf("Incorrect number of StopTimeUpdates in gtfs entities:\n got: %v and %v\n want 1 and 2", len(gtfsFeed.Entity[0].TripUpdate.StopTimeUpdate), len(gtfsFeed.Entity[1].TripUpdate.StopTimeUpdate))
 	}
 
-	if r := "trip:vjId"; entity.GetId() != r {
-		t.Errorf("Response first Feed entity have incorrect Id:\n got: %v\n want: %v", entity.GetId(), r)
-	}
+	assert.Equal("trip:vjId", entity.GetId())
+
 	tripUpdate := entity.TripUpdate
-	if r := "vjId"; tripUpdate.Trip.GetTripId() != r {
-		t.Errorf("Response first Trip Update have incorrect TripId:\n got: %v\n want: %v", tripUpdate.Trip.GetTripId(), r)
-	}
-	if r := "lId"; tripUpdate.Trip.GetRouteId() != r {
-		t.Errorf("Response first Trip Update have incorrect RouteId:\n got: %v\n want: %v", tripUpdate.Trip.GetRouteId(), r)
-	}
-	// ARA-829
-	// if r := "02:10:00"; tripUpdate.Trip.GetStartTime() != r {
-	// 	t.Errorf("Response first Trip Update have incorrect StartTime:\n got: %v\n want: %v", tripUpdate.Trip.GetStartTime(), r)
-	// }
-	if l := len(tripUpdate.StopTimeUpdate); l != 1 {
-		t.Errorf("Response first Trip Update have incorrect number of StopTimeUpdate:\n got: %v\n want: 1", l)
-	}
+	assert.Equal("vjId", tripUpdate.Trip.GetTripId())
+	assert.Equal("lId", tripUpdate.Trip.GetRouteId())
+	assert.Equal(uint32(1), tripUpdate.Trip.GetDirectionId())
+	assert.Len(tripUpdate.StopTimeUpdate, 1)
+
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
-	if r := uint32(0); stopTimeUpdate.GetStopSequence() != r {
-		t.Errorf("Incorrect StopSequence in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopSequence(), r)
-	}
-	if r := "saId"; stopTimeUpdate.GetStopId() != r {
-		t.Errorf("Incorrect StopId in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopId(), r)
-	}
-	if r := int64(referential.Clock().Now().Add(10 * time.Minute).Unix()); stopTimeUpdate.Departure.GetTime() != r {
-		t.Errorf("Incorrect Departure.Time in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetDeparture().Time, r)
-	}
-	if r := int64(0); stopTimeUpdate.Arrival.GetTime() != r {
-		t.Errorf("Incorrect Arrival.Time in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetArrival().Time, r)
-	}
+	assert.Equal(uint32(0), stopTimeUpdate.GetStopSequence())
+	assert.Equal("saId", stopTimeUpdate.GetStopId())
+	assert.Equal(referential.Clock().Now().Add(10*time.Minute).Unix(), stopTimeUpdate.Departure.GetTime())
+	assert.Equal(int64(0), stopTimeUpdate.Arrival.GetTime())
 }
 
 func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdCodeSpace(t *testing.T) {

@@ -342,6 +342,12 @@ end
 def gtfs_attributes(table)
   attributes = table.rows_hash.dup
 
+  attributes.dup.each do |key, value|
+    if key =~ /direction_id/
+      attributes[key] = value.to_i
+    end
+  end
+
   attributes.each { |k, v| attributes[k] = eval("GTFS::Realtime::VehiclePosition::OccupancyStatus::#{v}") if k == "occupancy_status" }
 
   attributes.dup.each do |key, value|

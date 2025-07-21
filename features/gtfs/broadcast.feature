@@ -43,8 +43,9 @@ Feature: Support GTFS-RT feeds
       | Name            | Test |
       | Codes[internal] | 1234 |
     And a VehicleJourney exists with the following attributes:
-      | Codes[internal] |                              2345 |
+      | Codes[internal] | 2345                              |
       | LineId          | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | DirectionType   | inbound                           |
     And a StopArea exists with the following attributes:
       | Codes[internal] | 4567 |
     And a Vehicle exists with the following attributes:
@@ -57,10 +58,11 @@ Feature: Support GTFS-RT feeds
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Vehicle Position with these attributes:
-      | vehicle_id | 3456 |
-      | stop_id    | 4567 |
-      | trip_id    | 2345 |
-      | route_id   | 1234 |
+      | vehicle_id   | 3456 |
+      | stop_id      | 4567 |
+      | trip_id      | 2345 |
+      | route_id     | 1234 |
+      | direction_id |    0 |
 
   @ARA-872
   Scenario: Retrieve Vehicle Positions with unmatching code kind
@@ -380,6 +382,7 @@ Feature: Support GTFS-RT feeds
     And a VehicleJourney exists with the following attributes:
       | Codes[external] | external:2345                     |
       | LineId          | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
+      | DirectionType   | inbound                           |
     And a StopArea exists with the following attributes:
       | Codes[external] | external:4567  |
     And a Vehicle exists with the following attributes:
@@ -411,8 +414,9 @@ Feature: Support GTFS-RT feeds
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should contain a Trip Update with these attributes:
-      | trip_id    | external:2345 |
-      | route_id   | external:1234 |
+      | trip_id      | external:2345 |
+      | route_id     | external:1234 |
+      | direction_id | 0             |
 
   Scenario: Retrieve Service Alerts
     Given a Line exists with the following attributes:
