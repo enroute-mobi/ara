@@ -35,6 +35,7 @@ func (p *Purifier) Purge() error {
 		"vehicle_journeys",
 		"stop_visits",
 		"operators",
+		"facilities",
 	}
 	for i := range table_names {
 		r, err := tx.Exec(p.query(table_names[i]))

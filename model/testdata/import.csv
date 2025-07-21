@@ -13,3 +13,5 @@ operator,03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"opera
 stop_area_group,cf3e1970-7a7e-4379-ae67-a67abe1c7c1b,2017-01-01,Name,ShortName,"[""a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11""]"
 line_group,59208069-3cad-4108-968f-349c5d50a351,2017-01-01,AgroupName,groupShortName,"[""f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11""]"
 line_group,59208069-3cad-4108-968f-349c5d50a351,2017-01-02,AgroupName,groupShortName,"[""f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11""]"
+facility,05cb9be3-e78b-4f76-b644-459e23ba5f1c,2017-01-01,{"internal":"facilityCode"}
+facility,05cb9be3-e78b-4f76-b644-459e23ba5f1c,2017-01-02,{"internal":"facilityCode"}

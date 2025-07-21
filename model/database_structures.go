@@ -210,6 +210,20 @@ type SelectStopVisit struct {
 	PassageOrder     sql.NullInt64  `db:"passage_order"`
 }
 
+type DatabaseFacility struct {
+	Id              string `db:"id"`
+	ReferentialSlug string `db:"referential_slug"`
+	ModelName       string `db:"model_name"`
+	Codes           string `db:"codes"`
+}
+
+type SelectFacility struct {
+	Id              string
+	ReferentialSlug string         `db:"referential_slug"`
+	ModelName       string         `db:"model_name"`
+	Codes           sql.NullString `db:"codes"`
+}
+
 // type DatabaseMacro struct {
 // 	ReferentialId  string         `db:"referential_id"`
 // 	Slug           string         `db:"slug"`
