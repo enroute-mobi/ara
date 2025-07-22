@@ -99,7 +99,7 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  sxml.NewXMLStopPointsDiscoveryRequest(envelope.Body()),
 			referential: handler.referential,
 		}
-	case "LinesDiscovery":
+	case "LinesDiscovery", "Lines":
 		return &SIRILinesDiscoveryRequestHandler{
 			xmlRequest:  sxml.NewXMLLinesDiscoveryRequest(envelope.Body()),
 			referential: handler.referential,

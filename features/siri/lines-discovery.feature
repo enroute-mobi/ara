@@ -369,3 +369,56 @@ Feature: Support SIRI LinesDiscovery
     And a minute has passed
     Then a Line "internal":"NINOXE:Line:BP:6:LOC" should exist
     And a Line "internal":"NINOXE:Line:BP:7:LOC" should exist
+
+  @ARA-1413
+  Scenario: Handle a raw SIRI LinesDiscovery request
+    Given a Partner "test" exists with connectors [siri-lines-discovery-request-broadcaster] and the following settings:
+      | local_credential  | test     |
+      | remote_code_space | internal |
+      | local_url         | address  |
+      | siri.envelope     | raw      |
+    And a Line exists with the following attributes:
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
+    And a Line exists with the following attributes:
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
+    And a Line exists with the following attributes:
+      | Name            | Line 3             |
+      | Codes[internal] | STIF:Line::C00274: |
+    When I send this SIRI request
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <Siri xmlns="http://www.siri.org.uk/siri">
+      <LinesRequest>
+         <RequestTimestamp>2017-03-03T11:28:00.359Z</RequestTimestamp>
+         <RequestorRef>test</RequestorRef>
+         <MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</MessageIdentifier>
+      </LinesRequest>
+      </Siri>
+      """
+    Then I should receive this SIRI response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+        <LinesDelivery>
+          <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+          <Status>true</Status>
+          <AnnotatedLineRef>
+            <LineRef>STIF:Line::C00272:</LineRef>
+            <LineName>Line 1</LineName>
+            <Monitored>true</Monitored>
+          </AnnotatedLineRef>
+          <AnnotatedLineRef>
+            <LineRef>STIF:Line::C00273:</LineRef>
+            <LineName>Line 2</LineName>
+            <Monitored>true</Monitored>
+          </AnnotatedLineRef>
+          <AnnotatedLineRef>
+            <LineRef>STIF:Line::C00274:</LineRef>
+            <LineName>Line 3</LineName>
+            <Monitored>true</Monitored>
+          </AnnotatedLineRef>
+        </LinesDelivery>
+      </Siri>
+      """

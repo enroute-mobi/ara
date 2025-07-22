@@ -1,0 +1,9 @@
+<LinesDelivery>
+		<ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>
+		<Status>{{ .Status }}</Status>{{ range .AnnotatedLines }}
+		<AnnotatedLineRef>
+			<LineRef>{{ .LineRef }}</LineRef>
+			<LineName>{{ .LineName }}</LineName>
+			<Monitored>{{ .Monitored }}</Monitored>
+		</AnnotatedLineRef>{{ end }}
+</LinesDelivery>
