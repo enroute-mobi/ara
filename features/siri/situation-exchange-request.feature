@@ -432,12 +432,14 @@ Feature: Support SIRI Situation Exchange by request
       </S:Envelope>
       """
     And an audit event should exist with these attributes:
-      | Protocol  | siri                                                         |
-      | Direction | received                                                     |
-      | Status    | OK                                                           |
-      | Type      | SituationExchangeRequest                                     |
-      | StopAreas | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"] |
-      | Lines     | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                                      |
+      | Protocol           | siri                                                           |
+      | Direction          | received                                                       |
+      | Status             | OK                                                             |
+      | Type               | SituationExchangeRequest                                       |
+      | StopAreas          | ["NINOXE:StopPoint:SP:24:LOC", "NINOXE:StopPoint:SP:25:LOC"]   |
+      | Lines              | ["NINOXE:Line:3:LOC", "NINOXE:Line:BP:LOC"]                    |
+      | RequestIdentifier  | 33170d7c-35e3-11ee-8a32-7f95f59ec38f                           |
+      | ResponseIdentifier | RATPDev:ResponseMessage::6ba7b814-9dad-11d1-9-00c04fd430c8:LOC |
 
   @ARA-1582
   Scenario: Handle a SIRI SituationExchange request with All affected Lines

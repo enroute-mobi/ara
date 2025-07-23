@@ -55,6 +55,8 @@ func (connector *SIRISituationExchangeRequestBroadcaster) Situations(request *sx
 
 	message.Lines = GetModelReferenceSlice(delivery.LineRefs)
 	message.StopAreas = GetModelReferenceSlice(delivery.MonitoringRefs)
+	message.RequestIdentifier = request.MessageIdentifier()
+	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
 	response.SIRISituationExchangeDelivery = *delivery
 	return response
