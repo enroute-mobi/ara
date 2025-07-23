@@ -1,0 +1,12 @@
+<StopPointsDelivery>
+	<ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>
+	<Status>{{ .Status }}</Status>{{ range .AnnotatedStopPoints }}
+	<AnnotatedStopPointRef>
+		<StopPointRef>{{ .StopPointRef }}</StopPointRef>
+		<Monitored>{{ .Monitored }}</Monitored>
+		<StopName>{{ .StopName }}</StopName>{{ if .Lines }}
+		<Lines>{{ range .Lines }}
+			<LineRef>{{ . }}</LineRef>{{ end }}
+		</Lines>{{ end }}
+	</AnnotatedStopPointRef>{{ end }}
+</StopPointsDelivery>

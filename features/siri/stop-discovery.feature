@@ -917,3 +917,68 @@ Feature: Support SIRI StopPointsDiscovery
         </S:Body>
       </S:Envelope>
         """
+
+  @ARA-1739
+  Scenario: Handle a raw SIRI StopPointsDiscovery request
+    Given a Partner "test" exists with connectors [siri-stop-points-discovery-request-broadcaster] and the following settings:
+      | local_credential  | test     |
+      | remote_code_space | internal |
+      | local_url         | address  |
+      | siri.envelope     | raw      |
+    And a Line exists with the following attributes:
+      | Name            | Line 1             |
+      | Codes[internal] | STIF:Line::C00272: |
+    And a Line exists with the following attributes:
+      | Name            | Line 2             |
+      | Codes[internal] | STIF:Line::C00273: |
+    And a Line exists with the following attributes:
+      | Name            | Line 3             |
+      | Codes[internal] | STIF:Line::C00274: |
+    And a StopArea exists with the following attributes:
+      | Name            | Test                                                                      |
+      | Codes[internal] | NINOXE:StopPoint:BP:6:LOC                                                 |
+      | Lines           | ["6ba7b814-9dad-11d1-2-00c04fd430c8","6ba7b814-9dad-11d1-3-00c04fd430c8"] |
+    And a StopArea exists with the following attributes:
+      | Name            | Test 2                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:16:LOC |
+    And a StopArea exists with the following attributes:
+      | Name            | Test 3                                |
+      | Codes[internal] | NINOXE:StopPoint:BP:7:LOC             |
+      | Lines           | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
+    When I send this SIRI request
+      """
+      <Siri xmlns="http://www.siri.org.uk/siri">
+       <StopPointsRequest version="2.0">
+        <RequestTimestamp>2017-03-03T11:28:00.359Z</RequestTimestamp>
+        <RequestorRef>test</RequestorRef>
+        <MessageIdentifier>STIF:Message::2345Fsdfrg35df:LOC</MessageIdentifier>
+       </StopPointsRequest>
+      </Siri>
+      """
+    Then I should receive this SIRI response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+        <StopPointsDelivery>
+          <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+          <Status>true</Status>
+          <AnnotatedStopPointRef>
+            <StopPointRef>NINOXE:StopPoint:BP:6:LOC</StopPointRef>
+            <Monitored>true</Monitored>
+            <StopName>Test</StopName>
+            <Lines>
+              <LineRef>STIF:Line::C00272:</LineRef>
+              <LineRef>STIF:Line::C00273:</LineRef>
+            </Lines>
+          </AnnotatedStopPointRef>
+          <AnnotatedStopPointRef>
+            <StopPointRef>NINOXE:StopPoint:BP:7:LOC</StopPointRef>
+            <Monitored>true</Monitored>
+            <StopName>Test 3</StopName>
+            <Lines>
+              <LineRef>STIF:Line::C00274:</LineRef>
+            </Lines>
+          </AnnotatedStopPointRef>
+        </StopPointsDelivery>
+      </Siri>
+      """
