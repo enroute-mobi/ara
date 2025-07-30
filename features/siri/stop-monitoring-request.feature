@@ -499,6 +499,7 @@ Feature: Support SIRI StopMonitoring by request
       | remote_credential          | test                       |
       | remote_code_space          | internal                   |
       | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+      | http.custom_headers        | IDFM-API-KEY=toto          |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | Test 1                     |

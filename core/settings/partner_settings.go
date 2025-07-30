@@ -86,6 +86,8 @@ const (
 	DEFAULT_GTFS_TTL                         = 30 * time.Second
 	DEFAULT_SITUATIONS_TTL                   = 1 * time.Hour
 
+	HTTP_CUSTOM_HEADERS = "http.custom_headers"
+
 	SORT_PAYLOAD_FOR_TEST = "sort_payload_for_test"
 
 	GRAPHQL_MUTABLE_ATTRIBUTES = "graphql.mutable_attributes"
@@ -102,6 +104,7 @@ type PartnerSettings struct {
 	rateLimit                           float64
 	gtfsTTL                             time.Duration
 	gtfsCacheTimeout                    time.Duration
+	httpCustomHeaders                   []string
 	siriCredentialHeader                string
 	siriEnvelopeType                    string
 	siriSoapEmptyResponseOnNotification bool
@@ -189,6 +192,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string, resolvers []
 	s.setSIRILinePublishedName(settings)
 	s.setSIRIDirectionType(settings)
 	s.setCollectSettings(settings, resolvers)
+	s.setHttpCustomHeaders(settings)
 	s.setSiriCredentialHeader(settings)
 	s.setSiriEnvelopeType(settings)
 	s.setSiriSoapEmptyResponseOnNotification(settings)
@@ -804,6 +808,15 @@ func (s *PartnerSettings) CollectSettings() *CollectSettings {
 	return s.collectSettings
 }
 
+func (s *PartnerSettings) setHttpCustomHeaders(settings map[string]string) {
+	headers := trimedSlice(settings[HTTP_CUSTOM_HEADERS])
+
+	s.httpCustomHeaders = headers
+}
+
+func (s *PartnerSettings) HttpCustomHeaders() []string {
+	return s.httpCustomHeaders
+}
 func (s *PartnerSettings) setSiriCredentialHeader(settings map[string]string) {
 	header := settings[SIRI_CREDENTIAL_HEADER]
 
@@ -828,6 +841,7 @@ func (s *PartnerSettings) setHTTPClientOptions(settings map[string]string) {
 		SiriEnvelopeType: s.SiriEnvelopeType(),
 		OAuth:            s.HTTPClientOAuth(),
 		SiriCredential:   credential,
+		CustomHeaders:    s.HttpCustomHeaders(),
 		Urls: remote.HTTPClientUrls{
 			Url:              settings[REMOTE_URL],
 			SubscriptionsUrl: settings[SUBSCRIPTIONS_REMOTE_URL],

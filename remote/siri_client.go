@@ -37,6 +37,7 @@ type Request interface {
 
 type SIRIClient struct {
 	httpClient       *HTTPClient
+	customHeaders    []string
 	siriEnvelopeType string
 }
 
@@ -49,10 +50,11 @@ type siriClientArguments struct {
 
 var xmlRegex = regexp.MustCompile("^(application|text)/xml;charset=([ -~]+)")
 
-func NewSIRIClient(c *HTTPClient, set string) *SIRIClient {
+func NewSIRIClient(c *HTTPClient, opts *HTTPClientOptions) *SIRIClient {
 	return &SIRIClient{
 		httpClient:       c,
-		siriEnvelopeType: set,
+		customHeaders:    opts.CustomHeaders,
+		siriEnvelopeType: opts.SiriEnvelopeType,
 	}
 }
 
@@ -98,6 +100,14 @@ func (client *SIRIClient) prepareAndSendRequest(args siriClientArguments) (xml.N
 	}
 	httpRequest.Header.Set("Content-Type", "text/xml; charset=utf-8")
 	httpRequest.Header.Set("User-Agent", version.ApplicationName())
+	for i := range client.customHeaders {
+		x := strings.Split(client.customHeaders[i], "=")
+		if len(x) != 2 {
+			continue
+		}
+		httpRequest.Header.Set(x[0], x[1])
+	}
+
 	httpRequest.ContentLength = buffer.Length()
 
 	// Send http request
