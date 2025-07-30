@@ -493,6 +493,14 @@ func (partner *Partner) GtfsConnectors() (connectors []GtfsConnector, ok bool) {
 	return
 }
 
+func (partner *Partner) FacilityMonitoringRequestCollector() FacilityMonitoringRequestCollector {
+	client, ok := partner.connectors[SIRI_FACILITY_MONITORING_REQUEST_COLLECTOR]
+	if ok {
+		return client.(FacilityMonitoringRequestCollector)
+	}
+	return nil
+}
+
 func (partner *Partner) SituationExchangeRequestCollector() SituationExchangeRequestCollector {
 	client, ok := partner.connectors[SIRI_SITUATION_EXCHANGE_REQUEST_COLLECTOR]
 	if ok {

@@ -6,6 +6,8 @@ const (
 	DestinationRef         = "DestinationRef"
 	DirectionRef           = "DirectionRef"
 	DriverRef              = "DriverRef"
+	FacilityRef            = "FacilityRef"
+	FacilityStatus         = "FacilityStatus"
 	FirstStopPointRef      = "FirstStopPointRef"
 	InfoChannelRef         = "InfoChannelRef"
 	ItemRef                = "ItemRef"

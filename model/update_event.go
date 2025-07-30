@@ -11,6 +11,7 @@ const (
 	NOT_COLLECTED_EVENT
 	VEHICLE_EVENT
 	SITUATION_EVENT
+	FACILITY_EVENT
 )
 
 type UpdateEvent interface {

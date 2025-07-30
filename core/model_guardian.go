@@ -75,6 +75,7 @@ func (guardian *ModelGuardian) routineWork() {
 	guardian.refreshLines(spanContext)
 	guardian.cleanOrUpdateStopVisits(spanContext)
 	guardian.requestSituations(spanContext)
+	guardian.refreshFacilities(spanContext)
 }
 
 func (guardian *ModelGuardian) checkReloadModel() bool {
@@ -124,6 +125,32 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(stopArea.Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
+	}
+}
+
+func (guardian *ModelGuardian) refreshFacilities(ctx context.Context) {
+	child, _ := tracer.StartSpanFromContext(ctx, "refresh_facilities")
+	defer child.Finish()
+
+	defer monitoring.HandlePanic()
+
+	now := guardian.Clock().Now()
+
+	facilities := guardian.referential.Model().Facilities().FindAll()
+	child.SetTag("facilities_count", len(facilities))
+
+	for i := range facilities {
+		if !facilities[i].NextCollectAt().Before(now) {
+			continue
+		}
+
+		facility, _ := guardian.referential.Model().Facilities().Find(facilities[i].Id())
+
+		facility.NextCollect(now.Add(guardian.randDuration()))
+		facility.Save()
+
+		facilityUpdateRequest := NewFacilityUpdateRequest(facility.Id())
+		guardian.referential.CollectManager().UpdateFacility(facilityUpdateRequest)
 	}
 }
 

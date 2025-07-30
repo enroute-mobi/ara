@@ -419,3 +419,17 @@ func (client *SIRIClient) NotifyVehicleMonitoring(request *siri.SIRINotifyVehicl
 	}
 	return nil
 }
+
+func (client *SIRIClient) FacilityMonitoring(request *siri.SIRIGetFacilityMonitoringRequest) (*sxml.XMLFacilityMonitoringResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:           request,
+		expectedResponses: []string{"GetFacilityMonitoringResponse"},
+		acceptGzip:        true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	stopMonitoring := sxml.NewXMLFacilityMonitoringResponse(node)
+	return stopMonitoring, nil
+}

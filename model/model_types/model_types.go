@@ -9,8 +9,9 @@ const (
 	StopVisit
 	Vehicle
 	Situation
+	Facility
 
-	Total = 6
+	Total = 7
 )
 
 var Type = map[string]Model{
@@ -20,4 +21,5 @@ var Type = map[string]Model{
 	"StopVisit":      StopVisit,
 	"Vehicle":        Vehicle,
 	"Situation":      Situation,
+	"Facility":       Facility,
 }

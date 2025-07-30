@@ -27,6 +27,7 @@ const (
 	NOTIFY_SUBSCRIPTION_TERMINATED BigQueryMessageType = "NotifySubscriptionTerminated"
 
 	ESTIMATED_TIMETABLE_REQUEST   BigQueryMessageType = "EstimatedTimetableRequest"
+	FACILITY_MONITORING_REQUEST   BigQueryMessageType = "FacilityMonitoringRequest"
 	GENERAL_MESSAGE_REQUEST       BigQueryMessageType = "GeneralMessageRequest"
 	LINES_DISCOVERY_REQUEST       BigQueryMessageType = "LinesDiscoveryRequest"
 	SIRI_SERVICE_REQUEST          BigQueryMessageType = "SiriServiceRequest"
