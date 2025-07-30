@@ -14,7 +14,7 @@ group :test do
   gem 'siri-xsd', en_route: 'siri-xsd'
   gem 'activesupport'
   gem 'webrick'
-  gem 'ara', en_route: 'ara-ruby'
+  gem 'ara', en_route: 'ara-ruby', branch: 'ARA-1705'
 end
 
 group :development do

@@ -67,7 +67,7 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 		return
 	}
 
-	jsonBytes, _ := json.Marshal(paginatedSituations)
+	jsonBytes, _ := json.Marshal(paginatedSituations.Models)
 	response.Write(jsonBytes)
 }
 

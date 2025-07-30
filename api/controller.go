@@ -76,26 +76,43 @@ type Paginable interface {
 	model.Situation | model.StopArea
 }
 
-func paginate[P Paginable](p []*P, params url.Values) ([]*P, error) {
+type PaginatedResource[p Paginable] struct {
+	Models     []*p
+	Pagination `json:"Pagination"`
+}
+
+type Pagination struct {
+	CurrentPage int
+	PerPage     int
+	TotalPages  int
+}
+
+func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], error) {
+	paginatedResource := PaginatedResource[P]{}
+
 	if len(params) == 0 {
-		return p, nil
+		paginatedResource.Models = p
+		paginatedResource.CurrentPage = 1
+		paginatedResource.PerPage = len(p)
+		paginatedResource.TotalPages = 1
+		return paginatedResource, nil
 	}
 
 	page, err := strconv.Atoi(params.Get("page"))
 	if err != nil {
-		return nil, fmt.Errorf("invalid request: query parameter \"page\": %s", params.Get("page"))
+		return paginatedResource, fmt.Errorf("invalid request: query parameter \"page\": %s", params.Get("page"))
 	}
 
 	var per_page int
 	if params.Get("per_page") != "" {
 		per_page, err = strconv.Atoi(params.Get("per_page"))
 		if page != 0 && err != nil {
-			return nil, fmt.Errorf("invalid request: query parameter \"per_page\": %s", params.Get("per_page"))
+			return paginatedResource, fmt.Errorf("invalid request: query parameter \"per_page\": %s", params.Get("per_page"))
 		}
 	}
 
 	if page == 0 && per_page == 0 {
-		return p, nil
+		return paginatedResource, nil
 	}
 
 	if per_page == 0 || per_page > DEFAULT_PER_PAGE {
@@ -105,7 +122,18 @@ func paginate[P Paginable](p []*P, params url.Values) ([]*P, error) {
 	start, end := paginateSlice(page, per_page, len(p))
 	pagedSlice := p[start:end]
 
-	return pagedSlice, nil
+	paginatedResource.Models = pagedSlice
+	paginatedResource.CurrentPage = page
+	paginatedResource.PerPage = per_page
+	var totalPages int
+	if len(p) <= per_page {
+		totalPages = 1
+	} else {
+		totalPages = len(p)/per_page + 1
+	}
+	paginatedResource.TotalPages = totalPages
+
+	return paginatedResource, nil
 }
 
 func paginateSlice(pageNum int, pageSize int, sliceLength int) (int, int) {

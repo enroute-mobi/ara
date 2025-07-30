@@ -76,10 +76,10 @@ func Test_Paginate(t *testing.T) {
 			params.Set("per_page", tt.per_page)
 		}
 
-		x, err := paginate(slice, params)
+		paginatedResource, err := paginate(slice, params)
 		if tt.error == false {
 			assert.NoError(err)
-			assert.Len(x, tt.expectedLength, tt.message)
+			assert.Len(paginatedResource.Models, tt.expectedLength, tt.message)
 		}
 
 		if tt.error == true {
