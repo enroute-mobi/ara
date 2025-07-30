@@ -94,7 +94,7 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  sxml.NewXMLSubscriptionTerminatedNotification(envelope.Body()),
 			referential: handler.referential,
 		}
-	case "StopPointsDiscovery":
+	case "StopPointsDiscovery", "StopPoints":
 		return &SIRIStopDiscoveryRequestHandler{
 			xmlRequest:  sxml.NewXMLStopPointsDiscoveryRequest(envelope.Body()),
 			referential: handler.referential,
