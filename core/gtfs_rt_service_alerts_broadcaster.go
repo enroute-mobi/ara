@@ -1,7 +1,6 @@
 package core
 
 import (
-	"errors"
 	"slices"
 
 	"bitbucket.org/enroute-mobi/ara/cache"
@@ -80,7 +79,7 @@ func (connector *ServiceAlertsBroadcaster) handleGtfs() (entities []*gtfs.FeedEn
 		}
 
 		if len(alert.InformedEntity) == 0 {
-			return nil, errors.New("no informed entities")
+			logger.Log.Debugf("no informed entities")
 		}
 
 		feedEntity := &gtfs.FeedEntity{
