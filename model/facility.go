@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"fmt"
 	"sync"
 	"time"
 
@@ -198,5 +199,33 @@ func (facility *Facility) UnmarshalJSON(data []byte) error {
 		facility.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
 	}
 
+	return nil
+}
+
+func (manager *MemoryFacilities) Load(referentialSlug string) error {
+	var selectFacilities []SelectFacility
+	modelName := manager.model.Date()
+
+	sqlQuery := fmt.Sprintf("select * from facilities where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+
+	_, err := Database.Select(&selectFacilities, sqlQuery)
+	if err != nil {
+		return err
+	}
+
+	for _, so := range selectFacilities {
+		facility := manager.New()
+		facility.id = FacilityId(so.Id)
+
+		if so.Codes.Valid && len(so.Codes.String) > 0 {
+			codeMap := make(map[string]string)
+			if err = json.Unmarshal([]byte(so.Codes.String), &codeMap); err != nil {
+				return err
+			}
+
+			facility.codes = NewCodesFromMap(codeMap)
+		}
+		manager.Save(facility)
+	}
 	return nil
 }

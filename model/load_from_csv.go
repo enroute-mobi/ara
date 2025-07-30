@@ -23,6 +23,7 @@ vehicle_journey,Id,ModelName,Name,Codes,LineId,OriginName,DestinationName,Attrib
 stop_visit,Id,ModelName,Codes,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
 stop_area_group,Id,ModelName,Name,ShortName,StopAreaIds
 line_group,Id,ModelName,Name,ShortName,LineIds
+facility,Id,ModelName,Codes
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -37,6 +38,7 @@ const (
 	VEHICLE_JOURNEY = "vehicle_journey"
 	STOP_VISIT      = "stop_visit"
 	OPERATOR        = "operator"
+	FACILITY        = "facility"
 	TOTAL_INSERTS   = "Total"
 	ERRORS          = "Errors"
 )
@@ -53,6 +55,7 @@ type Loader struct {
 	lines           []byte
 	lineGroups      []byte
 	operators       []byte
+	facilities      []byte
 	force           bool
 	printErrors     bool
 }
@@ -102,14 +105,15 @@ func LoadFromCSVFile(filePath string, referentialSlug string, force bool) error 
 
 func NewLoader(referentialSlug string, force, printErrors bool) *Loader {
 	d := make(map[string]map[string]struct{})
-	for _, m := range [7]string{
+	for _, m := range [8]string{
 		STOP_AREA,
 		STOP_AREA_GROUP,
 		LINE,
 		LINE_GROUP,
 		VEHICLE_JOURNEY,
 		STOP_VISIT,
-		OPERATOR} {
+		OPERATOR,
+		FACILITY} {
 		d[m] = make(map[string]struct{})
 	}
 	r := Result{
@@ -185,6 +189,11 @@ func (loader Loader) Load(reader io.Reader) Result {
 			if err != nil {
 				loader.err(i, err)
 			}
+		case FACILITY:
+			err := loader.handleFacility(record)
+			if err != nil {
+				loader.err(i, err)
+			}
 		default:
 			loader.err(i, fmt.Errorf("unknown record type %v", record[0]))
 			continue
@@ -198,6 +207,7 @@ func (loader Loader) Load(reader io.Reader) Result {
 	loader.insertLineGroups()
 	loader.insertVehicleJourneys()
 	loader.insertStopVisits()
+	loader.insertFacilities()
 
 	loader.result.setTotalInserts()
 
@@ -211,7 +221,13 @@ func (loader *Loader) handleForce(klass, modelName string) error {
 	if loader.force {
 		if _, ok := loader.deletedModels[klass][modelName]; !ok {
 			loader.deletedModels[klass][modelName] = struct{}{}
-			query := fmt.Sprintf("delete from %vs where model_name='%v' and referential_slug='%v';", klass, modelName, loader.referentialSlug)
+			var araModel string
+			if klass == FACILITY {
+				araModel = "facilities"
+			} else {
+				araModel = fmt.Sprintf(klass + "s")
+			}
+			query := fmt.Sprintf("delete from %v where model_name='%v' and referential_slug='%v';", araModel, modelName, loader.referentialSlug)
 			_, err := Database.Exec(query)
 			if err != nil {
 				return err
@@ -716,6 +732,64 @@ func (loader *Loader) insertStopVisits() {
 	loader.result.Import[STOP_VISIT] += rows
 }
 
+func (loader *Loader) handleFacility(record []string) error {
+	if len(record) < 4 {
+		return fmt.Errorf("wrong number of entries, expected at least 4 got %v", len(record))
+	}
+
+	var err error
+	parseErrors := ComplexError{}
+
+	if parseErrors.ErrorCount() != 0 {
+		return parseErrors
+	}
+
+	err = loader.handleForce(FACILITY, record[2])
+	if err != nil {
+		return err
+	}
+
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$),",
+		loader.referentialSlug,
+		record[1],
+		record[2],
+		record[3],
+	)
+	loader.facilities = append(loader.facilities, values...)
+	loader.bulkCounter[FACILITY]++
+
+	if loader.bulkCounter[FACILITY] >= config.Config.LoadMaxInsert {
+		loader.insertFacilities()
+	}
+
+	return nil
+}
+
+func (loader *Loader) insertFacilities() {
+
+	if len(loader.facilities) == 0 {
+		return
+	}
+
+	defer func() {
+		loader.facilities = []byte{}
+		loader.bulkCounter[FACILITY] = 0
+	}()
+
+	query := fmt.Sprintf("INSERT INTO facilities(referential_slug,id,model_name,codes) VALUES %v;", string(loader.facilities[:len(loader.facilities)-1]))
+	result, err := Database.Exec(query)
+	if err != nil {
+		loader.errInsert("facilities", err)
+		return
+	}
+	rows, err := result.RowsAffected()
+	if err != nil { // should not happen
+		loader.errInsert("facilities", err)
+		return
+	}
+	loader.result.Import[FACILITY] += rows
+}
+
 func (loader *Loader) err(i int, e error) {
 	if loader.printErrors {
 		logger.Log.Debugf("Error on line %v: %v", i, e)
@@ -741,14 +815,15 @@ func (loader *Loader) errInsert(m string, e error) {
 
 func (r *Result) setTotalInserts() {
 	var c int64
-	for _, model := range [7]string{
+	for _, model := range [8]string{
 		STOP_AREA,
 		STOP_AREA_GROUP,
 		LINE,
 		LINE_GROUP,
 		VEHICLE_JOURNEY,
 		STOP_VISIT,
-		OPERATOR} {
+		OPERATOR,
+		FACILITY} {
 		c += r.Import[model]
 	}
 	r.Import[TOTAL_INSERTS] = c
@@ -774,7 +849,8 @@ func (r Result) PrintResult() string {
   %v Lines
   %v LineGroups
   %v VehicleJourneys
-  %v StopVisits`,
+  %v StopVisits
+  %v Facilities`,
 		r.Import[ERRORS],
 		r.Import[OPERATOR],
 		r.Import[STOP_AREA],
@@ -782,5 +858,6 @@ func (r Result) PrintResult() string {
 		r.Import[LINE],
 		r.Import[LINE_GROUP],
 		r.Import[VEHICLE_JOURNEY],
-		r.Import[STOP_VISIT])
+		r.Import[STOP_VISIT],
+		r.Import[FACILITY])
 }

@@ -297,6 +297,10 @@ func (model *MemoryModel) Load() error {
 	if err != nil {
 		logger.Log.Debugf("Error while loading Operators: %v", err)
 	}
+	err = model.facilities.Load(model.referential)
+	if err != nil {
+		logger.Log.Debugf("Error while loading Facilities: %v", err)
+	}
 	err = model.macros.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Macros: %v", err)
