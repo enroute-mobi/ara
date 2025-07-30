@@ -563,6 +563,50 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 
 }
 
+func Test_FacilityUpdateManager_Update_With_Wrong_Status(t *testing.T) {
+	assert := assert.New(t)
+	code := NewCode("codeSpace", "value")
+
+	model := NewTestMemoryModel()
+	facility := model.Facilities().New()
+	facility.SetCode(code)
+	facility.Status = FacilityStatusPartiallyAvailable
+	model.Facilities().Save(facility)
+
+	manager := newUpdateManager(model)
+
+	event := &FacilityUpdateEvent{
+		Code:   code,
+		Status: "WRONG",
+	}
+
+	manager.Update(event)
+	updatedFacility, _ := model.facilities.Find(facility.id)
+	assert.Equal(FacilityStatusPartiallyAvailable, updatedFacility.Status, "Should keep existing Status if new Status does not match enum status")
+}
+
+func Test_FacilityUpdateManager_Update_With_Known_Status(t *testing.T) {
+	assert := assert.New(t)
+	code := NewCode("codeSpace", "value")
+
+	model := NewTestMemoryModel()
+	facility := model.Facilities().New()
+	facility.SetCode(code)
+	facility.Status = FacilityStatusPartiallyAvailable
+	model.Facilities().Save(facility)
+
+	manager := newUpdateManager(model)
+
+	event := &FacilityUpdateEvent{
+		Code:   code,
+		Status: "available",
+	}
+
+	manager.Update(event)
+	updatedFacility, _ := model.facilities.Find(facility.id)
+	assert.Equal(FacilityStatusAvailable, updatedFacility.Status, "Should change existing Status if new Status matches enum status")
+}
+
 func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 	assert := assert.New(t)
 	code := NewCode("codeSpace", "value")

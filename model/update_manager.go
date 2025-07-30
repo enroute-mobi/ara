@@ -60,7 +60,9 @@ func (manager *UpdateManager) updateFacility(event *FacilityUpdateEvent) {
 		facility.SetCode(NewCode(Default, event.Code.HashValue()))
 	}
 
-	facility.Status = FacilityStatus(event.Status)
+	if status, err := FacilityStatusFromString(event.Status); err == nil {
+		facility.Status = *status
+	}
 
 	facility.Save()
 }
