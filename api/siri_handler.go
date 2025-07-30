@@ -129,6 +129,11 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  sxml.NewXMLGetSituationExchange(envelope.Body()),
 			referential: handler.referential,
 		}
+	case "GetFacilityMonitoring":
+		return &SIRIFacilityMonitoringRequestHandler{
+			xmlRequest:  sxml.NewXMLGetFacilityMonitoring(envelope.Body()),
+			referential: handler.referential,
+		}
 	}
 
 	return nil

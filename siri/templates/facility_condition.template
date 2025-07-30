@@ -1,0 +1,6 @@
+<siri:FacilityCondition>
+				<siri:FacilityRef>{{ .FacilityRef }}</siri:FacilityRef>
+				<siri:FacilityStatus>
+					<siri:Status>{{ .FacilityStatus }}</siri:Status>
+				</siri:FacilityStatus>
+			</siri:FacilityCondition>
