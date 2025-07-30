@@ -58,8 +58,9 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	_, ok = model.Operators().Find("03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find Operator: \"03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 
-	_, ok = model.Facilities().Find("05cb9be3-e78b-4f76-b644-459e23ba5f1c")
+	facility, ok := model.Facilities().Find("05cb9be3-e78b-4f76-b644-459e23ba5f1c")
 	assert.True(ok, "Can't find Facility: \"05cb9be3-e78b-4f76-b644-459e23ba5f1c\"")
+	assert.Equal(FacilityStatusUnknown, facility.Status)
 
 	model = NewTestMemoryModel("referential")
 	model.date = Date{
