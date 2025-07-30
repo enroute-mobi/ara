@@ -15,7 +15,7 @@ type VehiclePositionBroadcaster struct {
 
 	vjRemoteCodeSpaces      []string
 	vehicleRemoteCodeSpaces []string
-	cache                      *cache.CachedItem
+	cache                   *cache.CachedItem
 }
 
 type VehiclePositionBroadcasterFactory struct{}
@@ -94,6 +94,10 @@ func (connector *VehiclePositionBroadcaster) handleGtfs() (entities []*gtfs.Feed
 			trip = &gtfs.TripDescriptor{
 				TripId:  &tripId,
 				RouteId: &routeId,
+			}
+
+			if directionId := vj.GtfsDirectionId(); directionId != nil {
+				trip.DirectionId = directionId
 			}
 
 			// ARA-874

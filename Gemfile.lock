@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
-  revision: 5300de258bc63c5580ffd914bda042956f814441
+  revision: e0b01b976d15044e179c9500f220a78270660491
   specs:
     gtfs-rt (0.1.0)
       racc

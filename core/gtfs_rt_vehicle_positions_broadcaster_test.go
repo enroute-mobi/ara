@@ -9,9 +9,12 @@ import (
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
+	assert := assert.New(t)
+
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	partner := referential.Partners().New("partner")
@@ -33,6 +36,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	vjId := model.NewCode("codeSpace", "vjId")
 	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
+	vehicleJourney.DirectionType = model.VEHICLE_DIRECTION_OUTBOUND
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
@@ -66,11 +70,10 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	gtfsFeed := &gtfs.FeedMessage{}
 
 	connector.HandleGtfs(gtfsFeed)
+	assert.Len(gtfsFeed.Entity, 2)
 
-	if l := len(gtfsFeed.Entity); l != 2 {
-		t.Fatalf("Response have incorrect number of entities:\n got: %v\n want: 2", l)
-	}
 	var entity *gtfs.FeedEntity
+
 	if gtfsFeed.Entity[0].GetId() == "vehicle:vId" && gtfsFeed.Entity[1].GetId() == "vehicle:vId2" {
 		entity = gtfsFeed.Entity[0]
 	} else if gtfsFeed.Entity[1].GetId() == "vehicle:vId" && gtfsFeed.Entity[0].GetId() == "vehicle:vId2" {
@@ -79,32 +82,17 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 		t.Fatalf("Incorrect Ids for gtfs entities:\n got: %v and %v\n want vehicle:vId and vehicle:vId2", gtfsFeed.Entity[0].GetId(), gtfsFeed.Entity[1].GetId())
 	}
 
-	if r := "vId"; entity.GetVehicle().GetVehicle().GetId() != r {
-		t.Errorf("Incorrect Vehicle Id:\n got: %v\n want: %v", entity.GetVehicle().GetVehicle().GetId(), r)
-	}
+	assert.Equal("vId", entity.GetVehicle().GetVehicle().GetId())
 
 	trip := entity.GetVehicle().GetTrip()
-	if r := "vjId"; trip.GetTripId() != r {
-		t.Errorf("Incorrect TripId for entity TripUpdate:\n got: %v\n want: %v", trip.GetTripId(), r)
-	}
-	if r := "lId"; trip.GetRouteId() != r {
-		t.Errorf("Incorrect RouteId for entity TripUpdate:\n got: %v\n want: %v", trip.GetRouteId(), r)
-	}
-	// ARA-874
-	// if r := connector.Clock().Now().Add(10 * time.Minute).Format("15:04:05"); trip.GetStartTime() != r {
-	// 	t.Errorf("Incorrect StartTime for entity TripUpdate:\n got: %v\n want: %v", trip.GetStartTime(), r)
-	// }
+	assert.Equal("vjId", trip.GetTripId())
+	assert.Equal("lId", trip.GetRouteId())
+	assert.Equal(uint32(1), trip.GetDirectionId())
 
 	position := entity.GetVehicle().GetPosition()
-	if r := float32(1.23456); position.GetLongitude() != r {
-		t.Errorf("Incorrect Longitude for entity PositionUpdate:\n got: %v\n want: %v", position.GetLongitude(), r)
-	}
-	if r := float32(2.34567); position.GetLatitude() != r {
-		t.Errorf("Incorrect Latitude for entity PositionUpdate:\n got: %v\n want: %v", position.GetLatitude(), r)
-	}
-	if r := float32(1.2); position.GetBearing() != r {
-		t.Errorf("Incorrect Bearing for entity PositionUpdate:\n got: %v\n want: %v", position.GetBearing(), r)
-	}
+	assert.Equal(float32(1.23456), position.GetLongitude())
+	assert.Equal(float32(2.34567), position.GetLatitude())
+	assert.Equal(float32(1.2), position.GetBearing())
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
