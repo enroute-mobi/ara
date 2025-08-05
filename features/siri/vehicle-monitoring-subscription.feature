@@ -93,7 +93,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Codes[internal]          | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -123,7 +123,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                 |
       | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                 |
       | DepartureStatus               | delayed                                                  |
-      | Attribute[DestinationDisplay] | Pouet-pouet                                              |
+      | Attributes[DestinationDisplay] | Pouet-pouet                                              |
       # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringBroadcast          |
@@ -1098,7 +1098,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Codes[external]          | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -1191,7 +1191,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Codes[external]          | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |

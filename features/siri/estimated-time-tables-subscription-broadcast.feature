@@ -295,8 +295,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[OriginRef]#Code      | "external": "ThisIsTheBeginning"  |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
@@ -390,8 +390,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -477,8 +477,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -563,8 +563,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -663,8 +663,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
     And a StopVisit exists with the following attributes:
@@ -835,8 +835,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1040,8 +1040,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1184,8 +1184,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]              | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1228,8 +1228,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]              | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1279,10 +1279,10 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[didok]                   | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | outbound                          |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "internal": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a StopVisit exists with the following attributes:
       | PassageOrder                | 4                                 |
       | StopAreaId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
@@ -1365,10 +1365,10 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | outbound                          |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -1489,8 +1489,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1657,10 +1657,10 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | outbound                          |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -1748,8 +1748,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]              | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1849,8 +1849,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -1966,7 +1966,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
+      | Attributes[DirectionName] | A Direction Name                  |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
@@ -2088,7 +2088,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
+      | Attributes[DirectionName] | A Direction Name                  |
       | HasCompleteStopSequence  | true                              |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
     And a ScheduledStopVisit exists with the following attributes:
@@ -2200,10 +2200,10 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | outbound                          |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -2306,8 +2306,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -2403,8 +2403,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -2503,8 +2503,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -2589,8 +2589,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -2682,8 +2682,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -2770,8 +2770,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -2870,10 +2870,10 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | outbound                          |
-      | Attribute[OriginName]          | Le début                          |
-      | Attribute[DestinationName]     | La fin.                           |
+      | Attributes[OriginName]          | Le début                          |
+      | Attributes[DestinationName]     | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |

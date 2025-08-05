@@ -75,8 +75,8 @@ Feature: Audit API exchanges
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
-      | Attribute[VehicleMode]   | bus                               |
+      | Attributes[DirectionName] | A Direction Name                  |
+      | Attributes[VehicleMode]   | bus                               |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
     And a minute has passed
     When I send this SIRI request
@@ -232,8 +232,8 @@ Feature: Audit API exchanges
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
-      | Attribute[VehicleMode]   | bus                               |
+      | Attributes[DirectionName] | A Direction Name                  |
+      | Attributes[VehicleMode]   | bus                               |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
     And a minute has passed
     When I send this SIRI request
@@ -351,8 +351,8 @@ Feature: Audit API exchanges
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
-      | Attribute[VehicleMode]   | bus                               |
+      | Attributes[DirectionName] | A Direction Name                  |
+      | Attributes[VehicleMode]   | bus                               |
       # "Id":"6ba7b814-9dad-11d1-6-00c04fd430c8"
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -457,8 +457,8 @@ Feature: Audit API exchanges
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
-      | Attribute[VehicleMode]   | bus                               |
+      | Attributes[DirectionName] | A Direction Name                  |
+      | Attributes[VehicleMode]   | bus                               |
       # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
@@ -598,8 +598,8 @@ Feature: Audit API exchanges
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
-      | Attribute[VehicleMode]   | bus                               |
+      | Attributes[DirectionName] | A Direction Name                  |
+      | Attributes[VehicleMode]   | bus                               |
       # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |

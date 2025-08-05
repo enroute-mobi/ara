@@ -59,26 +59,17 @@ def model_attributes(table)
     end
 
     # Transform
-    # | Codes[A]  | value1 |
-    # | Codes[B]  | value2 |
+    # | KEY[A]  | value1 |
+    # | KEY[B]  | value2 |
     # into
-    # "Codes" => {"A" => "value1", "B" => "value2" }
-    if key =~ /Codes\[([^\]]+)\]/
-      name = $1
-      attributes["Codes"] ||= {}
-      attributes["Codes"][name] = value
-      attributes.delete key
-    end
+    # "KEY" => {"A" => "value1", "B" => "value2" }
+    # With KEY either Codes, Attributes
+    if key =~ /(Codes|Attributes)\[([^\]]+)\]/
+      attr = Regexp.last_match(1)
+      name = Regexp.last_match(2)
 
-    # Transform
-    # | Attribute[A]   | value1 |
-    # | Attribute[B]   | value2 |
-    # into
-    # "Attribute" => {"A" => "value1", "B" => "value2" }
-    if key =~ /Attribute\[([^\]]+)\]/
-      name = $1
-      attributes["Attributes"] ||= {}
-      attributes["Attributes"][name] = value
+      attributes[attr] ||= {}
+      attributes[attr][name] = value
       attributes.delete key
     end
 

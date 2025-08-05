@@ -66,7 +66,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Codes[other]             | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[other]     | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -156,7 +156,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Codes[internal]          | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[other]     | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -247,7 +247,7 @@ Feature: Support SIRI VehicleMonitoring by request
      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
      | Monitored                | true                              |
-     | Attribute[DirectionName] | Direction Name                    |
+     | Attributes[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
      | Codes[other]     | Test:Vehicle:201123:LOC           |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -338,7 +338,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Codes[internal]          | STIF:bievre-VehicleJourney        |
       | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
       # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a Vehicle exists with the following attributes:
       | Codes[rdbievre]  | bievre-Vehicle                    |
@@ -372,7 +372,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z             |
       | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z             |
       | DepartureStatus               | delayed                              |
-      | Attribute[DestinationDisplay] | Pouet-pouet                          |
+      | Attributes[DestinationDisplay] | Pouet-pouet                          |
     # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a Line exists with the following attributes:
       | Codes[rdmantois] | Line-2                            |
@@ -385,7 +385,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Codes[internal]          | STIF:mantois-VehicleJourney       |
       | LineId                   | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Another Direction Name            |
+      | Attributes[DirectionName] | Another Direction Name            |
     # 6ba7b814-9dad-11d1-9-00c04fd430c8
     And a Vehicle exists with the following attributes:
       | Codes[rdmantois] | mantois-Vehicle                   |
@@ -540,7 +540,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | DestinationName                   | Destination Name                         |
       | DirectionName                     | Direction Name                           |
       | DirectionType                     | outbound                                 |
-      | Attribute[JourneyPatternName]     | Journey Pattern Name                     |
+      | Attributes[JourneyPatternName]     | Journey Pattern Name                     |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -596,7 +596,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                 |
       | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                 |
       | DepartureStatus               | delayed                                                  |
-      | Attribute[DestinationDisplay] | Pouet-pouet                                              |
+      | Attributes[DestinationDisplay] | Pouet-pouet                                              |
       # 6ba7b814-9dad-11d1-9-00c04fd430c8
     When I send this SIRI request
       """
@@ -769,7 +769,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | DestinationName                   | Destination Name                         |
       | DirectionName                     | Direction Name                           |
       | DirectionType                     | outbound                                 |
-      | Attribute[JourneyPatternName]     | Journey Pattern Name                     |
+      | Attributes[JourneyPatternName]     | Journey Pattern Name                     |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:1:LOC                |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -899,7 +899,7 @@ Feature: Support SIRI VehicleMonitoring by request
      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
      | Monitored                | true                              |
-     | Attribute[DirectionName] | Direction Name                    |
+     | Attributes[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
      | Codes[other]     | Test:Vehicle:201123:LOC           |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -982,7 +982,7 @@ Feature: Support SIRI VehicleMonitoring by request
      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
      | Monitored                | true                              |
-     | Attribute[DirectionName] | Direction Name                    |
+     | Attributes[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
      | Codes[internal]  | Test:Vehicle:201123:LOC           |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -1065,7 +1065,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Codes[other]             | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[other]     | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -1804,7 +1804,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | DestinationName                   | Destination Name                         |
       | DirectionName                     | Direction Name                           |
       | DirectionType                     | outbound                                 |
-      | Attribute[JourneyPatternName]     | Journey Pattern Name                     |
+      | Attributes[JourneyPatternName]     | Journey Pattern Name                     |
       # Id 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:1:LOC                |
