@@ -74,12 +74,13 @@ def model_attributes(table)
     end
 
     # Transform
-    #  | KEY[DefaultValue]      | A value  |
-    #  | KEY[Translations]#FR   | un texte |
+    #  | KEY[A]     | value1 |
+    #  | KEY[B]#FR  | value2 |
     # into
-    # "KEY" => {"DefaultValue"=>"A value", "Translations"=> { "FR" => "un texte" } }
+    # "KEY" => {"A"=>"value1", "B"=> { "FR" => "value2" } }
     #
     # With KEY either Summary, Description or Prompt
+    # and B either DefaultValue, Translations
     if key =~ /(Summary|Description|Prompt)\[(DefaultValue|Translations)\](#(\S+))?/
       text_type = Regexp.last_match(1)
       name = Regexp.last_match(2)
