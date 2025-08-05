@@ -47,21 +47,6 @@ def model_attributes(table)
     end
 
     # Transform
-    #  | Origin[partner]  | true  |
-    #  | Origin[partner2] | false |
-    # into
-    # "Origins" => {"partner"=>true, "partner2"=>false}
-    if key =~ /Origin\[([^\]]+)\]/
-      partner = $1
-
-      attributes["Origins"] ||= {}
-
-      attributes["Origins"][$1] = value == "true" unless attributes["Origins"].key?($1)
-
-      attributes.delete key
-    end
-
-    # Transform
     # | Blocking[JourneyPlanner]  | true  |
     # | Blocking[RealTime]        | false |
     # into

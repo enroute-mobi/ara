@@ -1533,7 +1533,6 @@ Feature: Support SIRI StopMonitoring by request
     And a StopArea exists with the following attributes:
       | Name             | Test                       |
       | Codes[external]  | NINOXE:StopPoint:SP:24:LOC |
-      | Origin[partner1] | false                      |
       | Monitored        | false                      |
     And a Line exists with the following attributes:
       | Codes[external] | NINOXE:Line:3:LOC |
