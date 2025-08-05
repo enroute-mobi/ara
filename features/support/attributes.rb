@@ -128,22 +128,10 @@ def model_attributes(table)
       attributes.delete raw_attribute
     end
 
-    # Situation References are an array of Reference
-    # Format: | Reference[0] | Kind:Code |
-    if key =~ /References\[(\d+)\]/
-      reference_number = $1.to_i
-
-      attributes["References"] ||= []
-
-      until attributes["References"].length >= reference_number+1
-        attributes["References"] << {}
-      end
-
-      kind, code = value.split(":",2)
-      attributes["References"][reference_number] = { "Type" => kind, "Code" => JSON.parse(code) }
-      attributes.delete key
-    end
-
+    # Transform
+    #  | Reference[A]#Code  | "code_space" : "value" |
+    # into
+    # "References" => { "A" => { Codes => { "code_space" => "value2" } } }
     if key =~ /Reference\[([^\]]+)\]#(Code|Id)/
       name = $1
       attribute = $2
@@ -197,10 +185,14 @@ def model_attributes(table)
     # | ReferenceArray[0] | A, "B": "C" |
     # into
     # References => [ { "Type" => A, "Code" => { "B" => "C" } } ]
+    #
     # or
+    #
     # | ReferenceArray[0] | "B": "C" |
     # into
     # References => [ { "Code" => { "B" => "C" } } ]
+    # example
+    # | ReferenceArray[0] | "SituationExchangeCollect": "all" |
     if key =~ /ReferenceArray\[(\d+)\]/
       name = $1
       attribute = $2
