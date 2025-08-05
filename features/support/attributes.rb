@@ -76,6 +76,11 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    # Transform
+    # | Blocking[JourneyPlanner]  | true  |
+    # | Blocking[RealTime]        | false |
+    # into
+    # "Blocking" => {"JourneyPlanner" => true, "Realtime" => false }
     if key =~ /Blocking\[([^\]]+)\]/
       name = $1
       attributes["Blocking"] ||= {}
@@ -83,6 +88,11 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    # Transform
+    # | Codes[A]  | value1 |
+    # | Codes[B]  | value2 |
+    # into
+    # "Codes" => {"A" => "value1", "B" => "value2" }
     if key =~ /Codes\[([^\]]+)\]/
       name = $1
       attributes["Codes"] ||= {}
@@ -90,6 +100,11 @@ def model_attributes(table)
       attributes.delete key
     end
 
+    # Transform
+    # | Attribute[A]   | value1 |
+    # | Attribute[B]   | value2 |
+    # into
+    # "Attribute" => {"A" => "value1", "B" => "value2" }
     if key =~ /Attribute\[([^\]]+)\]/
       name = $1
       attributes["Attributes"] ||= {}
@@ -215,7 +230,15 @@ def model_attributes(table)
       end
       attributes.delete key
     end
-    
+
+    # Transform
+    # | ReferenceArray[0] | A, "B": "C" |
+    # into
+    # References => [ { "Type" => A, "Code" => { "B" => "C" } } ]
+    # or
+    # | ReferenceArray[0] | "B": "C" |
+    # into
+    # References => [ { "Code" => { "B" => "C" } } ]
     if key =~ /ReferenceArray\[(\d+)\]/
       name = $1
       attribute = $2
