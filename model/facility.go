@@ -198,9 +198,8 @@ func (facility *Facility) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	var status FacilityStatus
-	if err := status.FromString(aux.Status); err == nil {
-		facility.Status = status
+	if status, err := FacilityStatusFromString(aux.Status); err == nil {
+		facility.Status = *status
 	} else {
 		logger.Log.Debugf("%v", err)
 		facility.Status = FacilityStatusUnknown
@@ -241,7 +240,8 @@ func (manager *MemoryFacilities) Load(referentialSlug string) error {
 	return nil
 }
 
-func (status *FacilityStatus) FromString(s string) error {
+func FacilityStatusFromString(s string) (*FacilityStatus, error) {
+	var status FacilityStatus
 	switch FacilityStatus(s) {
 	case FacilityStatusAvailable:
 		fallthrough
@@ -252,8 +252,8 @@ func (status *FacilityStatus) FromString(s string) error {
 	case FacilityStatusRemoved:
 		fallthrough
 	case FacilityStatusUnknown:
-		*status = FacilityStatus(s)
-		return nil
+		status = FacilityStatus(s)
+		return &status, nil
 	}
-	return fmt.Errorf("invalid Facility status %s", s)
+	return nil, fmt.Errorf("invalid Facility status %s", s)
 }

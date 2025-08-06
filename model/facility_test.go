@@ -221,17 +221,16 @@ func Test_FacilityStatus_FromString(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		var status FacilityStatus
-		err := status.FromString(test.stringValue)
+		status, err := FacilityStatusFromString(test.stringValue)
 		assert.NoError(err)
-		assert.Equal(test.expectedFacilityStatus, status)
+		assert.Equal(test.expectedFacilityStatus, *status)
 	}
 }
 
 func Test_FacilityStatus_FromString_Wrong(t *testing.T) {
 	assert := assert.New(t)
 
-	var status FacilityStatus
-	err := status.FromString("WRONG")
+	status, err := FacilityStatusFromString("WRONG")
+	assert.Nil(status)
 	assert.EqualError(err, "invalid Facility status WRONG")
 }
