@@ -115,6 +115,17 @@ func (connector *SIRISubscriptionRequestDispatcher) Dispatch(request *sxml.XMLSu
 		return &response, nil
 	}
 
+	if len(request.XMLSubscriptionFMEntries()) > 0 {
+		fmbc, ok := connector.Partner().Connector(SIRI_FACILITY_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if !ok {
+			return nil, fmt.Errorf("no FacilityMonitoringSubscriptionBroadcaster Connector")
+		}
+
+		response.ResponseStatus = fmbc.(*SIRIFacilityMonitoringSubscriptionBroadcaster).HandleSubscriptionRequest(request, message)
+
+		return &response, nil
+	}
+
 	return nil, fmt.Errorf("subscription not supported")
 }
 

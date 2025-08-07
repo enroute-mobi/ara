@@ -37,5 +37,6 @@ const (
 	ProductionTimetableSubscriptionRequest = "ProductionTimetableSubscriptionRequest"
 	GeneralMessageSubscriptionRequest      = "GeneralMessageSubscriptionRequest"
 	SituationExchangeSubscriptionRequest   = "SituationExchangeSubscriptionRequest"
+	FacilityMonitoringSubscriptionRequest  = "FacilityMonitoringSubscriptionRequest"
 	ResponseStatus                         = "ResponseStatus"
 )

@@ -364,6 +364,17 @@ func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptio
 	return terminatedSub, nil
 }
 
+func (client *SIRIClient) NotifyFacilityMonitoring(request *siri.SIRINotifyFacilityMonitoring) error {
+	_, err := client.prepareAndSendRequest(siriClientArguments{
+		request:     request,
+		requestType: NOTIFICATION,
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (client *SIRIClient) NotifyStopMonitoring(request *siri.SIRINotifyStopMonitoring) error {
 	_, err := client.prepareAndSendRequest(siriClientArguments{
 		request:     request,

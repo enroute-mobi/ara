@@ -53,6 +53,7 @@ type MemoryModel struct {
 	GMEventsChan        chan SituationBroadcastEvent
 	SXEventsChan        chan SituationBroadcastEvent
 	VeEventChan         chan VehicleBroadcastEvent
+	FMEventChan         chan FacilityBroadcastEvent
 	referential         string
 	date                Date
 }
@@ -135,6 +136,7 @@ func (model *MemoryModel) refresh() {
 	facilities := NewMemoryFacilities()
 	facilities.model = model
 	model.facilities = facilities
+	model.facilities.broadcastEvent = model.broadcastFMEvent
 
 	model.controls = NewControlManager()
 }
@@ -163,6 +165,10 @@ func (model *MemoryModel) SetBroadcastSXChan(broadcastSXEventChan chan Situation
 
 func (model *MemoryModel) SetBroadcastVeChan(broadcastVeEventChan chan VehicleBroadcastEvent) {
 	model.VeEventChan = broadcastVeEventChan
+}
+
+func (model *MemoryModel) SetBroadcastFMChan(broadcastFMEventChan chan FacilityBroadcastEvent) {
+	model.FMEventChan = broadcastFMEventChan
 }
 
 func (model *MemoryModel) Referential() string {
@@ -202,6 +208,14 @@ func (model *MemoryModel) broadcastSXEvent(event SituationBroadcastEvent) {
 	case model.SXEventsChan <- event:
 	default:
 		logger.Log.Debugf("BrocasterManager SituationExchangeBroadcastEvent queue is full")
+	}
+}
+
+func (model *MemoryModel) broadcastFMEvent(event FacilityBroadcastEvent) {
+	select {
+	case model.FMEventChan <- event:
+	default:
+		logger.Log.Debugf("BrocasterManager FacilityBroadcastEvent queue is full")
 	}
 }
 

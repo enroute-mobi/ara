@@ -1,0 +1,58 @@
+package siri
+
+import (
+	"bytes"
+	"fmt"
+	"time"
+
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
+)
+
+type SIRINotifyFacilityMonitoring struct {
+	Address                   string
+	RequestMessageRef         string
+	ProducerRef               string
+	ResponseMessageIdentifier string
+	SubscriberRef             string
+	SubscriptionIdentifier    string
+
+	ResponseTimestamp time.Time
+	Status            bool
+	ErrorType         string
+	ErrorNumber       int
+	ErrorText         string
+
+	FacilityConditions []*SIRIFacilityCondition
+
+	SortPayloadForTest bool
+}
+
+func (notify *SIRINotifyFacilityMonitoring) ErrorString() string {
+	return fmt.Sprintf("%v: %v", notify.errorType(), notify.ErrorText)
+}
+
+func (notify *SIRINotifyFacilityMonitoring) errorType() string {
+	if notify.ErrorType == siri_attributes.OtherError {
+		return fmt.Sprintf("%v %v", notify.ErrorType, notify.ErrorNumber)
+	}
+	return notify.ErrorType
+}
+
+func (notify *SIRINotifyFacilityMonitoring) BuildXML(envelopeType ...string) (string, error) {
+	var buffer bytes.Buffer
+	var envType string
+	var templateName string
+
+	if len(envelopeType) != 0 && envelopeType[0] != "soap" && envelopeType[0] != "" {
+		envType = "_" + envelopeType[0]
+	}
+
+	templateName = fmt.Sprintf("facility_monitoring_notify%s.template", envType)
+
+	if err := templates.ExecuteTemplate(&buffer, templateName, notify); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return buffer.String(), nil
+}

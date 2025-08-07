@@ -20,6 +20,7 @@ type XMLSubscriptionRequest struct {
 	ettEntries []*XMLEstimatedTimetableSubscriptionRequestEntry
 	pttEntries []*XMLProductionTimetableSubscriptionRequestEntry
 	vmEntries  []*XMLVehicleMonitoringSubscriptionRequestEntry
+	fmEntries  []*XMLFacilityMonitoringSubscriptionRequestEntry
 }
 
 func NewXMLSubscriptionRequestFromContent(content []byte) (*XMLSubscriptionRequest, error) {
@@ -57,6 +58,17 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionETTEntries() []*XMLEstimat
 		request.ettEntries = append(request.ettEntries, NewXMLEstimatedTimetableSubscriptionRequestEntry(ett))
 	}
 	return request.ettEntries
+}
+
+func (request *XMLSubscriptionRequest) XMLSubscriptionFMEntries() []*XMLFacilityMonitoringSubscriptionRequestEntry {
+	if len(request.fmEntries) != 0 {
+		return request.fmEntries
+	}
+	nodes := request.findNodes(siri_attributes.FacilityMonitoringSubscriptionRequest)
+	for _, fm := range nodes {
+		request.fmEntries = append(request.fmEntries, NewXMLFacilityMonitoringSubscriptionRequestEntry(fm))
+	}
+	return request.fmEntries
 }
 
 func (request *XMLSubscriptionRequest) XMLSubscriptionVMEntries() []*XMLVehicleMonitoringSubscriptionRequestEntry {
