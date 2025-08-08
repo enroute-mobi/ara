@@ -73,7 +73,7 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 }
 
 type Paginable interface {
-	model.Situation | model.StopArea
+	model.Situation | model.StopArea | model.Line
 }
 
 type PaginatedResource[p Paginable] struct {

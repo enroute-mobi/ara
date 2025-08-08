@@ -155,7 +155,11 @@ func Test_LineController_Index(t *testing.T) {
 	// Test response
 	checkLineResponseStatus(responseRecorder, t)
 
-	expected := `[{"CollectSituations":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	//Test Result
+	expected := `{"Models":
+  [{"CollectSituations": false,
+    "Id": "6ba7b814-9dad-11d1-0-00c04fd430c8"}],
+    "Pagination": {"CurrentPage": 1, "PerPage": 1, "TotalCount": 1, "TotalPages": 1}}`
 	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
