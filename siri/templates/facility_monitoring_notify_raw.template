@@ -1,0 +1,19 @@
+<ServiceDelivery>
+	<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+	<ProducerRef>{{.ProducerRef}}</ProducerRef>{{ if .Address }}
+	<Address>{{ .Address }}</Address>{{ end }}
+	<ResponseMessageIdentifier>{{.ResponseMessageIdentifier}}</ResponseMessageIdentifier>
+	<FacilityMonitoringDelivery>
+		<ResponseTimestamp>{{.ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</ResponseTimestamp>
+		<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>
+		<SubscriptionRef>{{.SubscriptionIdentifier}}</SubscriptionRef>
+		<Status>{{ .Status }}</Status>{{ if not .Status }}
+		<ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+			<OtherError number="{{.ErrorNumber}}">{{ else }}
+			<{{.ErrorType}}>{{ end }}
+				<ErrorText>{{.ErrorText}}</ErrorText>
+			</{{.ErrorType}}>
+		</ErrorCondition>{{ else }}{{ range .FacilityConditions }}
+		{{ .BuildFacilityConditionXMLRaw }}{{ end }}{{ end }}
+	</FacilityMonitoringDelivery>
+</ServiceDelivery>
