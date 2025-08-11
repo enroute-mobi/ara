@@ -64,3 +64,12 @@ func (request *SIRIFacilityMonitoringRequest) BuildFacilityMonitoringRequestXML(
 	}
 	return buffer.String(), nil
 }
+
+func (request *SIRIFacilityMonitoringRequest) BuildFacilityMonitoringRequestXMLRaw() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "facility_monitoring_request_raw.template", request); err != nil {
+		logger.Log.Debugf("Errorw hile executing template: %v", err)
+		return "", err
+	}
+	return buffer.String(), nil
+}

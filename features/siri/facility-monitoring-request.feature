@@ -171,3 +171,42 @@ Feature: Support SIRI FacilityMonitoring by request
       | Type         | FacilityMonitoringRequest                                 |
       | Status       | Error                                                     |
       | ErrorDetails | InvalidDataReferencesError: Facility not found: 'UNKNOWN' |
+
+  @ARA-1731
+  Scenario: Performs a raw SIRI FacilityMonitoring request to a Partner
+    Given a raw SIRI server waits FacilityMonitoring request on "http://localhost:8090" to respond with
+      """
+     <?xml version="1.0" encoding="UTF-8"?>
+     <Siri xmlns="http://www.siri.org.uk/siri" xmlns:acsb="http://www.ifopt.org.uk/acsb" xmlns:ifopt="http://www.ifopt.org.uk/ifopt" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+         <ServiceDelivery>
+             <ResponseTimestamp>2030-01-01T12:01:10.000Z</ResponseTimestamp>
+             <FacilityMonitoringDelivery>
+                 <ResponseTimestamp>2030-01-01T15:00:00.000Z</ResponseTimestamp>
+                 <FacilityCondition>
+                     <FacilityRef>NINOXE:Facility:ABC1:LOC</FacilityRef>
+                     <FacilityStatus>
+                         <Status>available</Status>
+                     </FacilityStatus>
+                 </FacilityCondition>
+             </FacilityMonitoringDelivery>
+         </ServiceDelivery>
+     </Siri>
+      """
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-facility-monitoring-request-collector] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | remote_code_space | internal              |
+      | siri.envelope     | raw                   |
+    And a minute has passed
+    And a Facility exists with the following attributes:
+      | Codes[internal] | NINOXE:Facility:ABC1:LOC |
+    When a minute has passed
+    And the SIRI server has received a FacilityMonitoring request
+    Then one Facility has the following attributes:
+      | Codes[internal] | NINOXE:Facility:ABC1:LOC |
+      | Status          | available                |
+    And an audit event should exist with these attributes:
+      | Protocol  | siri                      |
+      | Direction | sent                      |
+      | Status    | OK                        |
+      | Type      | FacilityMonitoringRequest |
