@@ -29,14 +29,14 @@ Feature: Support SIRI ProductionTimetable by subscription
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | inbound                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a VehicleJourney exists with the following attributes:
       | Name                           | Passage 32 outbound               |
       | Codes[internal]                | NINOXE:VehicleJourney:202         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | outbound                          |
       | Reference[DestinationRef]#Code | "external": "ThisAnotherTheEnd"   |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 1                                                      |
@@ -519,7 +519,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | inbound                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -648,7 +648,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | inbound                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -778,7 +778,7 @@ Feature: Support SIRI ProductionTimetable by subscription
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | inbound                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -1198,14 +1198,14 @@ Feature: Support SIRI ProductionTimetable by subscription
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | inbound                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a VehicleJourney exists with the following attributes:
       | Name                           | Passage 32 outbound               |
       | Codes[internal]                | NINOXE:VehicleJourney:202         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | outbound                          |
       | Reference[DestinationRef]#Code | "external": "ThisAnotherTheEnd"   |
-      | Attribute[VehicleMode]         | bus                               |
+      | Attributes[VehicleMode]         | bus                               |
     And a ScheduledStopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 1                                                      |

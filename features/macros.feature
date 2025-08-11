@@ -182,7 +182,7 @@ Feature: Manages Macros
     And the SIRI server has received a GetStopMonitoring request
     Then one VehicleJourney has the following attributes:
       | Codes[internal]          | NINOXE:VehicleJourney:201 |
-      | Attribute[DirectionName] | Aller                     |
+      | Attributes[DirectionName] | Aller                     |
       | DirectionType            | outbound                  |
 
   @nostart @database

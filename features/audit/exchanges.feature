@@ -597,7 +597,7 @@ Feature: Audit API exchanges
       | Codes[internal]          | NINOXE:VehicleJourney:201         |
       | LineId                   | 6ba7b814-9dad-11d1-c-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | A Direction Name                  |
+      | Attributes[DirectionName] | A Direction Name                  |
     And a minute has passed
     When I send this SIRI request
       """

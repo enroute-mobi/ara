@@ -32,7 +32,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Arrival    | 2017-01-12T11:42:54.000+01:00      |
       | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00      |
       | VehicleAtStop                 | false                              |
-      | Attribute[DestinationDisplay] | Méliès - Croix Bonnet              |
+      | Attributes[DestinationDisplay] | Méliès - Croix Bonnet              |
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2  |
@@ -46,7 +46,7 @@ Feature: Support SIRI GetSIRI
       | LineId                            | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                         | true                                          |
       | DestinationName                   | PARIS - Porte d'Orléans                       |
-      | Attribute[DirectionName]          | Aller                                         |
+      | Attributes[DirectionName]          | Aller                                         |
       | DirectionType                     | cladebr                                       |
       | Reference[JourneyPatternRef]#Code | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#Code    | "internal": "parorle"                         |
@@ -63,7 +63,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Arrival    | 2017-01-12T11:41:00.000+01:00      |
       | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00      |
       | VehicleAtStop                 | false                              |
-      | Attribute[DestinationDisplay] | PARIS - Porte d'Orléans            |
+      | Attributes[DestinationDisplay] | PARIS - Porte d'Orléans            |
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
     When I send this SIRI request
       """
@@ -224,7 +224,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Arrival    | 2017-01-12T11:42:54.000+01:00      |
       | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00      |
       | VehicleAtStop                 | false                              |
-      | Attribute[DestinationDisplay] | Méliès - Croix Bonnet              |
+      | Attributes[DestinationDisplay] | Méliès - Croix Bonnet              |
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2  |
@@ -235,10 +235,10 @@ Feature: Support SIRI GetSIRI
     And a VehicleJourney exists with the following attributes:
       | Codes[internal]                   | 5CAR621689196575                              |
       | LineId                            | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
-      | Attribute[DestinationName]        | PARIS - Porte d'Orléans                       |
-      | Attribute[DirectionName]          | Aller                                         |
+      | Attributes[DestinationName]        | PARIS - Porte d'Orléans                       |
+      | Attributes[DirectionName]          | Aller                                         |
       | DirectionType                     | cladebr                                       |
-      | Attribute[Monitored]              | true                                          |
+      | Attributes[Monitored]              | true                                          |
       | Reference[JourneyPatternRef]#Code | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#Code    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
@@ -254,7 +254,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Arrival    | 2017-01-12T11:41:00.000+01:00      |
       | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00      |
       | VehicleAtStop                 | false                              |
-      | Attribute[DestinationDisplay] | PARIS - Porte d'Orléans            |
+      | Attributes[DestinationDisplay] | PARIS - Porte d'Orléans            |
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
     When I send this SIRI request
       """
@@ -376,7 +376,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Arrival    | 2017-01-12T11:42:54.000+01:00      |
       | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00      |
       | VehicleAtStop                 | false                              |
-      | Attribute[DestinationDisplay] | Méliès - Croix Bonnet              |
+      | Attributes[DestinationDisplay] | Méliès - Croix Bonnet              |
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2  |
@@ -390,7 +390,7 @@ Feature: Support SIRI GetSIRI
       | LineId                            | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                         | true                                          |
       | DestinationName                   | PARIS - Porte d'Orléans                       |
-      | Attribute[DirectionName]          | Aller                                         |
+      | Attributes[DirectionName]          | Aller                                         |
       | DirectionType                     | cladebr                                       |
       | Reference[JourneyPatternRef]#Code | "external": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#Code    | "external": "parorle"                         |
@@ -407,7 +407,7 @@ Feature: Support SIRI GetSIRI
       | Schedule[expected]#Arrival    | 2017-01-12T11:41:00.000+01:00      |
       | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00      |
       | VehicleAtStop                 | false                              |
-      | Attribute[DestinationDisplay] | PARIS - Porte d'Orléans            |
+      | Attributes[DestinationDisplay] | PARIS - Porte d'Orléans            |
       | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
     When I send this SIRI request
       """

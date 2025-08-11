@@ -921,13 +921,12 @@ Feature: Support SIRI GeneralMessage by subscription
     And 10 seconds have passed
     And 5 seconds have passed
     And a Situation exists with the following attributes:
-      | Codes[internal]         | NINOXE:GeneralMessage:27_1 |
-      | RecordedAt              | 2017-01-01T03:30:06+02:00  |
-      | Version                 | 1                          |
-      | Channel                 | Perturbations              |
-      | ValidUntil              | 2017-01-01T20:30:06+02:00  |
-      | Messages[0]#MessageType | longMessage                |
-      | Messages[0]#MessageText | Les autres non             |
+      | Codes[internal]           | NINOXE:GeneralMessage:27_1 |
+      | RecordedAt                | 2017-01-01T03:30:06+02:00  |
+      | Version                   | 1                          |
+      | Channel                   | Perturbations              |
+      | ValidUntil                | 2017-01-01T20:30:06+02:00  |
+      | Description[DefaultValue] | longMessage                |
     When I send this SIRI request
       """
      <?xml version='1.0' encoding='utf-8'?>

@@ -372,7 +372,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[other]             | Test:VehicleJourney:201:LOC       |
       | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Monitored                | true                              |
-      | Attribute[DirectionName] | Direction Name                    |
+      | Attributes[DirectionName] | Direction Name                    |
     And a StopArea exists with the following attributes:
       | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
       | Name            | Test                       |

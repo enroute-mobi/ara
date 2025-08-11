@@ -427,8 +427,6 @@ Feature: Support SIRI GeneralMessage for Situation
       | RecordedAt                 | 2017-01-01T03:30:06+02:00                                                  |
       | Version                    | 1                                                                          |
       | Channel                    | Perturbation                                                               |
-      | Messages[0]#MessageType    | longMessage                                                                |
-      | Messages[0]#MessageText    | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
       | ValidityPeriods[0]#EndTime | 2017-01-01T01:01:00+02:00                                                  |
       | Description[DefaultValue]  | La nouvelle carte d'abonnement est disponible au points de vente du réseau |
     And a SIRI Partner "test" exists with connectors [siri-general-message-request-broadcaster] and the following settings:

@@ -47,35 +47,10 @@ def model_attributes(table)
     end
 
     # Transform
-    #  | Origin[partner]  | true  |
-    #  | Origin[partner2] | false |
+    # | Blocking[JourneyPlanner]  | true  |
+    # | Blocking[RealTime]        | false |
     # into
-    # "Origins" => {"partner"=>true, "partner2"=>false}
-    if key =~ /Origin\[([^\]]+)\]/
-      partner = $1
-
-      attributes["Origins"] ||= {}
-
-      attributes["Origins"][$1] = value == "true" unless attributes["Origins"].key?($1)
-
-      attributes.delete key
-    end
-
-    if key =~ /Messages\[(\d+)\]#(\S+)/
-      message_number = $1.to_i
-      attribute = $2
-
-      attributes["Messages"] ||= []
-
-      until attributes["Messages"].length >= message_number+1
-        attributes["Messages"] << {}
-      end
-      message = attributes["Messages"][message_number]
-
-      message[attribute] = value
-      attributes.delete key
-    end
-
+    # "Blocking" => {"JourneyPlanner" => true, "Realtime" => false }
     if key =~ /Blocking\[([^\]]+)\]/
       name = $1
       attributes["Blocking"] ||= {}
@@ -83,27 +58,29 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ /Codes\[([^\]]+)\]/
-      name = $1
-      attributes["Codes"] ||= {}
-      attributes["Codes"][name] = value
-      attributes.delete key
-    end
+    # Transform
+    # | KEY[A]  | value1 |
+    # | KEY[B]  | value2 |
+    # into
+    # "KEY" => {"A" => "value1", "B" => "value2" }
+    # With KEY either Codes, Attributes
+    if key =~ /(Codes|Attributes)\[([^\]]+)\]/
+      attr = Regexp.last_match(1)
+      name = Regexp.last_match(2)
 
-    if key =~ /Attribute\[([^\]]+)\]/
-      name = $1
-      attributes["Attributes"] ||= {}
-      attributes["Attributes"][name] = value
+      attributes[attr] ||= {}
+      attributes[attr][name] = value
       attributes.delete key
     end
 
     # Transform
-    #  | KEY[DefaultValue]      | A value  |
-    #  | KEY[Translations]#FR   | un texte |
+    #  | KEY[A]     | value1 |
+    #  | KEY[B]#FR  | value2 |
     # into
-    # "KEY" => {"DefaultValue"=>"A value", "Translations"=> { "FR" => "un texte" } }
+    # "KEY" => {"A"=>"value1", "B"=> { "FR" => "value2" } }
     #
     # With KEY either Summary, Description or Prompt
+    # and B either DefaultValue, Translations
     if key =~ /(Summary|Description|Prompt)\[(DefaultValue|Translations)\](#(\S+))?/
       text_type = Regexp.last_match(1)
       name = Regexp.last_match(2)
@@ -151,22 +128,10 @@ def model_attributes(table)
       attributes.delete raw_attribute
     end
 
-    # Situation References are an array of Reference
-    # Format: | Reference[0] | Kind:Code |
-    if key =~ /References\[(\d+)\]/
-      reference_number = $1.to_i
-
-      attributes["References"] ||= []
-
-      until attributes["References"].length >= reference_number+1
-        attributes["References"] << {}
-      end
-
-      kind, code = value.split(":",2)
-      attributes["References"][reference_number] = { "Type" => kind, "Code" => JSON.parse(code) }
-      attributes.delete key
-    end
-
+    # Transform
+    #  | Reference[A]#Code  | "code_space" : "value" |
+    # into
+    # "References" => { "A" => { Codes => { "code_space" => "value2" } } }
     if key =~ /Reference\[([^\]]+)\]#(Code|Id)/
       name = $1
       attribute = $2
@@ -215,7 +180,19 @@ def model_attributes(table)
       end
       attributes.delete key
     end
-    
+
+    # Transform
+    # | ReferenceArray[0] | A, "B": "C" |
+    # into
+    # References => [ { "Type" => A, "Code" => { "B" => "C" } } ]
+    #
+    # or
+    #
+    # | ReferenceArray[0] | "B": "C" |
+    # into
+    # References => [ { "Code" => { "B" => "C" } } ]
+    # example
+    # | ReferenceArray[0] | "SituationExchangeCollect": "all" |
     if key =~ /ReferenceArray\[(\d+)\]/
       name = $1
       attribute = $2
