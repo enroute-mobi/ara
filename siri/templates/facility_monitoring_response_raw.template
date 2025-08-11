@@ -1,0 +1,8 @@
+<ServiceDelivery>
+	<ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>
+	<ProducerRef>{{ .ProducerRef }}</ProducerRef>{{ if .Address }}
+	<Address>{{ .Address }}</Address>{{ end }}
+	<ResponseMessageIdentifier>{{ .ResponseMessageIdentifier }}</ResponseMessageIdentifier>
+	<RequestMessageRef>{{ .RequestMessageRef }}</RequestMessageRef>
+		{{ .BuildFacilityMonitoringDeliveryXMLRaw }}
+</ServiceDelivery>

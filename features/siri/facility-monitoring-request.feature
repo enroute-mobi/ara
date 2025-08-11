@@ -172,7 +172,7 @@ Feature: Support SIRI FacilityMonitoring by request
       | Status       | Error                                                     |
       | ErrorDetails | InvalidDataReferencesError: Facility not found: 'UNKNOWN' |
 
-  @ARA-1731
+  @ARA-XXX
   Scenario: Performs a raw SIRI FacilityMonitoring request to a Partner
     Given a raw SIRI server waits FacilityMonitoring request on "http://localhost:8090" to respond with
       """
@@ -210,3 +210,56 @@ Feature: Support SIRI FacilityMonitoring by request
       | Direction | sent                      |
       | Status    | OK                        |
       | Type      | FacilityMonitoringRequest |
+
+  @ARA-XXX
+  Scenario: Handle a raw SIRI FacilityMonitoring request
+    Given a SIRI Partner "test" exists with connectors [siri-facility-monitoring-request-broadcaster] and the following settings:
+      | local_credential  | test     |
+      | remote_code_space | internal |
+      | siri.envelope     | raw      |
+    And a Facility exists with the following attributes:
+      | Codes[internal] | NINOXE:Facility:ABC1:LOC |
+      | Status          | available                |
+    When I send this SIRI request
+    """
+    <?xml version='1.0' encoding='utf-8'?>
+    <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+      <ServiceRequest>
+        <RequestTimestamp>2017-01-01T12:02:00.000Z</RequestTimestamp>
+        <RequestorRef>test</RequestorRef>
+        <MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</MessageIdentifier>
+        <FacilityMonitoringRequest>
+          <RequestTimestamp>2017-01-01T12:02:00.000Z</RequestTimestamp>
+          <MessageIdentifier>6ba7b814-9dad-11d1-4-00c04fd430c8</MessageIdentifier>
+          <FacilityRef>NINOXE:Facility:ABC1:LOC</FacilityRef>
+        </FacilityMonitoringRequest>
+      </ServiceRequest>
+    </Siri>
+    """
+    Then I should receive this SIRI response
+    """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
+        <ServiceDelivery>
+          <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+          <ProducerRef>Ara</ProducerRef>
+          <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-3-00c04fd430c8:LOC</ResponseMessageIdentifier>
+          <RequestMessageRef>6ba7b814-9dad-11d1-4-00c04fd430c8</RequestMessageRef>
+          <FacilityMonitoringDelivery>
+            <ResponseTimestamp>2017-01-01T12:00:00.000Z</ResponseTimestamp>
+            <RequestMessageRef>6ba7b814-9dad-11d1-4-00c04fd430c8</RequestMessageRef>
+            <FacilityCondition>
+              <FacilityRef>NINOXE:Facility:ABC1:LOC</FacilityRef>
+              <FacilityStatus>
+                <Status>available</Status>
+              </FacilityStatus>
+            </FacilityCondition>
+          </FacilityMonitoringDelivery>
+        </ServiceDelivery>
+      </Siri>
+    """
+    And an audit event should exist with these attributes:
+      | Protocol        | siri                           |
+      | Direction       | received                       |
+      | Status          | OK                             |
+      | Type            | FacilityMonitoringRequest      |

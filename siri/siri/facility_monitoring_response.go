@@ -71,9 +71,27 @@ func (delivery *SIRIFacilityMonitoringDelivery) BuildFacilityMonitoringDeliveryX
 	return buffer.String(), nil
 }
 
+func (delivery *SIRIFacilityMonitoringDelivery) BuildFacilityMonitoringDeliveryXMLRaw() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "facility_monitoring_delivery_raw.template", delivery); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
 func (delivery *SIRIFacilityCondition) BuildFacilityConditionXML() (string, error) {
 	var buffer bytes.Buffer
 	if err := templates.ExecuteTemplate(&buffer, "facility_condition.template", delivery); err != nil {
+		logger.Log.Debugf("Error while executing template: %v", err)
+		return "", err
+	}
+	return buffer.String(), nil
+}
+
+func (delivery *SIRIFacilityCondition) BuildFacilityConditionXMLRaw() (string, error) {
+	var buffer bytes.Buffer
+	if err := templates.ExecuteTemplate(&buffer, "facility_condition_raw.template", delivery); err != nil {
 		logger.Log.Debugf("Error while executing template: %v", err)
 		return "", err
 	}
