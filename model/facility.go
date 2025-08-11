@@ -6,6 +6,7 @@ import (
 	"sync"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -35,6 +36,7 @@ func NewFacility(model Model) *Facility {
 		model: model,
 	}
 	facility.codes = make(Codes)
+	facility.Status = FacilityStatusUnknown
 	return facility
 }
 
@@ -185,7 +187,8 @@ func (facility *Facility) MarshalJSON() ([]byte, error) {
 func (facility *Facility) UnmarshalJSON(data []byte) error {
 	type Alias Facility
 	aux := &struct {
-		Codes map[string]string
+		Codes  map[string]string
+		Status string
 		*Alias
 	}{
 		Alias: (*Alias)(facility),
@@ -193,6 +196,13 @@ func (facility *Facility) UnmarshalJSON(data []byte) error {
 	err := json.Unmarshal(data, aux)
 	if err != nil {
 		return err
+	}
+
+	if status, err := FacilityStatusFromString(aux.Status); err == nil {
+		facility.Status = *status
+	} else {
+		logger.Log.Debugf("%v", err)
+		facility.Status = FacilityStatusUnknown
 	}
 
 	if aux.Codes != nil {
@@ -228,4 +238,22 @@ func (manager *MemoryFacilities) Load(referentialSlug string) error {
 		manager.Save(facility)
 	}
 	return nil
+}
+
+func FacilityStatusFromString(s string) (*FacilityStatus, error) {
+	var status FacilityStatus
+	switch FacilityStatus(s) {
+	case FacilityStatusAvailable:
+		fallthrough
+	case FacilityStatusNotAvailable:
+		fallthrough
+	case FacilityStatusPartiallyAvailable:
+		fallthrough
+	case FacilityStatusRemoved:
+		fallthrough
+	case FacilityStatusUnknown:
+		status = FacilityStatus(s)
+		return &status, nil
+	}
+	return nil, fmt.Errorf("invalid Facility status %s", s)
 }

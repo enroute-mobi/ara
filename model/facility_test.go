@@ -66,6 +66,32 @@ func Test_Facility_UnmarshalJSON(t *testing.T) {
 	assert.Equal(FacilityStatusAvailable, facility.Status)
 }
 
+func Test_Facility_UnmarshalJSON_WithoutStatus(t *testing.T) {
+	assert := assert.New(t)
+	require := require.New(t)
+
+	text := `{
+    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+  }`
+
+	facility := Facility{}
+	err := json.Unmarshal([]byte(text), &facility)
+	require.NoError(err)
+
+	expectedCodes := []Code{
+		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
+		NewCode("hastus", "sqypis"),
+	}
+
+	for _, expectedCode := range expectedCodes {
+		code, found := facility.Code(expectedCode.CodeSpace())
+		assert.True(found)
+		assert.Equal(expectedCode, code)
+	}
+
+	assert.Equal(FacilityStatusUnknown, facility.Status)
+}
+
 func Test_Facility_Save(t *testing.T) {
 	assert := assert.New(t)
 
@@ -178,4 +204,33 @@ func Test_MemoryFacilities_Delete(t *testing.T) {
 
 	_, ok = facilities.FindByCode(code)
 	assert.False(ok, "Deleted Facility should not be findable by code")
+}
+
+func Test_FacilityStatus_FromString(t *testing.T) {
+	assert := assert.New(t)
+
+	var tests = []struct {
+		stringValue            string
+		expectedFacilityStatus FacilityStatus
+	}{
+		{"unknown", FacilityStatusUnknown},
+		{"available", FacilityStatusAvailable},
+		{"notAvailable", FacilityStatusNotAvailable},
+		{"partiallyAvailable", FacilityStatusPartiallyAvailable},
+		{"removed", FacilityStatusRemoved},
+	}
+
+	for _, test := range tests {
+		status, err := FacilityStatusFromString(test.stringValue)
+		assert.NoError(err)
+		assert.Equal(test.expectedFacilityStatus, *status)
+	}
+}
+
+func Test_FacilityStatus_FromString_Wrong(t *testing.T) {
+	assert := assert.New(t)
+
+	status, err := FacilityStatusFromString("WRONG")
+	assert.Nil(status)
+	assert.EqualError(err, "invalid Facility status WRONG")
 }

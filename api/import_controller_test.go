@@ -128,8 +128,9 @@ func Test_Serve(t *testing.T) {
 	_, ok = referential.Model().VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok)
 
-	_, ok = referential.Model().Facilities().Find("05cb9be3-e78b-4f76-b644-459e23ba5f1c")
+	facility, ok := referential.Model().Facilities().Find("05cb9be3-e78b-4f76-b644-459e23ba5f1c")
 	assert.True(ok)
+	assert.Equal(model.FacilityStatusUnknown, facility.Status)
 
 	// FIXME: We don't reload SV for now
 	// _, ok = referential.Model().StopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
