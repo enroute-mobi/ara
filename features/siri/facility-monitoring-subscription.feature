@@ -284,7 +284,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
       | internal | NINOXE:Facility:1:LOC |
       | internal | NINOXE:Facility:2:LOC |
 
-  @ARA-XXX
+  @ARA-1757
   Scenario: Handle a raw SIRI FacilityMonitoring request for subscription to a single Facility
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-facility-monitoring-subscription-broadcaster] and the following settings:
@@ -344,7 +344,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
       | Status                  | OK                                    |
       | SubscriptionIdentifiers | ["subscription-1"]                    |
 
-  @ARA-XXX
+  @ARA-1757
   Scenario: Handle a raw SIRI FacilityMonitoring request for subscription to an unknown facility
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-facility-monitoring-subscription-broadcaster] and the following settings:
@@ -407,7 +407,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
       | Partner                 | test                                  |
       | Status                  | Error                                 |
 
-  @ARA-XXX
+  @ARA-1757
   Scenario: Send a raw FacilityMonitoring notification when a facility status changes
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-facility-monitoring-subscription-broadcaster] and the following settings:
@@ -457,7 +457,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
       | Status                  | OK                       |
       | SubscriptionIdentifiers | ["subscription-1"]       |
 
-  @ARA-XXX
+  @ARA-1757
   Scenario: Handle a raw SIRI FacilityMonitoring subscription for all existing facilities in a referential having same remote_code_space
     Given a raw SIRI server on "http://localhost:8090"
     Given a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server ,siri-facility-monitoring-subscription-broadcaster] and the following settings:

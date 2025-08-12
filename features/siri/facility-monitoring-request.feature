@@ -48,6 +48,7 @@ Feature: Support SIRI FacilityMonitoring by request
       | Status    | OK                        |
       | Type      | FacilityMonitoringRequest |
 
+  @ARA-1732
   Scenario: Handle a SIRI FacilityMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-facility-monitoring-request-broadcaster] and the following settings:
       | local_credential  | test     |
@@ -110,6 +111,7 @@ Feature: Support SIRI FacilityMonitoring by request
       | Status          | OK                             |
       | Type            | FacilityMonitoringRequest      |
 
+  @ARA-1732
   Scenario: Handle a SIRI FacilityMonitoring request on an unknown Facility
     Given a SIRI Partner "test" exists with connectors [siri-facility-monitoring-request-broadcaster] and the following settings:
       | local_credential  | test     |
@@ -172,7 +174,7 @@ Feature: Support SIRI FacilityMonitoring by request
       | Status       | Error                                                     |
       | ErrorDetails | InvalidDataReferencesError: Facility not found: 'UNKNOWN' |
 
-  @ARA-XXX
+  @ARA-1757
   Scenario: Performs a raw SIRI FacilityMonitoring request to a Partner
     Given a raw SIRI server waits FacilityMonitoring request on "http://localhost:8090" to respond with
       """
@@ -211,7 +213,7 @@ Feature: Support SIRI FacilityMonitoring by request
       | Status    | OK                        |
       | Type      | FacilityMonitoringRequest |
 
-  @ARA-XXX
+  @ARA-1757
   Scenario: Handle a raw SIRI FacilityMonitoring request
     Given a SIRI Partner "test" exists with connectors [siri-facility-monitoring-request-broadcaster] and the following settings:
       | local_credential  | test     |
