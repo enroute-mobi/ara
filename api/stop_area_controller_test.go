@@ -162,7 +162,15 @@ func Test_StopAreaController_Index(t *testing.T) {
 	checkStopAreaResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Origins":{},"Name":"First StopArea","CollectChildren":false,"CollectSituations":false,"CollectedAlways":true,"Monitored":false,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	expected := `{"Models":
+  [{"Origins": {},
+    "Name": "First StopArea",
+    "CollectChildren": false,
+    "CollectSituations": false,
+    "CollectedAlways": true,
+    "Monitored": false,
+    "Id": "6ba7b814-9dad-11d1-0-00c04fd430c8"}],
+ 	"Pagination": {"CurrentPage": 1, "PerPage": 1, "TotalPages": 1}}`
 	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
@@ -211,10 +219,6 @@ func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
 	referential.Model().StopAreas().Save(stopArea2)
 
 	all := referential.Model().StopAreas().FindAll()
-	for i := range all {
-		fmt.Printf("name: %s, Origins ==> %#v\n", all[i].Name, all[i].Origins)
-	}
-
 	assert.Len(all, 2)
 
 	// Create a request
@@ -241,10 +245,11 @@ func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
 	data, err := io.ReadAll(res.Body)
 	assert.NoError(err)
 
-	fmt.Println(string(data))
-	var stopAreas []model.StopArea
-	err = json.Unmarshal(data, &stopAreas)
+	var paginatedResource PaginatedResource[model.StopArea]
+	err = json.Unmarshal(data, &paginatedResource)
 	assert.NoError(err)
+
+	stopAreas := paginatedResource.Models
 	assert.Len(stopAreas, 2, "All stopAreas should be provided with page: 1 and per_page: 2")
 	// StopAreas should be ordered by Name ascending
 	assert.Equal("A", stopAreas[0].Name)
@@ -273,8 +278,10 @@ func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
 	data, err = io.ReadAll(res.Body)
 	assert.NoError(err)
 
-	err = json.Unmarshal(data, &stopAreas)
+	err = json.Unmarshal(data, &paginatedResource)
 	assert.NoError(err)
+
+	stopAreas = paginatedResource.Models
 	assert.Len(stopAreas, 2, "All stopAreas should be provided with page: 1 and per_page: 2")
 	// StopAreas should be ordered by Name descending
 	assert.Equal("B", stopAreas[0].Name)
