@@ -87,3 +87,17 @@ func Test_Paginate(t *testing.T) {
 		}
 	}
 }
+
+func Test_Paginate_With_empty_models(t *testing.T) {
+	assert := assert.New(t)
+
+	slice := []*model.StopArea{}
+	params := url.Values{}
+
+	paginatedResource, err := paginate(slice, params)
+	assert.NoError(err)
+	assert.Equal([]*model.StopArea{}, paginatedResource.Models)
+	assert.Equal(1, paginatedResource.CurrentPage)
+	assert.Equal(0, paginatedResource.PerPage)
+	assert.Equal(1, paginatedResource.TotalPages)
+}

@@ -90,6 +90,14 @@ type Pagination struct {
 func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], error) {
 	paginatedResource := PaginatedResource[P]{}
 
+	if len(p) == 0 {
+		paginatedResource.Models = []*P{}
+		paginatedResource.CurrentPage = 1
+		paginatedResource.PerPage = len(p)
+		paginatedResource.TotalPages = 1
+		return paginatedResource, nil
+	}
+
 	if len(params) == 0 {
 		paginatedResource.Models = p
 		paginatedResource.CurrentPage = 1
