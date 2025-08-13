@@ -19,37 +19,42 @@ func Test_Paginate(t *testing.T) {
 	}
 
 	var TestCases = []struct {
-		page           string
-		per_page       string
-		error          bool
-		errorMessage   string
-		expectedLength int
-		message        string
+		page               string
+		per_page           string
+		error              bool
+		errorMessage       string
+		expectedLength     int
+		expectedTotalCount int
+		message            string
 	}{
 		{
-			error:          false,
-			expectedLength: FULL_LIST_LENGTH,
-			message:        "When no pagination is given, it should return the full list",
+			error:              false,
+			expectedLength:     FULL_LIST_LENGTH,
+			expectedTotalCount: FULL_LIST_LENGTH,
+			message:            "When no pagination is given, it should return the full list",
 		},
 		{
-			page:           "1",
-			error:          false,
-			expectedLength: DEFAULT_PER_PAGE,
-			message:        "When page=1 and no per_page, should return page 1 with the DEFAULT_PER_PAGE size",
+			page:               "1",
+			error:              false,
+			expectedLength:     DEFAULT_PER_PAGE,
+			expectedTotalCount: FULL_LIST_LENGTH,
+			message:            "When page=1 and no per_page, should return page 1 with the DEFAULT_PER_PAGE size",
 		},
 		{
-			page:           "1",
-			per_page:       "20",
-			error:          false,
-			expectedLength: 20,
-			message:        "When page=1 and per_page=20, should return page 1 with 20 items",
+			page:               "1",
+			per_page:           "20",
+			error:              false,
+			expectedLength:     20,
+			expectedTotalCount: FULL_LIST_LENGTH,
+			message:            "When page=1 and per_page=20, should return page 1 with 20 items",
 		},
 		{
-			page:           "1",
-			per_page:       "80",
-			error:          false,
-			expectedLength: DEFAULT_PER_PAGE,
-			message:        "When page=1 and per_page=80, should return page 1 with the DEFAULT_PER_PAGE size",
+			page:               "1",
+			per_page:           "80",
+			error:              false,
+			expectedLength:     DEFAULT_PER_PAGE,
+			expectedTotalCount: FULL_LIST_LENGTH,
+			message:            "When page=1 and per_page=80, should return page 1 with the DEFAULT_PER_PAGE size",
 		},
 		{
 			page:         "WRONG",
@@ -80,6 +85,7 @@ func Test_Paginate(t *testing.T) {
 		if tt.error == false {
 			assert.NoError(err)
 			assert.Len(paginatedResource.Models, tt.expectedLength, tt.message)
+			assert.Equal(paginatedResource.TotalCount, tt.expectedTotalCount, tt.message)
 		}
 
 		if tt.error == true {
@@ -100,4 +106,5 @@ func Test_Paginate_With_empty_models(t *testing.T) {
 	assert.Equal(1, paginatedResource.CurrentPage)
 	assert.Equal(0, paginatedResource.PerPage)
 	assert.Equal(1, paginatedResource.TotalPages)
+	assert.Equal(0, paginatedResource.TotalCount)
 }

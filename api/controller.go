@@ -85,6 +85,7 @@ type Pagination struct {
 	CurrentPage int
 	PerPage     int
 	TotalPages  int
+	TotalCount  int
 }
 
 func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], error) {
@@ -93,8 +94,9 @@ func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], err
 	if len(p) == 0 {
 		paginatedResource.Models = []*P{}
 		paginatedResource.CurrentPage = 1
-		paginatedResource.PerPage = len(p)
+		paginatedResource.PerPage = 0
 		paginatedResource.TotalPages = 1
+		paginatedResource.TotalCount = 0
 		return paginatedResource, nil
 	}
 
@@ -103,6 +105,7 @@ func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], err
 		paginatedResource.CurrentPage = 1
 		paginatedResource.PerPage = len(p)
 		paginatedResource.TotalPages = 1
+		paginatedResource.TotalCount = len(p)
 		return paginatedResource, nil
 	}
 
@@ -140,6 +143,7 @@ func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], err
 		totalPages = len(p)/per_page + 1
 	}
 	paginatedResource.TotalPages = totalPages
+	paginatedResource.TotalCount = len(p)
 
 	return paginatedResource, nil
 }
