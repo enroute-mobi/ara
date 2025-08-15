@@ -620,6 +620,60 @@ func Test_CanCollectLine(t *testing.T) {
 	}
 }
 
+func Test_CanCollectFacility(t *testing.T) {
+	assert := assert.New(t)
+
+	var TestCases = []struct {
+		collectIncludeFacilities []string
+		collectExcludeFacilities []string
+		expectedOutput           bool
+		testName                 int
+	}{
+		{
+			collectIncludeFacilities: []string{},
+			collectExcludeFacilities: []string{},
+			expectedOutput:           true,
+			testName:                 1,
+		},
+		{
+			collectIncludeFacilities: []string{"dummy"},
+			collectExcludeFacilities: []string{},
+			expectedOutput:           true,
+			testName:                 2,
+		},
+		{
+			collectIncludeFacilities: []string{},
+			collectExcludeFacilities: []string{"dummy"},
+			expectedOutput:           false,
+			testName:                 3,
+		},
+		{
+			collectIncludeFacilities: []string{"dummy"},
+			collectExcludeFacilities: []string{"dummy"},
+			expectedOutput:           true,
+			testName:                 4,
+		},
+	}
+
+	for _, test := range TestCases {
+		partner := NewPartner()
+		settings := map[string]string{}
+
+		if len(test.collectIncludeFacilities) != 0 {
+			settings[s.COLLECT_INCLUDE_FACILITIES] = test.collectIncludeFacilities[0]
+		}
+
+		if len(test.collectExcludeFacilities) != 0 {
+			settings[s.COLLECT_EXCLUDE_FACILITIES] = test.collectExcludeFacilities[0]
+		}
+
+		partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+
+		output := partner.CanCollectFacility("dummy")
+		assert.Equal(output, test.expectedOutput, strconv.Itoa(test.testName))
+	}
+}
+
 func Test_Partners_FindAllByCollectPriority(t *testing.T) {
 	partners := createTestPartnerManager()
 	partner1 := &Partner{

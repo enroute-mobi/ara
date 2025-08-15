@@ -18,7 +18,7 @@ type CollectManagerInterface interface {
 	UpdateLine(ctx context.Context, request *LineUpdateRequest)
 	UpdateVehicle(ctx context.Context, request *VehicleUpdateRequest)
 	UpdateSituation(request *SituationUpdateRequest)
-	UpdateFacility(request *FacilityUpdateRequest)
+	UpdateFacility(ctx context.Context, request *FacilityUpdateRequest)
 
 	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
 	BroadcastUpdateEvent(event model.UpdateEvent)
@@ -62,10 +62,10 @@ func (manager *TestCollectManager) BroadcastUpdateEvent(event model.UpdateEvent)
 	manager.UpdateEvents = append(manager.UpdateEvents, event)
 }
 
-func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)              {}
-func (manager *TestCollectManager) UpdateLine(context.Context, *LineUpdateRequest)       {}
-func (manager *TestCollectManager) UpdateVehicle(context.Context, *VehicleUpdateRequest) {}
-func (manager *TestCollectManager) UpdateFacility(*FacilityUpdateRequest)                {}
+func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)                {}
+func (manager *TestCollectManager) UpdateLine(context.Context, *LineUpdateRequest)         {}
+func (manager *TestCollectManager) UpdateVehicle(context.Context, *VehicleUpdateRequest)   {}
+func (manager *TestCollectManager) UpdateFacility(context.Context, *FacilityUpdateRequest) {}
 
 // TEST END
 
@@ -248,17 +248,49 @@ func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *Vehic
 	}
 }
 
-func (manager *CollectManager) UpdateFacility(request *FacilityUpdateRequest) {
+func (manager *CollectManager) UpdateFacility(ctx context.Context, request *FacilityUpdateRequest) {
+	child, _ := tracer.StartSpanFromContext(ctx, "update_facility")
+	defer child.Finish()
+
+	facility, ok := manager.referential.Model().Facilities().Find(request.FacilityId())
+	if !ok {
+		logger.Log.Debugf("Can't find Facility %v in Collect Manager", request.FacilityId())
+		return
+	}
+
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		requestCollector := partner.FacilityMonitoringRequestCollector()
+		subscriptionCollector := partner.FacilityMonitoringSubscriptionCollector()
+
+		if subscriptionCollector == nil && requestCollector == nil {
 			continue
 		}
 
-		requestConnector := partner.FacilityMonitoringRequestCollector()
+		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+			logger.Log.Debugf("Partner %s isn't up", partner.Slug())
+			continue
+		}
+
+		partnerCodeSpace := partner.RemoteCodeSpace()
+
+		facilityCode, ok := facility.Code(partnerCodeSpace)
+		if !ok {
+			continue
+		}
+
+		if !partner.CanCollectFacility(facilityCode.Value()) {
+			continue
+		}
 
 		logger.Log.Debugf("Request FacilityUpdate for Partner %v", partner.Slug())
-		if requestConnector != nil {
-			requestConnector.RequestFacilityUpdate(request)
+
+		if subscriptionCollector != nil {
+			subscriptionCollector.RequestFacilityUpdate(request)
+			return
+		}
+
+		if requestCollector != nil {
+			requestCollector.RequestFacilityUpdate(request)
 		}
 	}
 }

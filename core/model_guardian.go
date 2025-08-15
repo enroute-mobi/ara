@@ -129,7 +129,7 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 }
 
 func (guardian *ModelGuardian) refreshFacilities(ctx context.Context) {
-	child, _ := tracer.StartSpanFromContext(ctx, "refresh_facilities")
+	child, childContext := tracer.StartSpanFromContext(ctx, "refresh_facilities")
 	defer child.Finish()
 
 	defer monitoring.HandlePanic()
@@ -150,7 +150,7 @@ func (guardian *ModelGuardian) refreshFacilities(ctx context.Context) {
 		facility.Save()
 
 		facilityUpdateRequest := NewFacilityUpdateRequest(facility.Id())
-		guardian.referential.CollectManager().UpdateFacility(facilityUpdateRequest)
+		guardian.referential.CollectManager().UpdateFacility(childContext, facilityUpdateRequest)
 	}
 }
 

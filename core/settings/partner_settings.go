@@ -35,6 +35,7 @@ const (
 	COLLECT_EXCLUDE_LINE_GROUPS      = "collect.exclude_line_groups"
 	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
 	COLLECT_EXCLUDE_STOP_AREA_GROUPS = "collect.exclude_stop_area_groups"
+	COLLECT_EXCLUDE_FACILITIES       = "collect.exclude_facilities"
 	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
 	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
 	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
@@ -42,6 +43,7 @@ const (
 	COLLECT_INCLUDE_LINE_GROUPS      = "collect.include_line_groups"
 	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
 	COLLECT_INCLUDE_STOP_AREA_GROUPS = "collect.include_stop_area_groups"
+	COLLECT_INCLUDE_FACILITIES       = "collect.include_facilities"
 	COLLECT_PERSISTENT               = "collect.persistent"
 	COLLECT_PRIORITY                 = "collect.priority"
 	COLLECT_SITUATIONS_INTERNAL_TAGS = "collect.situations.internal_tags"
@@ -748,6 +750,8 @@ func (s *PartnerSettings) setCollectSettings(settings map[string]string, resolve
 		excludedSA:         toMap(settings[COLLECT_EXCLUDE_STOP_AREAS]),
 		includedLines:      toMap(settings[COLLECT_INCLUDE_LINES]),
 		excludedLines:      toMap(settings[COLLECT_EXCLUDE_LINES]),
+		includedFacilities: toMap(settings[COLLECT_INCLUDE_FACILITIES]),
+		excludedFacilities: toMap(settings[COLLECT_EXCLUDE_FACILITIES]),
 	}
 
 	remoteCodeSpace := s.RemoteCodeSpace()

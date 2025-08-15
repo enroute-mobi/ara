@@ -673,6 +673,8 @@ func Test_CollectSettings_Empty(t *testing.T) {
 		excludedSA:         collection{},
 		includedLines:      collection{},
 		excludedLines:      collection{},
+		includedFacilities: collection{},
+		excludedFacilities: collection{},
 	}
 	assert.Equal(expected, partnerSettings.CollectSettings())
 }
@@ -696,6 +698,8 @@ func Test_CollectSettings(t *testing.T) {
 		excludedSA:         collection{"STIF:StopPoint:X:": struct{}{}, "STIF:StopPoint:J:": struct{}{}},
 		includedLines:      collection{"Line:B:Tram": struct{}{}, "Line:A:Metro": struct{}{}},
 		excludedLines:      collection{"Line:C:Bus": struct{}{}},
+		includedFacilities: collection{},
+		excludedFacilities: collection{},
 	}
 
 	assert.Equal(expected, partnerSettings.CollectSettings())
@@ -718,10 +722,12 @@ func Test_CollectSettings_With_Included_StopAreaGroups(t *testing.T) {
 		{
 			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{"C"}, true },
 			expectedCollectSetting: &CollectSettings{
-				includedSA:    collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
-				excludedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{},
+				includedSA:         collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				excludedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the stopAreaResolver finds the StopArea Value, it should add it
 in the included StopAreas list`,
@@ -729,10 +735,12 @@ in the included StopAreas list`,
 		{
 			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{}, false },
 			expectedCollectSetting: &CollectSettings{
-				includedSA:    collection{"A": struct{}{}, "B": struct{}{}},
-				excludedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{},
+				includedSA:         collection{"A": struct{}{}, "B": struct{}{}},
+				excludedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the stopAreaResolver does not find the StopArea Value, the included StopAreas list
 should be unchanged`,
@@ -740,10 +748,12 @@ should be unchanged`,
 		{
 			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{"A"}, false },
 			expectedCollectSetting: &CollectSettings{
-				includedSA:    collection{"A": struct{}{}, "B": struct{}{}},
-				excludedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{},
+				includedSA:         collection{"A": struct{}{}, "B": struct{}{}},
+				excludedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the stopAreaResolver finds the StopArea Value that already exists in
 the includedStopAreas, it should not add it again`,
@@ -774,10 +784,12 @@ func Test_CollectSettings_With_Excluded_StopAreaGroups(t *testing.T) {
 		{
 			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{"C"}, true },
 			expectedCollectSetting: &CollectSettings{
-				excludedSA:    collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
-				includedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{},
+				excludedSA:         collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				includedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the stopAreaResolver finds the StopArea Value, it should add it
 in the excluded StopAreas list`,
@@ -785,10 +797,12 @@ in the excluded StopAreas list`,
 		{
 			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{}, false },
 			expectedCollectSetting: &CollectSettings{
-				excludedSA:    collection{"A": struct{}{}, "B": struct{}{}},
-				includedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{},
+				excludedSA:         collection{"A": struct{}{}, "B": struct{}{}},
+				includedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the stopAreaResolver does not find the StopArea Value, the excluded StopAreas list
 should be unchanged`,
@@ -796,10 +810,12 @@ should be unchanged`,
 		{
 			fakeStopAreaResolver: func(string, string) ([]string, bool) { return []string{"A"}, false },
 			expectedCollectSetting: &CollectSettings{
-				excludedSA:    collection{"A": struct{}{}, "B": struct{}{}},
-				includedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{},
+				excludedSA:         collection{"A": struct{}{}, "B": struct{}{}},
+				includedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the stopAreaResolver finds the StopArea Value that already exists in
 the excludedStopAreas, it should not add it again`,
@@ -830,10 +846,12 @@ func Test_CollectSettings_With_Included_LineGroups(t *testing.T) {
 		{
 			fakeLineResolver: func(string, string) ([]string, bool) { return []string{"C"}, true },
 			expectedCollectSetting: &CollectSettings{
-				includedSA:    collection{},
-				excludedSA:    collection{},
-				includedLines: collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
-				excludedLines: collection{},
+				includedSA:         collection{},
+				excludedSA:         collection{},
+				includedLines:      collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the lineResolver finds the Line Value, it should add it
 in the included Lines list`,
@@ -841,10 +859,12 @@ in the included Lines list`,
 		{
 			fakeLineResolver: func(string, string) ([]string, bool) { return []string{}, false },
 			expectedCollectSetting: &CollectSettings{
-				includedSA:    collection{},
-				excludedSA:    collection{},
-				includedLines: collection{"A": struct{}{}, "B": struct{}{}},
-				excludedLines: collection{},
+				includedSA:         collection{},
+				excludedSA:         collection{},
+				includedLines:      collection{"A": struct{}{}, "B": struct{}{}},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the lineResolver does not find the Line Value, the included Lines list
 should be unchanged`,
@@ -852,10 +872,12 @@ should be unchanged`,
 		{
 			fakeLineResolver: func(string, string) ([]string, bool) { return []string{"A"}, false },
 			expectedCollectSetting: &CollectSettings{
-				includedSA:    collection{},
-				excludedSA:    collection{},
-				includedLines: collection{"A": struct{}{}, "B": struct{}{}},
-				excludedLines: collection{},
+				includedSA:         collection{},
+				excludedSA:         collection{},
+				includedLines:      collection{"A": struct{}{}, "B": struct{}{}},
+				excludedLines:      collection{},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the lineResolver finds the Line Value that already exists in
 the includedLines, it should not add it again`,
@@ -888,10 +910,12 @@ func Test_CollectSettings_With_Excluded_LineGroups(t *testing.T) {
 		{
 			fakeLineResolver: func(string, string) ([]string, bool) { return []string{"C"}, true },
 			expectedCollectSetting: &CollectSettings{
-				excludedSA:    collection{},
-				includedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				excludedSA:         collection{},
+				includedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{"A": struct{}{}, "B": struct{}{}, "C": struct{}{}},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the lineResolver finds the Line Value, it should add it
 in the excluded Lines list`,
@@ -899,10 +923,12 @@ in the excluded Lines list`,
 		{
 			fakeLineResolver: func(string, string) ([]string, bool) { return []string{}, false },
 			expectedCollectSetting: &CollectSettings{
-				excludedSA:    collection{},
-				includedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{"A": struct{}{}, "B": struct{}{}},
+				excludedSA:         collection{},
+				includedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{"A": struct{}{}, "B": struct{}{}},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the lineResolver does not find the Line Value, the excluded Lines list
 should be unchanged`,
@@ -910,10 +936,12 @@ should be unchanged`,
 		{
 			fakeLineResolver: func(string, string) ([]string, bool) { return []string{"A"}, false },
 			expectedCollectSetting: &CollectSettings{
-				excludedSA:    collection{},
-				includedSA:    collection{},
-				includedLines: collection{},
-				excludedLines: collection{"A": struct{}{}, "B": struct{}{}},
+				excludedSA:         collection{},
+				includedSA:         collection{},
+				includedLines:      collection{},
+				excludedLines:      collection{"A": struct{}{}, "B": struct{}{}},
+				includedFacilities: collection{},
+				excludedFacilities: collection{},
 			},
 			message: `When the lineResolver finds the Line Value that already exists in
 the excludedLines, it should not add it again`,

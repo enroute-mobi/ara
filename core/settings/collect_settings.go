@@ -12,10 +12,12 @@ type CollectSettings struct {
 	UseDiscoveredSA    bool
 	UseDiscoveredLines bool
 
-	includedSA    collection
-	excludedSA    collection
-	includedLines collection
-	excludedLines collection
+	includedSA         collection
+	excludedSA         collection
+	includedLines      collection
+	excludedLines      collection
+	includedFacilities collection
+	excludedFacilities collection
 }
 
 type collection map[string]struct{}
@@ -76,6 +78,25 @@ func (cs *CollectSettings) ExcludeLine(lineId string) CollectStatus {
 	return COLLECT_UNKNOWN
 }
 
+func (cs *CollectSettings) IncludeFacility(facilityId string) CollectStatus {
+	if len(cs.includedFacilities) == 0 {
+		return COLLECT_UNKNOWN
+	}
+
+	if cs.includedFacilities.include(facilityId) {
+		return CAN_COLLECT
+	}
+
+	return CANNOT_COLLECT
+}
+
+func (cs *CollectSettings) ExcludeFacility(facilityId string) CollectStatus {
+	if cs.excludedFacilities.include(facilityId) {
+		return CANNOT_COLLECT
+	}
+	return COLLECT_UNKNOWN
+}
+
 func (cs *CollectSettings) CanCollectLine(lineId string) CollectStatus {
 	canCollect := cs.IncludeLine(lineId)
 	if canCollect != COLLECT_UNKNOWN {
@@ -83,6 +104,19 @@ func (cs *CollectSettings) CanCollectLine(lineId string) CollectStatus {
 	}
 
 	canCollect = cs.ExcludeLine(lineId)
+	if canCollect != COLLECT_UNKNOWN {
+		return canCollect
+	}
+	return COLLECT_UNKNOWN
+}
+
+func (cs *CollectSettings) CanCollectFacility(facilityId string) CollectStatus {
+	canCollect := cs.IncludeFacility(facilityId)
+	if canCollect != COLLECT_UNKNOWN {
+		return canCollect
+	}
+
+	canCollect = cs.ExcludeFacility(facilityId)
 	if canCollect != COLLECT_UNKNOWN {
 		return canCollect
 	}
