@@ -39,6 +39,7 @@ func (builder *FacilityMonitoringUpdateEventBuilder) buildUpdateEvents(xmlFacili
 		}
 
 		builder.facilityUpdateEvents.Facilities[xmlFacilityEvent.FacilityRef()] = event
+		builder.facilityUpdateEvents.FacilityRefs[xmlFacilityEvent.FacilityRef()] = struct{}{}
 	}
 }
 

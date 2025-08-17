@@ -49,7 +49,7 @@ func newSIRIFacilityMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIFac
 }
 
 func (connector *SIRIFacilityMonitoringSubscriptionBroadcaster) HandleSubscriptionRequest(request *sxml.XMLSubscriptionRequest, message *audit.BigQueryMessage) (resps []siri.SIRIResponseStatus) {
-	var subIds []string
+	var facilityIds, subIds []string
 
 	for _, fm := range request.XMLSubscriptionFMEntries() {
 		rs := siri.SIRIResponseStatus{
@@ -59,6 +59,8 @@ func (connector *SIRIFacilityMonitoringSubscriptionBroadcaster) HandleSubscripti
 			ResponseTimestamp: connector.Clock().Now(),
 		}
 
+		// for logging
+		facilityIds = append(facilityIds, fm.FacilityRefs()...)
 		sub, ok := connector.Partner().Subscriptions().FindByExternalId(fm.SubscriptionIdentifier())
 		if ok {
 			if sub.Kind() != FacilityMonitoringBroadcast {
@@ -114,6 +116,8 @@ func (connector *SIRIFacilityMonitoringSubscriptionBroadcaster) HandleSubscripti
 
 	message.Type = audit.FACILITY_MONITORING_SUBSCRIPTION_REQUEST
 	message.SubscriptionIdentifiers = subIds
+
+	message.Facilities = facilityIds
 
 	return resps
 }

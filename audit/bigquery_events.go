@@ -94,6 +94,7 @@ type BigQueryMessage struct {
 	Lines                   []string            `bigquery:"lines"`                    // array of code values
 	Vehicles                []string            `bigquery:"vehicles"`
 	VehicleJourneys         []string            `bigquery:"vehicle_journeys"` // array of code values
+	Facilities              []string            `bigquery:"facilities"`
 }
 
 func (bq *BigQueryMessage) EventType() string        { return BQ_MESSAGE }
@@ -122,6 +123,7 @@ var bqMessageSchema = bigquery.Schema{
 	{Name: "stop_areas", Repeated: true, Type: bigquery.StringFieldType},
 	{Name: "vehicles", Repeated: true, Type: bigquery.StringFieldType},
 	{Name: "vehicle_journeys", Repeated: true, Type: bigquery.StringFieldType},
+	{Name: "facilities", Repeated: true, Type: bigquery.StringFieldType},
 }
 
 type BigQueryPartnerEvent struct {

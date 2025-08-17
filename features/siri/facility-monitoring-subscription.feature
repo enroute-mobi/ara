@@ -77,6 +77,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
       | Partner                 | test                                  |
       | Status                  | OK                                    |
       | SubscriptionIdentifiers | ["subscription-1"]                    |
+      | Facilities              | ["NINOXE:Facility:1:LOC"]             |
 
   @ARA-1755
   Scenario: Handle a SIRI FacilityMonitoring request for subscription to an unknown facility
@@ -205,12 +206,13 @@ Feature: Support SIRI FacilityMonitoring by subscription
       </S:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type                    | NotifyFacilityMonitoring |
-      | Direction               | sent                     |
-      | Protocol                | siri                     |
-      | Partner                 | test                     |
-      | Status                  | OK                       |
-      | SubscriptionIdentifiers | ["subscription-1"]       |
+      | Type                    | NotifyFacilityMonitoring  |
+      | Direction               | sent                      |
+      | Protocol                | siri                      |
+      | Partner                 | test                      |
+      | Status                  | OK                        |
+      | SubscriptionIdentifiers | ["subscription-1"]        |
+      | Facilities              | ["NINOXE:Facility:1:LOC"] |
 
   @ARA-1755
   Scenario: Handle a SIRI FacilityMonitoring subscription for all existing facilities in a referential having same remote_code_space
@@ -516,7 +518,37 @@ Feature: Support SIRI FacilityMonitoring by subscription
 
   @ARA-1761
   Scenario: FacilityMonitoring subscription collect should send FacilityMonitoringSubscriptionRequest to partner
-    Given a SIRI server on "http://localhost:8090"
+        Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
+      """
+  <?xml version='1.0' encoding='utf-8'?>
+  <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="http://wsdl.siri.org.uk">
+  <S:Body>
+    <ns1:SubscribeResponse xmlns:ns5="http://www.siri.org.uk/siri">
+      <SubscriptionAnswerInfo
+           xmlns:ns2="http://www.ifopt.org.uk/acsb"
+           xmlns:ns3="http://www.ifopt.org.uk/ifopt"
+           xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
+           xmlns:ns5="http://www.siri.org.uk/siri"
+           xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
+        <ns5:ResponderRef>remote_credential</ns5:ResponderRef>
+        <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
+      </SubscriptionAnswerInfo>
+      <Answer>
+        <ns5:ResponseStatus>
+            <ns5:ResponseTimestamp>2017-01-01T12:00:00+01:00</ns5:ResponseTimestamp>
+            <ns5:RequestMessageRef>{LastRequestMessageRef}</ns5:RequestMessageRef>
+            <ns5:SubscriberRef>SubscriberRef</ns5:SubscriberRef>
+            <ns5:SubscriptionRef>6ba7b814-9dad-11d1-4-00c04fd430c8</ns5:SubscriptionRef>
+            <ns5:Status>true</ns5:Status>
+            <ns5:ValidUntil>2017-01-02T12:00:00+01:00</ns5:ValidUntil>
+        </ns5:ResponseStatus>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:SubscribeResponse>
+  </S:Body>
+  </S:Envelope>
+    """
     And a Partner "test" exists with connectors [siri-check-status-client,siri-check-status-server,siri-facility-monitoring-subscription-collector] and the following settings:
       | remote_url                 | http://localhost:8090 |
       | remote_credential          | test                  |
@@ -531,6 +563,13 @@ Feature: Support SIRI FacilityMonitoring by subscription
     And 20 seconds have passed
     Then the SIRI server should have received a FacilityMonitoringSubscriptionRequest request with:
       | //siri:FacilityRef | NINOXE:Facility:1:LOC |
+    Then an audit event should exist with these attributes:
+      | Type                    | FacilityMonitoringSubscriptionRequest |
+      | Direction               | sent                                  |
+      | Protocol                | siri                                  |
+      | Partner                 | test                                  |
+      | Status                  | OK                                    |
+      | Facilities              | ["NINOXE:Facility:1:LOC"]             |
 
   @ARA-1761
   Scenario: RAW FacilityMonitoring subscription collect should send FacilityMonitoringSubscriptionRequest to partner
@@ -661,6 +700,14 @@ Feature: Support SIRI FacilityMonitoring by subscription
     Then one Subscription exists with the following attributes:
       | Kind                      | FacilityMonitoringCollect |
       | Resources[0]/SubscribedAt | > 2017-01-01T12:01:00Z    |
+    Then an audit event should exist with these attributes:
+      | Type                    | FacilityMonitoringSubscriptionRequest |
+      | Direction               | sent                                  |
+      | Protocol                | siri                                  |
+      | Partner                 | test                                  |
+      | Status                  | OK                                    |
+      | SubscriptionIdentifiers | ["6ba7b814-9dad-11d1-4-00c04fd430c8"] |
+      | Facilities              | ["NINOXE:Facility:1:LOC"]             |
 
   @ARA-1761
   Scenario: Update a Facility after a FacilityMonitoringDelivery in a subscription
@@ -751,11 +798,12 @@ Feature: Support SIRI FacilityMonitoring by subscription
       | Codes[internal] | NINOXE:Facility:1:LOC |
       | Status          | available             |
     Then an audit event should exist with these attributes:
-      | Type      | NotifyFacilityMonitoring |
-      | Protocol  | siri                     |
-      | Direction | received                 |
-      | Status    | OK                       |
-      | Partner   | test                     |
+      | Type       | NotifyFacilityMonitoring  |
+      | Protocol   | siri                      |
+      | Direction  | received                  |
+      | Status     | OK                        |
+      | Partner    | test                      |
+      | Facilities | ["NINOXE:Facility:1:LOC"] |
 
   @ARA-1761
   Scenario: Update a Facility after a RAW FacilityMonitoringDelivery in a subscription

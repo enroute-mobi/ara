@@ -99,6 +99,7 @@ func (subscriber *FMSubscriber) prepareSIRIFacilityMonitoringSubscriptionRequest
 	}
 
 	subIds := []string{}
+	facilitiesToLog := []string{}
 	for subId, subscriptionRequest := range subscriptionRequests {
 		for _, m := range subscriptionRequest.modelsToRequest {
 			entry := &siri.SIRIFacilityMonitoringSubscriptionRequestEntry{
@@ -112,6 +113,7 @@ func (subscriber *FMSubscriber) prepareSIRIFacilityMonitoringSubscriptionRequest
 			switch m.kind {
 			case "Facility":
 				entry.FacilityRef = m.code.Value()
+				facilitiesToLog = append(facilitiesToLog, entry.FacilityRef)
 				subIds = append(subIds, string(subId))
 			}
 			siriFacilityMonitoringSubscriptionRequest.Entries = append(siriFacilityMonitoringSubscriptionRequest.Entries, entry)
@@ -121,6 +123,7 @@ func (subscriber *FMSubscriber) prepareSIRIFacilityMonitoringSubscriptionRequest
 	message.RequestIdentifier = siriFacilityMonitoringSubscriptionRequest.MessageIdentifier
 	message.RequestRawMessage, _ = siriFacilityMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 	message.RequestSize = int64(len(message.RequestRawMessage))
+	message.Facilities = facilitiesToLog
 	message.SubscriptionIdentifiers = subIds
 
 	startTime := subscriber.Clock().Now()

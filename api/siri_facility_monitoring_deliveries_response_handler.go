@@ -28,7 +28,7 @@ func (handler *SIRIFacilityMonitoringRequestDeliveriesResponseHandler) Respond(p
 
 	t := clock.DefaultClock().Now()
 
-	params.connector.(core.FacilityMonitoringSubscriptionCollector).HandleNotifyFacilityMonitoring(handler.xmlRequest)
+	collectedRefs := params.connector.(core.FacilityMonitoringSubscriptionCollector).HandleNotifyFacilityMonitoring(handler.xmlRequest)
 
 	params.rw.WriteHeader(http.StatusOK)
 
@@ -50,7 +50,7 @@ func (handler *SIRIFacilityMonitoringRequestDeliveriesResponseHandler) Respond(p
 		subs = append(subs, k)
 	}
 	params.message.SubscriptionIdentifiers = subs
-	// params.message.Facilitys = collectedRefs.GetFacilitys()
+	params.message.Facilities = collectedRefs.GetFacilities()
 
 	audit.CurrentBigQuery(string(handler.referential.Slug())).WriteEvent(params.message)
 }
