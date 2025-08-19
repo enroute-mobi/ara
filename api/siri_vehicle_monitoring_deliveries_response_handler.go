@@ -7,16 +7,16 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/siri/sxml"
+	"bitbucket.org/enroute-mobi/sirigo/siristructs"
 )
 
 type SIRIVehicleMonitoringRequestDeliveriesResponseHandler struct {
-	xmlRequest  *sxml.XMLNotifyVehicleMonitoring
+	xmlRequest  *siristructs.NotifyVehicleMonitoring
 	referential *core.Referential
 }
 
 func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) RequestorRef() string {
-	return handler.xmlRequest.ProducerRef()
+	return handler.xmlRequest.ProducerRef
 }
 
 func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) ConnectorType() string {
@@ -24,7 +24,7 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) ConnectorT
 }
 
 func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(params HandlerParams) {
-	logger.Log.Debugf("NotifyVehicleMonitoring %s\n", handler.xmlRequest.ResponseMessageIdentifier())
+	logger.Log.Debugf("NotifyVehicleMonitoring %s\n", handler.xmlRequest.ResponseMessageIdentifier)
 
 	t := clock.DefaultClock().Now()
 
@@ -33,17 +33,17 @@ func (handler *SIRIVehicleMonitoringRequestDeliveriesResponseHandler) Respond(pa
 	params.rw.WriteHeader(http.StatusOK)
 
 	params.message.Type = audit.NOTIFY_VEHICLE_MONITORING
-	params.message.RequestRawMessage = handler.xmlRequest.RawXML()
+	params.message.RequestRawMessage = handler.xmlRequest.RawXML
 	params.message.ProcessingTime = clock.DefaultClock().Since(t).Seconds()
-	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef()
-	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier()
-	if !handler.xmlRequest.Status() {
-		params.message.Status = "Error"
-	}
+	params.message.RequestIdentifier = handler.xmlRequest.RequestMessageRef
+	params.message.ResponseIdentifier = handler.xmlRequest.ResponseMessageIdentifier
 
 	subIds := make(map[string]struct{})
-	for _, delivery := range handler.xmlRequest.VehicleMonitoringDeliveries() {
-		subIds[delivery.SubscriptionRef()] = struct{}{}
+	for _, delivery := range handler.xmlRequest.Deliveries {
+		subIds[string(delivery.SubscriberRef)] = struct{}{}
+		if !delivery.Status.Status.Bool {
+			params.message.Status = "Error"
+		}
 	}
 	subs := make([]string, 0, len(subIds))
 	for k := range subIds {
