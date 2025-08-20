@@ -184,6 +184,8 @@ func (fm *FMBroadcaster) logSIRIFacilityMonitoring(message *audit.BigQueryMessag
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 	message.SubscriptionIdentifiers = []string{response.SubscriptionIdentifier}
 
+	message.Facilities = GetModelReferenceSlice(facilityRefs)
+
 	if !response.Status {
 		message.Status = "Error"
 		message.ErrorDetails = response.ErrorString()

@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type FacilityMonitoringSubscriptionCollector interface {
@@ -133,6 +134,8 @@ func (connector *SIRIFacilityMonitoringSubscriptionCollector) HandleNotifyFacili
 		builder.SetUpdateEvents(delivery.FacilityConditions())
 
 		updateEvents = builder.UpdateEvents()
+
+		maps.Copy(collectedRefs.FacilityRefs, updateEvents.FacilityRefs)
 
 		connector.broadcastUpdateEvents(&updateEvents)
 	}

@@ -90,7 +90,7 @@ func (connector *SIRIFacilityMonitoringRequestCollector) RequestFacilityUpdate(r
 	updateEvents := builder.UpdateEvents()
 
 	// Log Models
-	// message.Facilitys = updateEvents.GetFacilitys()
+	message.Facilities = updateEvents.GetFacilities()
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(&updateEvents)

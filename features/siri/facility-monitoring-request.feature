@@ -43,10 +43,11 @@ Feature: Support SIRI FacilityMonitoring by request
       | Codes[internal] | NINOXE:Facility:ABC1:LOC |
       | Status          | available                |
     And an audit event should exist with these attributes:
-      | Protocol  | siri                      |
-      | Direction | sent                      |
-      | Status    | OK                        |
-      | Type      | FacilityMonitoringRequest |
+      | Protocol   | siri                         |
+      | Direction  | sent                         |
+      | Status     | OK                           |
+      | Type       | FacilityMonitoringRequest    |
+      | Facilities | ["NINOXE:Facility:ABC1:LOC"] |
 
   @ARA-1732
   Scenario: Handle a SIRI FacilityMonitoring request
@@ -106,10 +107,11 @@ Feature: Support SIRI FacilityMonitoring by request
       </S:Envelope>
     """
     And an audit event should exist with these attributes:
-      | Protocol        | siri                           |
-      | Direction       | received                       |
-      | Status          | OK                             |
-      | Type            | FacilityMonitoringRequest      |
+      | Protocol   | siri                         |
+      | Direction  | received                     |
+      | Status     | OK                           |
+      | Type       | FacilityMonitoringRequest    |
+      | Facilities | ["NINOXE:Facility:ABC1:LOC"] |
 
   @ARA-1732
   Scenario: Handle a SIRI FacilityMonitoring request on an unknown Facility

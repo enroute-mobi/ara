@@ -58,7 +58,6 @@ func (connector *SIRIFacilityMonitoringRequestBroadcaster) getFacilityMonitoring
 	delivery.FacilityRef = request.FacilityRef()
 	delivery.FacilityStatus = string(facility.Status)
 
-	// facilityBuilder := NewBroadcastFacilityMonitoringBuilder(connector.Partner(), SIRI_FACILITY_MONITORING_REQUEST_BROADCASTER)
 	return delivery
 }
 
@@ -75,7 +74,7 @@ func (connector *SIRIFacilityMonitoringRequestBroadcaster) RequestFacility(reque
 		message.Status = "Error"
 		message.ErrorDetails = response.SIRIFacilityMonitoringDelivery.ErrorString()
 	}
-	// message.Facilities = []string{request.MonitoringRef()}
+	message.Facilities = []string{request.FacilityRef()}
 	message.RequestIdentifier = request.MessageIdentifier()
 	message.ResponseIdentifier = response.ResponseMessageIdentifier
 
