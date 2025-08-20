@@ -1,0 +1,15 @@
+	<SubscriptionRequest>
+		<RequestTimestamp>{{.RequestTimestamp.Format "2006-01-02T15:04:05.000Z07:00"}}</RequestTimestamp>
+		<RequestorRef>{{.RequestorRef}}</RequestorRef>
+		<MessageIdentifier>{{.MessageIdentifier}}</MessageIdentifier>{{ if .ConsumerAddress }}
+		<ConsumerAddress>{{.ConsumerAddress}}</ConsumerAddress>{{end}}{{ range .Entries }}
+		<FacilityMonitoringSubscriptionRequest>
+			<SubscriberRef>{{.SubscriberRef}}</SubscriberRef>
+			<SubscriptionIdentifier>{{.SubscriptionIdentifier}}</SubscriptionIdentifier>
+			<InitialTerminationTime>{{.InitialTerminationTime.Format "2006-01-02T15:04:05.000Z07:00"}}</InitialTerminationTime>
+			<FacilityMonitoringRequest version="2.0:FR-IDF-2.4">
+				{{ .BuildFacilityMonitoringRequestXMLRaw }}
+			</FacilityMonitoringRequest>
+			<IncrementalUpdates>true</IncrementalUpdates>
+		</FacilityMonitoringSubscriptionRequest>{{end}}
+	</SubscriptionRequest>

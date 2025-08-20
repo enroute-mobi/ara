@@ -340,6 +340,15 @@ func (partner *Partner) CanCollectLine(lineId string) bool { // Used for vehicle
 	return true
 }
 
+func (partner *Partner) CanCollectFacility(facilityId string) bool { // Used for vehicle collect
+	canCollect := partner.CollectSettings().CanCollectFacility(facilityId)
+	if canCollect != s.COLLECT_UNKNOWN {
+		return canCollect == s.CAN_COLLECT
+	}
+
+	return true
+}
+
 func (partner *Partner) checkDiscoveredLines(lineIds map[string]struct{}) (ok bool) {
 	partner.mutex.RLock()
 	defer partner.mutex.RUnlock()
@@ -502,6 +511,14 @@ func (partner *Partner) FacilityMonitoringRequestCollector() FacilityMonitoringR
 	client, ok := partner.connectors[SIRI_FACILITY_MONITORING_REQUEST_COLLECTOR]
 	if ok {
 		return client.(FacilityMonitoringRequestCollector)
+	}
+	return nil
+}
+
+func (partner *Partner) FacilityMonitoringSubscriptionCollector() FacilityMonitoringSubscriptionCollector {
+	client, ok := partner.connectors[SIRI_FACILITY_MONITORING_SUBSCRIPTION_COLLECTOR]
+	if ok {
+		return client.(FacilityMonitoringSubscriptionCollector)
 	}
 	return nil
 }

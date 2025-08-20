@@ -77,7 +77,7 @@ func (connector *SIRIFacilityMonitoringRequestCollector) RequestFacilityUpdate(r
 
 	logXMLFacilityMonitoringResponse(message, xmlFacilityMonitoringResponse)
 
-	builder := NewFacilityMonitoringUpdateEventBuilder(connector.partner, code)
+	builder := NewFacilityMonitoringUpdateEventBuilder(connector.partner)
 
 	for _, delivery := range xmlFacilityMonitoringResponse.FacilityMonitoringDeliveries() {
 		// if !delivery.Status() {

@@ -25,6 +25,7 @@ const (
 	SituationExchangeCollect  = "SituationExchangeCollect"
 	StopMonitoringCollect     = "StopMonitoringCollect"
 	VehicleMonitoringCollect  = "VehicleMonitoringCollect"
+	FacilityMonitoringCollect = "FacilityMonitoringCollect"
 )
 
 type SubscriptionId string

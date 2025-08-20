@@ -349,6 +349,20 @@ func (client *SIRIClient) VehicleMonitoringSubscription(request *siri.SIRIVehicl
 	return response, nil
 }
 
+func (client *SIRIClient) FacilityMonitoringSubscription(request *siri.SIRIFacilityMonitoringSubscriptionRequest) (*sxml.XMLSubscriptionResponse, error) {
+	node, err := client.prepareAndSendRequest(siriClientArguments{
+		request:           request,
+		requestType:       SUBSCRIPTION,
+		expectedResponses: []string{"SubscribeResponse", "SubscriptionResponse"},
+		acceptGzip:        true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	response := sxml.NewXMLSubscriptionResponse(node)
+	return response, nil
+}
+
 func (client *SIRIClient) DeleteSubscription(request *siri.SIRIDeleteSubscriptionRequest) (*sxml.XMLDeleteSubscriptionResponse, error) {
 	node, err := client.prepareAndSendRequest(siriClientArguments{
 		request:           request,

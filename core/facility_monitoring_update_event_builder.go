@@ -16,7 +16,7 @@ type FacilityMonitoringUpdateEventBuilder struct {
 	facilityUpdateEvents *CollectUpdateEvents
 }
 
-func NewFacilityMonitoringUpdateEventBuilder(partner *Partner, originFacilityCode model.Code) FacilityMonitoringUpdateEventBuilder {
+func NewFacilityMonitoringUpdateEventBuilder(partner *Partner) FacilityMonitoringUpdateEventBuilder {
 	return FacilityMonitoringUpdateEventBuilder{
 		partner:              partner,
 		remoteCodeSpace:      partner.RemoteCodeSpace(),
