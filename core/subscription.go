@@ -18,6 +18,7 @@ const (
 	SituationExchangeBroadcast   = "SituationExchangeBroadcast"
 	StopMonitoringBroadcast      = "StopMonitoringBroadcast"
 	VehicleMonitoringBroadcast   = "VehicleMonitoringBroadcast"
+	FacilityMonitoringBroadcast  = "FacilityMonitoringBroadcast"
 
 	EstimatedTimetableCollect = "EstimatedTimetableCollect"
 	GeneralMessageCollect     = "GeneralMessageCollect"

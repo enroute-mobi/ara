@@ -22,6 +22,7 @@ const (
 	NOTIFY_SITUATION_EXCHANGE   BigQueryMessageType = "NotifySituationExchange"
 	NOTIFY_STOP_MONITORING      BigQueryMessageType = "NotifyStopMonitoring"
 	NOTIFY_VEHICLE_MONITORING   BigQueryMessageType = "NotifyVehicleMonitoring"
+	NOTIFY_FACILITY_MONITORING  BigQueryMessageType = "NotifyFacilityMonitoring"
 
 	DELETE_SUBSCRIPTION_REQUEST    BigQueryMessageType = "DeleteSubscriptionRequest"
 	NOTIFY_SUBSCRIPTION_TERMINATED BigQueryMessageType = "NotifySubscriptionTerminated"
@@ -49,6 +50,7 @@ const (
 	STOP_MONITORING_SUBSCRIPTION_REQUEST      BigQueryMessageType = "StopMonitoringSubscriptionRequest"
 	VEHICLE_MONITORING_SUBSCRIPTION_REQUEST   BigQueryMessageType = "VehicleMonitoringSubscriptionRequest"
 	SITUATION_EXCHANGE_SUBSCRIPTION_REQUEST   BigQueryMessageType = "SituationExchangeSubscriptionRequest"
+	FACILITY_MONITORING_SUBSCRIPTION_REQUEST  BigQueryMessageType = "FacilityMonitoringSubscriptionRequest"
 
 	PUSH_NOTIFICATION BigQueryMessageType = "push-notification"
 

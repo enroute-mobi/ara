@@ -5,7 +5,9 @@ def show_me(model_type, partner_name, slug = "test")
 end
 
 Given(/^show me ara subscriptions for partner "([^"]+)"?$/) do |partner|
-  show_me(model_type, partner)
+  url = url_for_model({resource: 'partner', partner_name: "#{partner}", model: 'subscriptions'})
+  response = RestClient.get(url, {content_type: :json, :Authorization => "Token token=#{$token}"})
+  puts JSON.pretty_generate(JSON.parse(response))
 end
 
 Then(/^show me ara (vehicle_journeys|stop_areas|stop_area_groups|stop_visits|lines|line_groups|vehicles|partners|operators|scheduled_stop_visits|subscriptions|situations|facilities)$/) do |model_type|

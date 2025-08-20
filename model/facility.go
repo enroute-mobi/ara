@@ -68,6 +68,8 @@ type MemoryFacilities struct {
 	mutex        *sync.RWMutex
 	byIdentifier map[FacilityId]*Facility
 	byCode       *CodeIndex
+
+	broadcastEvent func(event FacilityBroadcastEvent)
 }
 
 type Facilities interface {
@@ -132,17 +134,25 @@ func (manager *MemoryFacilities) FindAll() (facilitys []*Facility) {
 }
 
 func (manager *MemoryFacilities) Save(facility *Facility) bool {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	if facility.Id() == "" {
 		facility.id = FacilityId(manager.NewUUID())
 	}
-
-	manager.mutex.Lock()
 
 	facility.model = manager.model
 	manager.byIdentifier[facility.Id()] = facility
 	manager.byCode.Index(facility)
 
-	manager.mutex.Unlock()
+	event := FacilityBroadcastEvent{
+		ModelId:   string(facility.id),
+		ModelType: "Facility",
+	}
+
+	if manager.broadcastEvent != nil {
+		manager.broadcastEvent(event)
+	}
 
 	return true
 }

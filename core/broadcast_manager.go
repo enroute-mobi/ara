@@ -14,6 +14,7 @@ type BroadcastManagerInterface interface {
 	GetGeneralMessageBroadcastEventChan() chan model.SituationBroadcastEvent
 	GetSituationExchangeBroadcastEventChan() chan model.SituationBroadcastEvent
 	GetVehicleBroadcastEventChan() chan model.VehicleBroadcastEvent
+	GetFacilityBroadcastEventChan() chan model.FacilityBroadcastEvent
 }
 
 type BroadcastManager struct {
@@ -23,6 +24,7 @@ type BroadcastManager struct {
 	gmbEventChan chan model.SituationBroadcastEvent
 	sxbEventChan chan model.SituationBroadcastEvent
 	vbEventChan  chan model.VehicleBroadcastEvent
+	fmbEventChan chan model.FacilityBroadcastEvent
 	stop         chan struct{}
 }
 
@@ -33,6 +35,7 @@ func NewBroadcastManager(referential *Referential) *BroadcastManager {
 		gmbEventChan: make(chan model.SituationBroadcastEvent, 2000),
 		sxbEventChan: make(chan model.SituationBroadcastEvent, 2000),
 		vbEventChan:  make(chan model.VehicleBroadcastEvent, 2000),
+		fmbEventChan: make(chan model.FacilityBroadcastEvent, 2000),
 	}
 }
 
@@ -50,6 +53,10 @@ func (manager *BroadcastManager) GetVehicleBroadcastEventChan() chan model.Vehic
 
 func (manager *BroadcastManager) GetSituationExchangeBroadcastEventChan() chan model.SituationBroadcastEvent {
 	return manager.sxbEventChan
+}
+
+func (manager *BroadcastManager) GetFacilityBroadcastEventChan() chan model.FacilityBroadcastEvent {
+	return manager.fmbEventChan
 }
 
 func (manager *BroadcastManager) Start() {
@@ -72,6 +79,8 @@ func (manager *BroadcastManager) run() {
 			manager.sxbEvent_handler(event)
 		case event := <-manager.vbEventChan:
 			manager.vmEvent_handler(event)
+		case event := <-manager.fmbEventChan:
+			manager.fmbEvent_handler(event)
 		case <-manager.stop:
 			logger.Log.Debugf("BroadcastManager Stop")
 			return
@@ -156,6 +165,24 @@ func (manager *BroadcastManager) sxbEvent_handler(event model.SituationBroadcast
 		connector, ok := partner.Connector(SIRI_SITUATION_EXCHANGE_SUBSCRIPTION_BROADCASTER)
 		if ok {
 			connector.(*SIRISituationExchangeSubscriptionBroadcaster).HandleSituationExchangeBroadcastEvent(&event)
+			continue
+		}
+	}
+}
+
+func (manager *BroadcastManager) fmbEvent_handler(event model.FacilityBroadcastEvent) {
+	connectorTypes := []string{SIRI_FACILITY_MONITORING_SUBSCRIPTION_BROADCASTER, TEST_FACILITY_MONITORING_SUBSCRIPTION_BROADCASTER}
+	for _, partner := range manager.Referential.Partners().FindAllWithConnector(connectorTypes) {
+		connector, ok := partner.Connector(SIRI_FACILITY_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*SIRIFacilityMonitoringSubscriptionBroadcaster).HandleBroadcastEvent(&event)
+			continue
+		}
+
+		// TEST
+		connector, ok = partner.Connector(TEST_FACILITY_MONITORING_SUBSCRIPTION_BROADCASTER)
+		if ok {
+			connector.(*TestFMSubscriptionBroadcaster).HandleBroadcastEvent(&event)
 			continue
 		}
 	}
