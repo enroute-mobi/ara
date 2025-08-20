@@ -1,0 +1,6 @@
+<FacilityCondition>
+				<FacilityRef>{{ .FacilityRef }}</FacilityRef>
+				<FacilityStatus>
+					<Status>{{ .FacilityStatus }}</Status>
+				</FacilityStatus>
+			</FacilityCondition>

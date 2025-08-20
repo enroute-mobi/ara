@@ -1,0 +1,11 @@
+<FacilityMonitoringDelivery>
+			<ResponseTimestamp>{{ .ResponseTimestamp.Format "2006-01-02T15:04:05.000Z07:00" }}</ResponseTimestamp>
+			<RequestMessageRef>{{ .RequestMessageRef }}</RequestMessageRef>{{ if not .Status }}
+			<ErrorCondition>{{ if eq .ErrorType "OtherError" }}
+				<OtherError number="{{.ErrorNumber}}">{{ else }}
+				<{{.ErrorType}}>{{ end }}
+					<ErrorText>{{.ErrorText}}</ErrorText>
+				</{{.ErrorType}}>
+			</ErrorCondition>{{ end }}{{ if or .Status (eq .ErrorType "OtherError") }}
+			{{ .BuildFacilityConditionXMLRaw }}{{ end }}
+		</FacilityMonitoringDelivery>
