@@ -52,7 +52,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
             <SubscriptionAnswerInfo>
               <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
               <siri:ResponderRef>test</siri:ResponderRef>
-              <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
+              <siri:RequestMessageRef>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
             </SubscriptionAnswerInfo>
             <Answer>
               <siri:ResponseStatus>
@@ -128,7 +128,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
             <SubscriptionAnswerInfo>
               <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
               <siri:ResponderRef>test</siri:ResponderRef>
-              <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
+              <siri:RequestMessageRef>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
             </SubscriptionAnswerInfo>
             <Answer>
               <siri:ResponseStatus>
@@ -264,7 +264,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
             <SubscriptionAnswerInfo>
               <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
               <siri:ResponderRef>test</siri:ResponderRef>
-              <siri:RequestMessageRef xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:type='siri:MessageRefStructure'>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
+              <siri:RequestMessageRef>6ba7b814-9dad-11d1-7-00c04fd430c8</siri:RequestMessageRef>
             </SubscriptionAnswerInfo>
             <Answer>
               <siri:ResponseStatus>
@@ -726,7 +726,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
-        <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">Subscription:Test:0</ns5:RequestMessageRef>
+        <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
         xmlns:ns2="http://www.ifopt.org.uk/acsb"

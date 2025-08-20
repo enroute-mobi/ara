@@ -273,7 +273,7 @@ Feature: Support SIRI ProductionTimetable by subscription
     <SubscriptionAnswerInfo>
         <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
         <siri:ResponderRef>ara</siri:ResponderRef>
-        <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">1</siri:RequestMessageRef>
+        <siri:RequestMessageRef>1</siri:RequestMessageRef>
     </SubscriptionAnswerInfo>
     <Answer>
         <siri:ResponseStatus>
@@ -421,7 +421,7 @@ Feature: Support SIRI ProductionTimetable by subscription
     <SubscriptionAnswerInfo>
         <siri:ResponseTimestamp>2017-01-01T12:01:00.000Z</siri:ResponseTimestamp>
         <siri:ResponderRef>ara</siri:ResponderRef>
-        <siri:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="siri:MessageRefStructure">1</siri:RequestMessageRef>
+        <siri:RequestMessageRef>1</siri:RequestMessageRef>
     </SubscriptionAnswerInfo>
     <Answer>
         <siri:ResponseStatus>
