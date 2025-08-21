@@ -1,7 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: 40478b57837cec67d6cfcfc23fd0ad75b8045594
-  branch: ARA-1754-paginate-lines
+  revision: 64c3909575922dad0b220ee68c1e9c5ceccc1cb3
   specs:
     ara (3.5.4)
       faraday
