@@ -371,7 +371,7 @@ func testSetup() (subscriber *CollectSubscriber, subscription *Subscription, res
                 <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
                 <ns5:Address>http://sqybus-siri:8080/ProfilSiriKidf2_4Producer-Sqybus/SiriServices</ns5:Address>
                 <ns5:ResponderRef>SQYBUS</ns5:ResponderRef>
-                <ns5:RequestMessageRef xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns5:MessageRefStructure">28679112-9dad-11d1-2-00c04fd430c8</ns5:RequestMessageRef>
+                <ns5:RequestMessageRef>28679112-9dad-11d1-2-00c04fd430c8</ns5:RequestMessageRef>
             </SubscriptionAnswerInfo>
             <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb"
 	 				xmlns:ns3="http://www.ifopt.org.uk/ifopt"
