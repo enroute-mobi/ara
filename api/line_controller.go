@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -30,10 +31,32 @@ func (controller *LineController) findLine(identifier string) (*model.Line, bool
 	return controller.referential.Model().Lines().Find(model.LineId(identifier))
 }
 
-func (controller *LineController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *LineController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Lines Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().Lines().FindAll())
+	allLines := controller.referential.Model().Lines().FindAll()
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(allLines, func(i, j int) bool {
+			return allLines[i].Name > allLines[j].Name
+		})
+	case "asc", "":
+		sort.Slice(allLines, func(i, j int) bool {
+			return allLines[i].Name < allLines[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	paginatedLines, err := paginate(allLines, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedLines)
 	response.Write(jsonBytes)
 }
 
