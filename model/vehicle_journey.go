@@ -146,9 +146,9 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 func (vehicleJourney *VehicleJourney) GtfsDirectionId() *uint32 {
 	var directionId uint32
 	switch vehicleJourney.DirectionType {
-	case VEHICLE_DIRECTION_INBOUND:
-		directionId = uint32(0)
 	case VEHICLE_DIRECTION_OUTBOUND:
+		directionId = uint32(0)
+	case VEHICLE_DIRECTION_INBOUND:
 		directionId = uint32(1)
 	default:
 		return nil
