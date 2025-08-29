@@ -1,12 +1,11 @@
 module bitbucket.org/enroute-mobi/ara
 
-go 1.23.5
+go 1.23.1
 
 toolchain go1.24.5
 
 require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
-	bitbucket.org/enroute-mobi/sirigo v0.0.5
 	cloud.google.com/go v0.121.4
 	cloud.google.com/go/bigquery v1.69.0
 	github.com/getsentry/sentry-go v0.34.1
@@ -86,7 +85,6 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
-	github.com/orisano/gosax v1.1.2 // indirect
 	github.com/outcaste-io/ristretto v0.2.3 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect

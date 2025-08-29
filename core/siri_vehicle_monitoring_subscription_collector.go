@@ -5,8 +5,8 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
-	"bitbucket.org/enroute-mobi/sirigo/siristructs"
 	"golang.org/x/exp/maps"
 )
 
@@ -15,7 +15,7 @@ type VehicleMonitoringSubscriptionCollector interface {
 	state.Startable
 
 	RequestVehicleUpdate(request *VehicleUpdateRequest)
-	HandleNotifyVehicleMonitoring(delivery *siristructs.NotifyVehicleMonitoring) *CollectedRefs
+	HandleNotifyVehicleMonitoring(delivery *sxml.XMLNotifyVehicleMonitoring) *CollectedRefs
 }
 
 type SIRIVehicleMonitoringSubscriptionCollector struct {
@@ -101,14 +101,14 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) SetVehicleMonitorin
 	connector.vehicleMonitoringSubscriber = vehicleMonitoringSubscriber
 }
 
-func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *siristructs.NotifyVehicleMonitoring) (collectedRefs *CollectedRefs) {
+func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicleMonitoring(notify *sxml.XMLNotifyVehicleMonitoring) (collectedRefs *CollectedRefs) {
 	subscriptionErrors := make(map[string]string)
 	subToDelete := make(map[string]struct{})
 	var updateEvents VehicleMonitoringUpdateEvents
 
 	collectedRefs = NewCollectedRefs()
-	for _, delivery := range notify.Deliveries {
-		subscriptionId := string(delivery.SubscriptionRef)
+	for _, delivery := range notify.VehicleMonitoringDeliveries() {
+		subscriptionId := delivery.SubscriptionRef()
 
 		if subscriptionId == "" {
 			logger.Log.Debugf("Partner %s sent a NotifyVehicleMonitoring with an empty SubscriptionRef\n", connector.Partner().Slug())
@@ -130,8 +130,8 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 			continue
 		}
 
-		builder := NewSirigoVehicleMonitoringUpdateEventBuilder(connector.partner)
-		builder.SetUpdateEvents(delivery.VehicleActivities)
+		builder := NewVehicleMonitoringUpdateEventBuilder(connector.partner)
+		builder.SetUpdateEvents(delivery.VehicleActivities())
 
 		updateEvents = builder.UpdateEvents()
 
