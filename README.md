@@ -1,4 +1,4 @@
-[![Logo Ara](https://bitbucket.org/repo/d6Abpo8/images/925946015-Logo%20Ara.png)](https://enroute.mobi/produits/ara/)
+[![Logo Ara](https://bitbucket.org/repo/d6Abpo8/images/925946015-Logo%20Ara.png)](https://enroute.mobi/en/ara/)
 
 ## An innovative and modular solution
 
@@ -37,11 +37,8 @@ Outsource, process and store in real time all exchanges managed by Ara :
 
 ## More Information
 
-Some technical articles are available [on the wiki](../../wiki) too.
-
 Related projects :
 
-* [Administration interface](https://bitbucket.org/enroute-mobi/ara-admin)
 * [Ruby SDK](https://bitbucket.org/enroute-mobi/ara-ruby)
 * [Models for Protocol Buffers exchange with Ara](https://bitbucket.org/enroute-mobi/ara-external-models)
 
