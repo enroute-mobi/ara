@@ -1,7 +1,5 @@
 bitbucket.org/enroute-mobi/ara-external-models v0.0.9 h1:KRg4uG5DJyMsn56V1MWgF7qOhRAlUxChuorlO0SGOuo=
 bitbucket.org/enroute-mobi/ara-external-models v0.0.9/go.mod h1:EXKNHGUaMYcZ83bHCoJJWjgCQelWTwW95oRV1vzKNnw=
-bitbucket.org/enroute-mobi/sirigo v0.0.5 h1:XhqkodsTSSHSBgKX9aKHyocMnAwVORKAqmItOSc1SC0=
-bitbucket.org/enroute-mobi/sirigo v0.0.5/go.mod h1:oP1Iv0zGH3VNZG6zr80KEW8abT8zcV9aB/BhEJzEIK8=
 cel.dev/expr v0.24.0 h1:56OvJKSH3hDGL0ml5uSxZmz3/3Pq4tJ+fb1unVLAFcY=
 cel.dev/expr v0.24.0/go.mod h1:hLPLo1W4QUmuYdA72RBX06QTs6MXw941piREPl3Yfiw=
 cloud.google.com/go v0.121.4 h1:cVvUiY0sX0xwyxPwdSU2KsF9knOVmtRyAMt8xou0iTs=
@@ -193,8 +191,6 @@ github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisti
 github.com/open-telemetry/opentelemetry-collector-contrib/processor/probabilisticsamplerprocessor v0.128.0/go.mod h1:qA8r/j9nMha/2KfBlqcBpE52S5GfRvLRntN2GlhMe6g=
 github.com/opentracing/opentracing-go v1.2.0 h1:uEJPy/1a5RIPAJ0Ov+OIO8OxWu77jEv+1B0VhjKrZUs=
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
-github.com/orisano/gosax v1.1.2 h1:5tx4vxxTjxlW8zEQ3AtmagrcQjGrikVg+4J2uvlArqQ=
-github.com/orisano/gosax v1.1.2/go.mod h1:mw6A5jIOFDeVOqffQkggKOOjRFevYnLyXgiZP06fRjI=
 github.com/outcaste-io/ristretto v0.2.3 h1:AK4zt/fJ76kjlYObOeNwh4T3asEuaCmp26pOvUOL9w0=
 github.com/outcaste-io/ristretto v0.2.3/go.mod h1:W8HywhmtlopSB1jeMg3JtdIhf+DYkLAr0VN/s4+MHac=
 github.com/philhofer/fwd v1.2.0 h1:e6DnBTl7vGY+Gz322/ASL4Gyp1FspeMvx1RNDoToZuM=
