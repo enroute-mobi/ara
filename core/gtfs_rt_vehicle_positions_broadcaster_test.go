@@ -36,7 +36,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	vjId := model.NewCode("codeSpace", "vjId")
 	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
-	vehicleJourney.DirectionType = model.VEHICLE_DIRECTION_OUTBOUND
+	vehicleJourney.DirectionType = model.VEHICLE_DIRECTION_INBOUND
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()

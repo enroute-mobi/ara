@@ -99,7 +99,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	tripUpdate := entity.TripUpdate
 	assert.Equal("vjId", tripUpdate.Trip.GetTripId())
 	assert.Equal("lId", tripUpdate.Trip.GetRouteId())
-	assert.Equal(uint32(1), tripUpdate.Trip.GetDirectionId())
+	assert.Equal(uint32(0), tripUpdate.Trip.GetDirectionId())
 	assert.Len(tripUpdate.StopTimeUpdate, 1)
 
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]

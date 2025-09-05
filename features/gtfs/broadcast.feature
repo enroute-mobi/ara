@@ -62,7 +62,7 @@ Feature: Support GTFS-RT feeds
       | stop_id      | 4567 |
       | trip_id      | 2345 |
       | route_id     | 1234 |
-      | direction_id |    0 |
+      | direction_id |    1 |
 
   @ARA-872
   Scenario: Retrieve Vehicle Positions with unmatching code kind
@@ -382,7 +382,7 @@ Feature: Support GTFS-RT feeds
     And a VehicleJourney exists with the following attributes:
       | Codes[external] | external:2345                     |
       | LineId          | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
-      | DirectionType   | inbound                           |
+      | DirectionType   | outbound                          |
     And a StopArea exists with the following attributes:
       | Codes[external] | external:4567  |
     And a Vehicle exists with the following attributes:

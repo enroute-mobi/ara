@@ -285,9 +285,9 @@ func Test_VehicleJourney_GtfsDirectionId(t *testing.T) {
 
 	assert.Nil(vehicleJourney.GtfsDirectionId())
 
-	vehicleJourney.DirectionType = VEHICLE_DIRECTION_INBOUND
+	vehicleJourney.DirectionType = VEHICLE_DIRECTION_OUTBOUND
 	assert.Equal(uint32(0), *vehicleJourney.GtfsDirectionId())
 
-	vehicleJourney.DirectionType = VEHICLE_DIRECTION_OUTBOUND
+	vehicleJourney.DirectionType = VEHICLE_DIRECTION_INBOUND
 	assert.Equal(uint32(1), *vehicleJourney.GtfsDirectionId())
 }
