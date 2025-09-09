@@ -74,6 +74,7 @@ func Test_Referential_MarshalJSON(t *testing.T) {
 		ReferentialSettings: s.NewReferentialSettings(),
 	}
 	referential.partners = NewPartnerManager(referential)
+	referential.partnerTemplates = NewPartnerTemplateManager(referential)
 	referential.SetSettingsDefinition(map[string]string{"key": "value"})
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"referential","Settings":{"key":"value"}}`
 	jsonBytes, err := referential.MarshalJSON()

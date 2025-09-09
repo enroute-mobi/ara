@@ -41,6 +41,7 @@ type Referential struct {
 	model             *model.MemoryModel
 	modelGuardian     *ModelGuardian
 	partners          Partners
+	partnerTemplates  PartnerTemplates
 	startedAt         time.Time
 	nextReloadAt      time.Time
 	Tokens            []string `json:",omitempty"`
@@ -148,6 +149,10 @@ func (referential *Referential) Partners() Partners {
 	return referential.partners
 }
 
+func (referential *Referential) PartnerTemplates() PartnerTemplates {
+	return referential.partnerTemplates
+}
+
 func (referential *Referential) DatabaseOrganisationId() sql.NullString {
 	if referential.OrganisationId == "" {
 		return sql.NullString{}
@@ -197,11 +202,12 @@ func (referential *Referential) Save() (ok bool) {
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	type Alias Referential
 	aux := struct {
-		Id           ReferentialId
-		Slug         ReferentialSlug
-		NextReloadAt *time.Time `json:",omitempty"`
-		Partners     Partners   `json:",omitempty"`
-		Settings     map[string]string
+		Id               ReferentialId
+		Slug             ReferentialSlug
+		NextReloadAt     *time.Time       `json:",omitempty"`
+		Partners         Partners         `json:",omitempty"`
+		PartnerTemplates PartnerTemplates `json:",omitempty"`
+		Settings         map[string]string
 		*Alias
 	}{
 		Id:       referential.id,
@@ -215,6 +221,9 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 	}
 	if !referential.partners.IsEmpty() {
 		aux.Partners = referential.partners
+	}
+	if !referential.partnerTemplates.IsEmpty() {
+		aux.PartnerTemplates = referential.partnerTemplates
 	}
 
 	return json.Marshal(&aux)
@@ -308,6 +317,7 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	}
 
 	referential.partners = NewPartnerManager(referential)
+	referential.partnerTemplates = NewPartnerTemplateManager(referential)
 	referential.collectManager = NewCollectManager(referential)
 	referential.broacasterManager = NewBroadcastManager(referential)
 

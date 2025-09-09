@@ -36,6 +36,7 @@ type Partners interface {
 	uuid.UUIDInterface
 	state.Startable
 	state.Stopable
+	SlugAndCredentialsHandler
 
 	New(PartnerSlug) *Partner
 	Find(PartnerId) *Partner
@@ -48,11 +49,15 @@ type Partners interface {
 	Delete(partner *Partner) bool
 	Model() model.Model
 	Referential() *Referential
-	UniqCredentials(PartnerId, string) bool
 	IsEmpty() bool
 	CancelSubscriptions()
 	Load() error
 	SaveToDatabase() (int, error)
+}
+
+type SlugAndCredentialsHandler interface {
+	UniqCredentials(PartnerId, string) bool
+	UniqSlug(PartnerId, PartnerSlug) bool
 }
 
 type PartnerStatus struct {
@@ -772,6 +777,20 @@ func NewPartnerManager(referential *Referential) *PartnerManager {
 
 func (manager *PartnerManager) Guardian() *PartnersGuardian {
 	return manager.guardian
+}
+
+func (manager *PartnerManager) UniqSlug(modelId PartnerId, slug PartnerSlug) bool {
+	manager.mutex.RLock()
+	for _, partner := range manager.byId {
+		if partner.slug == slug && partner.id != modelId {
+			manager.mutex.RUnlock()
+			return false
+		}
+	}
+
+	manager.mutex.RUnlock()
+	return true
+
 }
 
 func (manager *PartnerManager) UniqCredentials(modelId PartnerId, localCredentials string) bool {
