@@ -2,6 +2,9 @@ package core
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"net/http"
 	"regexp"
 	"slices"
 	"strings"
@@ -10,6 +13,7 @@ import (
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
+	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -36,6 +40,7 @@ type PartnerTemplates interface {
 	Delete(*PartnerTemplate) bool
 	Referential() *Referential
 	IsEmpty() bool
+	SaveToDatabase() (int, error)
 }
 
 type PartnerTemplate struct {
@@ -307,4 +312,78 @@ func (manager *PartnerTemplateManager) Referential() *Referential {
 
 func (manager *PartnerTemplateManager) IsEmpty() bool {
 	return len(manager.byId) == 0
+}
+
+func (manager *PartnerTemplateManager) SaveToDatabase() (int, error) {
+	// Check presence of Referential
+	selectReferentials := []model.SelectReferential{}
+	sqlQuery := fmt.Sprintf("select * from referentials where referential_id = '%s'", manager.referential.Id())
+	_, err := model.Database.Select(&selectReferentials, sqlQuery)
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
+	}
+	if len(selectReferentials) == 0 {
+		return http.StatusNotAcceptable, errors.New("can't save Partner templates without Referential in Database")
+	}
+
+	// Begin transaction
+	tx, err := model.Database.Begin()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
+	}
+
+	// Delete partner templates
+	sqlQuery = fmt.Sprintf("delete from partner_templates where referential_id = '%s';", manager.referential.Id())
+	_, err = tx.Exec(sqlQuery)
+	if err != nil {
+		tx.Rollback()
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
+	}
+
+	// Insert partner templates
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+	for _, pt := range manager.byId {
+		dbPT, err := manager.newDbPartnerTemplate(pt)
+		if err != nil {
+			tx.Rollback()
+			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
+		}
+		err = tx.Insert(dbPT)
+		if err != nil {
+			tx.Rollback()
+			return http.StatusInternalServerError, fmt.Errorf("internal error: %v", err)
+		}
+	}
+
+	// Commit transaction
+	err = tx.Commit()
+	if err != nil {
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
+	}
+
+	return http.StatusOK, nil
+}
+
+func (manager *PartnerTemplateManager) newDbPartnerTemplate(pt *PartnerTemplate) (*model.DatabasePartnerTemplate, error) {
+	settings, err := json.Marshal(pt.Settings)
+	if err != nil {
+		return nil, err
+	}
+	connectors, err := json.Marshal(pt.ConnectorTypes)
+	if err != nil {
+		return nil, err
+	}
+	return &model.DatabasePartnerTemplate{
+		Id:               string(pt.id),
+		ReferentialId:    string(manager.referential.id),
+		Slug:             string(pt.Slug),
+		Name:             pt.Name,
+		CredentialType:   pt.CredentialType,
+		LocalCredential:  pt.LocalCredential,
+		RemoteCredential: pt.RemoteCredential,
+		MaxPartners:      pt.MaxPartners,
+		Settings:         string(settings),
+		ConnectorTypes:   string(connectors),
+	}, nil
 }

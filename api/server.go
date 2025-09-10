@@ -68,6 +68,7 @@ func (server *Server) ListenAndServe() error {
 	mux.HandleFunc("POST /{referential_slug}/import", server.handleReferentialImport)
 
 	mux.HandleFunc("POST /{referential_slug}/partners/save", server.handleReferentialPartnerSave)
+	mux.HandleFunc("POST /{referential_slug}/partner_templates/save", server.handleReferentialPartnerTemplateSave)
 
 	mux.HandleFunc("GET /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsIndex)
 	mux.HandleFunc("POST /{referential_slug}/partners/{id}/subscriptions", server.handlePartnerSubscriptionsCreate)
@@ -248,13 +249,34 @@ func (server *Server) handleReferentialPartnerSave(response http.ResponseWriter,
 		return
 	}
 
-	partnerControler := NewPartnerController(foundReferential)
+	partnerController := NewPartnerController(foundReferential)
 	response.Header().Set("Server", version.ApplicationName())
 	response.Header().Set("Content-Type", "application/json")
 
 	logger.Log.Debugf("Partner controller Save request: %v", request)
 
-	partnerControler.(Savable).Save(response)
+	partnerController.(Savable).Save(response)
+}
+
+func (server *Server) handleReferentialPartnerTemplateSave(response http.ResponseWriter, request *http.Request) {
+	referentialSlug := request.PathValue("referential_slug")
+	foundReferential := server.CurrentReferentials().FindBySlug(core.ReferentialSlug(referentialSlug))
+	if foundReferential == nil {
+		http.Error(response, "Referential not found", http.StatusNotFound)
+		return
+	}
+	if !server.isAuth(foundReferential, request) {
+		http.Error(response, "Unauthorized request", http.StatusUnauthorized)
+		return
+	}
+
+	partnerTemplateController := NewPartnerTemplateController(foundReferential)
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
+	logger.Log.Debugf("PartnerTemplate controller Save request: %v", request)
+
+	partnerTemplateController.(Savable).Save(response)
 }
 
 func (server *Server) handleReferentialModelDelete(response http.ResponseWriter, request *http.Request) {

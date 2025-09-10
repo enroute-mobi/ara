@@ -8,6 +8,8 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/core/partners"
+	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/monitoring"
 )
 
 type PartnerTemplateController struct {
@@ -103,15 +105,16 @@ func (controller *PartnerTemplateController) Create(response http.ResponseWriter
 	response.Write(jsonBytes)
 }
 
-// func (controller *PartnerTemplateController) Save(response http.ResponseWriter) {
+func (controller *PartnerTemplateController) Save(response http.ResponseWriter) {
+	logger.Log.Debugf("Saving partner templates to database")
 
-// 	status, err := controller.referential.PartnerTemplates().SaveToDatabase()
+	status, err := controller.referential.PartnerTemplates().SaveToDatabase()
 
-// 	if err != nil {
-// 		monitoring.ReportError(err)
+	if err != nil {
+		monitoring.ReportError(err)
 
-// 		response.WriteHeader(status)
-// 		jsonBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
-// 		response.Write(jsonBytes)
-// 	}
-// }
+		response.WriteHeader(status)
+		jsonBytes, _ := json.Marshal(map[string]string{"error": err.Error()})
+		response.Write(jsonBytes)
+	}
+}
