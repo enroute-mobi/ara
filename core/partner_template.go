@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -23,11 +24,11 @@ const (
 )
 
 type PartnerTemplates interface {
-	SlugAndCredentialsHandler
+	partners.SlugAndCredentialsHandler
 
-	New(PartnerSlug) *PartnerTemplate
-	Find(PartnerId) *PartnerTemplate
-	FindBySlug(PartnerSlug) *PartnerTemplate
+	New(partners.Slug) *PartnerTemplate
+	Find(partners.Id) *PartnerTemplate
+	FindBySlug(partners.Slug) *PartnerTemplate
 	FindByRawCredential(string, string) *PartnerTemplate
 	FindByCredential(string) (*PartnerTemplate, string)
 	FindAll() []*PartnerTemplate
@@ -40,10 +41,10 @@ type PartnerTemplates interface {
 type PartnerTemplate struct {
 	manager PartnerTemplates
 
-	id               PartnerId
+	id               partners.Id
 	credentialRegexp *regexp.Regexp
 
-	Slug             PartnerSlug
+	Slug             partners.Slug
 	Name             string `json:",omitempty"`
 	CredentialType   string
 	LocalCredential  string
@@ -59,7 +60,7 @@ type PartnerTemplateManager struct {
 
 	mutex *sync.RWMutex
 
-	byId        map[PartnerId]*PartnerTemplate
+	byId        map[partners.Id]*PartnerTemplate
 	referential *Referential
 }
 
@@ -154,7 +155,7 @@ func (pt *PartnerTemplate) Copy() (copy *PartnerTemplate) {
 func (pt *PartnerTemplate) MarshalJSON() ([]byte, error) {
 	type Alias PartnerTemplate
 	return json.Marshal(&struct {
-		Id PartnerId
+		Id partners.Id
 		*Alias
 	}{
 		Id:    pt.id,
@@ -167,13 +168,13 @@ func (pt *PartnerTemplate) MarshalJSON() ([]byte, error) {
 func NewPartnerTemplateManager(referential *Referential) *PartnerTemplateManager {
 	manager := &PartnerTemplateManager{
 		mutex:       &sync.RWMutex{},
-		byId:        make(map[PartnerId]*PartnerTemplate),
+		byId:        make(map[partners.Id]*PartnerTemplate),
 		referential: referential,
 	}
 	return manager
 }
 
-func (manager *PartnerTemplateManager) UniqSlug(id PartnerId, s PartnerSlug) bool {
+func (manager *PartnerTemplateManager) UniqSlug(id partners.Id, s partners.Slug) bool {
 	manager.mutex.RLock()
 	for _, pt := range manager.byId {
 		if pt.Slug == s && pt.id != id {
@@ -187,7 +188,7 @@ func (manager *PartnerTemplateManager) UniqSlug(id PartnerId, s PartnerSlug) boo
 
 }
 
-func (manager *PartnerTemplateManager) UniqCredentials(id PartnerId, c string, params ...string) bool {
+func (manager *PartnerTemplateManager) UniqCredentials(id partners.Id, c string, params ...string) bool {
 	pt := manager.FindByRawCredential(c, params[0]) // params = CredentialType
 
 	if pt != nil && pt.id != id {
@@ -196,7 +197,7 @@ func (manager *PartnerTemplateManager) UniqCredentials(id PartnerId, c string, p
 	return true
 }
 
-func (manager *PartnerTemplateManager) New(slug PartnerSlug) *PartnerTemplate {
+func (manager *PartnerTemplateManager) New(slug partners.Slug) *PartnerTemplate {
 	return &PartnerTemplate{
 		Slug:           slug,
 		manager:        manager,
@@ -213,7 +214,7 @@ func (manager *PartnerTemplateManager) MarshalJSON() ([]byte, error) {
 	return json.Marshal(pts)
 }
 
-func (manager *PartnerTemplateManager) Find(id PartnerId) (partner *PartnerTemplate) {
+func (manager *PartnerTemplateManager) Find(id partners.Id) (partner *PartnerTemplate) {
 	manager.mutex.RLock()
 	partner = manager.byId[id]
 	manager.mutex.RUnlock()
@@ -252,7 +253,7 @@ func (manager *PartnerTemplateManager) FindByCredential(c string) (pt *PartnerTe
 	return
 }
 
-func (manager *PartnerTemplateManager) FindBySlug(slug PartnerSlug) (pt *PartnerTemplate) {
+func (manager *PartnerTemplateManager) FindBySlug(slug partners.Slug) (pt *PartnerTemplate) {
 	manager.mutex.RLock()
 	for _, t := range manager.byId {
 		if t.Slug == slug {
@@ -278,7 +279,7 @@ func (manager *PartnerTemplateManager) FindAll() (pts []*PartnerTemplate) {
 // Warning: PartnerTemplate.Validate() must be called for the regexp to be compiled for now
 func (manager *PartnerTemplateManager) Save(pt *PartnerTemplate) bool {
 	if pt.id == "" {
-		pt.id = PartnerId(manager.NewUUID())
+		pt.id = partners.Id(manager.NewUUID())
 	}
 	pt.manager = manager
 

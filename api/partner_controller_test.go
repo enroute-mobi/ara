@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/stretchr/testify/assert"
@@ -254,7 +255,7 @@ func Test_PartnerController_Update(t *testing.T) {
 	// Test Results
 	updatedPartner := referential.Partners().Find(partner.Id())
 	assert.NotNil(updatedPartner, "Partner should be found after PUT request")
-	assert.Equal(core.PartnerSlug("another_test"), updatedPartner.Slug())
+	assert.Equal(partners.Slug("another_test"), updatedPartner.Slug())
 	assert.Equal("test", updatedPartner.Name)
 
 	expected, err := updatedPartner.MarshalJSON()
@@ -277,7 +278,7 @@ func Test_PartnerController_UpdateConnectorTypes(t *testing.T) {
 	// Test Results
 	updatedPartner := referential.Partners().Find(partner.Id())
 	assert.NotNil(updatedPartner, "Partner should be found after PUT request")
-	assert.Equal(core.PartnerSlug("first_partner"), updatedPartner.Slug())
+	assert.Equal(partners.Slug("first_partner"), updatedPartner.Slug())
 	assert.Len(updatedPartner.ConnectorTypes, 1, "ConnectorTypes should have been updated by POST request")
 }
 
@@ -309,7 +310,7 @@ func Test_PartnerController_Create(t *testing.T) {
 	// Test Results
 	assert.Len(referential.Partners().FindAll(), 2)
 
-	partner, _ := referential.Partners().FindBySlug(core.PartnerSlug("test"))
+	partner, _ := referential.Partners().FindBySlug(partners.Slug("test"))
 	assert.NotNil(partner)
 	assert.Equal("test", string(partner.Slug()))
 

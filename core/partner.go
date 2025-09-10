@@ -12,6 +12,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/cache"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -21,34 +22,23 @@ import (
 	"golang.org/x/time/rate"
 )
 
-type OperationnalStatus string
-
-const (
-	OPERATIONNAL_STATUS_UNKNOWN OperationnalStatus = "unknown"
-	OPERATIONNAL_STATUS_UP      OperationnalStatus = "up"
-	OPERATIONNAL_STATUS_DOWN    OperationnalStatus = "down"
-)
-
-type PartnerId string
-type PartnerSlug string
-
 type Partners interface {
 	uuid.UUIDInterface
 	state.Startable
 	state.Stopable
-	SlugAndCredentialsHandler
+	partners.SlugAndCredentialsHandler
 
-	New(PartnerSlug) *Partner
+	New(partners.Slug) *Partner
 	NewFromTemplate(*PartnerTemplate, string, string, string) *Partner
-	Find(PartnerId) *Partner
-	FindBySlug(PartnerSlug) (*Partner, bool)
+	Find(partners.Id) *Partner
+	FindBySlug(partners.Slug) (*Partner, bool)
 	FindByCredential(string, string) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAllWithConnector([]string) []*Partner
 	FindAll() []*Partner
 	Save(*Partner) bool
 	Delete(*Partner) bool
-	DeleteFromTemplate(PartnerId)
+	DeleteFromTemplate(partners.Id)
 	DeleteAllFromTemplate()
 	Model() model.Model
 	Referential() *Referential
@@ -56,22 +46,6 @@ type Partners interface {
 	CancelSubscriptions()
 	Load() error
 	SaveToDatabase() (int, error)
-}
-
-type SlugAndCredentialsHandler interface {
-	UniqCredentials(PartnerId, string, ...string) bool
-	UniqSlug(PartnerId, PartnerSlug) bool
-}
-
-type PartnerStatus struct {
-	OperationnalStatus OperationnalStatus
-	RetryCount         int
-	ServiceStartedAt   time.Time
-}
-
-type PartnerStatusCheck struct {
-	LastCheck time.Time
-	Status    OperationnalStatus
 }
 
 type Partner struct {
@@ -83,11 +57,11 @@ type Partner struct {
 	manager             Partners
 	subscriptionManager Subscriptions
 
-	id            PartnerId
-	slug          PartnerSlug
-	FromTemplate  PartnerId `json:",omitempty"`
-	Name          string    `json:",omitempty"`
-	PartnerStatus PartnerStatus
+	id            partners.Id
+	fromTemplate  partners.Id
+	slug          partners.Slug
+	Name          string `json:",omitempty"`
+	PartnerStatus partners.Status
 
 	ConnectorTypes []string
 
@@ -96,7 +70,7 @@ type Partner struct {
 	discoveredLines        map[string]struct{}
 	startedAt              time.Time
 	lastDiscovery          time.Time
-	alternativeStatusCheck PartnerStatusCheck
+	alternativeStatusCheck partners.StatusCheck
 
 	httpClient *remote.HTTPClient
 
@@ -118,8 +92,9 @@ type PartnerManager struct {
 
 	mutex *sync.RWMutex
 
-	byId                  map[PartnerId]*Partner
-	localCredentialsIndex *LocalCredentialsIndex
+	byId                  map[partners.Id]*Partner
+	byTemplate            *partners.ByTemplateIndex
+	localCredentialsIndex *partners.LocalCredentialsIndex
 	guardian              *PartnersGuardian
 	referential           *Referential
 }
@@ -132,8 +107,8 @@ func NewPartner() *Partner {
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
 		discoveredLines:     make(map[string]struct{}),
-		PartnerStatus: PartnerStatus{
-			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		PartnerStatus: partners.Status{
+			OperationnalStatus: partners.OperationnalStatusUnknown,
 		},
 		gtfsCache: cache.NewCacheTable(),
 		limiters:  make(map[string]*rate.Limiter),
@@ -156,15 +131,19 @@ func (partner *Partner) StartedAt() time.Time {
 	return partner.startedAt
 }
 
-func (partner *Partner) Id() PartnerId {
+func (partner *Partner) Id() partners.Id {
 	return partner.id
 }
 
-func (partner *Partner) Slug() PartnerSlug {
+func (partner *Partner) FromTemplate() partners.Id {
+	return partner.fromTemplate
+}
+
+func (partner *Partner) Slug() partners.Slug {
 	return partner.slug
 }
 
-func (partner *Partner) SetSlug(s PartnerSlug) {
+func (partner *Partner) SetSlug(s partners.Slug) {
 	partner.slug = s
 }
 
@@ -191,7 +170,7 @@ func (partner *Partner) SIRILiteClient() *remote.SIRILiteClient {
 	return partner.HTTPClient().SIRILiteClient()
 }
 
-func (partner *Partner) OperationnalStatus() OperationnalStatus {
+func (partner *Partner) OperationnalStatus() partners.OperationnalStatus {
 	return partner.PartnerStatus.OperationnalStatus
 }
 
@@ -201,9 +180,10 @@ func (partner *Partner) Save() (ok bool) {
 
 func (partner *Partner) MarshalJSON() ([]byte, error) {
 	type Alias Partner
-	return json.Marshal(&struct {
-		Id   PartnerId
-		Slug PartnerSlug
+	p := &struct {
+		Id           partners.Id
+		FromTemplate partners.Id `json:",omitempty"`
+		Slug         partners.Slug
 		*Alias
 		Settings map[string]string
 	}{
@@ -211,7 +191,12 @@ func (partner *Partner) MarshalJSON() ([]byte, error) {
 		Slug:     partner.slug,
 		Settings: partner.SettingsDefinition(),
 		Alias:    (*Alias)(partner),
-	})
+	}
+	if partner.fromTemplate != "" {
+		p.FromTemplate = partner.fromTemplate
+	}
+
+	return json.Marshal(p)
 }
 
 func (partner *Partner) Definition() *APIPartner {
@@ -245,7 +230,7 @@ func (partner *Partner) Start() {
 	partner.startedAt = partner.manager.Referential().Clock().Now()
 	partner.lastDiscovery = time.Time{}
 	partner.alternativeStatusCheck.LastCheck = time.Time{}
-	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
+	partner.alternativeStatusCheck.Status = partners.OperationnalStatusUnknown
 
 	for _, connector := range partner.connectors {
 		c, ok := connector.(state.Startable)
@@ -389,7 +374,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, apiPartner.Settings)
 
 	partner.ConnectorTypes = apiPartner.ConnectorTypes
-	partner.PartnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+	partner.PartnerStatus.OperationnalStatus = partners.OperationnalStatusUnknown
 
 	for id, factory := range apiPartner.factories {
 		if _, ok := partner.connectors[id]; !ok {
@@ -638,9 +623,9 @@ func (partner *Partner) alternativeStatusConnector() string {
 	return "none"
 }
 
-func (partner *Partner) CheckStatus() (PartnerStatus, error) {
+func (partner *Partner) CheckStatus() (partners.Status, error) {
 	logger.Log.Debugf("Check '%s' partner status", partner.slug)
-	partnerStatus := PartnerStatus{}
+	partnerStatus := partners.Status{}
 
 	if partner.CheckStatusClient() == nil {
 		switch partner.alternativeStatusConnector() {
@@ -650,7 +635,7 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 			return partner.checkGtfsStatus()
 		default:
 			logger.Log.Debugf("Can't define Status for partner %v", partner.slug)
-			partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UNKNOWN
+			partnerStatus.OperationnalStatus = partners.OperationnalStatusUnknown
 			return partnerStatus, errors.New("no way to define status")
 		}
 	}
@@ -663,21 +648,21 @@ func (partner *Partner) CheckStatus() (PartnerStatus, error) {
 	return partnerStatus, nil
 }
 
-func (partner *Partner) checkPushStatus() (partnerStatus PartnerStatus, _ error) {
+func (partner *Partner) checkPushStatus() (partnerStatus partners.Status, _ error) {
 	logger.Log.Debugf("Checking %v partner status with PushNotifications", partner.slug)
 	if partner.alternativeStatusCheck.LastCheck.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+		partnerStatus.OperationnalStatus = partners.OperationnalStatusDown
 	} else {
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
+		partnerStatus.OperationnalStatus = partners.OperationnalStatusUp
 	}
 	logger.Log.Debugf("Partner %v status is %v", partner.slug, partnerStatus.OperationnalStatus)
 	return partnerStatus, nil
 }
 
-func (partner *Partner) checkGtfsStatus() (partnerStatus PartnerStatus, _ error) {
+func (partner *Partner) checkGtfsStatus() (partnerStatus partners.Status, _ error) {
 	logger.Log.Debugf("Checking %v partner status with Gtfs collect", partner.slug)
 	if partner.alternativeStatusCheck.LastCheck.Before(partner.manager.Referential().Clock().Now().Add(-5 * time.Minute)) {
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+		partnerStatus.OperationnalStatus = partners.OperationnalStatusDown
 	} else {
 		partnerStatus.OperationnalStatus = partner.alternativeStatusCheck.Status
 	}
@@ -735,7 +720,7 @@ func (partner *Partner) Pushed() {
 	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
 }
 
-func (partner *Partner) GtfsStatus(s OperationnalStatus) {
+func (partner *Partner) GtfsStatus(s partners.OperationnalStatus) {
 	partner.alternativeStatusCheck.LastCheck = partner.manager.Referential().Clock().Now()
 	partner.alternativeStatusCheck.Status = s
 }
@@ -771,8 +756,9 @@ func (partner *Partner) RegisterDiscoveredLines(lines []string) {
 func NewPartnerManager(referential *Referential) *PartnerManager {
 	manager := &PartnerManager{
 		mutex:                 &sync.RWMutex{},
-		byId:                  make(map[PartnerId]*Partner),
-		localCredentialsIndex: NewLocalCredentialsIndex(),
+		byId:                  make(map[partners.Id]*Partner),
+		byTemplate:            partners.NewByTemplateIndex(),
+		localCredentialsIndex: partners.NewLocalCredentialsIndex(),
 		referential:           referential,
 	}
 	manager.guardian = NewPartnersGuardian(referential)
@@ -783,7 +769,7 @@ func (manager *PartnerManager) Guardian() *PartnersGuardian {
 	return manager.guardian
 }
 
-func (manager *PartnerManager) UniqSlug(modelId PartnerId, slug PartnerSlug) bool {
+func (manager *PartnerManager) UniqSlug(modelId partners.Id, slug partners.Slug) bool {
 	manager.mutex.RLock()
 	for _, partner := range manager.byId {
 		if partner.slug == slug && partner.id != modelId {
@@ -797,7 +783,7 @@ func (manager *PartnerManager) UniqSlug(modelId PartnerId, slug PartnerSlug) boo
 
 }
 
-func (manager *PartnerManager) UniqCredentials(modelId PartnerId, localCredentials string, _ ...string) bool {
+func (manager *PartnerManager) UniqCredentials(modelId partners.Id, localCredentials string, _ ...string) bool {
 	return manager.localCredentialsIndex.UniqCredentials(modelId, localCredentials)
 }
 
@@ -815,7 +801,7 @@ func (manager *PartnerManager) Stop() {
 	}
 }
 
-func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
+func (manager *PartnerManager) New(slug partners.Slug) *Partner {
 	partner := &Partner{
 		mutex:               &sync.RWMutex{},
 		slug:                slug,
@@ -823,8 +809,8 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
 		discoveredLines:     make(map[string]struct{}),
-		PartnerStatus: PartnerStatus{
-			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		PartnerStatus: partners.Status{
+			OperationnalStatus: partners.OperationnalStatusUnknown,
 		},
 		ConnectorTypes: []string{},
 		gtfsCache:      cache.NewCacheTable(),
@@ -839,15 +825,15 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 func (manager *PartnerManager) NewFromTemplate(pt *PartnerTemplate, match, requestorRef, requestURL string) *Partner {
 	partner := &Partner{
 		mutex:               &sync.RWMutex{},
-		FromTemplate:        pt.id,
+		fromTemplate:        pt.id,
 		manager:             manager,
-		slug:                PartnerSlug(fmt.Sprintf("%s-%s", pt.Slug, match)),
+		slug:                partners.Slug(fmt.Sprintf("%s-%s", pt.Slug, match)),
 		Name:                fmt.Sprintf("%s %s", pt.Name, match),
 		connectors:          make(map[string]Connector),
 		discoveredStopAreas: make(map[string]struct{}),
 		discoveredLines:     make(map[string]struct{}),
-		PartnerStatus: PartnerStatus{
-			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		PartnerStatus: partners.Status{
+			OperationnalStatus: partners.OperationnalStatusUnknown,
 		},
 		ConnectorTypes: pt.ConnectorTypes,
 		gtfsCache:      cache.NewCacheTable(),
@@ -864,21 +850,21 @@ func (manager *PartnerManager) NewFromTemplate(pt *PartnerTemplate, match, reque
 }
 
 func (manager *PartnerManager) MarshalJSON() ([]byte, error) {
-	partnersId := []PartnerId{}
+	partnersId := []partners.Id{}
 	for id := range manager.byId {
 		partnersId = append(partnersId, id)
 	}
 	return json.Marshal(partnersId)
 }
 
-func (manager *PartnerManager) Find(id PartnerId) *Partner {
+func (manager *PartnerManager) Find(id partners.Id) *Partner {
 	manager.mutex.RLock()
 	partner := manager.byId[id]
 	manager.mutex.RUnlock()
 	return partner
 }
 
-func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
+func (manager *PartnerManager) FindBySlug(slug partners.Slug) (*Partner, bool) {
 	manager.mutex.RLock()
 	for _, partner := range manager.byId {
 		if partner.slug == slug {
@@ -953,12 +939,13 @@ func (manager *PartnerManager) FindAllWithConnector(connectorTypes []string) (pa
 
 func (manager *PartnerManager) Save(partner *Partner) bool {
 	if partner.id == "" {
-		partner.id = PartnerId(manager.NewUUID())
+		partner.id = partners.Id(manager.NewUUID())
 	}
 	partner.manager = manager
 
 	manager.mutex.Lock()
 	manager.byId[partner.id] = partner
+	manager.byTemplate.Index(partner)
 	manager.localCredentialsIndex.Index(partner.id, partner.Credentials())
 	manager.mutex.Unlock()
 
@@ -967,6 +954,7 @@ func (manager *PartnerManager) Save(partner *Partner) bool {
 
 func (manager *PartnerManager) Delete(partner *Partner) bool {
 	manager.mutex.Lock()
+	manager.byTemplate.Delete(partner.id)
 	manager.localCredentialsIndex.Delete(partner.id)
 	delete(manager.byId, partner.id)
 	manager.mutex.Unlock()
@@ -974,14 +962,15 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 	return true
 }
 
-func (manager *PartnerManager) DeleteFromTemplate(id PartnerId) {
+func (manager *PartnerManager) DeleteFromTemplate(id partners.Id) {
 	manager.mutex.Lock()
 
-	for _, partner := range manager.byId {
-		if partner.FromTemplate == id {
-			manager.localCredentialsIndex.Delete(partner.id)
-			delete(manager.byId, partner.id)
-		}
+	ids := manager.byTemplate.Find(id)
+
+	for i := range ids {
+		manager.byTemplate.Delete(ids[i])
+		manager.localCredentialsIndex.Delete(ids[i])
+		delete(manager.byId, ids[i])
 	}
 
 	manager.mutex.Unlock()
@@ -991,7 +980,8 @@ func (manager *PartnerManager) DeleteAllFromTemplate() {
 	manager.mutex.Lock()
 
 	for _, partner := range manager.byId {
-		if partner.FromTemplate != "" {
+		if partner.fromTemplate != "" {
+			manager.byTemplate.Delete(partner.id)
 			manager.localCredentialsIndex.Delete(partner.id)
 			delete(manager.byId, partner.id)
 		}
@@ -1028,8 +1018,8 @@ func (manager *PartnerManager) Load() error {
 		return err
 	}
 	for _, p := range selectPartners {
-		partner := manager.New(PartnerSlug(p.Slug))
-		partner.id = PartnerId(p.Id)
+		partner := manager.New(partners.Slug(p.Slug))
+		partner.id = partners.Id(p.Id)
 		if p.Name.Valid {
 			partner.Name = p.Name.String
 		}

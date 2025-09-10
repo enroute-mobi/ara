@@ -10,6 +10,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/core"
+	p "bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/stretchr/testify/assert"
@@ -306,7 +307,7 @@ func Test_ReferentialController_Reload(t *testing.T) {
 		ReferentialSlug: "referential",
 		ModelName:       "1984-04-04",
 		Name:            "stopArea",
-		Codes:       `{"internal":"value"}`,
+		Codes:           `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
 		Attributes:      "{}",
 		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
@@ -408,5 +409,5 @@ func Test_ReferentialController_Reload_Partner(t *testing.T) {
 	// Test Results
 	partners = referential.Partners().FindAll()
 	assert.Len(partners, 1, "Partners must be loaded after a referential is reloaded")
-	assert.Equal(partners[0].Id(), core.PartnerId("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
+	assert.Equal(partners[0].Id(), p.Id("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11"))
 }

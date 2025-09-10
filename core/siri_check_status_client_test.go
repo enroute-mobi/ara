@@ -7,11 +7,12 @@ import (
 	"os"
 	"testing"
 
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareSiriCheckStatusClient(t *testing.T, responseFilePath string) (PartnerStatus, error) {
+func prepareSiriCheckStatusClient(t *testing.T, responseFilePath string) (partners.Status, error) {
 	// Create a test http server
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.ContentLength <= 0 {
@@ -46,7 +47,7 @@ func Test_SIRICheckStatusClient_Status_OK(t *testing.T) {
 	partnerStatus, err := prepareSiriCheckStatusClient(t, "testdata/checkstatus-response-soap.xml")
 
 	assert.Nil(err)
-	assert.Equal(partnerStatus.OperationnalStatus, OPERATIONNAL_STATUS_UP)
+	assert.Equal(partnerStatus.OperationnalStatus, partners.OperationnalStatusUp)
 }
 
 func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
@@ -54,7 +55,7 @@ func Test_SIRICheckStatusClient_Status_KO(t *testing.T) {
 	partnerStatus, err := prepareSiriCheckStatusClient(t, "testdata/checkstatus-negative-response-soap.xml")
 
 	assert.Nil(err)
-	assert.Equal(partnerStatus.OperationnalStatus, OPERATIONNAL_STATUS_DOWN)
+	assert.Equal(partnerStatus.OperationnalStatus, partners.OperationnalStatusDown)
 }
 
 func Test_SIRICheckStatusClient_Status_Not_Successful(t *testing.T) {
@@ -62,7 +63,7 @@ func Test_SIRICheckStatusClient_Status_Not_Successful(t *testing.T) {
 	partnerStatus, err := prepareSiriCheckStatusClient(t, "testdata/checkstatus-500.html")
 
 	assert.Error(err, "SIRI CRITICAL: HTTP Content-Type text/html; charset=utf-8")
-	assert.Equal(partnerStatus.OperationnalStatus, OPERATIONNAL_STATUS_DOWN)
+	assert.Equal(partnerStatus.OperationnalStatus, partners.OperationnalStatusDown)
 }
 
 func Test_SIRICheckStatusClientFactory_Validate(t *testing.T) {

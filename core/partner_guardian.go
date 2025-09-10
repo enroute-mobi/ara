@@ -5,6 +5,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"cloud.google.com/go/civil"
@@ -82,15 +83,15 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	partnerStatus, _ := partner.CheckStatus()
 
 	// Do nothing if partner status is unknown
-	if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UNKNOWN && partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN && partner.PartnerStatus.RetryCount < partner.MaximumChechstatusRetry() {
+	if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUnknown && partnerStatus.OperationnalStatus == partners.OperationnalStatusUnknown && partner.PartnerStatus.RetryCount < partner.MaximumChechstatusRetry() {
 		partner.PartnerStatus.RetryCount += 1
 		logger.Log.Debugf("Unknow Status, %v retry", partner.PartnerStatus.RetryCount)
-		return partner.PartnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP
+		return partner.PartnerStatus.OperationnalStatus == partners.OperationnalStatusUp
 	}
 
 	if partnerStatus.OperationnalStatus != partner.PartnerStatus.OperationnalStatus {
 		logger.Log.Debugf("Partner %v status changed after a CheckStatus: was %v, now is %v", partner.Slug(), partner.PartnerStatus.OperationnalStatus, partnerStatus.OperationnalStatus)
-		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP)
+		guardian.referential.CollectManager().HandlePartnerStatusChange(string(partner.Slug()), partnerStatus.OperationnalStatus == partners.OperationnalStatusUp)
 		partnerEvent := &audit.BigQueryPartnerEvent{
 			Timestamp:                guardian.Clock().Now(),
 			Slug:                     string(partner.Slug()),
@@ -104,14 +105,14 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 		audit.CurrentBigQuery(string(guardian.referential.Slug())).WriteEvent(partnerEvent)
 	}
 
-	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UP && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
+	if partnerStatus.OperationnalStatus == partners.OperationnalStatusUp && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
 		partner.PartnerStatus = partnerStatus
 		partner.Subscriptions().CancelSubscriptionsResourcesBefore(partnerStatus.ServiceStartedAt)
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner reloaded
 		return false
 	}
 
-	if partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_UNKNOWN || partnerStatus.OperationnalStatus == OPERATIONNAL_STATUS_DOWN {
+	if partnerStatus.OperationnalStatus == partners.OperationnalStatusUnknown || partnerStatus.OperationnalStatus == partners.OperationnalStatusDown {
 		partner.PartnerStatus.OperationnalStatus = partnerStatus.OperationnalStatus
 		partner.PartnerStatus.RetryCount = 0
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner is down
@@ -153,7 +154,7 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 }
 
 func (guardian *PartnersGuardian) checkPartnerDiscovery(partner *Partner) {
-	if partner.OperationnalStatus() != OPERATIONNAL_STATUS_UP {
+	if partner.OperationnalStatus() != partners.OperationnalStatusUp {
 		return
 	}
 

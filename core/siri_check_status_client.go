@@ -4,18 +4,19 @@ import (
 	"fmt"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type CheckStatusClient interface {
-	Status() (PartnerStatus, error)
+	Status() (partners.Status, error)
 }
 
 type TestCheckStatusClient struct {
 	connector
 
-	partnerStatus PartnerStatus
+	partnerStatus partners.Status
 	Done          chan bool
 }
 
@@ -29,20 +30,20 @@ type SIRICheckStatusClientFactory struct{}
 
 func NewTestCheckStatusClient() *TestCheckStatusClient {
 	return &TestCheckStatusClient{
-		partnerStatus: PartnerStatus{
-			OperationnalStatus: OPERATIONNAL_STATUS_UP,
+		partnerStatus: partners.Status{
+			OperationnalStatus: partners.OperationnalStatusUp,
 		},
 		Done: make(chan bool, 1),
 	}
 }
 
-func (connector *TestCheckStatusClient) Status() (PartnerStatus, error) {
+func (connector *TestCheckStatusClient) Status() (partners.Status, error) {
 	connector.Done <- true
 
 	return connector.partnerStatus, nil
 }
 
-func (connector *TestCheckStatusClient) SetStatus(status OperationnalStatus) {
+func (connector *TestCheckStatusClient) SetStatus(status partners.OperationnalStatus) {
 	connector.partnerStatus.OperationnalStatus = status
 }
 
@@ -58,13 +59,13 @@ func NewSIRICheckStatusClient(partner *Partner) *SIRICheckStatusClient {
 	return siriCheckStatusClient
 }
 
-func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
+func (connector *SIRICheckStatusClient) Status() (partners.Status, error) {
 	message := connector.newBQEvent()
 	defer audit.CurrentBigQuery(string(connector.Partner().Referential().Slug())).WriteEvent(message)
 
 	startTime := connector.Clock().Now()
 
-	partnerStatus := PartnerStatus{}
+	partnerStatus := partners.Status{}
 	request := &siri.SIRICheckStatusRequest{
 		RequestorRef:      connector.Partner().RequestorRef(),
 		RequestTimestamp:  startTime,
@@ -79,7 +80,7 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 		e := fmt.Sprintf("Error during CheckStatus: %v", err)
 		message.Status = "Error"
 		message.ErrorDetails = e
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+		partnerStatus.OperationnalStatus = partners.OperationnalStatusDown
 		return partnerStatus, err
 	}
 
@@ -87,10 +88,10 @@ func (connector *SIRICheckStatusClient) Status() (PartnerStatus, error) {
 
 	partnerStatus.ServiceStartedAt = response.ServiceStartedTime()
 	if response.Status() {
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_UP
+		partnerStatus.OperationnalStatus = partners.OperationnalStatusUp
 		return partnerStatus, nil
 	} else {
-		partnerStatus.OperationnalStatus = OPERATIONNAL_STATUS_DOWN
+		partnerStatus.OperationnalStatus = partners.OperationnalStatusDown
 		return partnerStatus, nil
 	}
 }

@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/monitoring"
 )
@@ -88,11 +89,11 @@ func (controller *PartnerController) SubscriptionsCreate(response http.ResponseW
 }
 
 func (controller *PartnerController) findPartner(identifier string) *core.Partner {
-	partner, ok := controller.referential.Partners().FindBySlug(core.PartnerSlug(identifier))
+	partner, ok := controller.referential.Partners().FindBySlug(partners.Slug(identifier))
 	if ok {
 		return partner
 	}
-	return controller.referential.Partners().Find(core.PartnerId(identifier))
+	return controller.referential.Partners().Find(partners.Id(identifier))
 }
 
 func (controller *PartnerController) Index(response http.ResponseWriter, _params url.Values) {
@@ -135,7 +136,7 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 		return
 	}
 
-	if partner.FromTemplate != "" {
+	if partner.FromTemplate() != "" {
 		http.Error(response, fmt.Sprintf("Can't update partner %s, created from template", identifier), http.StatusBadRequest)
 		return
 	}

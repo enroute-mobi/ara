@@ -2,6 +2,7 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -211,7 +212,7 @@ type TestValidationConnector struct {
 }
 
 func (factory *TestValidationFactory) Validate(apiPartner *APIPartner) {
-	if apiPartner.Slug == PartnerSlug("invalid_slug") {
+	if apiPartner.Slug == partners.Slug("invalid_slug") {
 		apiPartner.Errors.Add("slug", "Invalid format")
 	}
 }

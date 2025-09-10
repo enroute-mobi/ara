@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	p "bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
@@ -32,7 +33,7 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusUp {
 			t.Errorf("Partner OperationnalStatus should be UP when guardian is running, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
@@ -40,12 +41,12 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 	}
 
 	// Test a change in status
-	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(OPERATIONNAL_STATUS_DOWN)
+	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(p.OperationnalStatusDown)
 	fakeClock.Advance(31 * time.Second)
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusDown {
 			t.Errorf("Partner OperationnalStatus should be DOWN when guardian is running, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
@@ -80,7 +81,7 @@ func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusUp {
 			t.Errorf("Partner OperationnalStatus should be UP when guardian is running, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
@@ -88,12 +89,12 @@ func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
 	}
 
 	// Test a change in status
-	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(OPERATIONNAL_STATUS_UNKNOWN)
+	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(p.OperationnalStatusUnknown)
 	fakeClock.Advance(31 * time.Second)
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusUp {
 			t.Errorf("Partner OperationnalStatus should still be UP, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
@@ -104,43 +105,43 @@ func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UNKNOWN {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusUnknown {
 			t.Errorf("Partner OperationnalStatus should still be UNKNOWN, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
 		t.Errorf("Guardian CheckPartnerStatus with TestCheckStatusClient timed out")
 	}
 
-	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(OPERATIONNAL_STATUS_DOWN)
+	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(p.OperationnalStatusDown)
 	fakeClock.Advance(31 * time.Second)
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusDown {
 			t.Errorf("Partner OperationnalStatus should still be UP, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
 		t.Errorf("Guardian CheckPartnerStatus with TestCheckStatusClient timed out")
 	}
 
-	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(OPERATIONNAL_STATUS_UNKNOWN)
+	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(p.OperationnalStatusUnknown)
 	fakeClock.Advance(31 * time.Second)
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_DOWN {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusDown {
 			t.Errorf("Partner OperationnalStatus should still be UP, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):
 		t.Errorf("Guardian CheckPartnerStatus with TestCheckStatusClient timed out")
 	}
 
-	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(OPERATIONNAL_STATUS_UP)
+	partner.CheckStatusClient().(*TestCheckStatusClient).SetStatus(p.OperationnalStatusUp)
 	fakeClock.Advance(31 * time.Second)
 	select {
 	case <-partner.CheckStatusClient().(*TestCheckStatusClient).Done:
 		time.Sleep(42 * time.Millisecond) // Wait a bit for partner to change status
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != p.OperationnalStatusUp {
 			t.Errorf("Partner OperationnalStatus should still be UP, got: %v", partner.PartnerStatus.OperationnalStatus)
 		}
 	case <-time.After(5 * time.Second):

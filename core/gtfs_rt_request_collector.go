@@ -2,6 +2,7 @@ package core
 
 import (
 	"bitbucket.org/enroute-mobi/ara/audit"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -117,7 +118,7 @@ func (connector *GtfsRequestCollector) requestGtfs() {
 
 	// Broadcast all events
 	connector.broadcastUpdateEvents(updateEvents)
-	connector.Partner().GtfsStatus(OPERATIONNAL_STATUS_UP)
+	connector.Partner().GtfsStatus(partners.OperationnalStatusUp)
 }
 
 func (connector *GtfsRequestCollector) handleAlert(events *CollectUpdateEvents, a *gtfs.Alert, id string, timestamp uint64) {
@@ -386,11 +387,11 @@ func (connector *GtfsRequestCollector) broadcastUpdateEvents(events *CollectUpda
 	}
 }
 
-func operationnalStatusFromError(err error) OperationnalStatus {
+func operationnalStatusFromError(err error) partners.OperationnalStatus {
 	if _, ok := err.(remote.GtfsError); ok {
-		return OPERATIONNAL_STATUS_DOWN
+		return partners.OperationnalStatusDown
 	}
-	return OPERATIONNAL_STATUS_UNKNOWN
+	return partners.OperationnalStatusUnknown
 }
 
 func occupancyName(occupancy *gtfs.VehiclePosition_OccupancyStatus) string {

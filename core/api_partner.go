@@ -5,19 +5,20 @@ import (
 	"fmt"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
 type APIPartner struct {
-	Id             PartnerId `json:"Id,omitempty"`
-	Slug           PartnerSlug
+	Id             partners.Id `json:"Id,omitempty"`
+	Slug           partners.Slug
 	Name           string            `json:"Name,omitempty"`
 	Settings       map[string]string `json:"Settings,omitempty"`
 	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
 	Errors         e.Errors          `json:"Errors,omitempty"`
 
 	factories map[string]ConnectorFactory
-	manager   SlugAndCredentialsHandler
+	manager   partners.SlugAndCredentialsHandler
 }
 
 func (partner *APIPartner) Validate() bool {

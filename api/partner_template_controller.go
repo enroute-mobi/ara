@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"bitbucket.org/enroute-mobi/ara/core"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 )
 
 type PartnerTemplateController struct {
@@ -20,11 +21,11 @@ func NewPartnerTemplateController(referential *core.Referential) RestfulResource
 }
 
 func (controller *PartnerTemplateController) findPartnerTemplate(identifier string) *core.PartnerTemplate {
-	pt := controller.referential.PartnerTemplates().FindBySlug(core.PartnerSlug(identifier))
+	pt := controller.referential.PartnerTemplates().FindBySlug(partners.Slug(identifier))
 	if pt != nil {
 		return pt
 	}
-	return controller.referential.PartnerTemplates().Find(core.PartnerId(identifier))
+	return controller.referential.PartnerTemplates().Find(partners.Id(identifier))
 }
 
 func (controller *PartnerTemplateController) Index(response http.ResponseWriter, _params url.Values) {

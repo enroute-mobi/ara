@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
+	p "bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -26,7 +28,7 @@ func Test_Partner_Id(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 
-	if expected := PartnerId("6ba7b814-9dad-11d1-0-00c04fd430c8"); partner.Id() != expected {
+	if expected := p.Id("6ba7b814-9dad-11d1-0-00c04fd430c8"); partner.Id() != expected {
 		t.Errorf("Partner.Id() returns wrong value, got: %s, required: %s", partner.Id(), expected)
 	}
 }
@@ -36,7 +38,7 @@ func Test_Partner_Slug(t *testing.T) {
 		slug: "partner",
 	}
 
-	if expected := PartnerSlug("partner"); partner.Slug() != expected {
+	if expected := p.Slug("partner"); partner.Slug() != expected {
 		t.Errorf("Partner.Slug() returns wrong value, got: %s, required: %s", partner.Id(), expected)
 	}
 }
@@ -44,7 +46,7 @@ func Test_Partner_Slug(t *testing.T) {
 func Test_Partner_OperationnalStatus(t *testing.T) {
 	partner := NewPartner()
 
-	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.PartnerStatus.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusUnknown; partner.PartnerStatus.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
@@ -73,7 +75,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_DOWN; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusDown; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 
@@ -84,7 +86,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_UP; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusUp; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
@@ -114,19 +116,19 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_DOWN; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusDown; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 
 	// Push collector but recent collect
 	partner.alternativeStatusCheck.LastCheck = clock.DefaultClock().Now()
-	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
+	partner.alternativeStatusCheck.Status = p.OperationnalStatusUnknown
 
 	ps, err = partner.CheckStatus()
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_UNKNOWN; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusUnknown; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
@@ -182,8 +184,8 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := &Partner{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		PartnerStatus: PartnerStatus{
-			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		PartnerStatus: partners.Status{
+			OperationnalStatus: p.OperationnalStatusUnknown,
 		},
 		slug:           "partner",
 		ConnectorTypes: []string{},
@@ -818,7 +820,7 @@ func Test_PartnerManager_FindAll(t *testing.T) {
 	partners := createTestPartnerManager()
 
 	for i := 0; i < 5; i++ {
-		existingPartner := partners.New(PartnerSlug(strconv.Itoa(i)))
+		existingPartner := partners.New(p.Slug(strconv.Itoa(i)))
 		partners.Save(existingPartner)
 	}
 
@@ -874,7 +876,7 @@ func Test_MemoryPartners_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	partnerId := PartnerId(dbPartner.Id)
+	partnerId := p.Id(dbPartner.Id)
 	partner := partners.Find(partnerId)
 	if partner == nil {
 		t.Errorf("Loaded Partners should be found")

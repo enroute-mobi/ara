@@ -1,6 +1,8 @@
-package core
+package partners
 
-import "testing"
+import (
+	"testing"
+)
 
 func Test_LocalCredentialsIndex_Simple(t *testing.T) {
 	index := NewLocalCredentialsIndex()
@@ -95,10 +97,10 @@ func Test_LocalCredentialsIndex_EmptyString(t *testing.T) {
 	if !ok {
 		t.Error("Can't find after index: ", index)
 	}
-	if !index.UniqCredentials(PartnerId("id"), "") {
+	if !index.UniqCredentials(Id("id"), "") {
 		t.Error("Empty string should return true to uniq for the same id: ", index)
 	}
-	if index.UniqCredentials(PartnerId("id2"), "") {
+	if index.UniqCredentials(Id("id2"), "") {
 		t.Error("Empty string should return false to uniq for another id: ", index)
 	}
 
@@ -111,7 +113,7 @@ func Test_LocalCredentialsIndex_EmptyString(t *testing.T) {
 	if !ok {
 		t.Error("Credential should be found after modification: ", index)
 	}
-	if !index.UniqCredentials(PartnerId("id"), "") || !index.UniqCredentials(PartnerId("id2"), "") {
+	if !index.UniqCredentials(Id("id"), "") || !index.UniqCredentials(Id("id2"), "") {
 		t.Error("Empty string should return true to uniq: ", index)
 	}
 
@@ -124,10 +126,10 @@ func Test_LocalCredentialsIndex_EmptyString(t *testing.T) {
 	if ok {
 		t.Error("Credential shouldn't be found after modification: ", index)
 	}
-	if !index.UniqCredentials(PartnerId("id"), "") {
+	if !index.UniqCredentials(Id("id"), "") {
 		t.Error("Empty string should return true to uniq for the same id: ", index)
 	}
-	if index.UniqCredentials(PartnerId("id2"), "") {
+	if index.UniqCredentials(Id("id2"), "") {
 		t.Error("Empty string should return false to uniq for another id: ", index)
 	}
 }
