@@ -135,6 +135,11 @@ func (controller *PartnerController) Update(response http.ResponseWriter, identi
 		return
 	}
 
+	if partner.FromTemplate != "" {
+		http.Error(response, fmt.Sprintf("Can't update partner %s, created from template", identifier), http.StatusBadRequest)
+		return
+	}
+
 	logger.Log.Debugf("Update partner %s: %s", identifier, string(body))
 
 	apiPartner := partner.Definition()

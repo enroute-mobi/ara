@@ -31,7 +31,7 @@ func NewGtfsHandler(referential *core.Referential, token string) *GtfsHandler {
 
 func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Request, resource string) {
 	// Find Partner by authorization Key
-	partner, ok := handler.referential.Partners().FindByCredential(handler.token)
+	partner, ok := handler.referential.Partners().FindByCredential(handler.token, handler.HandleRemoteAddress(request))
 	if !ok {
 		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
 		return

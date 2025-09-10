@@ -31,7 +31,7 @@ func NewGraphqlHandler(referential *core.Referential, token string) *GraphqlHand
 
 func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http.Request) {
 	// Find Partner by authorization Key
-	partner, ok := handler.referential.Partners().FindByCredential(handler.token)
+	partner, ok := handler.referential.Partners().FindByCredential(handler.token, handler.HandleRemoteAddress(request))
 	if !ok {
 		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
 		return

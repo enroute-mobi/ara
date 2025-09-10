@@ -265,6 +265,7 @@ func (referential *Referential) NextReloadAt() time.Time {
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model for referential %v", referential.slug)
 	referential.Stop()
+	referential.partners.DeleteAllFromTemplate()
 	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
 	referential.partners.Load()
@@ -282,7 +283,7 @@ func (referential *Referential) setNextReloadAt() {
 	}
 
 	referential.nextReloadAt = time.Date(now.Year(), now.Month(), day, hour, minute, 0, 0, now.Location())
-	logger.Log.Printf("Next reload at: %v", referential.nextReloadAt)
+	logger.Log.Debugf("Next reload at: %v", referential.nextReloadAt)
 }
 
 func (referential *Referential) Load() {

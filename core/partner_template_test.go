@@ -16,15 +16,16 @@ func createTestPartnerTemplateManager() *PartnerTemplateManager {
 	return NewPartnerTemplateManager(referential)
 }
 
-func TestFindByCredentialRegexp(t *testing.T) {
+func TestFindByCredential(t *testing.T) {
 	assert := assert.New(t)
 
 	m := createTestPartnerTemplateManager()
 	pt := m.New("test")
+	pt.CredentialType = FormatMatching
 
 	okTests := map[string][]string{
-		"%{value}":          []string{"1234", "abcneizp", "ab:12-32"},
-		"test:%{value}:LOC": []string{"test:1234:LOC", "test:test:abcd:LOC"},
+		"%{value}":          []string{"1234", "abcneizp", "ab_A12-32"},
+		"test:%{value}:LOC": []string{"test:1234:LOC", "test:test-abcd:LOC"},
 	}
 
 	for k, s := range okTests {
@@ -33,7 +34,7 @@ func TestFindByCredentialRegexp(t *testing.T) {
 		m.Save(pt)
 
 		for _, v := range s {
-			assert.NotNil(m.FindByCredentialRegexp(v))
+			assert.NotNil(m.FindByCredential(v))
 		}
 	}
 
@@ -48,7 +49,7 @@ func TestFindByCredentialRegexp(t *testing.T) {
 		m.Save(pt)
 
 		for _, v := range s {
-			assert.Nil(m.FindByCredentialRegexp(v))
+			assert.Nil(m.FindByCredential(v))
 		}
 	}
 }
@@ -58,6 +59,7 @@ func TestValidate(t *testing.T) {
 
 	m := createTestPartnerTemplateManager()
 	pt := m.New("test")
+	pt.CredentialType = FormatMatching
 	pt.LocalCredential = "%{value}"
 	pt.RemoteCredential = "%{value}"
 	pt.Save()

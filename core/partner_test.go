@@ -774,7 +774,7 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 	existingPartner.PartnerSettings = s.NewPartnerSettings(existingPartner.UUIDGenerator, settings)
 	partners.Save(existingPartner)
 
-	partner, ok := partners.FindByCredential("cred")
+	partner, ok := partners.FindByCredential("cred", "")
 	if !ok {
 		t.Fatal("FindByCredential should return true when Partner is found")
 	}
@@ -782,7 +782,7 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 		t.Errorf("FindByCredential should return a Partner with the given local_credential")
 	}
 
-	partner, ok = partners.FindByCredential("cred2")
+	partner, ok = partners.FindByCredential("cred2", "")
 	if !ok {
 		t.Fatal("FindByCredential should return true when Partner is found")
 	}
@@ -790,7 +790,7 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 		t.Errorf("FindByCredential should return a Partner with the given local_credential")
 	}
 
-	partner, ok = partners.FindByCredential("cred3")
+	partner, ok = partners.FindByCredential("cred3", "")
 	if !ok {
 		t.Fatal("FindByCredential should return true when Partner is found")
 	}

@@ -39,14 +39,17 @@ type Partners interface {
 	SlugAndCredentialsHandler
 
 	New(PartnerSlug) *Partner
+	NewFromTemplate(*PartnerTemplate, string, string, string) *Partner
 	Find(PartnerId) *Partner
 	FindBySlug(PartnerSlug) (*Partner, bool)
-	FindByCredential(string) (*Partner, bool)
+	FindByCredential(string, string) (*Partner, bool)
 	FindAllByCollectPriority() []*Partner
 	FindAllWithConnector([]string) []*Partner
 	FindAll() []*Partner
-	Save(partner *Partner) bool
-	Delete(partner *Partner) bool
+	Save(*Partner) bool
+	Delete(*Partner) bool
+	DeleteFromTemplate(PartnerId)
+	DeleteAllFromTemplate()
 	Model() model.Model
 	Referential() *Referential
 	IsEmpty() bool
@@ -56,7 +59,7 @@ type Partners interface {
 }
 
 type SlugAndCredentialsHandler interface {
-	UniqCredentials(PartnerId, string) bool
+	UniqCredentials(PartnerId, string, ...string) bool
 	UniqSlug(PartnerId, PartnerSlug) bool
 }
 
@@ -82,7 +85,8 @@ type Partner struct {
 
 	id            PartnerId
 	slug          PartnerSlug
-	Name          string `json:",omitempty"`
+	FromTemplate  PartnerId `json:",omitempty"`
+	Name          string    `json:",omitempty"`
 	PartnerStatus PartnerStatus
 
 	ConnectorTypes []string
@@ -396,7 +400,7 @@ func (partner *Partner) SetDefinition(apiPartner *APIPartner) {
 	partner.cleanConnectors()
 }
 
-// Test method, refresh Connector instances according to connector type list without validation
+// Warning: refresh Connector instances according to connector type list without validation
 func (partner *Partner) RefreshConnectors() {
 	logger.Log.Debugf("Initialize Connectors %#v for %s", partner.ConnectorTypes, partner.slug)
 
@@ -793,7 +797,7 @@ func (manager *PartnerManager) UniqSlug(modelId PartnerId, slug PartnerSlug) boo
 
 }
 
-func (manager *PartnerManager) UniqCredentials(modelId PartnerId, localCredentials string) bool {
+func (manager *PartnerManager) UniqCredentials(modelId PartnerId, localCredentials string, _ ...string) bool {
 	return manager.localCredentialsIndex.UniqCredentials(modelId, localCredentials)
 }
 
@@ -832,6 +836,33 @@ func (manager *PartnerManager) New(slug PartnerSlug) *Partner {
 	return partner
 }
 
+func (manager *PartnerManager) NewFromTemplate(pt *PartnerTemplate, match, requestorRef, requestURL string) *Partner {
+	partner := &Partner{
+		mutex:               &sync.RWMutex{},
+		FromTemplate:        pt.id,
+		manager:             manager,
+		slug:                PartnerSlug(fmt.Sprintf("%s-%s", pt.Slug, match)),
+		Name:                fmt.Sprintf("%s %s", pt.Name, match),
+		connectors:          make(map[string]Connector),
+		discoveredStopAreas: make(map[string]struct{}),
+		discoveredLines:     make(map[string]struct{}),
+		PartnerStatus: PartnerStatus{
+			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		},
+		ConnectorTypes: pt.ConnectorTypes,
+		gtfsCache:      cache.NewCacheTable(),
+		limiters:       make(map[string]*rate.Limiter),
+	}
+	settings := pt.Settings
+	settings[s.LOCAL_CREDENTIAL] = requestorRef
+	settings[s.REMOTE_URL] = requestURL
+	settings[s.REMOTE_CREDENTIAL] = pt.BuildRemoteCredential(match)
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, pt.Settings)
+	partner.SetUUIDGenerator(manager.UUIDGenerator())
+	partner.subscriptionManager = NewMemorySubscriptions(partner)
+	return partner
+}
+
 func (manager *PartnerManager) MarshalJSON() ([]byte, error) {
 	partnersId := []PartnerId{}
 	for id := range manager.byId {
@@ -860,16 +891,38 @@ func (manager *PartnerManager) FindBySlug(slug PartnerSlug) (*Partner, bool) {
 	return nil, false
 }
 
-func (manager *PartnerManager) FindByCredential(c string) (*Partner, bool) {
+func (manager *PartnerManager) FindByCredential(c string, requestURL string) (*Partner, bool) {
 	manager.mutex.RLock()
-	defer manager.mutex.RUnlock()
 
 	id, ok := manager.localCredentialsIndex.Find(c)
-	if !ok {
+	if ok {
+		partner, ok := manager.byId[id]
+		manager.mutex.RUnlock()
+		return partner, ok
+	}
+
+	// Try Partner template
+	pt, m := manager.referential.PartnerTemplates().FindByCredential(c)
+	if pt == nil {
+		manager.mutex.RUnlock()
 		return nil, false
 	}
-	partner, ok := manager.byId[id]
-	return partner, ok
+
+	// Ensure url uniqueness
+	for i := range manager.byId {
+		if urls := manager.byId[i].HTTPClientOptions().Urls; urls.Contains(requestURL) {
+			manager.mutex.RUnlock()
+			return nil, false
+		}
+	}
+	manager.mutex.RUnlock()
+
+	p := manager.NewFromTemplate(pt, m, c, requestURL)
+	p.RefreshConnectors() // Factories should be valid as Template should be valid
+	manager.Save(p)
+	p.Start()
+
+	return p, true
 }
 
 func (manager *PartnerManager) FindAll() (partners []*Partner) {
@@ -919,6 +972,32 @@ func (manager *PartnerManager) Delete(partner *Partner) bool {
 	manager.mutex.Unlock()
 
 	return true
+}
+
+func (manager *PartnerManager) DeleteFromTemplate(id PartnerId) {
+	manager.mutex.Lock()
+
+	for _, partner := range manager.byId {
+		if partner.FromTemplate == id {
+			manager.localCredentialsIndex.Delete(partner.id)
+			delete(manager.byId, partner.id)
+		}
+	}
+
+	manager.mutex.Unlock()
+}
+
+func (manager *PartnerManager) DeleteAllFromTemplate() {
+	manager.mutex.Lock()
+
+	for _, partner := range manager.byId {
+		if partner.FromTemplate != "" {
+			manager.localCredentialsIndex.Delete(partner.id)
+			delete(manager.byId, partner.id)
+		}
+	}
+
+	manager.mutex.Unlock()
 }
 
 func (manager *PartnerManager) Model() model.Model {

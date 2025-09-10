@@ -19,7 +19,7 @@ const (
 
 	valuePattern         = "%{value}"
 	escaptedValuePattern = "%\\{value\\}"
-	valuePatternReplace  = "[0-9a-zA-Z-:_]+"
+	valuePatternReplace  = "([0-9a-zA-Z-_]+)"
 )
 
 type PartnerTemplates interface {
@@ -28,6 +28,8 @@ type PartnerTemplates interface {
 	New(PartnerSlug) *PartnerTemplate
 	Find(PartnerId) *PartnerTemplate
 	FindBySlug(PartnerSlug) *PartnerTemplate
+	FindByRawCredential(string, string) *PartnerTemplate
+	FindByCredential(string) (*PartnerTemplate, string)
 	FindAll() []*PartnerTemplate
 	Save(*PartnerTemplate) bool
 	Delete(*PartnerTemplate) bool
@@ -49,7 +51,7 @@ type PartnerTemplate struct {
 	Settings         map[string]string
 	ConnectorTypes   []string
 
-	Errors e.Errors
+	Errors e.Errors `json:",omitempty"`
 }
 
 type PartnerTemplateManager struct {
@@ -80,10 +82,15 @@ func (pt *PartnerTemplate) Validate() bool {
 		pt.Errors.Add("LocalCredential", e.ERROR_BLANK)
 	} else if !strings.Contains(pt.LocalCredential, valuePattern) {
 		pt.Errors.Add("LocalCredential", e.ERROR_FORMAT)
-	} else if err := pt.CompileLocalCredentials(); err != nil {
-		pt.Errors.Add("LocalCredential", e.ERROR_FORMAT)
-	} else if !pt.ValidateCredentials() {
+	} else if !pt.UniqCredentials() {
 		pt.Errors.Add("LocalCredential", e.ERROR_UNIQUE)
+	} else {
+		switch pt.CredentialType {
+		case FormatMatching:
+			if err := pt.CompileLocalCredentials(); err != nil {
+				pt.Errors.Add("LocalCredential", e.ERROR_FORMAT)
+			}
+		}
 	}
 
 	if pt.RemoteCredential == "" {
@@ -122,8 +129,12 @@ func (pt *PartnerTemplate) CompileLocalCredentials() (err error) {
 	return
 }
 
-func (pt *PartnerTemplate) ValidateCredentials() bool {
-	return pt.manager.UniqCredentials(pt.id, pt.LocalCredential)
+func (pt *PartnerTemplate) BuildRemoteCredential(m string) string {
+	return strings.Replace(pt.RemoteCredential, valuePattern, m, -1)
+}
+
+func (pt *PartnerTemplate) UniqCredentials() bool {
+	return pt.manager.UniqCredentials(pt.id, pt.LocalCredential, pt.CredentialType)
 }
 
 func (pt *PartnerTemplate) Copy() (copy *PartnerTemplate) {
@@ -176,8 +187,8 @@ func (manager *PartnerTemplateManager) UniqSlug(id PartnerId, s PartnerSlug) boo
 
 }
 
-func (manager *PartnerTemplateManager) UniqCredentials(id PartnerId, c string) bool {
-	pt := manager.FindByCredential(c)
+func (manager *PartnerTemplateManager) UniqCredentials(id PartnerId, c string, params ...string) bool {
+	pt := manager.FindByRawCredential(c, params[0]) // params = CredentialType
 
 	if pt != nil && pt.id != id {
 		return false
@@ -209,10 +220,10 @@ func (manager *PartnerTemplateManager) Find(id PartnerId) (partner *PartnerTempl
 	return
 }
 
-func (manager *PartnerTemplateManager) FindByCredential(c string) (pt *PartnerTemplate) {
+func (manager *PartnerTemplateManager) FindByRawCredential(c, ct string) (pt *PartnerTemplate) {
 	manager.mutex.RLock()
 	for k := range manager.byId {
-		if manager.byId[k].LocalCredential == c {
+		if manager.byId[k].LocalCredential == c && manager.byId[k].CredentialType == ct {
 			pt = manager.byId[k]
 			manager.mutex.RUnlock()
 			return
@@ -223,13 +234,17 @@ func (manager *PartnerTemplateManager) FindByCredential(c string) (pt *PartnerTe
 	return
 }
 
-func (manager *PartnerTemplateManager) FindByCredentialRegexp(c string) (pt *PartnerTemplate) {
+func (manager *PartnerTemplateManager) FindByCredential(c string) (pt *PartnerTemplate, match string) {
 	manager.mutex.RLock()
 	for k := range manager.byId {
-		if r := manager.byId[k].credentialRegexp.FindStringIndex(c); r != nil {
-			pt = manager.byId[k]
-			manager.mutex.RUnlock()
-			return
+		switch manager.byId[k].CredentialType {
+		case FormatMatching:
+			if r := manager.byId[k].credentialRegexp.FindStringSubmatch(c); r != nil {
+				pt = manager.byId[k]
+				manager.mutex.RUnlock()
+				match = r[1]
+				return
+			}
 		}
 	}
 
@@ -275,6 +290,8 @@ func (manager *PartnerTemplateManager) Save(pt *PartnerTemplate) bool {
 }
 
 func (manager *PartnerTemplateManager) Delete(pt *PartnerTemplate) bool {
+	manager.referential.Partners().DeleteFromTemplate(pt.id)
+
 	manager.mutex.Lock()
 	delete(manager.byId, pt.id)
 	manager.mutex.Unlock()

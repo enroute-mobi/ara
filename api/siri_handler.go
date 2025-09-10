@@ -223,7 +223,7 @@ func (handler *SIRIHandler) serve(response http.ResponseWriter, request *http.Re
 		}.Send()
 		return
 	}
-	partner, ok := handler.referential.Partners().FindByCredential(requestHandler.RequestorRef())
+	partner, ok := handler.referential.Partners().FindByCredential(requestHandler.RequestorRef(), handler.HandleRemoteAddress(request))
 	if !ok {
 		SIRIError{
 			errCode:         "UnknownCredential",
