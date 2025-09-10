@@ -149,5 +149,5 @@ func (handler *GtfsHandler) logError(m *audit.BigQueryMessage, startTime time.Ti
 	errorString := fmt.Sprintf(format, values...)
 
 	m.ErrorDetails = errorString
-	logger.Log.Debugf(errorString)
+	logger.Log.Debug(errorString)
 }

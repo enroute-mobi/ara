@@ -181,10 +181,10 @@ func TestValidate(t *testing.T) {
 			errLen += 1
 		}
 		assert.Len(tc.pt.Errors, errLen)
-		for k, _ := range tc.errs {
+		for k := range tc.errs {
 			assert.Equal(tc.errs[k], tc.pt.Errors.Get(k))
 		}
-		for k, _ := range tc.settingErrs {
+		for k := range tc.settingErrs {
 			assert.Equal(tc.settingErrs[k], tc.pt.Errors.GetSettingError(k))
 		}
 	}

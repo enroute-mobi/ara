@@ -16,7 +16,6 @@ import (
 
 func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	assert := assert.New(t)
-	// logger.Log.Debug = true
 
 	fakeClock := clock.NewFakeClock()
 	clock.SetDefaultClock(fakeClock)

@@ -97,7 +97,7 @@ func LoadFromCSVFile(filePath string, referentialSlug string, force bool) error 
 		return fmt.Errorf("loader error: couldn't import anything, import raised %v errors", result.ErrorCount())
 	}
 
-	logger.Log.Debugf(result.PrintResult())
+	logger.Log.Debug(result.PrintResult())
 	fmt.Println(result.PrintResult())
 
 	return nil
@@ -212,7 +212,7 @@ func (loader Loader) Load(reader io.Reader) Result {
 	loader.result.setTotalInserts()
 
 	logger.Log.Printf("Load operation done in %v", time.Since(startTime))
-	logger.Log.Printf(loader.result.PrintResult())
+	logger.Log.Print(loader.result.PrintResult())
 
 	return loader.result
 }
@@ -225,7 +225,7 @@ func (loader *Loader) handleForce(klass, modelName string) error {
 			if klass == FACILITY {
 				araModel = "facilities"
 			} else {
-				araModel = fmt.Sprintf(klass + "s")
+				araModel = fmt.Sprintf("%ss", klass)
 			}
 			query := fmt.Sprintf("delete from %v where model_name='%v' and referential_slug='%v';", araModel, modelName, loader.referentialSlug)
 			_, err := Database.Exec(query)

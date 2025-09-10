@@ -7,6 +7,7 @@ import (
 	"os/signal"
 	"runtime/pprof"
 	"strconv"
+	"strings"
 	"syscall"
 	"time"
 
@@ -208,7 +209,7 @@ func main() {
 		purifier := model.NewPurifier(*purgeDaysPtr)
 		err = purifier.Purge()
 	case "migrate":
-		logger.Log.Debug = true
+		logger.Log.DebugEnabled = true
 
 		migrateFlags := flag.NewFlagSet("migrate", flag.ExitOnError)
 		migrationFilesPtr := migrateFlags.String("path", "db/migrations", "Specify migration files path")
@@ -265,19 +266,20 @@ func checkStatus(url string, requestorRef string) error {
 	responseTime := time.Since(startTime)
 
 	// Log
-	var logMessage []byte
+	var logMessage strings.Builder
 	if xmlResponse.Status() {
-		logMessage = []byte("SIRI OK - status true - ")
+		logMessage.WriteString("SIRI OK - status true - ")
 	} else {
-		logMessage = []byte("SIRI CRITICAL: status false - ")
+		logMessage.WriteString("SIRI CRITICAL: status false - ")
 		if xmlResponse.ErrorType() == "OtherError" {
-			logMessage = append(logMessage, fmt.Sprintf("%s %d %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorNumber(), xmlResponse.ErrorText())...)
+			fmt.Fprintf(&logMessage, "%s %d %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorNumber(), xmlResponse.ErrorText())
 		} else {
-			logMessage = append(logMessage, fmt.Sprintf("%s %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorText())...)
+			fmt.Fprintf(&logMessage, "%s %s - ", xmlResponse.ErrorType(), xmlResponse.ErrorText())
 		}
 	}
-	logMessage = append(logMessage, fmt.Sprintf("%.3f seconds response time", responseTime.Seconds())...)
-	logger.Log.Printf(string(logMessage))
+	fmt.Fprintf(&logMessage, "%.3f seconds response time", responseTime.Seconds())
+
+	logger.Log.Print(logMessage.String())
 
 	return nil
 }

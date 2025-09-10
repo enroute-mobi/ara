@@ -901,6 +901,13 @@ func (manager *PartnerManager) FindByCredential(c string, requestURL string) (*P
 			return nil, false
 		}
 	}
+
+	// Check Template max partners
+	if pt.MaxPartners != 0 && manager.byTemplate.FromTemplateLength(pt.id) >= pt.MaxPartners {
+		manager.mutex.RUnlock()
+		return nil, false
+	}
+
 	manager.mutex.RUnlock()
 
 	p := manager.NewFromTemplate(pt, m, c, requestURL)

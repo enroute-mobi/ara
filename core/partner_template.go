@@ -49,6 +49,7 @@ type PartnerTemplate struct {
 	CredentialType   string
 	LocalCredential  string
 	RemoteCredential string
+	MaxPartners      int
 	Settings         map[string]string
 	ConnectorTypes   []string
 

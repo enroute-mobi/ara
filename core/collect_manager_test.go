@@ -48,9 +48,6 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 }
 
 func Test_CollectManager_StopAreaMonitored(t *testing.T) {
-	// logger.Log.Debug = true
-	// defer func() { logger.Log.Debug = false }()
-
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	referentials.Save(referential)
@@ -83,9 +80,6 @@ func Test_CollectManager_StopAreaMonitored(t *testing.T) {
 }
 
 func Test_CollectManager_StopAreaMonitoredWithReferent(t *testing.T) {
-	// logger.Log.Debug = true
-	// defer func() { logger.Log.Debug = false }()
-
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("referential")
 	referentials.Save(referential)

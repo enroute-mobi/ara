@@ -118,11 +118,9 @@ func (handler *PushHandler) newBQMessage(slug, remoteAddress string) *audit.BigQ
 	}
 }
 
-func (handler *PushHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
+func (handler *PushHandler) logError(m *audit.BigQueryMessage, startTime time.Time, errorString string) {
 	m.ProcessingTime = handler.referential.Clock().Since(startTime).Seconds()
 	m.Status = "Error"
-	errorString := fmt.Sprintf(format, values...)
-
 	m.ErrorDetails = errorString
-	logger.Log.Debugf(errorString)
+	logger.Log.Debug(errorString)
 }

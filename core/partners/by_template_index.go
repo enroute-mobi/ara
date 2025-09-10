@@ -49,7 +49,7 @@ func (index *ByTemplateIndex) Delete(id Id) {
 	delete(index.byIdentifier, id)
 }
 
-func (index *ByTemplateIndex) IndexableLength(pt Id) int {
+func (index *ByTemplateIndex) FromTemplateLength(pt Id) int {
 	return len(index.byTemplate[pt])
 }
 
