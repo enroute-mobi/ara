@@ -269,6 +269,7 @@ func (referential *Referential) ReloadModel() {
 	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
 	referential.partners.Load()
+	referential.partnerTemplates.Load()
 	referential.Start()
 }
 
@@ -289,6 +290,7 @@ func (referential *Referential) setNextReloadAt() {
 func (referential *Referential) Load() {
 	referential.model.Load()
 	referential.Partners().Load()
+	referential.PartnerTemplates().Load()
 }
 
 type MemoryReferentials struct {

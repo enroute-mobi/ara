@@ -41,6 +41,7 @@ type PartnerTemplates interface {
 	Referential() *Referential
 	IsEmpty() bool
 	SaveToDatabase() (int, error)
+	Load() error
 }
 
 type PartnerTemplate struct {
@@ -363,6 +364,53 @@ func (manager *PartnerTemplateManager) SaveToDatabase() (int, error) {
 	}
 
 	return http.StatusOK, nil
+}
+
+func (manager *PartnerTemplateManager) Load() error {
+	selectPTs := []model.SelectPartnerTemplate{}
+	sqlQuery := fmt.Sprintf("select * from partner_templates where referential_id = '%s'", manager.referential.Id())
+	_, err := model.Database.Select(&selectPTs, sqlQuery)
+	if err != nil {
+		return err
+	}
+	for _, p := range selectPTs {
+		pt := manager.New(partners.Slug(p.Slug))
+		pt.id = partners.Id(p.Id)
+		pt.CredentialType = p.CredentialType
+		pt.LocalCredential = p.LocalCredential
+		pt.RemoteCredential = p.RemoteCredential
+
+		if p.Name.Valid {
+			pt.Name = p.Name.String
+		}
+
+		if p.MaxPartners.Valid {
+			pt.MaxPartners = int(p.MaxPartners.Int64)
+		}
+
+		if p.Settings.Valid && len(p.Settings.String) > 0 {
+			settings := make(map[string]string)
+			if err = json.Unmarshal([]byte(p.Settings.String), &settings); err != nil {
+				return err
+			}
+		}
+
+		if p.ConnectorTypes.Valid && len(p.ConnectorTypes.String) > 0 {
+			if err = json.Unmarshal([]byte(p.ConnectorTypes.String), &pt.ConnectorTypes); err != nil {
+				return err
+			}
+		}
+
+		switch pt.CredentialType {
+		case FormatMatching:
+			if err := pt.CompileLocalCredentials(); err != nil {
+				return err
+			}
+		}
+
+		manager.Save(pt)
+	}
+	return nil
 }
 
 func (manager *PartnerTemplateManager) newDbPartnerTemplate(pt *PartnerTemplate) (*model.DatabasePartnerTemplate, error) {
