@@ -30,6 +30,7 @@ type Partners interface {
 
 	New(partners.Slug) *Partner
 	NewFromTemplate(*PartnerTemplate, string, string, string) *Partner
+	ByTemplateLength(partners.Id) int
 	Find(partners.Id) *Partner
 	FindBySlug(partners.Slug) (*Partner, bool)
 	FindByCredential(string, string) (*Partner, bool)
@@ -875,6 +876,13 @@ func (manager *PartnerManager) FindBySlug(slug partners.Slug) (*Partner, bool) {
 
 	manager.mutex.RUnlock()
 	return nil, false
+}
+
+func (manager *PartnerManager) ByTemplateLength(ptid partners.Id) (n int) {
+	manager.mutex.RLock()
+	n = manager.byTemplate.FromTemplateLength(ptid)
+	manager.mutex.RUnlock()
+	return
 }
 
 func (manager *PartnerManager) FindByCredential(c string, requestURL string) (*Partner, bool) {

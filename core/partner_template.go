@@ -162,11 +162,13 @@ func (pt *PartnerTemplate) Copy() (copy *PartnerTemplate) {
 func (pt *PartnerTemplate) MarshalJSON() ([]byte, error) {
 	type Alias PartnerTemplate
 	return json.Marshal(&struct {
-		Id partners.Id
+		Id              partners.Id
+		CurrentPartners int
 		*Alias
 	}{
-		Id:    pt.id,
-		Alias: (*Alias)(pt),
+		Id:              pt.id,
+		CurrentPartners: pt.manager.Referential().Partners().ByTemplateLength(pt.id),
+		Alias:           (*Alias)(pt),
 	})
 }
 
