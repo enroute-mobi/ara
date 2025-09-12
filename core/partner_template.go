@@ -391,10 +391,10 @@ func (manager *PartnerTemplateManager) Load() error {
 		}
 
 		if p.Settings.Valid && len(p.Settings.String) > 0 {
-			settings := make(map[string]string)
-			if err = json.Unmarshal([]byte(p.Settings.String), &settings); err != nil {
+			if err = json.Unmarshal([]byte(p.Settings.String), &pt.Settings); err != nil {
 				return err
 			}
+
 		}
 
 		if p.ConnectorTypes.Valid && len(p.ConnectorTypes.String) > 0 {
