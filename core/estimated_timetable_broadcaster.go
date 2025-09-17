@@ -193,9 +193,11 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					DataFrameRef:           ett.connector.dataFrameRef(),
 					PublishedLineName:      ett.connector.publishedLineName(line),
+					DestinationName:        vehicleJourney.DestinationName,
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}
+
 				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, stopVisit)
 				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
 
