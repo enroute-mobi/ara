@@ -131,6 +131,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					DataFrameRef:           connector.dataFrameRef(),
 					PublishedLineName:      connector.publishedLineName(line),
+					DestinationName:        vjs[i].DestinationName,
 					Attributes:             make(map[string]string),
 					References:             make(map[string]string),
 				}

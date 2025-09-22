@@ -139,9 +139,9 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		LineRef:                "line1",
 		DatedVehicleJourneyRef: "dvjref1",
 		DirectionType:          "direction1",
+		DestinationName:        "destination 1",
 		Attributes: map[string]string{
-			"OriginName":      "origin 1",
-			"DestinationName": "destination 1",
+			"OriginName": "origin 1",
 		},
 		References: map[string]string{
 			"OriginRef":      "origin1",
@@ -154,9 +154,9 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		LineRef:                "line2",
 		DatedVehicleJourneyRef: "dvjref2",
 		DirectionType:          "direction2",
+		DestinationName:        "destination 2",
 		Attributes: map[string]string{
-			"OriginName":      "origin 2",
-			"DestinationName": "destination 2",
+			"OriginName": "origin 2",
 		},
 		References: map[string]string{
 			"OriginRef":      "origin2",
@@ -169,9 +169,9 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		LineRef:                "line3",
 		DatedVehicleJourneyRef: "dvjref3",
 		DirectionType:          "direction3",
+		DestinationName:        "destination 3",
 		Attributes: map[string]string{
-			"OriginName":      "origin 3",
-			"DestinationName": "destination 3",
+			"OriginName": "origin 3",
 		},
 		References: map[string]string{
 			"OriginRef":      "origin3",
@@ -244,9 +244,9 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 		LineRef:                "line1",
 		DatedVehicleJourneyRef: "dvjref1",
 		DirectionType:          "direction1",
+		DestinationName:        "destination 1",
 		Attributes: map[string]string{
-			"OriginName":      "origin 1",
-			"DestinationName": "destination 1",
+			"OriginName": "origin 1",
 		},
 		References: map[string]string{
 			"OriginRef":      "origin1",

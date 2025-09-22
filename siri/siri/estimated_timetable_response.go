@@ -47,6 +47,7 @@ type SIRIEstimatedVehicleJourney struct {
 	DataFrameRef           string
 	DirectionType          string
 	PublishedLineName      string
+	DestinationName        string
 
 	IsCompleteStopSequence bool
 

@@ -20,20 +20,20 @@ Feature: Support SIRI GetSIRI
       | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Monitored       | true                              |
     And a StopVisit exists with the following attributes:
-      | StopAreaId                    | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8  |
-      | ArrivalStatus                 | onTime                             |
-      | DepartureStatus               | onTime                             |
-      | Codes[internal]               | SIRI:34852540                      |
-      | PassageOrder                  | 44                                 |
-      | RecordedAt                    | 2017-01-12T10:52:46.042+01:00      |
-      | Schedule[aimed]#Arrival       | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[aimed]#Departure     | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[expected]#Arrival    | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00      |
-      | VehicleAtStop                 | false                              |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8  |
+      | ArrivalStatus                  | onTime                             |
+      | DepartureStatus                | onTime                             |
+      | Codes[internal]                | SIRI:34852540                      |
+      | PassageOrder                   | 44                                 |
+      | RecordedAt                     | 2017-01-12T10:52:46.042+01:00      |
+      | Schedule[aimed]#Arrival        | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[aimed]#Departure      | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[expected]#Arrival     | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[expected]#Departure   | 2017-01-12T11:42:54.000+01:00      |
+      | VehicleAtStop                  | false                              |
       | Attributes[DestinationDisplay] | Méliès - Croix Bonnet              |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2  |
       | Codes[internal] | cladebr |
@@ -46,25 +46,25 @@ Feature: Support SIRI GetSIRI
       | LineId                            | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                         | true                                          |
       | DestinationName                   | PARIS - Porte d'Orléans                       |
-      | Attributes[DirectionName]          | Aller                                         |
+      | Attributes[DirectionName]         | Aller                                         |
       | DirectionType                     | cladebr                                       |
       | Reference[JourneyPatternRef]#Code | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#Code    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
-      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8  |
-      | ArrivalStatus                 | onTime                             |
-      | DepartureStatus               | onTime                             |
-      | Codes[internal]               | SIRI:34863800                      |
-      | PassageOrder                  | 11                                 |
-      | RecordedAt                    | 2017-01-12T10:52:46.050+01:00      |
-      | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[aimed]#Departure     | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[expected]#Arrival    | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00      |
-      | VehicleAtStop                 | false                              |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-8-00c04fd430c8  |
+      | ArrivalStatus                  | onTime                             |
+      | DepartureStatus                | onTime                             |
+      | Codes[internal]                | SIRI:34863800                      |
+      | PassageOrder                   | 11                                 |
+      | RecordedAt                     | 2017-01-12T10:52:46.050+01:00      |
+      | Schedule[aimed]#Arrival        | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[aimed]#Departure      | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[expected]#Arrival     | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[expected]#Departure   | 2017-01-12T11:41:00.000+01:00      |
+      | VehicleAtStop                  | false                              |
       | Attributes[DestinationDisplay] | PARIS - Porte d'Orléans            |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC" |
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
@@ -212,20 +212,20 @@ Feature: Support SIRI GetSIRI
       | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Monitored       | true                              |
     And a StopVisit exists with the following attributes:
-      | StopAreaId                    | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8  |
-      | ArrivalStatus                 | onTime                             |
-      | DepartureStatus               | onTime                             |
-      | Codes[internal]               | SIRI:34852540                      |
-      | PassageOrder                  | 44                                 |
-      | RecordedAt                    | 2017-01-12T10:52:46.042+01:00      |
-      | Schedule[aimed]#Arrival       | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[aimed]#Departure     | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[expected]#Arrival    | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00      |
-      | VehicleAtStop                 | false                              |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8  |
+      | ArrivalStatus                  | onTime                             |
+      | DepartureStatus                | onTime                             |
+      | Codes[internal]                | SIRI:34852540                      |
+      | PassageOrder                   | 44                                 |
+      | RecordedAt                     | 2017-01-12T10:52:46.042+01:00      |
+      | Schedule[aimed]#Arrival        | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[aimed]#Departure      | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[expected]#Arrival     | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[expected]#Departure   | 2017-01-12T11:42:54.000+01:00      |
+      | VehicleAtStop                  | false                              |
       | Attributes[DestinationDisplay] | Méliès - Croix Bonnet              |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2  |
       | Codes[internal] | cladebr |
@@ -235,27 +235,27 @@ Feature: Support SIRI GetSIRI
     And a VehicleJourney exists with the following attributes:
       | Codes[internal]                   | 5CAR621689196575                              |
       | LineId                            | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
-      | Attributes[DestinationName]        | PARIS - Porte d'Orléans                       |
-      | Attributes[DirectionName]          | Aller                                         |
+      | DestinationName                   | PARIS - Porte d'Orléans                       |
+      | Attributes[DirectionName]         | Aller                                         |
       | DirectionType                     | cladebr                                       |
-      | Attributes[Monitored]              | true                                          |
+      | Attributes[Monitored]             | true                                          |
       | Reference[JourneyPatternRef]#Code | "internal": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#Code    | "internal": "parorle"                         |
     And a StopVisit exists with the following attributes:
-      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8  |
-      | ArrivalStatus                 | onTime                             |
-      | DepartureStatus               | onTime                             |
-      | Codes[internal]               | SIRI:34863800                      |
-      | PassageOrder                  | 11                                 |
-      | RecordedAt                    | 2017-01-12T10:52:46.050+01:00      |
-      | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[aimed]#Departure     | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[expected]#Arrival    | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00      |
-      | VehicleAtStop                 | false                              |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-8-00c04fd430c8  |
+      | ArrivalStatus                  | onTime                             |
+      | DepartureStatus                | onTime                             |
+      | Codes[internal]                | SIRI:34863800                      |
+      | PassageOrder                   | 11                                 |
+      | RecordedAt                     | 2017-01-12T10:52:46.050+01:00      |
+      | Schedule[aimed]#Arrival        | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[aimed]#Departure      | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[expected]#Arrival     | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[expected]#Departure   | 2017-01-12T11:41:00.000+01:00      |
+      | VehicleAtStop                  | false                              |
       | Attributes[DestinationDisplay] | PARIS - Porte d'Orléans            |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC" |
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
@@ -364,20 +364,20 @@ Feature: Support SIRI GetSIRI
       | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Monitored       | true                              |
     And a StopVisit exists with the following attributes:
-      | StopAreaId                    | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8  |
-      | ArrivalStatus                 | onTime                             |
-      | DepartureStatus               | onTime                             |
-      | Codes[internal]               | SIRI:34852540                      |
-      | PassageOrder                  | 44                                 |
-      | RecordedAt                    | 2017-01-12T10:52:46.042+01:00      |
-      | Schedule[aimed]#Arrival       | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[aimed]#Departure     | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[expected]#Arrival    | 2017-01-12T11:42:54.000+01:00      |
-      | Schedule[expected]#Departure  | 2017-01-12T11:42:54.000+01:00      |
-      | VehicleAtStop                 | false                              |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8  |
+      | ArrivalStatus                  | onTime                             |
+      | DepartureStatus                | onTime                             |
+      | Codes[internal]                | SIRI:34852540                      |
+      | PassageOrder                   | 44                                 |
+      | RecordedAt                     | 2017-01-12T10:52:46.042+01:00      |
+      | Schedule[aimed]#Arrival        | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[aimed]#Departure      | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[expected]#Arrival     | 2017-01-12T11:42:54.000+01:00      |
+      | Schedule[expected]#Departure   | 2017-01-12T11:42:54.000+01:00      |
+      | VehicleAtStop                  | false                              |
       | Attributes[DestinationDisplay] | Méliès - Croix Bonnet              |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC" |
     And a StopArea exists with the following attributes:
       | Name            | Test 2  |
       | Codes[external] | cladebr |
@@ -390,25 +390,25 @@ Feature: Support SIRI GetSIRI
       | LineId                            | 6ba7b814-9dad-11d1-7-00c04fd430c8             |
       | Monitored                         | true                                          |
       | DestinationName                   | PARIS - Porte d'Orléans                       |
-      | Attributes[DirectionName]          | Aller                                         |
+      | Attributes[DirectionName]         | Aller                                         |
       | DirectionType                     | cladebr                                       |
       | Reference[JourneyPatternRef]#Code | "external": "CdF:JourneyPattern::L475P53:LOC" |
       | Reference[DestinationRef]#Code    | "external": "parorle"                         |
     And a StopVisit exists with the following attributes:
-      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-8-00c04fd430c8  |
-      | ArrivalStatus                 | onTime                             |
-      | DepartureStatus               | onTime                             |
-      | Codes[external]               | SIRI:34863800                      |
-      | PassageOrder                  | 11                                 |
-      | RecordedAt                    | 2017-01-12T10:52:46.050+01:00      |
-      | Schedule[aimed]#Arrival       | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[aimed]#Departure     | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[expected]#Arrival    | 2017-01-12T11:41:00.000+01:00      |
-      | Schedule[expected]#Departure  | 2017-01-12T11:41:00.000+01:00      |
-      | VehicleAtStop                 | false                              |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-6-00c04fd430c8  |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-8-00c04fd430c8  |
+      | ArrivalStatus                  | onTime                             |
+      | DepartureStatus                | onTime                             |
+      | Codes[external]                | SIRI:34863800                      |
+      | PassageOrder                   | 11                                 |
+      | RecordedAt                     | 2017-01-12T10:52:46.050+01:00      |
+      | Schedule[aimed]#Arrival        | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[aimed]#Departure      | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[expected]#Arrival     | 2017-01-12T11:41:00.000+01:00      |
+      | Schedule[expected]#Departure   | 2017-01-12T11:41:00.000+01:00      |
+      | VehicleAtStop                  | false                              |
       | Attributes[DestinationDisplay] | PARIS - Porte d'Orléans            |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC" |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC" |
     When I send this SIRI request
       """
       <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:m0="http://www.siri.org.uk/siri" xmlns:m1="http://www.ifopt.org.uk/acsb">
