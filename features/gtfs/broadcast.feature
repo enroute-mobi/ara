@@ -373,7 +373,6 @@ Feature: Support GTFS-RT feeds
       | VehicleAtStop               | true                               |
       | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
       | Schedule[actual]#Arrival    | 2017-01-01T14:55:00.000+02:00      |
-      | Schedule[actual]#Departure  | 2017-01-01T14:59:00.000+02:00      |
       | DepartureStatus             | onTime                             |
       | ArrivalStatus               | onTime                             |
     And a Line exists with the following attributes:
@@ -396,7 +395,6 @@ Feature: Support GTFS-RT feeds
       | VehicleJourneyId            | 6ba7b814-9dad-11d1-7-00c04fd430c8           |
       | VehicleAtStop               | true                                        |
       | Reference[OperatorRef]#Code | "external": "external:CdF:Company::410:LOC" |
-      | Schedule[actual]#Arrival    | 2017-01-01T14:55:00.000+02:00               |
       | Schedule[actual]#Departure  | 2017-01-01T14:59:00.000+02:00               |
       | DepartureStatus             | onTime                                      |
       | ArrivalStatus               | onTime                                      |

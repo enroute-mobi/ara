@@ -120,23 +120,25 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 
 		stopId := saId.Value()
 		stopSequence := connector.gtfsStopSequence(stopVisits[i].PassageOrder)
+
+		stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
+			StopSequence: &stopSequence,
+			StopId:       &stopId,
+		}
+
 		arrival := &gtfs.TripUpdate_StopTimeEvent{}
 		departure := &gtfs.TripUpdate_StopTimeEvent{}
 
 		if a := stopVisits[i].ReferenceArrivalTime(); !a.IsZero() {
 			arrivalTime := int64(a.Unix())
 			arrival.Time = &arrivalTime
+			stopTimeUpdate.Arrival = arrival
+
 		}
 		if d := stopVisits[i].ReferenceDepartureTime(); !d.IsZero() {
 			departureTime := int64(d.Unix())
 			departure.Time = &departureTime
-		}
-
-		stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
-			StopSequence: &stopSequence,
-			StopId:       &stopId,
-			Arrival:      arrival,
-			Departure:    departure,
+			stopTimeUpdate.Departure = departure
 		}
 
 		if stopVisits[i].DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED {
