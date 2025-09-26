@@ -60,7 +60,7 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 	response.Write(jsonBytes)
 }
 
-func (controller *StopAreaController) Show(response http.ResponseWriter, identifier string) {
+func (controller *StopAreaController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	stopArea, ok := controller.findStopArea(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop area not found: %s", identifier), http.StatusNotFound)

@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -30,6 +32,17 @@ type VehicleJourney struct {
 	OriginName              string `json:",omitempty"`
 	Monitored               bool
 	HasCompleteStopSequence bool
+	DetailedStopVisits      []DetailedStopVisit `json:"DetailedStopVisits,omitempty"`
+}
+
+type DetailedStopVisit struct {
+	Order           int                           `json:"Order"`
+	StopAreaName    string                        `json:"StopAreaName"`
+	StopAreaId      StopAreaId                    `json:"StopAreaId"`
+	Schedules       []schedules.StopVisitSchedule `json:",omitempty"`
+	ArrivalStatus   StopVisitArrivalStatus        `json:",omitempty"`
+	DepartureStatus StopVisitDepartureStatus      `json:",omitempty"`
+	CollectedAt     time.Time                     `json:",omitempty"`
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {
@@ -70,13 +83,15 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	type Alias VehicleJourney
+
 	aux := struct {
 		Codes      Codes                `json:",omitempty"`
 		Attributes Attributes           `json:",omitempty"`
 		References map[string]Reference `json:",omitempty"`
 		*Alias
-		Id         VehicleJourneyId
-		StopVisits []StopVisitId `json:",omitempty"`
+		Id                 VehicleJourneyId
+		StopVisits         []StopVisitId       `json:",omitempty"`
+		DetailedStopVisits []DetailedStopVisit `json:",omitempty"`
 	}{
 		Id:    vehicleJourney.id,
 		Alias: (*Alias)(vehicleJourney),
@@ -92,13 +107,17 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 		aux.References = vehicleJourney.References.GetReferences()
 	}
 
-	stopVisitIds := []StopVisitId{}
-	svs := vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id)
-	for i := range svs {
-		stopVisitIds = append(stopVisitIds, svs[i].Id())
+	if len(vehicleJourney.DetailedStopVisits) != 0 {
+		aux.DetailedStopVisits = vehicleJourney.DetailedStopVisits
 	}
-	if len(stopVisitIds) > 0 {
-		aux.StopVisits = stopVisitIds
+
+	svs := vehicleJourney.model.StopVisits().FindByVehicleJourneyId(vehicleJourney.id)
+	var stopVisits []StopVisitId
+	for i := range svs {
+		stopVisits = append(stopVisits, svs[i].Id())
+	}
+	if len(stopVisits) > 0 {
+		aux.StopVisits = stopVisits
 	}
 
 	return json.Marshal(&aux)

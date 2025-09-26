@@ -199,7 +199,7 @@ func (server *Server) handleReferentialModelShow(response http.ResponseWriter, r
 	logger.Log.Debugf("%s controller Show request: %v", model, request)
 
 	id := request.PathValue("id")
-	controller.Show(response, id)
+	controller.Show(response, id, request.URL.Query())
 }
 
 func (server *Server) handleReferentialModelCreate(response http.ResponseWriter, request *http.Request) {
@@ -334,7 +334,7 @@ func (server *Server) handleReferentialGet(response http.ResponseWriter, request
 
 	if referentialSlug == "_referentials" {
 		controller := server.referentialSetup(response, request)
-		controller.Show(response, data)
+		controller.Show(response, data, nil)
 		return
 	}
 

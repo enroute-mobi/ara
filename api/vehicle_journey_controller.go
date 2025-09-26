@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
+	"strconv"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -30,20 +32,76 @@ func (controller *VehicleJourneyController) findVehicleJourney(identifier string
 	return controller.referential.Model().VehicleJourneys().Find(model.VehicleJourneyId(identifier))
 }
 
-func (controller *VehicleJourneyController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *VehicleJourneyController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("VehicleJourneys Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().VehicleJourneys().FindAll())
+	allVehicleJourneys := controller.referential.Model().VehicleJourneys().FindAll()
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(allVehicleJourneys, func(i, j int) bool {
+			return allVehicleJourneys[i].Name > allVehicleJourneys[j].Name
+		})
+	case "asc", "":
+		sort.Slice(allVehicleJourneys, func(i, j int) bool {
+			return allVehicleJourneys[i].Name < allVehicleJourneys[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	paginatedVehicleJourneys, err := paginate(allVehicleJourneys, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedVehicleJourneys)
 	response.Write(jsonBytes)
 }
 
-func (controller *VehicleJourneyController) Show(response http.ResponseWriter, identifier string) {
+func (controller *VehicleJourneyController) Show(response http.ResponseWriter, identifier string, params url.Values) {
 	vehicleJourney, ok := controller.findVehicleJourney(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle journey not found: %s", identifier), http.StatusNotFound)
 		return
 	}
 	logger.Log.Debugf("Get vehicleJourney %s", identifier)
+
+	withDetailedStpVisits := params.Get("with_detailed_stop_visits")
+
+	if withDetailedStpVisits != "" {
+		ok, err := strconv.ParseBool(withDetailedStpVisits)
+		if err != nil {
+			http.Error(response, fmt.Sprintf("invalid request: query parameter \"with_detailed_stop_visits\": %s", params.Get("with_detailed_stop_visits")), http.StatusBadRequest)
+		}
+
+		if ok {
+
+			var stopVisitsWithDetails []model.DetailedStopVisit
+			svs := controller.referential.Model().StopVisits().FindByVehicleJourneyId(vehicleJourney.Id())
+			for i := range svs {
+				sa, ok := controller.referential.Model().StopAreas().Find(svs[i].StopAreaId)
+				if !ok {
+					continue
+				}
+
+				stopVisit := &model.DetailedStopVisit{}
+				stopVisit.Order = svs[i].PassageOrder
+				stopVisit.StopAreaId = svs[i].StopAreaId
+				stopVisit.StopAreaName = sa.Name
+				stopVisit.ArrivalStatus = svs[i].ArrivalStatus
+				stopVisit.DepartureStatus = svs[i].DepartureStatus
+				stopVisit.Schedules = svs[i].Schedules.ToSlice()
+				stopVisit.CollectedAt = svs[i].CollectedAt()
+				stopVisitsWithDetails = append(stopVisitsWithDetails, *stopVisit)
+
+			}
+
+			vehicleJourney.DetailedStopVisits = stopVisitsWithDetails
+		}
+	}
 
 	jsonBytes, _ := vehicleJourney.MarshalJSON()
 	response.Write(jsonBytes)

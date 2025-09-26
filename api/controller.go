@@ -36,7 +36,7 @@ const (
 
 type RestfulResource interface {
 	Index(response http.ResponseWriter, params url.Values)
-	Show(response http.ResponseWriter, identifier string)
+	Show(response http.ResponseWriter, identifier string, params url.Values)
 	Delete(response http.ResponseWriter, identifier string)
 	Update(response http.ResponseWriter, identifier string, body []byte)
 	Create(response http.ResponseWriter, body []byte)
@@ -74,7 +74,7 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 }
 
 type Paginable interface {
-	model.Situation | model.StopArea | model.Line
+	model.Situation | model.StopArea | model.Line | model.VehicleJourney
 }
 
 type PaginatedResource[p Paginable] struct {

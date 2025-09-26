@@ -42,7 +42,7 @@ func (controller *VehicleController) Index(response http.ResponseWriter, _params
 	response.Write(jsonBytes)
 }
 
-func (controller *VehicleController) Show(response http.ResponseWriter, identifier string) {
+func (controller *VehicleController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	vehicle, ok := controller.findVehicle(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle not found: %s", identifier), http.StatusNotFound)

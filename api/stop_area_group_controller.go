@@ -32,7 +32,7 @@ func (controller *StopAreaGroupsController) Index(response http.ResponseWriter, 
 	response.Write(jsonBytes)
 }
 
-func (controller *StopAreaGroupsController) Show(response http.ResponseWriter, identifier string) {
+func (controller *StopAreaGroupsController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	stopAreaGroup, ok := controller.findStopAreaGroup(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("StopAreaGroup not found: %s", identifier), http.StatusNotFound)

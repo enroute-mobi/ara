@@ -71,7 +71,7 @@ func (controller *SituationController) Index(response http.ResponseWriter, param
 	response.Write(jsonBytes)
 }
 
-func (controller *SituationController) Show(response http.ResponseWriter, identifier string) {
+func (controller *SituationController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	situation, ok := controller.findSituation(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Situation not found: %s", identifier), http.StatusNotFound)
