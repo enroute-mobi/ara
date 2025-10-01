@@ -26,7 +26,7 @@
 						<siri:PlaceName>{{ .Attributes.VehicleJourneyAttributes.ViaPlaceName }}</siri:PlaceName>{{end}}
 					</siri:Via>{{ end }}{{ if .References.VehicleJourney.DestinationRef }}
 					<siri:DestinationRef>{{ .References.VehicleJourney.DestinationRef }}</siri:DestinationRef>{{end}}{{ if .DestinationName}}
-					<siri:DestinationName>{{ .DestinationName | stringEscape }}</siri:DestinationName>{{end}}{{ if .VehicleJourneyName }}
+					<siri:DestinationName>{{ .DestinationName }}</siri:DestinationName>{{end}}{{ if .VehicleJourneyName }}
 					<siri:VehicleJourneyName>{{ .VehicleJourneyName }}</siri:VehicleJourneyName>{{end}}{{ if .Attributes.VehicleJourneyAttributes.JourneyNote}}
 					<siri:JourneyNote>{{.Attributes.VehicleJourneyAttributes.JourneyNote}}</siri:JourneyNote>{{end}}{{ if .Attributes.VehicleJourneyAttributes.HeadwayService}}
 					<siri:HeadwayService>{{.Attributes.VehicleJourneyAttributes.HeadwayService}}</siri:HeadwayService>{{end}}{{ if .Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}
@@ -55,7 +55,7 @@
 						<siri:StopPointName>{{ .StopPointName }}</siri:StopPointName>{{end}}
 						<siri:VehicleAtStop>{{ .VehicleAtStop }}</siri:VehicleAtStop>{{if .Attributes.StopVisitAttributes.PlatformTraversal }}
 						<siri:PlatformTraversal>{{ .Attributes.StopVisitAttributes.PlatformTraversal }}</siri:PlatformTraversal>{{end}}{{if .Attributes.StopVisitAttributes.DestinationDisplay }}
-						<siri:DestinationDisplay>{{ .Attributes.StopVisitAttributes.DestinationDisplay | stringEscape }}</siri:DestinationDisplay>{{end}}{{ if not .AimedArrivalTime.IsZero }}
+						<siri:DestinationDisplay>{{ .Attributes.StopVisitAttributes.DestinationDisplay }}</siri:DestinationDisplay>{{end}}{{ if not .AimedArrivalTime.IsZero }}
 						<siri:AimedArrivalTime>{{ .AimedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:AimedArrivalTime>{{ end }}{{ if not .ActualArrivalTime.IsZero }}
 						<siri:ActualArrivalTime>{{ .ActualArrivalTime.Format "2006-01-02T15:04:05.000Z07:00"}}</siri:ActualArrivalTime>{{ end }}{{ if not .ExpectedArrivalTime.IsZero }}
 						<siri:ExpectedArrivalTime>{{ .ExpectedArrivalTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ExpectedArrivalTime>{{ end }}{{ if .ArrivalStatus }}

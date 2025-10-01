@@ -6,18 +6,18 @@ Feature: Support SIRI GeneralMessage for Situation
   @ARA-1362
   Scenario: 3797 - Do not ignore Situations associated to other keywords than Commercial/Perturbation/Information
     Given a Situation exists with the following attributes:
-      | Codes[internal]              | 1                                             |
-      | RecordedAt                   | 2017-01-01T03:30:06+02:00                     |
-      | Version                      | 1                                             |
-      | Keywords                     | ["Others"]                                    |
-      | ValidityPeriods[0]#StartTime | 2016-01-01T20:30:06+02:00                     |
-      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00                     |
-      | ReportType                   | general                                       |
-      | Description[DefaultValue]    | La nouvelle carte d'abonnement est disponible |
-      | Description[Translations]#EN | The new pass is available                     |
-      | Summary[Translations]#FR     | Nouveau pass Navigo                           |
-      | Summary[Translations]#EN     | New pass Navigo                               |
-      | Affects[Line]                | 6ba7b814-9dad-11d1-2-00c04fd430c8             |
+      | Codes[internal]              | 1                                                    |
+      | RecordedAt                   | 2017-01-01T03:30:06+02:00                            |
+      | Version                      | 1                                                    |
+      | Keywords                     | ["Others"]                                           |
+      | ValidityPeriods[0]#StartTime | 2016-01-01T20:30:06+02:00                            |
+      | ValidityPeriods[0]#EndTime   | 2017-01-01T20:30:06+02:00                            |
+      | ReportType                   | general                                              |
+      | Description[DefaultValue]    | La nouvelle <b>carte d'abonnement</b> est disponible |
+      | Description[Translations]#EN | The new pass is available                            |
+      | Summary[Translations]#FR     | Nouveau pass Navigo                                  |
+      | Summary[Translations]#EN     | New pass Navigo                                      |
+      | Affects[Line]                | 6ba7b814-9dad-11d1-2-00c04fd430c8                    |
     And a Line exists with the following attributes:
       | Codes[internal] | NINOXE:Line:3:LOC |
       | Name            | Ligne 3 Metro     |
@@ -81,7 +81,7 @@ Feature: Support SIRI GeneralMessage for Situation
                    </Message>
                    <Message>
                      <MessageType>textOnly</MessageType>
-                     <MessageText>La nouvelle carte d'abonnement est disponible</MessageText>
+                     <MessageText>La nouvelle &lt;b&gt;carte d'abonnement&lt;/b&gt; est disponible</MessageText>
                      <MessageText xml:lang='EN'>The new pass is available</MessageText>
                    </Message>
                  </siri:Content>
