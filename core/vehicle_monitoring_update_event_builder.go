@@ -95,19 +95,9 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	_, ok = builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()]
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
-			Origin:          origin,
-			Code:            vjCode,
-			LineCode:        lineCode,
-			OriginRef:       xmlVehicleActivity.OriginRef(),
-			OriginName:      xmlVehicleActivity.OriginName(),
-			DestinationRef:  xmlVehicleActivity.DestinationRef(),
-			DirectionType:   builder.directionRef(xmlVehicleActivity.DirectionRef()),
-			DestinationName: xmlVehicleActivity.DestinationName(),
-			Monitored:       xmlVehicleActivity.Monitored(),
-			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
-
-			CodeSpace: builder.remoteCodeSpace,
-			SiriXML:   &xmlVehicleActivity.XMLMonitoredVehicleJourney,
+			FromVehicleMonitoring: true,
+			Code:                  vjCode,
+			Occupancy:             model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 		}
 
 		builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()] = vjEvent
