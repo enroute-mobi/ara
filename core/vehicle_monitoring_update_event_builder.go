@@ -138,24 +138,6 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	}
 }
 
-func (builder *VehicleMonitoringUpdateEventBuilder) directionRef(direction string) (dir string) {
-	in, out, err := builder.partner.PartnerSettings.SIRIDirectionType()
-	if err {
-		return direction
-	}
-
-	switch direction {
-	case in:
-		dir = model.VEHICLE_DIRECTION_INBOUND
-	case out:
-		dir = model.VEHICLE_DIRECTION_OUTBOUND
-	default:
-		dir = direction
-	}
-
-	return dir
-}
-
 func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *sxml.XMLVehicleActivity) (lon, lat float64, e error) {
 	longitude, _ := strconv.ParseFloat(xmlVehicleActivity.Longitude(), 64)
 	latitude, _ := strconv.ParseFloat(xmlVehicleActivity.Latitude(), 64)
