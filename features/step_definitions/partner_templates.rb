@@ -23,7 +23,7 @@ end
 When(/^the Partner template "([^"]*)"(?: in Referential "([^"]+)")? is updated with the following attributes:$/) do |slug, referential, attributes|
   attrs = attributes.rows_hash
 
-  path = partner_templates_path + '/' + slug
+  path = partner_templates_path(referential: referential) + '/' + slug
   begin
       RestClient.put path, attrs.to_json, {content_type: :json, accept: :json, :Authorization => "Token token=#{$token}"}
   rescue RestClient::ExceptionWithResponse => err
