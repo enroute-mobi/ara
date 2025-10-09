@@ -145,7 +145,7 @@ def model_attributes(table)
       attributes.delete key
     end
 
-    if key =~ %r{^(Affects\[([^\]]+)\])(/(AffectedDestinations|AffectedSections|AffectedRoutes|LineIds)\[(\d+)])?(/((FirstStop|LastStop)|StopAreaId\z|RouteRef|StopAreaIds))?}
+    if key =~ %r{^(Affects\[([^\]]+)\])(/(AffectedDestinations|AffectedSections|AffectedRoutes|LineIds)\[(\d+)\])?(/((FirstStop|LastStop)|StopAreaId\z|RouteRef|StopAreaIds))?}
       raw_attribute = Regexp.last_match(0).to_s
       attribute = Regexp.last_match(2).to_s
       subaffect = Regexp.last_match(4).to_s
