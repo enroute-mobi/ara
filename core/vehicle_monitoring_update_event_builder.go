@@ -95,19 +95,9 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 	_, ok = builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()]
 	if !ok {
 		vjEvent := &model.VehicleJourneyUpdateEvent{
-			Origin:          origin,
-			Code:            vjCode,
-			LineCode:        lineCode,
-			OriginRef:       xmlVehicleActivity.OriginRef(),
-			OriginName:      xmlVehicleActivity.OriginName(),
-			DestinationRef:  xmlVehicleActivity.DestinationRef(),
-			DirectionType:   builder.directionRef(xmlVehicleActivity.DirectionRef()),
-			DestinationName: xmlVehicleActivity.DestinationName(),
-			Monitored:       xmlVehicleActivity.Monitored(),
-			Occupancy:       model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
-
-			CodeSpace: builder.remoteCodeSpace,
-			SiriXML:   &xmlVehicleActivity.XMLMonitoredVehicleJourney,
+			FromVehicleMonitoring: true,
+			Code:                  vjCode,
+			Occupancy:             model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 		}
 
 		builder.vehicleMonitoringUpdateEvents.VehicleJourneys[xmlVehicleActivity.DatedVehicleJourneyRef()] = vjEvent
@@ -146,24 +136,6 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 		builder.vehicleMonitoringUpdateEvents.Vehicles[xmlVehicleActivity.DatedVehicleJourneyRef()] = vEvent
 		builder.vehicleMonitoringUpdateEvents.VehicleRefs[xmlVehicleActivity.VehicleRef()] = struct{}{}
 	}
-}
-
-func (builder *VehicleMonitoringUpdateEventBuilder) directionRef(direction string) (dir string) {
-	in, out, err := builder.partner.PartnerSettings.SIRIDirectionType()
-	if err {
-		return direction
-	}
-
-	switch direction {
-	case in:
-		dir = model.VEHICLE_DIRECTION_INBOUND
-	case out:
-		dir = model.VEHICLE_DIRECTION_OUTBOUND
-	default:
-		dir = direction
-	}
-
-	return dir
 }
 
 func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicleActivity *sxml.XMLVehicleActivity) (lon, lat float64, e error) {

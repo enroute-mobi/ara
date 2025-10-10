@@ -294,6 +294,9 @@ Feature: Support GTFS-RT feeds
     And a Line exists with the following attributes:
       | Name            | Test 1               |
       | Codes[internal] | RLA_Bus:Line::05:LOC |
+    And a VehicleJourney exists with the following attributes:
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8   |
+      | Codes[internal] | RLA_Bus:VehicleJourney::2978464:LOC |
     When a minute has passed
     And the SIRI server has received a GetVehicleMonitoring request
     And I send a GTFS-RT request to the Referential "test" with token "secret"

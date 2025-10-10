@@ -774,6 +774,12 @@ Feature: Audit API exchanges
     And a Line exists with the following attributes:
       | Name            | Test1     |
       | Codes[internal] | testLine1 |
+    And a VehicleJourney exists with the following attributes:
+      | Codes[internal] | RDMANTOIS:VehicleJourney::6628652:LOC |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8     |
+    And a VehicleJourney exists with the following attributes:
+      | Codes[internal] | RDMANTOIS:VehicleJourney::6628658:LOC |
+      | LineId          | 6ba7b814-9dad-11d1-4-00c04fd430c8     |
     And a Subscription exist with the following attributes:
       | Kind              | VehicleMonitoringCollect     |
       | ReferenceArray[0] | Line, "internal": "testLine" |
@@ -802,7 +808,7 @@ Feature: Audit API exchanges
               <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns5:ResponseTimestamp>2022-06-25T15:08:14.940+02:00</ns5:ResponseTimestamp>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:VehicleActivity>
                   <ns5:RecordedAtTime>2022-06-25T15:08:14.928+02:00</ns5:RecordedAtTime>
@@ -855,7 +861,7 @@ Feature: Audit API exchanges
               <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns5:ResponseTimestamp>2022-06-25T15:08:14.940+02:00</ns5:ResponseTimestamp>
                 <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ns2:SubscriptionRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:VehicleActivity>
                   <ns5:RecordedAtTime>2022-06-25T15:08:14.928+02:00</ns5:RecordedAtTime>
@@ -928,7 +934,7 @@ Feature: Audit API exchanges
         | StopAreas       | ["50000016", "50000020"]                                                           |
         | Lines           | ["testLine", "testLine1"]                                                          |
 
-  @ARA-1385 
+  @ARA-1385
   Scenario: Audit a EstimatedTimetableDelivery in a subscription with multiple ExistimatedTimetableDeliveries
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """

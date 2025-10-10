@@ -225,6 +225,11 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		return
 	}
 
+	if event.FromVehicleMonitoring {
+		manager.updateVehicleJourneyFromVehicleMonitoring(event)
+		return
+	}
+
 	vj, found := manager.model.VehicleJourneys().FindByCode(event.Code)
 	if !found {
 		// LineCode
@@ -283,6 +288,18 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	}
 
 	manager.model.VehicleJourneys().Save(vj)
+}
+
+func (manager *UpdateManager) updateVehicleJourneyFromVehicleMonitoring(event *VehicleJourneyUpdateEvent) {
+	vj, found := manager.model.VehicleJourneys().FindByCode(event.Code)
+	if !found {
+		return
+	}
+
+	if event.Occupancy != Undefined {
+		vj.Occupancy = event.Occupancy
+		manager.model.VehicleJourneys().Save(vj)
+	}
 }
 
 func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
@@ -418,7 +435,13 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	sa, _ := manager.model.StopAreas().FindByCode(event.StopAreaCode)
-	vj, _ := manager.model.VehicleJourneys().FindByCode(event.VehicleJourneyCode)
+	vj, ok := manager.model.VehicleJourneys().FindByCode(event.VehicleJourneyCode)
+	if !ok {
+		logger.Log.Debugf("Vehicle update event without corresponding vehicle journey: %v", event.VehicleJourneyCode.String())
+		return
+
+	}
+
 	line := vj.Line()
 
 	vehicle, found := manager.model.Vehicles().FindByCode(event.Code)
