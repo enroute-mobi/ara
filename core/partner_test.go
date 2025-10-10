@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	p "bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -26,7 +27,7 @@ func Test_Partner_Id(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 
-	if expected := PartnerId("6ba7b814-9dad-11d1-0-00c04fd430c8"); partner.Id() != expected {
+	if expected := p.Id("6ba7b814-9dad-11d1-0-00c04fd430c8"); partner.Id() != expected {
 		t.Errorf("Partner.Id() returns wrong value, got: %s, required: %s", partner.Id(), expected)
 	}
 }
@@ -36,7 +37,7 @@ func Test_Partner_Slug(t *testing.T) {
 		slug: "partner",
 	}
 
-	if expected := PartnerSlug("partner"); partner.Slug() != expected {
+	if expected := p.Slug("partner"); partner.Slug() != expected {
 		t.Errorf("Partner.Slug() returns wrong value, got: %s, required: %s", partner.Id(), expected)
 	}
 }
@@ -44,21 +45,21 @@ func Test_Partner_Slug(t *testing.T) {
 func Test_Partner_OperationnalStatus(t *testing.T) {
 	partner := NewPartner()
 
-	if expected := OPERATIONNAL_STATUS_UNKNOWN; partner.PartnerStatus.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusUnknown; partner.PartnerStatus.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
 
 func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.New("slug")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.New("slug")
 	settings := map[string]string{
 		"local_credential":  "loc",
 		"remote_code_space": "_internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{"push-collector"}
-	partners.Save(partner)
+	partnerManager.Save(partner)
 
 	// No Connectors
 	_, err := partner.CheckStatus()
@@ -73,7 +74,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_DOWN; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusDown; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 
@@ -84,14 +85,14 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_UP; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusUp; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
 
 func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.New("slug")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.New("slug")
 
 	settings := map[string]string{
 		"local_credential":  "loc",
@@ -99,7 +100,7 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{GTFS_RT_REQUEST_COLLECTOR}
-	partners.Save(partner)
+	partnerManager.Save(partner)
 
 	// No Connectors
 	_, err := partner.CheckStatus()
@@ -114,26 +115,26 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_DOWN; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusDown; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 
 	// Push collector but recent collect
 	partner.alternativeStatusCheck.LastCheck = clock.DefaultClock().Now()
-	partner.alternativeStatusCheck.Status = OPERATIONNAL_STATUS_UNKNOWN
+	partner.alternativeStatusCheck.Status = p.OperationnalStatusUnknown
 
 	ps, err = partner.CheckStatus()
 	if err != nil {
 		t.Fatalf("should not have an error during checkstatus: %v", err)
 	}
-	if expected := OPERATIONNAL_STATUS_UNKNOWN; ps.OperationnalStatus != expected {
+	if expected := p.OperationnalStatusUnknown; ps.OperationnalStatus != expected {
 		t.Errorf("partner.PartnerStatus.OperationnalStatus returns wrong status, got: %s, required: %s", partner.PartnerStatus.OperationnalStatus, expected)
 	}
 }
 
 func Test_Partner_SubcriptionCancel(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.New("slug")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.New("slug")
 
 	settings := map[string]string{
 		"remote_url":        "une url",
@@ -144,7 +145,7 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 	partner.ConnectorTypes = []string{"siri-stop-monitoring-subscription-collector"}
 
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
-	partners.Save(partner)
+	partnerManager.Save(partner)
 
 	partner.subscriptionManager.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	referential := partner.Referential()
@@ -182,8 +183,8 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 func Test_Partner_MarshalJSON(t *testing.T) {
 	partner := &Partner{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
-		PartnerStatus: PartnerStatus{
-			OperationnalStatus: OPERATIONNAL_STATUS_UNKNOWN,
+		PartnerStatus: p.Status{
+			OperationnalStatus: p.OperationnalStatusUnknown,
 		},
 		slug:           "partner",
 		ConnectorTypes: []string{},
@@ -214,10 +215,10 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 }
 
 func Test_Partner_Save(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.New("partner")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.New("partner")
 
-	if partner.manager != partners {
+	if partner.manager != partnerManager {
 		t.Errorf("New partner manager should be partners")
 	}
 
@@ -225,7 +226,7 @@ func Test_Partner_Save(t *testing.T) {
 	if !ok {
 		t.Errorf("partner.Save() should succeed")
 	}
-	partner = partners.Find(partner.Id())
+	partner = partnerManager.Find(partner.Id())
 	if partner == nil {
 		t.Errorf("New Partner should be found in Partners manager")
 	}
@@ -675,7 +676,7 @@ func Test_CanCollectFacility(t *testing.T) {
 }
 
 func Test_Partners_FindAllByCollectPriority(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 	partner1 := &Partner{
 		slug: "First",
 	}
@@ -689,10 +690,10 @@ func Test_Partners_FindAllByCollectPriority(t *testing.T) {
 	settings2 := map[string]string{s.COLLECT_PRIORITY: "1"}
 	partner2.PartnerSettings = s.NewPartnerSettings(partner2.UUIDGenerator, settings2)
 
-	partners.Save(partner1)
-	partners.Save(partner2)
+	partnerManager.Save(partner1)
+	partnerManager.Save(partner2)
 
-	orderedPartners := partners.FindAllByCollectPriority()
+	orderedPartners := partnerManager.FindAllByCollectPriority()
 	if orderedPartners[0].Slug() != "First" {
 		t.Errorf("Partners should be ordered")
 	}
@@ -710,16 +711,16 @@ func Test_Partner_Subcription(t *testing.T) {
 }
 
 func Test_NewPartnerManager(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
-	if partners.guardian == nil {
+	if partnerManager.guardian == nil {
 		t.Errorf("New PartnerManager should have a PartnersGuardian")
 	}
 }
 
 func Test_PartnerManager_New(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.New("partner")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.New("partner")
 
 	if partner.Id() != "" {
 		t.Errorf("New Partner identifier should be an empty string, got: %s", partner.Id())
@@ -727,10 +728,10 @@ func Test_PartnerManager_New(t *testing.T) {
 }
 
 func Test_PartnerManager_Save(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.New("partner")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.New("partner")
 
-	if success := partners.Save(partner); !success {
+	if success := partnerManager.Save(partner); !success {
 		t.Errorf("Save should return true")
 	}
 
@@ -740,21 +741,21 @@ func Test_PartnerManager_Save(t *testing.T) {
 }
 
 func Test_PartnerManager_Find_NotFound(t *testing.T) {
-	partners := createTestPartnerManager()
-	partner := partners.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
+	partnerManager := createTestPartnerManager()
+	partner := partnerManager.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	if partner != nil {
 		t.Errorf("Find should return false when Partner isn't found")
 	}
 }
 
 func Test_PartnerManager_Find(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
-	existingPartner := partners.New("partner")
-	partners.Save(existingPartner)
+	existingPartner := partnerManager.New("partner")
+	partnerManager.Save(existingPartner)
 	partnerId := existingPartner.Id()
 
-	partner := partners.Find(partnerId)
+	partner := partnerManager.Find(partnerId)
 	if partner == nil {
 		t.Fatal("Find should return true when Partner is found")
 	}
@@ -764,17 +765,17 @@ func Test_PartnerManager_Find(t *testing.T) {
 }
 
 func Test_PartnerManager_FindByCredentials(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
-	existingPartner := partners.New("partner")
+	existingPartner := partnerManager.New("partner")
 	settings := map[string]string{
 		s.LOCAL_CREDENTIAL:  "cred",
 		s.LOCAL_CREDENTIALS: "cred2,cred3",
 	}
 	existingPartner.PartnerSettings = s.NewPartnerSettings(existingPartner.UUIDGenerator, settings)
-	partners.Save(existingPartner)
+	partnerManager.Save(existingPartner)
 
-	partner, ok := partners.FindByCredential("cred")
+	partner, ok := partnerManager.FindByCredential("cred", "")
 	if !ok {
 		t.Fatal("FindByCredential should return true when Partner is found")
 	}
@@ -782,7 +783,7 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 		t.Errorf("FindByCredential should return a Partner with the given local_credential")
 	}
 
-	partner, ok = partners.FindByCredential("cred2")
+	partner, ok = partnerManager.FindByCredential("cred2", "")
 	if !ok {
 		t.Fatal("FindByCredential should return true when Partner is found")
 	}
@@ -790,7 +791,7 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 		t.Errorf("FindByCredential should return a Partner with the given local_credential")
 	}
 
-	partner, ok = partners.FindByCredential("cred3")
+	partner, ok = partnerManager.FindByCredential("cred3", "")
 	if !ok {
 		t.Fatal("FindByCredential should return true when Partner is found")
 	}
@@ -800,12 +801,12 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 }
 
 func Test_PartnerManager_FindBySlug(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
-	existingPartner := partners.New("partner")
-	partners.Save(existingPartner)
+	existingPartner := partnerManager.New("partner")
+	partnerManager.Save(existingPartner)
 
-	partner, ok := partners.FindBySlug("partner")
+	partner, ok := partnerManager.FindBySlug("partner")
 	if !ok {
 		t.Fatal("FindBySlug should return true when Partner is found")
 	}
@@ -815,14 +816,14 @@ func Test_PartnerManager_FindBySlug(t *testing.T) {
 }
 
 func Test_PartnerManager_FindAll(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
 	for i := 0; i < 5; i++ {
-		existingPartner := partners.New(PartnerSlug(strconv.Itoa(i)))
-		partners.Save(existingPartner)
+		existingPartner := partnerManager.New(p.Slug(strconv.Itoa(i)))
+		partnerManager.Save(existingPartner)
 	}
 
-	foundPartners := partners.FindAll()
+	foundPartners := partnerManager.FindAll()
 
 	if len(foundPartners) != 5 {
 		t.Errorf("FindAll should return all partners")
@@ -830,16 +831,16 @@ func Test_PartnerManager_FindAll(t *testing.T) {
 }
 
 func Test_PartnerManager_Delete(t *testing.T) {
-	partners := createTestPartnerManager()
+	partnerManager := createTestPartnerManager()
 
-	existingPartner := partners.New("partner")
-	partners.Save(existingPartner)
+	existingPartner := partnerManager.New("partner")
+	partnerManager.Save(existingPartner)
 
 	partnerId := existingPartner.Id()
 
-	partners.Delete(existingPartner)
+	partnerManager.Delete(existingPartner)
 
-	partner := partners.Find(partnerId)
+	partner := partnerManager.Find(partnerId)
 	if partner != nil {
 		t.Errorf("Deleted Partner should not be findable")
 	}
@@ -868,14 +869,14 @@ func Test_MemoryPartners_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	partners := NewPartnerManager(referential)
-	err = partners.Load()
+	partnerManager := NewPartnerManager(referential)
+	err = partnerManager.Load()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	partnerId := PartnerId(dbPartner.Id)
-	partner := partners.Find(partnerId)
+	partnerId := p.Id(dbPartner.Id)
+	partner := partnerManager.Find(partnerId)
 	if partner == nil {
 		t.Errorf("Loaded Partners should be found")
 	} else if partner.Id() != partnerId {

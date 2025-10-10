@@ -5,44 +5,51 @@ import (
 	"fmt"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 )
 
 type APIPartner struct {
-	Id             PartnerId `json:"Id,omitempty"`
-	Slug           PartnerSlug
+	Id             partners.Id `json:"Id,omitempty"`
+	Slug           partners.Slug
 	Name           string            `json:"Name,omitempty"`
 	Settings       map[string]string `json:"Settings,omitempty"`
 	ConnectorTypes []string          `json:"ConnectorTypes,omitempty"`
 	Errors         e.Errors          `json:"Errors,omitempty"`
 
 	factories map[string]ConnectorFactory
-	manager   Partners
+	manager   partners.SlugAndCredentialsHandler
 }
 
 func (partner *APIPartner) Validate() bool {
 	partner.Errors = e.NewErrors()
 
-	// Check if slug is non null
+	partner.ValidateSlug()
+	partner.ValidateFactories()
+	partner.ValidateCredentials()
+
+	return len(partner.Errors) == 0
+}
+
+func (partner *APIPartner) ValidateSlug() {
+	// Check if slug has correct format and is unique
 	if partner.Slug == "" {
 		partner.Errors.Add("Slug", e.ERROR_BLANK)
 	} else if !slugRegexp.MatchString(string(partner.Slug)) { // slugRegexp defined in Referential
 		partner.Errors.Add("Slug", e.ERROR_SLUG_FORMAT)
+	} else if !partner.manager.UniqSlug(partner.Id, partner.Slug) {
+		partner.Errors.Add("Slug", e.ERROR_UNIQUE)
 	}
-
+}
+func (partner *APIPartner) ValidateFactories() {
 	// Check factories
 	partner.setFactories()
 	for _, factory := range partner.factories {
 		factory.Validate(partner)
 	}
+}
 
-	// Check Slug uniqueness
-	for _, existingPartner := range partner.manager.FindAll() {
-		if existingPartner.id != partner.Id && existingPartner.slug == partner.Slug {
-			partner.Errors.Add("Slug", e.ERROR_UNIQUE)
-		}
-	}
-
+func (partner *APIPartner) ValidateCredentials() {
 	// Check Credentials uniqueness
 	if !partner.manager.UniqCredentials(partner.Id, partner.credentials()) {
 		if _, ok := partner.Settings[s.LOCAL_CREDENTIAL]; ok {
@@ -52,8 +59,6 @@ func (partner *APIPartner) Validate() bool {
 			partner.Errors.AddSettingError(s.LOCAL_CREDENTIALS, e.ERROR_UNIQUE)
 		}
 	}
-
-	return len(partner.Errors) == 0
 }
 
 func (partner *APIPartner) credentials() string {

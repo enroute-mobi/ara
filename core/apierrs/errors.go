@@ -22,6 +22,24 @@ const (
 	ERROR_UNIQUE      = "Is already in use"
 )
 
+func (errors Errors) Merge(errs Errors) {
+	for k, v := range errs {
+		_, ok := errors[k]
+		if !ok {
+			errors[k] = v
+			continue
+		}
+
+		switch v.(type) {
+		case []string:
+			errors[k] = append(errors[k].([]string), errs[k].([]string)...)
+			continue
+		case Errors:
+			errors[k].(Errors).Merge(v.(Errors))
+		}
+	}
+}
+
 func (errors Errors) Get(attribute string) []string {
 	m, ok := errors[attribute]
 	if !ok {

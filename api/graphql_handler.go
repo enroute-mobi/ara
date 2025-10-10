@@ -31,7 +31,7 @@ func NewGraphqlHandler(referential *core.Referential, token string) *GraphqlHand
 
 func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http.Request) {
 	// Find Partner by authorization Key
-	partner, ok := handler.referential.Partners().FindByCredential(handler.token)
+	partner, ok := handler.referential.Partners().FindByCredential(handler.token, handler.HandleRemoteAddress(request))
 	if !ok {
 		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
 		return
@@ -94,10 +94,8 @@ func (handler *GraphqlHandler) newBQMessage(slug, remoteAddress string) *audit.B
 	}
 }
 
-func (handler *GraphqlHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
+func (handler *GraphqlHandler) logError(m *audit.BigQueryMessage, startTime time.Time, errorString string) {
 	m.Status = "Error"
-	errorString := fmt.Sprintf(format, values...)
-
 	m.ErrorDetails = errorString
-	logger.Log.Debugf(errorString)
+	logger.Log.Debug(errorString)
 }

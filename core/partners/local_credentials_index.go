@@ -1,22 +1,22 @@
-package core
+package partners
 
 import (
 	"strings"
 )
 
 type LocalCredentialsIndex struct {
-	byCredentials map[string]PartnerId
-	byIdentifier  map[PartnerId][]string
+	byCredentials map[string]Id
+	byIdentifier  map[Id][]string
 }
 
 func NewLocalCredentialsIndex() *LocalCredentialsIndex {
 	return &LocalCredentialsIndex{
-		byCredentials: make(map[string]PartnerId),
-		byIdentifier:  make(map[PartnerId][]string),
+		byCredentials: make(map[string]Id),
+		byIdentifier:  make(map[Id][]string),
 	}
 }
 
-func (index *LocalCredentialsIndex) Index(modelId PartnerId, localCredentials string) {
+func (index *LocalCredentialsIndex) Index(modelId Id, localCredentials string) {
 	splitCredentials := splitCredentials(localCredentials)
 
 	// Delete from the index all elements of modelId not in the new localCredentials
@@ -32,12 +32,12 @@ func (index *LocalCredentialsIndex) Index(modelId PartnerId, localCredentials st
 	index.byIdentifier[modelId] = splitCredentials
 }
 
-func (index *LocalCredentialsIndex) Find(c string) (modelId PartnerId, ok bool) {
+func (index *LocalCredentialsIndex) Find(c string) (modelId Id, ok bool) {
 	modelId, ok = index.byCredentials[c]
 	return
 }
 
-func (index *LocalCredentialsIndex) Delete(modelId PartnerId) {
+func (index *LocalCredentialsIndex) Delete(modelId Id) {
 	currentCredentials, ok := index.byIdentifier[modelId]
 	if !ok {
 		return
@@ -49,7 +49,7 @@ func (index *LocalCredentialsIndex) Delete(modelId PartnerId) {
 	delete(index.byIdentifier, modelId)
 }
 
-func (index *LocalCredentialsIndex) UniqCredentials(modelId PartnerId, localCredentials string) bool {
+func (index *LocalCredentialsIndex) UniqCredentials(modelId Id, localCredentials string) bool {
 	splitCredentials := splitCredentials(localCredentials)
 
 	for i := range splitCredentials {

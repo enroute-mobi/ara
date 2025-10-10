@@ -41,7 +41,7 @@ func (handler *PushHandler) serve(response http.ResponseWriter, request *http.Re
 		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
 		return
 	}
-	partner, ok := handler.referential.Partners().FindByCredential(handler.token)
+	partner, ok := handler.referential.Partners().FindByCredential(handler.token, handler.HandleRemoteAddress(request))
 	if !ok {
 		http.Error(response, "Invalid Authorization Token", http.StatusUnauthorized)
 		return
@@ -118,11 +118,9 @@ func (handler *PushHandler) newBQMessage(slug, remoteAddress string) *audit.BigQ
 	}
 }
 
-func (handler *PushHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
+func (handler *PushHandler) logError(m *audit.BigQueryMessage, startTime time.Time, errorString string) {
 	m.ProcessingTime = handler.referential.Clock().Since(startTime).Seconds()
 	m.Status = "Error"
-	errorString := fmt.Sprintf(format, values...)
-
 	m.ErrorDetails = errorString
-	logger.Log.Debugf(errorString)
+	logger.Log.Debug(errorString)
 }

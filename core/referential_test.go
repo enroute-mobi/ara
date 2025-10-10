@@ -9,6 +9,7 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
+	p "bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/stretchr/testify/assert"
@@ -74,6 +75,7 @@ func Test_Referential_MarshalJSON(t *testing.T) {
 		ReferentialSettings: s.NewReferentialSettings(),
 	}
 	referential.partners = NewPartnerManager(referential)
+	referential.partnerTemplates = NewPartnerTemplateManager(referential)
 	referential.SetSettingsDefinition(map[string]string{"key": "value"})
 	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"referential","Settings":{"key":"value"}}`
 	jsonBytes, err := referential.MarshalJSON()
@@ -514,10 +516,10 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if p := partners2.Find(PartnerId(partner.id)); p == nil {
+	if p := partners2.Find(p.Id(partner.id)); p == nil {
 		t.Errorf("Loaded Partners should be found")
 	}
-	testPartner := partners2.Find(PartnerId(partner2.id))
+	testPartner := partners2.Find(p.Id(partner2.id))
 	if testPartner == nil {
 		t.Fatalf("Loaded Partners should be found")
 	}

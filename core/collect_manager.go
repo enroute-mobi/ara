@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 
+	"bitbucket.org/enroute-mobi/ara/core/partners"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/uuid"
@@ -112,7 +113,7 @@ func (manager *CollectManager) UpdateStopArea(request *StopAreaUpdateRequest) {
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp && !partner.PersistentCollect() {
 			localLogger.Printf("Partner %s isn't up", partner.Slug())
 			continue
 		}
@@ -177,7 +178,7 @@ func (manager *CollectManager) UpdateLine(ctx context.Context, request *LineUpda
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp && !partner.PersistentCollect() {
 			logger.Log.Debugf("Partner %s isn't up", partner.Slug())
 			continue
 		}
@@ -222,7 +223,7 @@ func (manager *CollectManager) UpdateVehicle(ctx context.Context, request *Vehic
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp && !partner.PersistentCollect() {
 			logger.Log.Debugf("Partner %s isn't up", partner.Slug())
 			continue
 		}
@@ -266,7 +267,7 @@ func (manager *CollectManager) UpdateFacility(ctx context.Context, request *Faci
 			continue
 		}
 
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP && !partner.PersistentCollect() {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp && !partner.PersistentCollect() {
 			logger.Log.Debugf("Partner %s isn't up", partner.Slug())
 			continue
 		}
@@ -310,7 +311,7 @@ func (manager *CollectManager) UpdateSituation(request *SituationUpdateRequest) 
 
 func (manager *CollectManager) requestAllSituations() {
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp {
 			continue
 		}
 		if partner.CollectFilteredSituations() {
@@ -351,7 +352,7 @@ func (manager *CollectManager) requestLineFilteredSituation(requestedId string) 
 	}
 
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp {
 			continue
 		}
 		if !partner.CollectFilteredSituations() {
@@ -404,7 +405,7 @@ func (manager *CollectManager) requestStopAreaFilteredSituation(requestedId stri
 	}
 
 	for _, partner := range manager.referential.Partners().FindAllByCollectPriority() {
-		if partner.PartnerStatus.OperationnalStatus != OPERATIONNAL_STATUS_UP {
+		if partner.PartnerStatus.OperationnalStatus != partners.OperationnalStatusUp {
 			continue
 		}
 		if !partner.CollectFilteredSituations() {

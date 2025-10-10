@@ -51,6 +51,13 @@ type HTTPClient struct {
 	siriLiteClient *SIRILiteClient
 }
 
+func (urls *HTTPClientUrls) Contains(url string) bool {
+	if urls.Url == url || urls.NotificationsUrl == url || urls.SubscriptionsUrl == url {
+		return true
+	}
+	return false
+}
+
 func NewHTTPClient(opts HTTPClientOptions) *HTTPClient {
 	c := &HTTPClient{
 		HTTPClientUrls: opts.Urls,

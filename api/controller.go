@@ -17,6 +17,7 @@ var idPattern = regexp.MustCompile("([0-9a-zA-Z-]+):([0-9a-zA-Z-:_]+)")
 var newWithReferentialControllerMap = map[string](func(*core.Referential) RestfulResource){
 	"stop_areas":            NewStopAreaController,
 	"partners":              NewPartnerController,
+	"partner_templates":     NewPartnerTemplateController,
 	"lines":                 NewLineController,
 	"line_groups":           NewLineGroupsController,
 	"stop_area_groups":      NewStopAreaGroupsController,

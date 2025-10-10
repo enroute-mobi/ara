@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	p "bitbucket.org/enroute-mobi/ara/core/partners"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
@@ -33,7 +34,7 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]mo
 	partners := referential.partners
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_url":           ts.URL,
+		"remote_url":        ts.URL,
 		"remote_code_space": "test_kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -76,7 +77,7 @@ func Test_GtfsCollectEvents(t *testing.T) {
 	if partner.alternativeStatusCheck.LastCheck != clock.FAKE_CLOCK_INITIAL_DATE {
 		t.Errorf("Partner alternative status time should be updated, got: %v", partner.alternativeStatusCheck.LastCheck)
 	}
-	if partner.alternativeStatusCheck.Status != OPERATIONNAL_STATUS_UP {
+	if partner.alternativeStatusCheck.Status != p.OperationnalStatusUp {
 		t.Errorf("Partner alternative status status should be updated, got: %v", partner.alternativeStatusCheck.Status)
 	}
 }
@@ -132,7 +133,7 @@ func Test_PartnerStatusDown(t *testing.T) {
 	partners := createTestPartnerManager()
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_url":           ts.URL,
+		"remote_url":        ts.URL,
 		"remote_code_space": "test_kind",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -145,7 +146,7 @@ func Test_PartnerStatusDown(t *testing.T) {
 	if partner.alternativeStatusCheck.LastCheck != clock.FAKE_CLOCK_INITIAL_DATE {
 		t.Errorf("Partner alternative status time should be updated, got: %v", partner.alternativeStatusCheck.LastCheck)
 	}
-	if partner.alternativeStatusCheck.Status != OPERATIONNAL_STATUS_DOWN {
+	if partner.alternativeStatusCheck.Status != p.OperationnalStatusDown {
 		t.Errorf("Partner alternative status status should be updated, got: %v", partner.alternativeStatusCheck.Status)
 	}
 }

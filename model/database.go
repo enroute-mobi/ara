@@ -47,6 +47,7 @@ func InitDB(config config.DatabaseConfig) *gorp.DbMap {
 	database := &gorp.DbMap{Db: db, Dialect: gorp.PostgresDialect{}}
 	database.AddTableWithName(DatabaseReferential{}, "referentials")
 	database.AddTableWithName(DatabasePartner{}, "partners")
+	database.AddTableWithName(DatabasePartnerTemplate{}, "partner_templates")
 
 	return database
 }

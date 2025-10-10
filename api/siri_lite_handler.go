@@ -51,7 +51,7 @@ func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *htt
 	}
 
 	// Find Partner by authorization Key
-	partner, ok := handler.referential.Partners().FindByCredential(handler.token)
+	partner, ok := handler.referential.Partners().FindByCredential(handler.token, handler.HandleRemoteAddress(request))
 	if !ok {
 		http.Error(response, "Invalid Authorization Token", http.StatusForbidden)
 		return
@@ -59,7 +59,6 @@ func (handler *SIRILiteHandler) serve(response http.ResponseWriter, request *htt
 
 	resource := request.PathValue("resource")
 	request.ParseForm()
-	request.URL.RequestURI()
 
 	requestHandler := handler.requestHandler(resource, request.Form)
 	if requestHandler == nil {

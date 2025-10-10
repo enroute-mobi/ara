@@ -75,7 +75,7 @@ func LoadConfig(path string) error {
 	}
 
 	logger.Log.Syslog = Config.Syslog
-	logger.Log.Debug = Config.Debug
+	logger.Log.DebugEnabled = Config.Debug
 	logger.Log.Color = Config.ColorizeLog
 
 	return nil

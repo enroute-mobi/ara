@@ -47,6 +47,32 @@ type SelectPartner struct {
 	ConnectorTypes sql.NullString `db:"connector_types"`
 }
 
+type DatabasePartnerTemplate struct {
+	Id               string `db:"id"`
+	ReferentialId    string `db:"referential_id"`
+	Slug             string `db:"slug"`
+	Name             string `db:"name"`
+	Settings         string `db:"settings"`
+	ConnectorTypes   string `db:"connector_types"`
+	CredentialType   string `db:"credential_type"`
+	LocalCredential  string `db:"local_credential"`
+	RemoteCredential string `db:"remote_credential"`
+	MaxPartners      int    `db:"max_partners"`
+}
+
+type SelectPartnerTemplate struct {
+	Id               string
+	ReferentialId    string `db:"referential_id"`
+	Slug             string
+	CredentialType   string        `db:"credential_type"`
+	LocalCredential  string        `db:"local_credential"`
+	RemoteCredential string        `db:"remote_credential"`
+	MaxPartners      sql.NullInt64 `db:"max_partners"`
+	Name             sql.NullString
+	Settings         sql.NullString
+	ConnectorTypes   sql.NullString `db:"connector_types"`
+}
+
 type DatabaseOperator struct {
 	Id              string `db:"id"`
 	ReferentialSlug string `db:"referential_slug"`

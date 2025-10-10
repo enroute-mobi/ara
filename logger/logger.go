@@ -9,9 +9,9 @@ import (
 )
 
 type Logger struct {
-	Syslog bool
-	Debug  bool
-	Color  bool
+	Syslog       bool
+	DebugEnabled bool
+	Color        bool
 
 	writer LogWriter
 }
@@ -71,10 +71,20 @@ func (logger *Logger) Writer() LogWriter {
 	return logger.writer
 }
 
+func (logger *Logger) Debug(s string) {
+	if logger.DebugEnabled {
+		logger.Writer().Debug(s)
+	}
+}
+
 func (logger *Logger) Debugf(format string, values ...interface{}) {
-	if logger.Debug {
+	if logger.DebugEnabled {
 		logger.Writer().Debug(fmt.Sprintf(format, values...))
 	}
+}
+
+func (logger *Logger) Print(s string) {
+	logger.Writer().Info(s)
 }
 
 func (logger *Logger) Printf(format string, values ...interface{}) {

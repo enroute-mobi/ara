@@ -41,6 +41,7 @@ type Referential struct {
 	model             *model.MemoryModel
 	modelGuardian     *ModelGuardian
 	partners          Partners
+	partnerTemplates  PartnerTemplates
 	startedAt         time.Time
 	nextReloadAt      time.Time
 	Tokens            []string `json:",omitempty"`
@@ -148,6 +149,10 @@ func (referential *Referential) Partners() Partners {
 	return referential.partners
 }
 
+func (referential *Referential) PartnerTemplates() PartnerTemplates {
+	return referential.partnerTemplates
+}
+
 func (referential *Referential) DatabaseOrganisationId() sql.NullString {
 	if referential.OrganisationId == "" {
 		return sql.NullString{}
@@ -197,11 +202,12 @@ func (referential *Referential) Save() (ok bool) {
 func (referential *Referential) MarshalJSON() ([]byte, error) {
 	type Alias Referential
 	aux := struct {
-		Id           ReferentialId
-		Slug         ReferentialSlug
-		NextReloadAt *time.Time `json:",omitempty"`
-		Partners     Partners   `json:",omitempty"`
-		Settings     map[string]string
+		Id               ReferentialId
+		Slug             ReferentialSlug
+		NextReloadAt     *time.Time       `json:",omitempty"`
+		Partners         Partners         `json:",omitempty"`
+		PartnerTemplates PartnerTemplates `json:",omitempty"`
+		Settings         map[string]string
 		*Alias
 	}{
 		Id:       referential.id,
@@ -215,6 +221,9 @@ func (referential *Referential) MarshalJSON() ([]byte, error) {
 	}
 	if !referential.partners.IsEmpty() {
 		aux.Partners = referential.partners
+	}
+	if !referential.partnerTemplates.IsEmpty() {
+		aux.PartnerTemplates = referential.partnerTemplates
 	}
 
 	return json.Marshal(&aux)
@@ -256,9 +265,11 @@ func (referential *Referential) NextReloadAt() time.Time {
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model for referential %v", referential.slug)
 	referential.Stop()
+	referential.partners.DeleteAllFromTemplate()
 	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
 	referential.partners.Load()
+	referential.partnerTemplates.Load()
 	referential.Start()
 }
 
@@ -273,12 +284,13 @@ func (referential *Referential) setNextReloadAt() {
 	}
 
 	referential.nextReloadAt = time.Date(now.Year(), now.Month(), day, hour, minute, 0, 0, now.Location())
-	logger.Log.Printf("Next reload at: %v", referential.nextReloadAt)
+	logger.Log.Debugf("Next reload at: %v", referential.nextReloadAt)
 }
 
 func (referential *Referential) Load() {
 	referential.model.Load()
 	referential.Partners().Load()
+	referential.PartnerTemplates().Load()
 }
 
 type MemoryReferentials struct {
@@ -308,6 +320,7 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	}
 
 	referential.partners = NewPartnerManager(referential)
+	referential.partnerTemplates = NewPartnerTemplateManager(referential)
 	referential.collectManager = NewCollectManager(referential)
 	referential.broacasterManager = NewBroadcastManager(referential)
 
