@@ -52,6 +52,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 							<siri:DepartureStatus>dstatus2</siri:DepartureStatus>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 			<siri:EstimatedJourneyVersionFrame>
@@ -74,6 +75,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 							<siri:DepartureStatus>dstatus3</siri:DepartureStatus>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>line3</siri:LineRef>
@@ -93,6 +95,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 							<siri:DepartureStatus>dstatus4</siri:DepartureStatus>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
@@ -231,6 +234,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 					<siri:DestinationRef>destination1</siri:DestinationRef>
 					<siri:DestinationName>destination 1</siri:DestinationName>
 					<siri:OperatorRef>operator1</siri:OperatorRef>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>

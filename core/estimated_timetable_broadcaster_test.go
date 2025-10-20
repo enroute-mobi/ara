@@ -146,6 +146,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 							<siri:Order>0</siri:Order>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
