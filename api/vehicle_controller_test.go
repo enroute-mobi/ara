@@ -158,7 +158,15 @@ func Test_VehicleController_Index(t *testing.T) {
 	checkVehicleResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"RecordedAtTime":"0001-01-01T00:00:00Z","ValidUntilTime":"0001-01-01T00:00:00Z","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}]`
+	expected := `{"Models":
+  [{"RecordedAtTime": "0001-01-01T00:00:00Z",
+    "ValidUntilTime": "0001-01-01T00:00:00Z",
+    "Longitude": 1.2,
+    "Latitude": 3.4,
+    "Bearing": 5.6,
+    "Id": "6ba7b814-9dad-11d1-0-00c04fd430c8"}],
+    "Pagination": {"CurrentPage": 1, "PerPage": 1, "TotalPages": 1, "TotalCount": 1}}`
+
 	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
