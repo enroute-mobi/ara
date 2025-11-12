@@ -51,6 +51,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.True(ok, "Can't find VehicleJourney: \"01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 	assert.Equal("outbound", vj.DirectionType)
 	assert.Equal("bus", vj.Attributes["VehicleMode"])
+	assert.Equal(1, vj.AimedStopVisitCount)
 
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find StopVisit: \"02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
@@ -87,6 +88,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.True(ok, "Can't find VehicleJourney: \"01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 	assert.Equal("inbound", vj.DirectionType)
 	assert.Equal("bus", vj.Attributes["VehicleMode"])
+	assert.Equal(2, vj.AimedStopVisitCount)
 
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find StopVisit: \"02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
@@ -108,6 +110,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find VehicleJourney: \"01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 	assert.Zero(vj.DirectionType)
+	assert.Equal(3, vj.AimedStopVisitCount)
 }
 
 func Test_LoadFromCSVFile_Force(t *testing.T) {
@@ -126,7 +129,7 @@ func Test_LoadFromCSVFile_Force(t *testing.T) {
 	o := []string{"operator", "03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", ""}
 	l := []string{"line", "f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", "", "", ""}
 	lg := []string{"line_group", "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", ""}
-	vj := []string{"vehicle_journey", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "", "", ""}
+	vj := []string{"vehicle_journey", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "", "", "", ""}
 	sv := []string{"stop_visit", "02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "2017-01-01", "", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", "", "", "", ""}
 
 	err := forceBuilder.handleStopArea(sa)
