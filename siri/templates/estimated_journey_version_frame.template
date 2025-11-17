@@ -39,5 +39,6 @@
 							<siri:DepartureStatus>{{ .DepartureStatus }}</siri:DepartureStatus>{{end}}
 						</siri:EstimatedCall>{{ end }}
 					</siri:EstimatedCalls>{{ end }}
+					<siri:IsCompleteStopSequence>{{ .IsCompleteStopSequence }}</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>{{ end }}
 			</siri:EstimatedJourneyVersionFrame>

@@ -113,6 +113,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -306,6 +307,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -505,6 +507,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -693,6 +696,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -882,6 +886,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -962,6 +967,7 @@ Feature: Support SIRI EstimatedTimetable
                   <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
                 </siri:EstimatedCall>
               </siri:EstimatedCalls>
+              <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
             </siri:EstimatedVehicleJourney>
           </siri:EstimatedJourneyVersionFrame>
         </siri:EstimatedTimetableDelivery>
@@ -1081,6 +1087,7 @@ Feature: Support SIRI EstimatedTimetable
                                           <siri:DepartureStatus>delayed</siri:DepartureStatus>
                                         </siri:EstimatedCall>
                                     </siri:EstimatedCalls>
+                                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                                 </siri:EstimatedVehicleJourney>
                             </siri:EstimatedJourneyVersionFrame>
                         </siri:EstimatedTimetableDelivery>
@@ -1207,6 +1214,7 @@ Feature: Support SIRI EstimatedTimetable
                                         <siri:DepartureStatus>delayed</siri:DepartureStatus>
                                       </siri:EstimatedCall>
                                   </siri:EstimatedCalls>
+                                  <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                               </siri:EstimatedVehicleJourney>
                           </siri:EstimatedJourneyVersionFrame>
                       </siri:EstimatedTimetableDelivery>
@@ -1338,6 +1346,7 @@ Feature: Support SIRI EstimatedTimetable
                                     <siri:DepartureStatus>delayed</siri:DepartureStatus>
                                   </siri:EstimatedCall>
                               </siri:EstimatedCalls>
+                              <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                           </siri:EstimatedVehicleJourney>
                       </siri:EstimatedJourneyVersionFrame>
                   </siri:EstimatedTimetableDelivery>
@@ -1448,6 +1457,7 @@ Feature: Support SIRI EstimatedTimetable
                           <siri:DepartureStatus>cancelled</siri:DepartureStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -1639,6 +1649,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -1830,6 +1841,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                   <siri:EstimatedVehicleJourney>
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
@@ -1857,6 +1869,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -1996,6 +2009,7 @@ Feature: Support SIRI EstimatedTimetable
                         <siri:DepartureStatus>delayed</siri:DepartureStatus>
                       </siri:EstimatedCall>
                      </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>

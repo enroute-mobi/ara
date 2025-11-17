@@ -352,6 +352,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
+          <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
         </siri:EstimatedVehicleJourney>
       </siri:EstimatedJourneyVersionFrame>
       </siri:EstimatedTimetableDelivery>
@@ -1095,6 +1096,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
+          <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
         </siri:EstimatedVehicleJourney>
       </siri:EstimatedJourneyVersionFrame>
       </siri:EstimatedTimetableDelivery>
@@ -1149,6 +1151,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <siri:DepartureStatus>departed</siri:DepartureStatus>
             </siri:RecordedCall>
           </siri:RecordedCalls>
+          <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
         </siri:EstimatedVehicleJourney>
       </siri:EstimatedJourneyVersionFrame>
       </siri:EstimatedTimetableDelivery>
@@ -1543,6 +1546,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
+          <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
         </siri:EstimatedVehicleJourney>
       </siri:EstimatedJourneyVersionFrame>
       </siri:EstimatedTimetableDelivery>
@@ -1929,7 +1933,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       """
 
   @ARA-1234
-  Scenario: Broadcast full ETT StopVisits when receiving all stops and with ScheduledStopVisits
+  Scenario: Broadcast full RAW ETT StopVisits when receiving all stops and with ScheduledStopVisits
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
       | remote_url                         | http://localhost:8090          |
@@ -2051,6 +2055,132 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </Siri>
       """
 
+  @ARA-1234 @ARA-1804
+  Scenario: Broadcast full SOAP ETT StopVisits when receiving all stops and with ScheduledStopVisits
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
+      | remote_url                         | http://localhost:8090          |
+      | remote_credential                  | test                           |
+      | local_credential                   | default                        |
+      | remote_code_space                  | internal                       |
+      | generators.subscription_identifier | RELAIS:Subscription::%{id}:LOC |
+    And 30 seconds have passed
+    And a StopArea exists with the following attributes:
+      | Name            | FIRST                      |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
+      # "Id":"6ba7b814-9dad-11d1-3-00c04fd430c8"
+    And a StopArea exists with the following attributes:
+      | Name            | SECOND                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:25:LOC |
+      # "Id":"6ba7b814-9dad-11d1-4-00c04fd430c8"
+    And a Subscription exist with the following attributes:
+      | Kind              | StopMonitoringCollect                              |
+      | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:24:LOC" |
+      # "SubscriptionRef":"RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC"
+    And a Subscription exist with the following attributes:
+      | Kind              | EstimatedTimetableBroadcast           |
+      | ExternalId        | externalId                            |
+      | SubscriberRef     | subscriber                            |
+      | ReferenceArray[0] | Line, "internal": "NINOXE:Line:3:LOC" |
+      # "SubscriptionRef":"RELAIS:Subscription::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC"
+    And a Line exists with the following attributes:
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
+      # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
+    And a VehicleJourney exists with the following attributes:
+      | Name                      | Passage 32                        |
+      | Codes[internal]           | NINOXE:VehicleJourney:201         |
+      | LineId                    | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
+      | Monitored                 | true                              |
+      | Attributes[DirectionName] | A Direction Name                  |
+      # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
+    And a ScheduledStopVisit exists with the following attributes:
+      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | PassageOrder            | 4                                                      |
+      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
+      | VehicleJourneyId        | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop           | false                                                  |
+      | Schedule[aimed]#Arrival | 2017-01-01T15:00:00.000Z                               |
+      # "Id":"6ba7b814-9dad-11d1-9-00c04fd430c8"
+    And a ScheduledStopVisit exists with the following attributes:
+      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3 |
+      | PassageOrder            | 5                                                      |
+      | StopAreaId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | VehicleJourneyId        | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop           | false                                                  |
+      | Schedule[aimed]#Arrival | 2017-01-01T15:20:00.000Z                               |
+      # "Id":"6ba7b814-9dad-11d1-d-00c04fd430c8"
+    And a StopVisit exists with the following attributes:
+      | Codes[internal]            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | PassageOrder               | 4                                                      |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop              | true                                                   |
+      | Schedule[aimed]#Arrival    | 2017-01-01T13:00:00.000+02:00                          |
+      | Schedule[expected]#Arrival | 2017-01-01T13:01:00.000+02:00                          |
+    And 10 seconds have passed
+    When the VehicleJourney "6ba7b814-9dad-11d1-8-00c04fd430c8" is edited with the following attributes:
+      | HasCompleteStopSequence | true |
+    And a StopVisit exists with the following attributes:
+      | Codes[internal]            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3 |
+      | PassageOrder               | 5                                                      |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop              | false                                                  |
+      | Schedule[aimed]#Arrival    | 2017-01-01T15:00:00.000+02:00                          |
+      | Schedule[expected]#Arrival | 2017-01-01T15:01:00.000+02:00                          |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifyEstimatedTimetable xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri'>
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>test</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-e-00c04fd430c8</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:EstimatedTimetableDelivery version='2.0:FR-IDF-2.4'>
+                <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:EstimatedJourneyVersionFrame>
+                  <siri:RecordedAtTime>2017-01-01T12:00:50.000Z</siri:RecordedAtTime>
+                  <siri:EstimatedVehicleJourney>
+                    <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+                    <siri:DirectionRef>unknown</siri:DirectionRef>
+                    <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:EstimatedCalls>
+                      <siri:EstimatedCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                        <siri:Order>4</siri:Order>
+                        <siri:StopPointName>FIRST</siri:StopPointName>
+                        <siri:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</siri:AimedArrivalTime>
+                        <siri:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</siri:ExpectedArrivalTime>
+                      </siri:EstimatedCall>
+                      <siri:EstimatedCall>
+                        <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
+                        <siri:Order>5</siri:Order>
+                        <siri:StopPointName>SECOND</siri:StopPointName>
+                        <siri:AimedArrivalTime>2017-01-01T15:00:00.000+02:00</siri:AimedArrivalTime>
+                        <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000+02:00</siri:ExpectedArrivalTime>
+                      </siri:EstimatedCall>
+                    </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>true</siri:IsCompleteStopSequence>
+                  </siri:EstimatedVehicleJourney>
+                </siri:EstimatedJourneyVersionFrame>
+              </siri:EstimatedTimetableDelivery>
+            </Notification>
+            <SiriExtension/>
+          </sw:NotifyEstimatedTimetable>
+        </S:Body>
+      </S:Envelope>
+      """
+
   @ARA-1234
   Scenario: Do not broadcast full ETT StopVisits after a first full broadcast when editing a StopVisit with ScheduledStopVisits
     Given a SIRI server on "http://localhost:8090"
@@ -2162,6 +2292,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                         <siri:ExpectedArrivalTime>2017-01-01T15:01:00.000+02:00</siri:ExpectedArrivalTime>
                       </siri:EstimatedCall>
                     </siri:EstimatedCalls>
+                    <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
                   </siri:EstimatedVehicleJourney>
                 </siri:EstimatedJourneyVersionFrame>
               </siri:EstimatedTimetableDelivery>
@@ -2736,6 +2867,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
+          <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
         </siri:EstimatedVehicleJourney>
       </siri:EstimatedJourneyVersionFrame>
       </siri:EstimatedTimetableDelivery>
@@ -2835,6 +2967,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
               <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
           </siri:EstimatedCalls>
+          <siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
         </siri:EstimatedVehicleJourney>
       </siri:EstimatedJourneyVersionFrame>
       </siri:EstimatedTimetableDelivery>

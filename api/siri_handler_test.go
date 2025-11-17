@@ -696,6 +696,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 			<siri:EstimatedJourneyVersionFrame>
@@ -714,6 +715,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 							<siri:ArrivalStatus>onTime</siri:ArrivalStatus>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>
+					<siri:IsCompleteStopSequence>false</siri:IsCompleteStopSequence>
 				</siri:EstimatedVehicleJourney>
 			</siri:EstimatedJourneyVersionFrame>
 		</siri:EstimatedTimetableDelivery>
