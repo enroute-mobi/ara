@@ -1,6 +1,7 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: c12f242976637eee74b03d99a73c209d6f28c11b
+  revision: 3206060cde1fb4b1762d4687be84cdd08dd0c3f4
+  branch: ARA-1810-use-aimed-stop-visit-count
   specs:
     ara (3.5.5)
       faraday
