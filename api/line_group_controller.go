@@ -32,7 +32,7 @@ func (controller *LineGroupsController) Index(response http.ResponseWriter, _par
 	response.Write(jsonBytes)
 }
 
-func (controller *LineGroupsController) Show(response http.ResponseWriter, identifier string) {
+func (controller *LineGroupsController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	lineGroup, ok := controller.findLineGroup(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("LineGroup not found: %s", identifier), http.StatusNotFound)

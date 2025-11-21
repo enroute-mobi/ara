@@ -35,7 +35,7 @@ func (controller *PartnerTemplateController) Index(response http.ResponseWriter,
 	response.Write(jsonBytes)
 }
 
-func (controller *PartnerTemplateController) Show(response http.ResponseWriter, identifier string) {
+func (controller *PartnerTemplateController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	pt := controller.findPartnerTemplate(identifier)
 	if pt == nil {
 		http.Error(response, fmt.Sprintf("Partner template not found: %s", identifier), http.StatusNotFound)

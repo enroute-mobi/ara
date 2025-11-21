@@ -37,7 +37,7 @@ func (controller *OperatorController) Index(response http.ResponseWriter, _param
 	response.Write(jsonBytes)
 }
 
-func (controller *OperatorController) Show(response http.ResponseWriter, identifier string) {
+func (controller *OperatorController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	operator, ok := controller.findOperator(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Operator not found: %s", identifier), http.StatusNotFound)

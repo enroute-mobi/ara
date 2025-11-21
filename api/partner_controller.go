@@ -103,7 +103,7 @@ func (controller *PartnerController) Index(response http.ResponseWriter, _params
 	response.Write(jsonBytes)
 }
 
-func (controller *PartnerController) Show(response http.ResponseWriter, identifier string) {
+func (controller *PartnerController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	partner := controller.findPartner(identifier)
 	if partner == nil {
 		http.Error(response, fmt.Sprintf("Partner not found: %s", identifier), http.StatusNotFound)

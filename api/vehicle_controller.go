@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -30,19 +31,41 @@ func (controller *VehicleController) findVehicle(identifier string) (*model.Vehi
 	return controller.referential.Model().Vehicles().Find(model.VehicleId(identifier))
 }
 
-func (controller *VehicleController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *VehicleController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Vehicles Index")
 
 	stime := controller.referential.Clock().Now()
-	vehicles := controller.referential.Model().Vehicles().FindAll()
+	allVehicles := controller.referential.Model().Vehicles().FindAll()
 	logger.Log.Debugf("VehicleController FindAll time : %v", controller.referential.Clock().Since(stime))
-	stime = controller.referential.Clock().Now()
-	jsonBytes, _ := json.Marshal(vehicles)
-	logger.Log.Debugf("VehicleController Json Marshal time : %v ", controller.referential.Clock().Since(stime))
+
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(allVehicles, func(i, j int) bool {
+			return allVehicles[i].Id() > allVehicles[j].Id()
+		})
+	case "asc", "":
+		sort.Slice(allVehicles, func(i, j int) bool {
+			return allVehicles[i].Id() < allVehicles[j].Id()
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	paginatedVehicles, err := paginate(allVehicles, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedVehicles)
 	response.Write(jsonBytes)
+
+	logger.Log.Debugf("VehicleController Json Marshal time : %v ", controller.referential.Clock().Since(stime))
 }
 
-func (controller *VehicleController) Show(response http.ResponseWriter, identifier string) {
+func (controller *VehicleController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	vehicle, ok := controller.findVehicle(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Vehicle not found: %s", identifier), http.StatusNotFound)

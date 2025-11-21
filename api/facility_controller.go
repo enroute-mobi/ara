@@ -37,7 +37,7 @@ func (controller *FacilityController) Index(response http.ResponseWriter, _param
 	response.Write(jsonBytes)
 }
 
-func (controller *FacilityController) Show(response http.ResponseWriter, identifier string) {
+func (controller *FacilityController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	facility, ok := controller.findFacility(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Facility not found: %s", identifier), http.StatusNotFound)

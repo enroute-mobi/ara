@@ -60,7 +60,7 @@ func (controller *LineController) Index(response http.ResponseWriter, params url
 	response.Write(jsonBytes)
 }
 
-func (controller *LineController) Show(response http.ResponseWriter, identifier string) {
+func (controller *LineController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	line, ok := controller.findLine(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Line not found: %s", identifier), http.StatusNotFound)

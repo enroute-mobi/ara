@@ -44,7 +44,7 @@ func (controller *StopVisitController) Index(response http.ResponseWriter, _para
 	response.Write(jsonBytes)
 }
 
-func (controller *StopVisitController) Show(response http.ResponseWriter, identifier string) {
+func (controller *StopVisitController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	stopVisit, ok := controller.findStopVisit(identifier)
 	if !ok {
 		http.Error(response, fmt.Sprintf("Stop visit not found: %s", identifier), http.StatusNotFound)

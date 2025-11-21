@@ -36,7 +36,7 @@ func (controller *ReferentialController) Index(response http.ResponseWriter, _pa
 	response.Write(jsonBytes)
 }
 
-func (controller *ReferentialController) Show(response http.ResponseWriter, identifier string) {
+func (controller *ReferentialController) Show(response http.ResponseWriter, identifier string, _params url.Values) {
 	referential := controller.findReferential(identifier)
 	if referential == nil {
 		http.Error(response, fmt.Sprintf("Referential not found: %s", identifier), http.StatusNotFound)
