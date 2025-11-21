@@ -1,7 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: e83f81711a877d7b75e1020dcd2ec905ee1ec743
-  branch: ARA-1799-paginate-vehicles
+  revision: c12f242976637eee74b03d99a73c209d6f28c11b
   specs:
     ara (3.5.5)
       faraday
@@ -82,15 +81,15 @@ GEM
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
-    faraday-net_http (3.4.1)
-      net-http (>= 0.5.0)
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
     ffi (1.17.2)
     http-accept (1.7.0)
     http-cookie (1.1.0)
       domain_name (~> 0.5)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
-    json (2.15.1)
+    json (2.16.0)
     license_finder (7.2.1)
       bundler
       csv (~> 3.2)
@@ -113,8 +112,8 @@ GEM
     mini_portile2 (2.8.9)
     minitest (5.26.0)
     multi_test (1.1.0)
-    net-http (0.6.0)
-      uri
+    net-http (0.8.0)
+      uri (>= 0.11.1)
     netrc (0.11.0)
     nokogiri (1.18.10)
       mini_portile2 (~> 2.8.2)
@@ -148,7 +147,7 @@ GEM
     tomlrb (2.0.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uri (1.0.4)
+    uri (1.1.1)
     webrick (1.9.1)
     with_env (1.1.0)
     xml-simple (1.1.9)
