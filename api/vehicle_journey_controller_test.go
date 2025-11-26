@@ -202,6 +202,7 @@ func Test_VehicleJourneyController_Show_With_Detailed_Stop_visits(t *testing.T) 
 {"Name": "A",
  "Monitored": false,
  "HasCompleteStopSequence": false,
+ "Cancellation": false,
  "Id":"6ba7b814-9dad-11d1-0-00c04fd430c8",
  "StopVisits": ["6ba7b814-9dad-11d1-2-00c04fd430c8"],
  "DetailedStopVisits":
@@ -232,7 +233,12 @@ func Test_VehicleJourneyController_Create(t *testing.T) {
 	vehicleJourney, ok := referential.Model().VehicleJourneys().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
 	assert.True(ok, "VehicleJourney should be found after POST request")
 
-	expected := `{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"HasCompleteStopSequence":false,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","Monitored":false}`
+	expected := `
+{"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},
+"HasCompleteStopSequence":false,
+"Cancellation": false,
+"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8",
+"Monitored":false}`
 	vehicleJourneyMarshal, err := vehicleJourney.MarshalJSON()
 	assert.NoError(err)
 	assert.JSONEq(expected, string(vehicleJourneyMarshal))
@@ -250,6 +256,7 @@ func Test_VehicleJourneyController_Index(t *testing.T) {
 	//Test Results
 	expected := `{"Models":
   [{"HasCompleteStopSequence": false,
+    "Cancellation": false,
     "Id": "6ba7b814-9dad-11d1-0-00c04fd430c8",
     "Monitored": false}],
     "Pagination": {"CurrentPage": 1, "PerPage": 1, "TotalCount": 1, "TotalPages": 1}}`

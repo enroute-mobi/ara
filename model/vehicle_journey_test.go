@@ -21,6 +21,8 @@ func Test_VehicleJourney_Id(t *testing.T) {
 }
 
 func Test_VehicleJourney_MarshalJSON(t *testing.T) {
+	assert := assert.New(t)
+
 	model := NewTestMemoryModel()
 	generator := uuid.NewFakeUUIDGenerator()
 	// Create a StopVisit
@@ -36,16 +38,17 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
-	expected := `{"Codes":{"codeSpace":"value"},"Monitored":false,"HasCompleteStopSequence":false,"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8","StopVisits":["6ba7b814-9dad-11d1-0-00c04fd430c8"]}`
+	expected := `
+{"Codes":{"codeSpace":"value"},
+"Monitored":false,
+"HasCompleteStopSequence":false,
+"Cancellation":false,
+"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8",
+"StopVisits":["6ba7b814-9dad-11d1-0-00c04fd430c8"]}`
 	jsonBytes, err := vehicleJourney.MarshalJSON()
-	if err != nil {
-		t.Fatal(err)
-	}
+	assert.NoError(err)
 
-	jsonString := string(jsonBytes)
-	if jsonString != expected {
-		t.Errorf("VehicleJourney.MarshalJSON() returns wrong json:\n got: %s\n want: %s", jsonString, expected)
-	}
+	assert.JSONEq(expected, string(jsonBytes))
 }
 
 func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
