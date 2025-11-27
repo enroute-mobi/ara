@@ -88,66 +88,86 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
-	message := subscriber.newBQEvent()
-	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
+	chunkSize := subscriber.connector.Partner().StopMonitoringMaxSubscriptionPerRequest()
+	subscriptionIds := make([]SubscriptionId, 0, chunkSize)
 
-	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
-		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
-		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
-		RequestTimestamp:  subscriber.Clock().Now(),
-	}
+	process := func() {
+		message := subscriber.newBQEvent()
+		defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
+		defer func() { subscriptionIds = subscriptionIds[:0] }()
 
-	var subIds []string
-	stopAreasToLog := []string{}
-	for subId, subscriptionRequest := range subscriptionRequests {
-		for _, m := range subscriptionRequest.modelsToRequest {
-			entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
-				SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-				SubscriptionIdentifier: string(subId),
-				InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-			}
-			entry.MessageIdentifier = subscriptionRequest.requestMessageRef
-			entry.RequestTimestamp = subscriber.Clock().Now()
-
-			switch m.kind {
-			case "StopArea":
-				entry.MonitoringRef = m.code.Value()
-				stopAreasToLog = append(stopAreasToLog, entry.MonitoringRef)
-				siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
-			}
+		siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
+			ConsumerAddress:   subscriber.connector.Partner().Address(),
+			MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
+			RequestorRef:      subscriber.connector.Partner().RequestorRef(),
+			RequestTimestamp:  subscriber.Clock().Now(),
 		}
-		subIds = append(subIds, string(subId))
+
+		var subIdsToLog []string
+		stopAreasToLog := []string{}
+		for i := range subscriptionIds {
+			subId := subscriptionIds[i]
+			for _, m := range subscriptionRequests[subId].modelsToRequest {
+				entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
+					SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
+					SubscriptionIdentifier: string(subId),
+					InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
+				}
+				entry.MessageIdentifier = subscriptionRequests[subId].requestMessageRef
+				entry.RequestTimestamp = subscriber.Clock().Now()
+
+				switch m.kind {
+				case "StopArea":
+					entry.MonitoringRef = m.code.Value()
+					stopAreasToLog = append(stopAreasToLog, entry.MonitoringRef)
+					siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
+				}
+			}
+			subIdsToLog = append(subIdsToLog, string(subId))
+		}
+
+		message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
+		message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
+		message.RequestSize = int64(len(message.RequestRawMessage))
+		message.StopAreas = stopAreasToLog
+		message.SubscriptionIdentifiers = subIdsToLog
+
+		startTime := subscriber.Clock().Now()
+		response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
+		message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
+		if err != nil {
+			logger.Log.Debugf("Error while subscribing: %v", err)
+			e := fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
+
+			collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
+
+			message.Status = "Error"
+			message.ErrorDetails = e
+
+			return
+		}
+
+		message.ResponseRawMessage = response.RawXML()
+		message.ResponseSize = int64(len(message.ResponseRawMessage))
+		message.ResponseIdentifier = response.ResponseMessageIdentifier()
+
+		collectSubscriber.HandleResponse(subscriptionRequests, message, response)
+
+		if len(subscriptionRequests) == 0 {
+			return
+		}
 	}
 
-	message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
-	message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
-	message.RequestSize = int64(len(message.RequestRawMessage))
-	message.StopAreas = stopAreasToLog
-	message.SubscriptionIdentifiers = subIds
-
-	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
-	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
-	if err != nil {
-		logger.Log.Debugf("Error while subscribing: %v", err)
-		e := fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
-
-		collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
-
-		message.Status = "Error"
-		message.ErrorDetails = e
-		return
+	for subscriptionId := range subscriptionRequests {
+		subscriptionIds = append(subscriptionIds, subscriptionId)
+		if len(subscriptionIds) == chunkSize {
+			process()
+		}
 	}
 
-	message.ResponseRawMessage = response.RawXML()
-	message.ResponseSize = int64(len(message.ResponseRawMessage))
-	message.ResponseIdentifier = response.ResponseMessageIdentifier()
-
-	collectSubscriber.HandleResponse(subscriptionRequests, message, response)
-
-	if len(subscriptionRequests) == 0 {
-		return
+	// Process last, potentially incomplete batch
+	if len(subscriptionIds) > 0 {
+		process()
 	}
 
 	collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
