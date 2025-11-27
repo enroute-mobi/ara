@@ -1059,3 +1059,25 @@ func Test_MaxStopVisitPerDelivery_Below_50(t *testing.T) {
 
 	assert.Equal(10, partnerSettings.MaxStopVisitPerDelivery())
 }
+
+func Test_StopMonitoringMaxSubscriptionPerRequest_Above_1000(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		COLLECT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST: "1200",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal(1000, partnerSettings.StopMonitoringMaxSubscriptionPerRequest(), "Should set StopMonitoringMaxSubscriptionPerRequest at default 1000")
+}
+
+func Test_StopMonitoringMaxSubscriptionPerRequest_Below_1000(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		COLLECT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST: "10",
+	}
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+
+	assert.Equal(10, partnerSettings.StopMonitoringMaxSubscriptionPerRequest())
+}
