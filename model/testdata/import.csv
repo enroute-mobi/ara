@@ -3,9 +3,9 @@ stop_area,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,a0eebc99-9c0b-4ef8-bb6d-6bb9bd380
 line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"lineCode"},{},{},true,L1,c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11
 line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"lineCode"},{},{},true
 line,f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-03,Name,{"internal":"lineCode"},{},{},true,L1
-vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{"VehicleMode":"bus"},{},outbound
-vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{"VehicleMode":"bus"},{},inbound
-vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-03,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},"{""OperatorRef"":{""Type"":""OperatorRef"",""Code"":{""internal"":""operatorCode""}}}"
+vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{"VehicleMode":"bus"},{},outbound,1
+vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{"VehicleMode":"bus"},{},inbound,2
+vehicle_journey,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-03,Name,{"internal":"vehicleJourneyCode"},f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,origin,destination,{},"{""OperatorRef"":{""Type"":""OperatorRef"",""Code"":{""internal"":""operatorCode""}}}","",3
 stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,{"internal":"stopVisitCode"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},"{""OperatorRef"":{""Type"":""OperatorRef"",""Code"":{""internal"":""operatorCode""}}}"
 stop_visit,02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-02,{"internal":"stopVisitCode"},a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,1,[],{},{}
 operator,03eebc99-9c0b-4ef8-bb6d-6bb9bd380a11,2017-01-01,Name,{"internal":"operatorCode"}

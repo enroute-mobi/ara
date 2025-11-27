@@ -33,6 +33,7 @@ type VehicleJourney struct {
 	Monitored               bool
 	HasCompleteStopSequence bool
 	DetailedStopVisits      []DetailedStopVisit `json:"DetailedStopVisits,omitempty"`
+	AimedStopVisitCount     int                 `json:",omitempty"`
 }
 
 type DetailedStopVisit struct {
@@ -364,6 +365,10 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 		}
 		if vj.DirectionType.Valid {
 			vehicleJourney.DirectionType = vj.DirectionType.String
+		}
+
+		if vj.AimedStopVisitCount.Valid {
+			vehicleJourney.AimedStopVisitCount = int(vj.AimedStopVisitCount.Int64)
 		}
 
 		if vj.Attributes.Valid && len(vj.Attributes.String) > 0 {

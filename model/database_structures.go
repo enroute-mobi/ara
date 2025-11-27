@@ -197,17 +197,18 @@ type DatabaseVehicleJourney struct {
 }
 
 type SelectVehicleJourney struct {
-	Id              string
-	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
-	Name            sql.NullString
-	Codes           sql.NullString `db:"codes"`
-	LineId          sql.NullString `db:"line_id"`
-	OriginName      sql.NullString `db:"origin_name"`
-	DestinationName sql.NullString `db:"destination_name"`
-	DirectionType   sql.NullString `db:"direction_type"`
-	Attributes      sql.NullString
-	References      sql.NullString `db:"siri_references"`
+	Id                  string
+	ReferentialSlug     string `db:"referential_slug"`
+	ModelName           string `db:"model_name"`
+	Name                sql.NullString
+	Codes               sql.NullString `db:"codes"`
+	LineId              sql.NullString `db:"line_id"`
+	OriginName          sql.NullString `db:"origin_name"`
+	DestinationName     sql.NullString `db:"destination_name"`
+	DirectionType       sql.NullString `db:"direction_type"`
+	Attributes          sql.NullString
+	References          sql.NullString `db:"siri_references"`
+	AimedStopVisitCount sql.NullInt64  `db:"aimed_stop_visit_count"`
 }
 
 type DatabaseStopVisit struct {

@@ -595,10 +595,8 @@ func (loader *Loader) insertLineGroups() {
 }
 
 func (loader *Loader) handleVehicleJourney(record []string) error {
-	var directionType string
-
-	if len(record) < 10 {
-		return fmt.Errorf("wrong number of entries, expected 10 minimun got %v", len(record))
+	if len(record) < 11 {
+		return fmt.Errorf("wrong number of entries, expected 11 minimun got %v", len(record))
 	}
 
 	err := loader.handleForce(VEHICLE_JOURNEY, record[2])
@@ -606,11 +604,7 @@ func (loader *Loader) handleVehicleJourney(record []string) error {
 		return err
 	}
 
-	if len(record) == 11 {
-		directionType = record[10]
-	}
-
-	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),",
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),",
 		loader.referentialSlug,
 		record[1],
 		record[2],
@@ -621,7 +615,8 @@ func (loader *Loader) handleVehicleJourney(record []string) error {
 		record[7],
 		record[8],
 		record[9],
-		directionType,
+		record[10],
+		record[11],
 	)
 
 	loader.vehicleJourneys = append(loader.vehicleJourneys, values...)
@@ -644,7 +639,7 @@ func (loader *Loader) insertVehicleJourneys() {
 		loader.bulkCounter[VEHICLE_JOURNEY] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,codes,line_id,origin_name,destination_name,attributes,siri_references, direction_type) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
+	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,codes,line_id,origin_name,destination_name,attributes,siri_references, direction_type, aimed_stop_visit_count) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
 
 	result, err := Database.Exec(query)
 	if err != nil {
