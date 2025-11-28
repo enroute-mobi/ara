@@ -69,6 +69,7 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 
 				CodeSpace: builder.remoteCodeSpace,
 				// SiriXML:      &estimatedVehicleJourney.XMLMonitoredVehicleJourney,
+				Cancellation: estimatedVehicleJourney.Cancellation(),
 			}
 
 			builder.updateEvents.VehicleJourneys[estimatedVehicleJourney.DatedVehicleJourneyRef()] = vjEvent

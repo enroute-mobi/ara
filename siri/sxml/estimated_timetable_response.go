@@ -17,12 +17,13 @@ type XMLEstimatedJourneyVersionFrame struct {
 type XMLEstimatedVehicleJourney struct {
 	XMLStructure
 
-	lineRef                string
+	cancellation           Bool
+	datedVehicleJourneyRef string
+	destinationRef         string
 	directionRef           string
 	operatorRef            string
-	datedVehicleJourneyRef string
 	originRef              string
-	destinationRef         string
+	lineRef                string
 
 	estimatedCalls []*XMLCall
 	recordedCalls  []*XMLCall
@@ -88,6 +89,13 @@ func (evj *XMLEstimatedVehicleJourney) LineRef() string {
 		evj.lineRef = evj.findStringChildContent(siri_attributes.LineRef)
 	}
 	return evj.lineRef
+}
+
+func (evj *XMLEstimatedVehicleJourney) Cancellation() bool {
+	if !evj.cancellation.Defined {
+		evj.cancellation.SetValue(evj.findBoolChildContent(siri_attributes.Cancellation))
+	}
+	return evj.cancellation.Value
 }
 
 func (evj *XMLEstimatedVehicleJourney) DirectionRef() string {
