@@ -415,7 +415,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 
 	// VehicleJourney stop sequence
 	if !vj.HasCompleteStopSequence {
-		completeStopSequence := (vj.AimedStopVisitCount == vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())) && vj.AimedStopVisitCount != 0
+		completeStopSequence := vj.AimedStopVisitCount != 0 && (vj.AimedStopVisitCount == vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())) 
 		if completeStopSequence {
 			vj.HasCompleteStopSequence = true
 			manager.model.VehicleJourneys().Save(vj)
