@@ -48,6 +48,7 @@ type SIRIEstimatedVehicleJourney struct {
 	DirectionType          string
 	PublishedLineName      string
 	DestinationName        string
+	Cancellation           bool
 
 	IsCompleteStopSequence bool
 
