@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type SIRIStopMonitoringSubscriber interface {
@@ -88,13 +89,19 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
-	chunkSize := subscriber.connector.Partner().StopMonitoringMaxSubscriptionPerRequest()
-	subscriptionIds := make([]SubscriptionId, 0, chunkSize)
+	subscriptionIds := maps.Keys(subscriptionRequests)
+	batchSize := subscriber.connector.Partner().StopMonitoringMaxSubscriptionPerRequest()
+	batches := make([][]SubscriptionId, 0, (len(subscriptionIds)+batchSize-1)/batchSize)
 
-	process := func() {
+	for batchSize < len(subscriptionIds) {
+		subscriptionIds, batches = subscriptionIds[batchSize:], append(batches, subscriptionIds[0:batchSize:batchSize])
+	}
+
+	batches = append(batches, subscriptionIds)
+
+	for i := range batches {
 		message := subscriber.newBQEvent()
 		defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
-		defer func() { subscriptionIds = subscriptionIds[:0] }()
 
 		siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
 			ConsumerAddress:   subscriber.connector.Partner().Address(),
@@ -103,17 +110,16 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			RequestTimestamp:  subscriber.Clock().Now(),
 		}
 
-		var subIdsToLog []string
+		var subscriptionIdsToLog []string
 		stopAreasToLog := []string{}
-		for i := range subscriptionIds {
-			subId := subscriptionIds[i]
-			for _, m := range subscriptionRequests[subId].modelsToRequest {
+		for _, subscriptionId := range batches[i] {
+			for _, m := range subscriptionRequests[subscriptionId].modelsToRequest {
 				entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
 					SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-					SubscriptionIdentifier: string(subId),
+					SubscriptionIdentifier: string(subscriptionId),
 					InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
 				}
-				entry.MessageIdentifier = subscriptionRequests[subId].requestMessageRef
+				entry.MessageIdentifier = subscriptionRequests[subscriptionId].requestMessageRef
 				entry.RequestTimestamp = subscriber.Clock().Now()
 
 				switch m.kind {
@@ -123,14 +129,14 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 					siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
 				}
 			}
-			subIdsToLog = append(subIdsToLog, string(subId))
+			subscriptionIdsToLog = append(subscriptionIdsToLog, string(subscriptionId))
 		}
 
 		message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
 		message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
 		message.RequestSize = int64(len(message.RequestRawMessage))
 		message.StopAreas = stopAreasToLog
-		message.SubscriptionIdentifiers = subIdsToLog
+		message.SubscriptionIdentifiers = subscriptionIdsToLog
 
 		startTime := subscriber.Clock().Now()
 		response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
@@ -144,7 +150,7 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			message.Status = "Error"
 			message.ErrorDetails = e
 
-			return
+			continue
 		}
 
 		message.ResponseRawMessage = response.RawXML()
@@ -157,19 +163,6 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 			return
 		}
 	}
-
-	for subscriptionId := range subscriptionRequests {
-		subscriptionIds = append(subscriptionIds, subscriptionId)
-		if len(subscriptionIds) == chunkSize {
-			process()
-		}
-	}
-
-	// Process last, potentially incomplete batch
-	if len(subscriptionIds) > 0 {
-		process()
-	}
-
 	collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 }
 
