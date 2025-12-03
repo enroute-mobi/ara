@@ -470,7 +470,7 @@ func (s *PartnerSettings) SmMultipleDeliveriesPerNotify() bool {
 
 func (s *PartnerSettings) setSiriStopMonitoringMaximumSubscriptionsPerRequest(settings map[string]string) {
 	max, _ := strconv.Atoi(settings[COLLECT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST])
-	if max > COLLECT_DEFAULT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST {
+	if max > COLLECT_DEFAULT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST || max == 0 {
 		max = COLLECT_DEFAULT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST
 	}
 	s.collectSiriStopMonitoringMaximumSubscriptionsPerRequest = max
