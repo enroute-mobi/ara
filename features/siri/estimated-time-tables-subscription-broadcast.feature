@@ -1933,7 +1933,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       """
 
   @ARA-1234
-  Scenario: Broadcast full RAW ETT StopVisits when receiving all stops and with ScheduledStopVisits
+  Scenario: Broadcast full ETT StopVisits when receiving all stops and AimedStopVisitCount
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
       | remote_url                         | http://localhost:8090          |
@@ -1971,23 +1971,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | LineId                    | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | Monitored                 | true                              |
       | Attributes[DirectionName] | A Direction Name                  |
+      | AimedStopVisitCount       | 2                                 |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
-    And a ScheduledStopVisit exists with the following attributes:
-      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
-      | PassageOrder            | 4                                                      |
-      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
-      | VehicleJourneyId        | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop           | false                                                  |
-      | Schedule[aimed]#Arrival | 2017-01-01T15:00:00.000Z                               |
-      # "Id":"6ba7b814-9dad-11d1-9-00c04fd430c8"
-    And a ScheduledStopVisit exists with the following attributes:
-      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3 |
-      | PassageOrder            | 5                                                      |
-      | StopAreaId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleJourneyId        | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop           | false                                                  |
-      | Schedule[aimed]#Arrival | 2017-01-01T15:20:00.000Z                               |
-      # "Id":"6ba7b814-9dad-11d1-d-00c04fd430c8"
     And a StopVisit exists with the following attributes:
       | Codes[internal]            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
       | PassageOrder               | 4                                                      |
@@ -2015,7 +2000,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
         <ServiceDelivery>
           <ResponseTimestamp>2017-01-01T12:00:50.000Z</ResponseTimestamp>
           <ProducerRef>test</ProducerRef>
-          <ResponseMessageIdentifier>6ba7b814-9dad-11d1-e-00c04fd430c8</ResponseMessageIdentifier>
+          <ResponseMessageIdentifier>6ba7b814-9dad-11d1-c-00c04fd430c8</ResponseMessageIdentifier>
           <EstimatedTimetableDelivery>
             <ResponseTimestamp>2017-01-01T12:00:50.000Z</ResponseTimestamp>
             <SubscriberRef>subscriber</SubscriberRef>
@@ -2182,7 +2167,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       """
 
   @ARA-1234
-  Scenario: Do not broadcast full ETT StopVisits after a first full broadcast when editing a StopVisit with ScheduledStopVisits
+  Scenario: Do not broadcast full ETT StopVisits after a first full broadcast when editing a StopVisit with AimedStopVisitCount
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-check-status-client,siri-estimated-timetable-subscription-broadcaster] and the following settings:
       | remote_url                         | http://localhost:8090          |
@@ -2220,23 +2205,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | Monitored                 | true                              |
       | Attributes[DirectionName] | A Direction Name                  |
       | HasCompleteStopSequence   | true                              |
+      | AimedStopVisitCount       | 2                                 |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
-    And a ScheduledStopVisit exists with the following attributes:
-      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
-      | PassageOrder            | 4                                                      |
-      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
-      | VehicleJourneyId        | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop           | false                                                  |
-      | Schedule[aimed]#Arrival | 2017-01-01T15:00:00.000Z                               |
-      # "Id":"6ba7b814-9dad-11d1-9-00c04fd430c8"
-    And a ScheduledStopVisit exists with the following attributes:
-      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3 |
-      | PassageOrder            | 5                                                      |
-      | StopAreaId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleJourneyId        | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop           | false                                                  |
-      | Schedule[aimed]#Arrival | 2017-01-01T15:20:00.000Z                               |
-      # "Id":"6ba7b814-9dad-11d1-a-00c04fd430c8"
     And a StopVisit exists with the following attributes:
       | Codes[internal]            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
       | PassageOrder               | 4                                                      |
@@ -2245,7 +2215,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | VehicleAtStop              | true                                                   |
       | Schedule[aimed]#Arrival    | 2017-01-01T13:00:00.000+02:00                          |
       | Schedule[expected]#Arrival | 2017-01-01T13:01:00.000+02:00                          |
-      # "Id":"6ba7b814-9dad-11d1-b-00c04fd430c8"
+      # "Id":"6ba7b814-9dad-11d1-9-00c04fd430c8"
     And a StopVisit exists with the following attributes:
       | Codes[internal]            | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3 |
       | PassageOrder               | 5                                                      |
@@ -2254,9 +2224,9 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | VehicleAtStop              | false                                                  |
       | Schedule[aimed]#Arrival    | 2017-01-01T15:00:00.000+02:00                          |
       | Schedule[expected]#Arrival | 2017-01-01T15:01:00.000+02:00                          |
-      # "Id":"6ba7b814-9dad-11d1-c-00c04fd430c8"
+      # "Id":"6ba7b814-9dad-11d1-a-00c04fd430c8"
     And 10 seconds have passed
-    When the StopVisit "6ba7b814-9dad-11d1-c-00c04fd430c8" is edited with the following attributes:
+    When the StopVisit "6ba7b814-9dad-11d1-a-00c04fd430c8" is edited with the following attributes:
       | VehicleAtStop | true |
     And 10 seconds have passed
     Then the SIRI server should receive this response
@@ -2268,7 +2238,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:50.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>test</siri:ProducerRef>
-              <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-e-00c04fd430c8</siri:ResponseMessageIdentifier>
+              <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-c-00c04fd430c8</siri:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Notification>
               <siri:EstimatedTimetableDelivery version="2.0:FR-IDF-2.4">

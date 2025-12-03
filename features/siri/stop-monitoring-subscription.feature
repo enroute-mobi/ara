@@ -1873,7 +1873,7 @@ Feature: Support SIRI StopMonitoring by subscription
     Then the SIRI server should have received 2 DeleteSubscription requests
 
   @ARA-1252 @ARA-1234
-  Scenario: Update HasCompleteStopSequence of a VehicleJourney when receiving all StopVisits with ScheduledStopVisits
+  Scenario: Update HasCompleteStopSequence of a VehicleJourney when receiving all StopVisits with AimedStopVisitCount
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
       <?xml version='1.0' encoding='utf-8'?>
@@ -1935,29 +1935,18 @@ Feature: Support SIRI StopMonitoring by subscription
       | Kind              | StopMonitoringCollect                              |
       | ReferenceArray[0] | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
       # "SubscriptionRef":"RELAIS:Subscription::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC"
-    And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[internal]          | NINOXE:VehicleJourney:201         |
-      | LineId                   | 6ba7b814-9dad-11d1-a-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | A Direction Name                  |
+    And a Line exists with the following attributes:
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
       # "Id":"6ba7b814-9dad-11d1-7-00c04fd430c8"
-    And a ScheduledStopVisit exists with the following attributes:
-      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
-      | PassageOrder            | 1                                                      |
-      | StopAreaId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
-      | VehicleJourneyId        | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
-      | VehicleAtStop           | false                                                  |
-      | Schedule[aimed]#Arrival | 2017-01-01T15:00:00.000Z                               |
+    And a VehicleJourney exists with the following attributes:
+      | Name                      | Passage 32                        |
+      | Codes[internal]           | NINOXE:VehicleJourney:201         |
+      | LineId                    | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
+      | Monitored                 | true                              |
+      | Attributes[DirectionName] | A Direction Name                  |
+      | AimedStopVisitCount       | 2                                 |
       # "Id":"6ba7b814-9dad-11d1-8-00c04fd430c8"
-    And a ScheduledStopVisit exists with the following attributes:
-      | Codes[internal]         | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-3 |
-      | PassageOrder            | 2                                                      |
-      | StopAreaId              | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleJourneyId        | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
-      | VehicleAtStop           | false                                                  |
-      | Schedule[aimed]#Arrival | 2017-01-01T15:20:00.000Z                               |
-      # "Id":"6ba7b814-9dad-11d1-9-00c04fd430c8"
     And a minute has passed
     When I send this SIRI request
       """
@@ -2016,9 +2005,8 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-    Then the VehicleJourney "6ba7b814-9dad-11d1-7-00c04fd430c8" has the following attributes:
-      | HasCompleteStopSequence | false                                 |
-      | StopVisits              | ["6ba7b814-9dad-11d1-f-00c04fd430c8"] |
+    Then the VehicleJourney "6ba7b814-9dad-11d1-8-00c04fd430c8" has the following attributes:
+      | HasCompleteStopSequence | false |
     And a minute has passed
     When I send this SIRI request
       """
@@ -2035,7 +2023,7 @@ Feature: Support SIRI StopMonitoring by subscription
               <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <siri:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</siri:ResponseTimestamp>
                 <siri:SubscriberRef>RELAIS</siri:SubscriberRef>
-                <siri:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</siri:SubscriptionRef>
+                <siri:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:SubscriptionRef>
                 <siri:Status>true</siri:Status>
                 <siri:MonitoredStopVisit>
                   <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
@@ -2060,9 +2048,9 @@ Feature: Support SIRI StopMonitoring by subscription
                     <siri:CourseOfJourneyRef>201</siri:CourseOfJourneyRef>
                     <siri:VehicleRef>NINOXE:Vehicle:23:LOC</siri:VehicleRef>
                     <siri:MonitoredCall>
-                      <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
-                      <siri:Order>4</siri:Order>
-                      <siri:StopPointName>Elf Sylvain - Métro (R)</siri:StopPointName>
+                      <siri:StopPointRef>NINOXE:StopPoint:SP:25:LOC</siri:StopPointRef>
+                      <siri:Order>5</siri:Order>
+                      <siri:StopPointName>Test</siri:StopPointName>
                       <siri:VehicleAtStop>true</siri:VehicleAtStop>
                       <siri:AimedArrivalTime>2017-01-01T13:00:00.000+02:00</siri:AimedArrivalTime>
                       <siri:ExpectedArrivalTime>2017-01-01T13:01:00.000+02:00</siri:ExpectedArrivalTime>
@@ -2077,9 +2065,8 @@ Feature: Support SIRI StopMonitoring by subscription
         </soap:Body>
       </soap:Envelope>
       """
-    Then the VehicleJourney "6ba7b814-9dad-11d1-7-00c04fd430c8" has the following attributes:
-      | HasCompleteStopSequence | true                                                                        |
-      | StopVisits              | ["6ba7b814-9dad-11d1-f-00c04fd430c8", "6ba7b814-9dad-11d1-14-00c04fd430c8"] |
+    Then the VehicleJourney "6ba7b814-9dad-11d1-8-00c04fd430c8" has the following attributes:
+      | HasCompleteStopSequence | true |
 
   @ARA-1256
   Scenario: Delete and recreate subscription when receiving subscription with same existing number

@@ -24,7 +24,6 @@ Feature: Support SIRI EstimatedTimetable
       | Attributes[OriginName]         | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
-    And show me ara vehicle_journeys
     And a StopVisit exists with the following attributes:
       | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                   | 4                                                      |
