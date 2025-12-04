@@ -397,6 +397,21 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 			manager.updateMonitoredStopArea(sa.Id(), event.Origin, event.Monitored)
 		}
 	}
+	// VehicleJourney stop sequence
+	if !vj.IsComplete() {
+		completeStopSequence := vj.AimedStopVisitCount != 0 &&
+			vj.AimedStopVisitCount == (vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id()))
+
+		if !found {
+			completeStopSequence = vj.AimedStopVisitCount != 0 &&
+				vj.AimedStopVisitCount == (vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())+1)
+		}
+
+		if completeStopSequence {
+			vj.HasCompleteStopSequence = true
+			manager.model.VehicleJourneys().Save(vj)
+		}
+	}
 
 	// Default is AfterCreate
 	var h hooks.Type
@@ -413,15 +428,6 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	manager.model.StopVisits().Save(sv)
-
-	// VehicleJourney stop sequence
-	if !vj.HasCompleteStopSequence {
-		completeStopSequence := vj.AimedStopVisitCount != 0 && (vj.AimedStopVisitCount == vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())) 
-		if completeStopSequence {
-			vj.HasCompleteStopSequence = true
-			manager.model.VehicleJourneys().Save(vj)
-		}
-	}
 
 	// long term historisation
 	if sv.IsArchivable() {
