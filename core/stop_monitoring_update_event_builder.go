@@ -107,8 +107,8 @@ func (builder *StopMonitoringUpdateEventBuilder) buildUpdateEvents(xmlStopVisitE
 			PassageOrder:       xmlStopVisitEvent.Order(),
 			Monitored:          xmlStopVisitEvent.Monitored(),
 			VehicleAtStop:      xmlStopVisitEvent.VehicleAtStop(),
-			ArrivalStatus:      model.SetStopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
-			DepartureStatus:    model.SetStopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
+			ArrivalStatus:      model.StopVisitArrivalStatus(xmlStopVisitEvent.ArrivalStatus()),
+			DepartureStatus:    model.StopVisitDepartureStatus(xmlStopVisitEvent.DepartureStatus()),
 			RecordedAt:         xmlStopVisitEvent.RecordedAt(),
 			Schedules:          schedules.NewStopVisitSchedules(),
 

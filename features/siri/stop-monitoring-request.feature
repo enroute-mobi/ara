@@ -350,7 +350,9 @@ Feature: Support SIRI StopMonitoring by request
     And the SIRI server has received a GetStopMonitoring request
     Then one StopVisit has the following attributes:
       | Codes[internal] | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
-      | PassageOrder    |                                                      4 |
+      | PassageOrder    | 4                                                      |
+      | ArrivalStatus   | arrived                                                |
+      | DepartureStatus | nil                                                    |
     And one Line has the following attributes:
       | Codes[internal] | NINOXE:Line:3:LOC |
       | Name            | Ligne 3 Metro     |
