@@ -8,6 +8,7 @@ require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/bigquery v1.71.0
+	github.com/DataDog/dd-trace-go/v2 v2.4.1
 	github.com/everystreet/go-proj/v6 v6.0.0
 	github.com/getsentry/sentry-go v0.36.0
 	github.com/graph-gophers/graphql-go v1.8.0
@@ -26,7 +27,6 @@ require (
 	golang.org/x/time v0.14.0
 	google.golang.org/api v0.252.0
 	google.golang.org/protobuf v1.36.10
-	gopkg.in/DataDog/dd-trace-go.v1 v1.74.7
 	gopkg.in/gorp.v1 v1.7.2
 	gopkg.in/yaml.v2 v2.4.0
 )
@@ -40,14 +40,13 @@ require (
 	github.com/DataDog/datadog-agent/pkg/obfuscate v0.71.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/opentelemetry-mapping-go/otlp/attributes v0.71.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/proto v0.71.2 // indirect
-	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.71.2 // indirect
+	github.com/DataDog/datadog-agent/pkg/remoteconfig/state v0.73.0-rc.1 // indirect
 	github.com/DataDog/datadog-agent/pkg/trace v0.71.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/util/log v0.71.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/util/scrubber v0.71.2 // indirect
 	github.com/DataDog/datadog-agent/pkg/version v0.71.2 // indirect
 	github.com/DataDog/datadog-go/v5 v5.8.1 // indirect
-	github.com/DataDog/dd-trace-go/v2 v2.3.0 // indirect
-	github.com/DataDog/go-libddwaf/v4 v4.6.0 // indirect
+	github.com/DataDog/go-libddwaf/v4 v4.6.1 // indirect
 	github.com/DataDog/go-runtime-metrics-internal v0.0.4-0.20250721125240-fdf1ef85b633 // indirect
 	github.com/DataDog/go-sqllexer v0.1.8 // indirect
 	github.com/DataDog/go-tuf v1.1.1-0.5.2 // indirect
@@ -80,10 +79,11 @@ require (
 	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.18.1 // indirect
+	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20251013123823-9fd1530e3ec3 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
+	github.com/minio/simdjson-go v0.4.5 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.3-0.20250322232337-35a7c28c31ee // indirect
 	github.com/outcaste-io/ristretto v0.2.3 // indirect
@@ -119,6 +119,7 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.43.0 // indirect
 	golang.org/x/mod v0.29.0 // indirect
 	golang.org/x/net v0.46.0 // indirect
