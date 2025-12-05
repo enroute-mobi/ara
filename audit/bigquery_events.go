@@ -31,7 +31,6 @@ const (
 	FACILITY_MONITORING_REQUEST   BigQueryMessageType = "FacilityMonitoringRequest"
 	GENERAL_MESSAGE_REQUEST       BigQueryMessageType = "GeneralMessageRequest"
 	LINES_DISCOVERY_REQUEST       BigQueryMessageType = "LinesDiscoveryRequest"
-	SIRI_SERVICE_REQUEST          BigQueryMessageType = "SiriServiceRequest"
 	SITUATION_EXCHANGE_REQUEST    BigQueryMessageType = "SituationExchangeRequest"
 	STOP_MONITORING_REQUEST       BigQueryMessageType = "StopMonitoringRequest"
 	STOP_POINTS_DISCOVERY_REQUEST BigQueryMessageType = "StopPointsDiscoveryRequest"
