@@ -8,7 +8,8 @@ GIT
 
 GIT
   remote: https://bitbucket.org/enroute-mobi/gtfs-rt.git
-  revision: e0b01b976d15044e179c9500f220a78270660491
+  revision: 6c8f5219ca8f1fd4ca03cc3c41b5d3035802975c
+  branch: ARA-1827-gtfs-rt-broadcast-cancelled-vj
   specs:
     gtfs-rt (0.1.0)
       racc

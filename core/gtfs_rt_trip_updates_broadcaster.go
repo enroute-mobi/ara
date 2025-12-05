@@ -108,6 +108,11 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 				tripDescriptor.DirectionId = directionId
 			}
 
+			if vj.IsCancelled() {
+				cancelled := gtfs.TripDescriptor_CANCELED
+				tripDescriptor.ScheduleRelationship = &cancelled
+			}
+
 			// Fill the FeedEntity
 			newId := fmt.Sprintf("trip:%v", vjId.Value())
 			feedEntity = &gtfs.FeedEntity{

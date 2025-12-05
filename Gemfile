@@ -9,7 +9,7 @@ group :test do
   gem 'http-cookie'
   gem 'rest-client'
   gem 'pg'
-  gem 'gtfs-rt', en_route: 'gtfs-rt'
+  gem 'gtfs-rt', en_route: 'gtfs-rt', branch: 'ARA-1827-gtfs-rt-broadcast-cancelled-vj'
   gem 'pry'
   gem 'siri-xsd', en_route: 'siri-xsd'
   gem 'activesupport'
