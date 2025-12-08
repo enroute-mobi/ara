@@ -679,6 +679,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 					<siri:LineRef>NINOXE:Line:2:LOC</siri:LineRef>
 					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>vehicleJourney</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>false</siri:Cancellation>
 					<siri:PublishedLineName>lineName</siri:PublishedLineName>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
@@ -705,6 +706,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 					<siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
 					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>vehicleJourney2</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>false</siri:Cancellation>
 					<siri:PublishedLineName>lineName2</siri:PublishedLineName>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>

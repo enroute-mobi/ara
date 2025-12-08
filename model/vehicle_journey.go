@@ -32,6 +32,7 @@ type VehicleJourney struct {
 	OriginName              string `json:",omitempty"`
 	Monitored               bool
 	HasCompleteStopSequence bool
+	Cancellation            bool
 	DetailedStopVisits      []DetailedStopVisit `json:"DetailedStopVisits,omitempty"`
 	AimedStopVisitCount     int                 `json:",omitempty"`
 }

@@ -3,7 +3,9 @@
 				<siri:EstimatedVehicleJourney>
 					<siri:LineRef>{{ .LineRef }}</siri:LineRef>
 					<siri:DirectionRef>{{ if .DirectionType }}{{ .DirectionType }}{{ else }}unknown{{ end }}</siri:DirectionRef>
-					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>{{ if .PublishedLineName }}
+					<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>{{ .Cancellation }}</siri:Cancellation>{{ if .Attributes.VehicleMode }}
+					<siri:VehicleMode>{{ .Attributes.VehicleMode }}</siri:VehicleMode>{{ end }}{{ if .PublishedLineName }}
 					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ end }}{{ if .References.OriginRef }}
 					<siri:OriginRef>{{ .References.OriginRef }}</siri:OriginRef>{{ end }}{{ if .References.DestinationRef }}
 					<siri:DestinationRef>{{ .References.DestinationRef }}</siri:DestinationRef>{{ end }}{{ if .DestinationName }}

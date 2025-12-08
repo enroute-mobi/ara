@@ -139,6 +139,7 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 					<siri:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:LineRef>
 					<siri:DirectionRef>unknown</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>false</siri:Cancellation>
 					<siri:OperatorRef>123456789</siri:OperatorRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>

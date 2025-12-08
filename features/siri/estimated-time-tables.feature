@@ -22,6 +22,7 @@ Feature: Support SIRI EstimatedTimetable
       | LineId                         | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType                  | Aller                             |
       | Attributes[OriginName]         | Le début                          |
+      | Attributes[VehicleMode]        | bus                               |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
@@ -94,6 +95,8 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
+                    <siri:VehicleMode>bus</siri:VehicleMode>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -264,6 +267,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -461,6 +465,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -653,6 +658,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -851,6 +857,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -952,6 +959,7 @@ Feature: Support SIRI EstimatedTimetable
               <siri:LineRef>NINOXE:Line:A:BUS:LOC</siri:LineRef>
               <siri:DirectionRef>Aller</siri:DirectionRef>
               <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+              <siri:Cancellation>false</siri:Cancellation>
               <siri:PublishedLineName>Ligne A Bus</siri:PublishedLineName>
               <siri:DestinationRef>a8989abce31bae21da02c1c2cf42dd855cd86a1d</siri:DestinationRef>
               <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1068,6 +1076,7 @@ Feature: Support SIRI EstimatedTimetable
                                 <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                                   <siri:DirectionRef>Aller</siri:DirectionRef>
                                   <siri:DatedVehicleJourneyRef>ch:1:ServiceJourney:87_TAC:6ba7b814</siri:DatedVehicleJourneyRef>
+                                  <siri:Cancellation>false</siri:Cancellation>
                                   <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                                   <siri:DestinationRef>a8989abce31bae21da02c1c2cf42dd855cd86a1d</siri:DestinationRef>
                                   <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1195,6 +1204,7 @@ Feature: Support SIRI EstimatedTimetable
                               <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                                 <siri:DirectionRef>Aller</siri:DirectionRef>
                                 <siri:DatedVehicleJourneyRef>RATPDev:VehicleJourney::6ba7b814:LOC</siri:DatedVehicleJourneyRef>
+                                <siri:Cancellation>false</siri:Cancellation>
                                 <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                                 <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                                 <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1329,6 +1339,7 @@ Feature: Support SIRI EstimatedTimetable
                             <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                             <siri:DirectionRef>Aller</siri:DirectionRef>
                             <siri:DatedVehicleJourneyRef>VehicleJourney:6ba7b814</siri:DatedVehicleJourneyRef>
+                            <siri:Cancellation>false</siri:Cancellation>
                             <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                             <siri:DestinationRef>a8989abce31bae21da02c1c2cf42dd855cd86a1d</siri:DestinationRef>
                             <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1441,6 +1452,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1606,6 +1618,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1814,6 +1827,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1846,6 +1860,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:202</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1989,6 +2004,7 @@ Feature: Support SIRI EstimatedTimetable
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>Aller</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
                     <siri:DestinationName>La fin.</siri:DestinationName>
