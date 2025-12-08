@@ -6,7 +6,8 @@
 					<FramedVehicleJourneyRef>
 						<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
 						<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
-					</FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
+					</FramedVehicleJourneyRef>
+					<Cancellation>{{ .Cancellation }}</Cancellation>{{ if .Attributes.VehicleMode }}
 					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}{{ if .PublishedLineName }}
 					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ end }}{{ if .DestinationName }}
 					<DestinationName>{{ .DestinationName}}</DestinationName>{{ end }}{{ if .References.OperatorRef }}

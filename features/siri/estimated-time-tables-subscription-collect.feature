@@ -271,6 +271,7 @@ Feature: Support SIRI EstimatedTimetable
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>true</siri:Cancellation>
           <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
           <siri:OperatorRef>CdF:Company::410:LOC</siri:OperatorRef>
           <siri:EstimatedCalls>
@@ -297,6 +298,7 @@ Feature: Support SIRI EstimatedTimetable
       | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType   | Aller                             |
       | Id              | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | Cancellation    | true                              |
     And one StopArea has the following attributes:
       | Codes[internal] | NINOXE:StopPoint:SP:24:LOC        |
       | Name            | Test                              |

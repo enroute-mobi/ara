@@ -30,6 +30,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>false</siri:Cancellation>
 					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
 					<siri:DestinationName>destination 1</siri:DestinationName>
@@ -61,6 +62,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>line2</siri:LineRef>
 					<siri:DirectionRef>direction2</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref2</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>true</siri:Cancellation>
 					<siri:OriginRef>origin2</siri:OriginRef>
 					<siri:DestinationRef>destination2</siri:DestinationRef>
 					<siri:DestinationName>destination 2</siri:DestinationName>
@@ -81,6 +83,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 					<siri:LineRef>line3</siri:LineRef>
 					<siri:DirectionRef>direction3</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref3</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>false</siri:Cancellation>
 					<siri:OriginRef>origin3</siri:OriginRef>
 					<siri:DestinationRef>destination3</siri:DestinationRef>
 					<siri:DestinationName>destination 3</siri:DestinationName>
@@ -158,6 +161,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		DatedVehicleJourneyRef: "dvjref2",
 		DirectionType:          "direction2",
 		DestinationName:        "destination 2",
+		Cancellation: true,
 		Attributes: map[string]string{
 			"OriginName": "origin 2",
 		},
@@ -230,6 +234,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 					<siri:LineRef>line1</siri:LineRef>
 					<siri:DirectionRef>direction1</siri:DirectionRef>
 					<siri:DatedVehicleJourneyRef>dvjref1</siri:DatedVehicleJourneyRef>
+					<siri:Cancellation>false</siri:Cancellation>
 					<siri:OriginRef>origin1</siri:OriginRef>
 					<siri:DestinationRef>destination1</siri:DestinationRef>
 					<siri:DestinationName>destination 1</siri:DestinationName>

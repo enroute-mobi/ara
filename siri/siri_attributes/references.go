@@ -1,6 +1,7 @@
 package siri_attributes
 
 const (
+	Cancellation           = "Cancellation"
 	DataFrameRef           = "DataFrameRef"
 	DatedVehicleJourneyRef = "DatedVehicleJourneyRef"
 	DestinationRef         = "DestinationRef"

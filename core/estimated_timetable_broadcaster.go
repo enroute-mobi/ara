@@ -192,6 +192,7 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 					DirectionType:          ett.connector.directionType(vehicleJourney.DirectionType),
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					DataFrameRef:           ett.connector.dataFrameRef(),
+					Cancellation:           vehicleJourney.Cancellation,
 					PublishedLineName:      ett.connector.publishedLineName(line),
 					DestinationName:        vehicleJourney.DestinationName,
 					Attributes:             make(map[string]string),

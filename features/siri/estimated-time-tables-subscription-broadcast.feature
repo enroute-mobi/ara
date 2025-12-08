@@ -299,6 +299,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | DestinationName                | La fin.                           |
       | Reference[OriginRef]#Code      | "external": "ThisIsTheBeginning"  |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
+      | Cancellation                   | true                              |
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
       | PassageOrder                | 4                                                      |
@@ -338,6 +339,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>true</siri:Cancellation>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:OriginRef>RATPDev:StopPoint:Q:437bd677531592a8d5138228dd571274689b24e0:LOC</siri:OriginRef>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
@@ -392,6 +394,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
       | Attributes[OriginName]         | Le début                          |
+      | Attributes[VehicleMode]        | bus                               |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
@@ -413,41 +416,43 @@ Feature: Support SIRI EstimatedTimetable by subscription
       """
       <?xml version='1.0' encoding='utf-8'?>
       <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
-      <ServiceDelivery>
-      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
-      <ProducerRef>test</ProducerRef>
-      <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
-      <EstimatedTimetableDelivery>
-      <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
-      <SubscriberRef>subscriber</SubscriberRef>
-      <SubscriptionRef>externalId</SubscriptionRef>
-      <Status>true</Status>
-      <EstimatedJourneyVersionFrame>
-       <RecordedAtTime>2017-01-01T12:00:15.000Z</RecordedAtTime>
-       <EstimatedVehicleJourney>
-         <LineRef>NINOXE:Line:3:LOC</LineRef>
-         <DirectionRef>Aller</DirectionRef>
-          <FramedVehicleJourneyRef>
-            <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
-            <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
-          </FramedVehicleJourneyRef>
-         <PublishedLineName>L3M</PublishedLineName>
-         <DestinationName>La fin.</DestinationName>
-         <OperatorRef>CdF:Company::410:LOC</OperatorRef>
-         <EstimatedCalls>
-           <EstimatedCall>
-             <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
-             <Order>4</Order>
-             <StopPointName>Test</StopPointName>
-             <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
-             <ArrivalStatus>delayed</ArrivalStatus>
-           </EstimatedCall>
-         </EstimatedCalls>
-         <IsCompleteStopSequence>false</IsCompleteStopSequence>
-       </EstimatedVehicleJourney>
-      </EstimatedJourneyVersionFrame>
-      </EstimatedTimetableDelivery>
-      </ServiceDelivery>
+        <ServiceDelivery>
+          <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
+          <ProducerRef>test</ProducerRef>
+          <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</ResponseMessageIdentifier>
+          <EstimatedTimetableDelivery>
+            <ResponseTimestamp>2017-01-01T12:00:15.000Z</ResponseTimestamp>
+            <SubscriberRef>subscriber</SubscriberRef>
+            <SubscriptionRef>externalId</SubscriptionRef>
+            <Status>true</Status>
+            <EstimatedJourneyVersionFrame>
+              <RecordedAtTime>2017-01-01T12:00:15.000Z</RecordedAtTime>
+              <EstimatedVehicleJourney>
+                <LineRef>NINOXE:Line:3:LOC</LineRef>
+                <DirectionRef>Aller</DirectionRef>
+                <FramedVehicleJourneyRef>
+                  <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+                  <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+                </FramedVehicleJourneyRef>
+                <Cancellation>false</Cancellation>
+                <VehicleMode>bus</VehicleMode>
+                <PublishedLineName>L3M</PublishedLineName>
+                <DestinationName>La fin.</DestinationName>
+                <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+                <EstimatedCalls>
+                  <EstimatedCall>
+                    <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+                    <Order>4</Order>
+                    <StopPointName>Test</StopPointName>
+                   <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
+                   <ArrivalStatus>delayed</ArrivalStatus>
+                  </EstimatedCall>
+                </EstimatedCalls>
+               <IsCompleteStopSequence>false</IsCompleteStopSequence>
+              </EstimatedVehicleJourney>
+            </EstimatedJourneyVersionFrame>
+          </EstimatedTimetableDelivery>
+        </ServiceDelivery>
       </Siri>
       """
 
@@ -518,7 +523,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
-         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <Cancellation>false</Cancellation>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -604,7 +610,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
-         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <Cancellation>false</Cancellation>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -752,6 +759,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
           <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
         </FramedVehicleJourneyRef>
+        <Cancellation>false</Cancellation>
         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
         <DestinationName>La fin.</DestinationName>
         <OperatorRef>CdF:Company::410:LOC</OperatorRef>
@@ -886,7 +894,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
-         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <Cancellation>false</Cancellation>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -935,6 +944,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
+          <Cancellation>false</Cancellation>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
           <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
@@ -994,6 +1004,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
+          <Cancellation>false</Cancellation>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
           <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::410:LOC</OperatorRef>
@@ -1083,6 +1094,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>false</siri:Cancellation>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1136,6 +1148,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>false</siri:Cancellation>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1322,6 +1335,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
         <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
         <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       </FramedVehicleJourneyRef>
+      <Cancellation>false</Cancellation>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
       <DestinationName>La fin.</DestinationName>
@@ -1409,6 +1423,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
         <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
         <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       </FramedVehicleJourneyRef>
+      <Cancellation>false</Cancellation>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
       <DestinationName>La fin.</DestinationName>
@@ -1533,6 +1548,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>false</siri:Cancellation>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>ThisIsTheEnd</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
@@ -1702,6 +1718,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
         <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
         <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
       </FramedVehicleJourneyRef>
+      <Cancellation>false</Cancellation>
       <VehicleMode>bus</VehicleMode>
       <PublishedLineName>Ligne 3 Metro</PublishedLineName>
       <DestinationName>La fin.</DestinationName>
@@ -1804,6 +1821,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
+          <Cancellation>false</Cancellation>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
           <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::420:LOC</OperatorRef>
@@ -1911,6 +1929,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
+          <Cancellation>false</Cancellation>
           <PublishedLineName>Ligne 3 Metro</PublishedLineName>
           <DestinationName>La fin.</DestinationName>
           <OperatorRef>CdF:Company::420:LOC</OperatorRef>
@@ -2015,6 +2034,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                   <DataFrameRef>2017-01-01</DataFrameRef>
                   <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
                 </FramedVehicleJourneyRef>
+                <Cancellation>false</Cancellation>
                 <PublishedLineName>Ligne 3 Metro</PublishedLineName>
                 <EstimatedCalls>
                   <EstimatedCall>
@@ -2138,6 +2158,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>unknown</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                     <siri:EstimatedCalls>
                       <siri:EstimatedCall>
@@ -2252,6 +2273,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                     <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
                     <siri:DirectionRef>unknown</siri:DirectionRef>
                     <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+                    <siri:Cancellation>false</siri:Cancellation>
                     <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
                      <siri:EstimatedCalls>
                       <siri:EstimatedCall>
@@ -2338,42 +2360,43 @@ Feature: Support SIRI EstimatedTimetable by subscription
       """
       <?xml version='1.0' encoding='utf-8'?>
       <Siri xmlns='http://www.siri.org.uk/siri' version='2.0'>
-      <ServiceDelivery>
-      <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
-      <ProducerRef>test</ProducerRef>
-      <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ResponseMessageIdentifier>
-      <EstimatedTimetableDelivery>
-      <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
-      <SubscriberRef>subscriber</SubscriberRef>
-      <SubscriptionRef>externalId</SubscriptionRef>
-      <Status>true</Status>
-      <EstimatedJourneyVersionFrame>
-      <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
-      <EstimatedVehicleJourney>
-      <LineRef>NINOXE:Line:3:LOC</LineRef>
-      <DirectionRef>outbound</DirectionRef>
-      <FramedVehicleJourneyRef>
-        <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
-        <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
-      </FramedVehicleJourneyRef>
-      <VehicleMode>bus</VehicleMode>
-      <PublishedLineName>Ligne 3 Metro</PublishedLineName>
-      <DestinationName>La fin.</DestinationName>
-      <OperatorRef>CdF:Company::410:LOC</OperatorRef>
-      <EstimatedCalls>
-        <EstimatedCall>
-          <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
-      <Order>4</Order>
-          <StopPointName>Test</StopPointName>
-          <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
-          <ArrivalStatus>delayed</ArrivalStatus>
-        </EstimatedCall>
-      </EstimatedCalls>
-      <IsCompleteStopSequence>false</IsCompleteStopSequence>
-      </EstimatedVehicleJourney>
-      </EstimatedJourneyVersionFrame>
-      </EstimatedTimetableDelivery>
-      </ServiceDelivery>
+        <ServiceDelivery>
+          <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+          <ProducerRef>test</ProducerRef>
+          <ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</ResponseMessageIdentifier>
+          <EstimatedTimetableDelivery>
+            <ResponseTimestamp>2017-01-01T12:00:20.000Z</ResponseTimestamp>
+            <SubscriberRef>subscriber</SubscriberRef>
+            <SubscriptionRef>externalId</SubscriptionRef>
+            <Status>true</Status>
+            <EstimatedJourneyVersionFrame>
+              <RecordedAtTime>2017-01-01T12:00:20.000Z</RecordedAtTime>
+              <EstimatedVehicleJourney>
+                <LineRef>NINOXE:Line:3:LOC</LineRef>
+                <DirectionRef>outbound</DirectionRef>
+                <FramedVehicleJourneyRef>
+                  <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
+                  <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
+                </FramedVehicleJourneyRef>
+                <Cancellation>false</Cancellation>
+                <VehicleMode>bus</VehicleMode>
+                <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+                <DestinationName>La fin.</DestinationName>
+                <OperatorRef>CdF:Company::410:LOC</OperatorRef>
+                <EstimatedCalls>
+                  <EstimatedCall>
+                    <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
+                    <Order>4</Order>
+                    <StopPointName>Test</StopPointName>
+                    <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
+                    <ArrivalStatus>delayed</ArrivalStatus>
+                  </EstimatedCall>
+                </EstimatedCalls>
+                <IsCompleteStopSequence>false</IsCompleteStopSequence>
+              </EstimatedVehicleJourney>
+            </EstimatedJourneyVersionFrame>
+          </EstimatedTimetableDelivery>
+        </ServiceDelivery>
       </Siri>
       """
 
@@ -2447,7 +2470,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>2017-01-01</DataFrameRef>
             <DatedVehicleJourneyRef>ch:1:ServiceJourney:87_TAC:6ba7b814</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
-         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <Cancellation>false</Cancellation>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -2544,7 +2568,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
             <DatedVehicleJourneyRef>RATPDev:VehicleJourney::6ba7b814:LOC</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
-         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <Cancellation>false</Cancellation>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -2644,7 +2669,8 @@ Feature: Support SIRI EstimatedTimetable by subscription
             <DataFrameRef>2017-01-01</DataFrameRef>
             <DatedVehicleJourneyRef>VehicleJourney:6ba7b814</DatedVehicleJourneyRef>
           </FramedVehicleJourneyRef>
-         <PublishedLineName>Ligne 3 Metro</PublishedLineName>
+          <Cancellation>false</Cancellation>
+          <PublishedLineName>Ligne 3 Metro</PublishedLineName>
          <DestinationName>La fin.</DestinationName>
          <OperatorRef>CdF:Company::410:LOC</OperatorRef>
          <EstimatedCalls>
@@ -2732,6 +2758,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
                <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
              </FramedVehicleJourneyRef>
+             <Cancellation>false</Cancellation>
              <PublishedLineName>Ligne 3 Metro</PublishedLineName>
              <DestinationName>La fin.</DestinationName>
              <OperatorRef>CdF:Company::410:LOC</OperatorRef>
@@ -2824,6 +2851,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>false</siri:Cancellation>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
@@ -2923,6 +2951,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
           <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
           <siri:DirectionRef>Aller</siri:DirectionRef>
           <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          <siri:Cancellation>false</siri:Cancellation>
           <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
           <siri:DestinationRef>RATPDev:StopPoint:Q:a8989abce31bae21da02c1c2cf42dd855cd86a1d:LOC</siri:DestinationRef>
           <siri:DestinationName>La fin.</siri:DestinationName>
@@ -3024,6 +3053,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                   <DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</DataFrameRef>
                   <DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</DatedVehicleJourneyRef>
                 </FramedVehicleJourneyRef>
+                <Cancellation>false</Cancellation>
                 <VehicleMode>bus</VehicleMode>
                 <PublishedLineName>Ligne 3 Metro</PublishedLineName>
                 <DestinationName>La fin.</DestinationName>

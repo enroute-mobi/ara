@@ -9,6 +9,7 @@ type VehicleJourneyUpdateEvent struct {
 	references            *References
 	SiriXML               *sxml.XMLMonitoredVehicleJourney
 	attributes            Attributes
+	Cancellation          bool
 	Code                  Code
 	LineCode              Code
 	Direction             string
