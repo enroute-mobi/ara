@@ -193,7 +193,7 @@ Feature: Support SIRI EstimatedTimetable
 </S:Envelope>
     """
 
-  @ARA-1152 @ARA-1310
+  @ARA-1152 @ARA-1310 @ARA-1825
   Scenario: Create ara models after a EstimatedTimetableNotify in a subscription
     Given a SIRI server waits Subscribe request on "http://localhost:8090" to respond with
       """
@@ -308,6 +308,7 @@ Feature: Support SIRI EstimatedTimetable
       | PassageOrder               | 4                                 |
       | VehicleAtStop              | false                             |
       | ArrivalStatus              | delayed                           |
+      | DepartureStatus            | nil                               |
       | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
       | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
       | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
