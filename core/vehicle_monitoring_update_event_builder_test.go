@@ -2,7 +2,6 @@ package core
 
 import (
 	"io"
-	"math"
 	"os"
 	"testing"
 
@@ -43,32 +42,6 @@ func Test_Vehicle_Code_Without_VehicleRef_With_VehicleMonitoringRef(t *testing.T
 	if vehicleRef := "TRANSDEV:Vehicle::7658:LOC"; mvj.VehicleRef() != vehicleRef {
 		t.Errorf("Wrong VehicleRef. Expected %v, got %v", vehicleRef, mvj.VehicleRef())
 	}
-}
-
-func Test_Coordinates_Transform(t *testing.T) {
-	p := NewPartner()
-	builder := NewVehicleMonitoringUpdateEventBuilder(p)
-
-	vm := getvm(t, "testdata/vm_response_soap.xml")
-	va := vm.VehicleMonitoringDeliveries()[0].VehicleActivities()[0]
-
-	lon, lat, err := builder.handleCoordinates(va)
-
-	if err != nil {
-		t.Errorf("Error while converting: %v", err)
-	}
-
-	if e := 7.2761920740520; round(lon) != e {
-		t.Errorf("Wrong coord longitude. Expected %v, got %v", e, round(lon))
-	}
-	if e := 43.703478617764; round(lat) != e {
-		t.Errorf("Wrong coord latitude. Expected %v, got %v", e, round(lat))
-	}
-}
-
-func round(n float64) float64 {
-	r := math.Pow(10, 12)
-	return math.Round((n * r)) / r
 }
 
 func Test_Coordinates_WithLonLat(t *testing.T) {

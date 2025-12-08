@@ -1,7 +1,7 @@
 # Used by build.sh to customize/add functions
 
-export DEV_PACKAGES="libxml2-dev"
-export RUN_PACKAGES="libxml2"
+export DEV_PACKAGES="libxml2-dev libproj-dev"
+export RUN_PACKAGES="libxml2 libproj25"
 
 export CUCUMBER_PACKAGES="libpq-dev libxml2-dev zlib1g-dev postgresql-client-common libproj-dev"
 

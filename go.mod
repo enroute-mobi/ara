@@ -8,6 +8,7 @@ require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/bigquery v1.71.0
+	github.com/everystreet/go-proj/v6 v6.0.0
 	github.com/getsentry/sentry-go v0.36.0
 	github.com/graph-gophers/graphql-go v1.8.0
 	github.com/jbowtie/gokogiri v0.0.0-20250107075044-de0f9d4877a5
@@ -69,6 +70,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/geo v0.0.0-20210211234256-740aa86cb551 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/flatbuffers v25.9.23+incompatible // indirect
 	github.com/google/pprof v0.0.0-20251007162407-5df77e3f7d1d // indirect

@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	"bitbucket.org/enroute-mobi/ara/core/geographic"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
-	"github.com/wroge/wgs84"
 )
 
 type VehicleMonitoringUpdateEventBuilder struct {
@@ -168,10 +168,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) handleCoordinates(xmlVehicle
 		return lon, lat, e
 	}
 
-	epsg := wgs84.EPSG()
-	lon, lat, _, e = epsg.SafeTransform(formatSRSName, 4326)(x, y, 0)
-
-	return lon, lat, e
+	return geographic.Transform(formatSRSName, x, y)
 }
 
 func (builder *VehicleMonitoringUpdateEventBuilder) formatSRSNameWithDefaut(srs string) (int, error) {
