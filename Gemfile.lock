@@ -1,7 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: bc556c827548c2e52f176e73984d516e470f91d5
-  branch: ARA-1817-vj-cancellation-attribute
+  revision: 617aeae1308c5f9265f40a602282be685dab551a
   specs:
     ara (3.5.5)
       faraday
