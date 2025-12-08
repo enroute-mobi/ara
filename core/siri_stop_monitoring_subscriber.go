@@ -9,6 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/state"
+	"golang.org/x/exp/maps"
 )
 
 type SIRIStopMonitoringSubscriber interface {
@@ -88,68 +89,80 @@ func (subscriber *SMSubscriber) prepareSIRIStopMonitoringSubscriptionRequest() {
 		return
 	}
 
-	message := subscriber.newBQEvent()
-	defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
+	subscriptionIds := maps.Keys(subscriptionRequests)
+	batchSize := subscriber.connector.Partner().StopMonitoringMaxSubscriptionPerRequest()
+	batches := make([][]SubscriptionId, 0, (len(subscriptionIds)+batchSize-1)/batchSize)
 
-	siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
-		ConsumerAddress:   subscriber.connector.Partner().Address(),
-		MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
-		RequestorRef:      subscriber.connector.Partner().RequestorRef(),
-		RequestTimestamp:  subscriber.Clock().Now(),
+	for batchSize < len(subscriptionIds) {
+		subscriptionIds, batches = subscriptionIds[batchSize:], append(batches, subscriptionIds[0:batchSize:batchSize])
 	}
 
-	var subIds []string
-	stopAreasToLog := []string{}
-	for subId, subscriptionRequest := range subscriptionRequests {
-		for _, m := range subscriptionRequest.modelsToRequest {
-			entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
-				SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
-				SubscriptionIdentifier: string(subId),
-				InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
-			}
-			entry.MessageIdentifier = subscriptionRequest.requestMessageRef
-			entry.RequestTimestamp = subscriber.Clock().Now()
+	batches = append(batches, subscriptionIds)
 
-			switch m.kind {
-			case "StopArea":
-				entry.MonitoringRef = m.code.Value()
-				stopAreasToLog = append(stopAreasToLog, entry.MonitoringRef)
-				siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
-			}
+	for i := range batches {
+		message := subscriber.newBQEvent()
+		defer audit.CurrentBigQuery(string(subscriber.connector.Partner().Referential().Slug())).WriteEvent(message)
+
+		siriStopMonitoringSubscriptionRequest := &siri.SIRIStopMonitoringSubscriptionRequest{
+			ConsumerAddress:   subscriber.connector.Partner().Address(),
+			MessageIdentifier: subscriber.connector.Partner().NewMessageIdentifier(),
+			RequestorRef:      subscriber.connector.Partner().RequestorRef(),
+			RequestTimestamp:  subscriber.Clock().Now(),
 		}
-		subIds = append(subIds, string(subId))
+
+		var subscriptionIdsToLog []string
+		stopAreasToLog := []string{}
+		for _, subscriptionId := range batches[i] {
+			for _, m := range subscriptionRequests[subscriptionId].modelsToRequest {
+				entry := &siri.SIRIStopMonitoringSubscriptionRequestEntry{
+					SubscriberRef:          subscriber.connector.Partner().RequestorRef(),
+					SubscriptionIdentifier: string(subscriptionId),
+					InitialTerminationTime: subscriber.Clock().Now().Add(48 * time.Hour),
+				}
+				entry.MessageIdentifier = subscriptionRequests[subscriptionId].requestMessageRef
+				entry.RequestTimestamp = subscriber.Clock().Now()
+
+				switch m.kind {
+				case "StopArea":
+					entry.MonitoringRef = m.code.Value()
+					stopAreasToLog = append(stopAreasToLog, entry.MonitoringRef)
+					siriStopMonitoringSubscriptionRequest.Entries = append(siriStopMonitoringSubscriptionRequest.Entries, entry)
+				}
+			}
+			subscriptionIdsToLog = append(subscriptionIdsToLog, string(subscriptionId))
+		}
+
+		message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
+		message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
+		message.RequestSize = int64(len(message.RequestRawMessage))
+		message.StopAreas = stopAreasToLog
+		message.SubscriptionIdentifiers = subscriptionIdsToLog
+
+		startTime := subscriber.Clock().Now()
+		response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
+		message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
+		if err != nil {
+			logger.Log.Debugf("Error while subscribing: %v", err)
+			e := fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
+
+			collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
+
+			message.Status = "Error"
+			message.ErrorDetails = e
+
+			continue
+		}
+
+		message.ResponseRawMessage = response.RawXML()
+		message.ResponseSize = int64(len(message.ResponseRawMessage))
+		message.ResponseIdentifier = response.ResponseMessageIdentifier()
+
+		collectSubscriber.HandleResponse(subscriptionRequests, message, response)
+
+		if len(subscriptionRequests) == 0 {
+			return
+		}
 	}
-
-	message.RequestIdentifier = siriStopMonitoringSubscriptionRequest.MessageIdentifier
-	message.RequestRawMessage, _ = siriStopMonitoringSubscriptionRequest.BuildXML(subscriber.connector.Partner().SIRIEnvelopeType())
-	message.RequestSize = int64(len(message.RequestRawMessage))
-	message.StopAreas = stopAreasToLog
-	message.SubscriptionIdentifiers = subIds
-
-	startTime := subscriber.Clock().Now()
-	response, err := subscriber.connector.Partner().SIRIClient().StopMonitoringSubscription(siriStopMonitoringSubscriptionRequest)
-	message.ProcessingTime = subscriber.Clock().Since(startTime).Seconds()
-	if err != nil {
-		logger.Log.Debugf("Error while subscribing: %v", err)
-		e := fmt.Sprintf("Error during StopMonitoringSubscriptionRequest: %v", err)
-
-		collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
-
-		message.Status = "Error"
-		message.ErrorDetails = e
-		return
-	}
-
-	message.ResponseRawMessage = response.RawXML()
-	message.ResponseSize = int64(len(message.ResponseRawMessage))
-	message.ResponseIdentifier = response.ResponseMessageIdentifier()
-
-	collectSubscriber.HandleResponse(subscriptionRequests, message, response)
-
-	if len(subscriptionRequests) == 0 {
-		return
-	}
-
 	collectSubscriber.IncrementRetryCountFromMap(subscriptionRequests)
 }
 

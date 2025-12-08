@@ -30,26 +30,28 @@ const (
 	NOTIFICATIONS_REMOTE_URL          = "notifications.remote_url"
 	SUBSCRIPTIONS_REMOTE_URL          = "subscriptions.remote_url"
 
-	COLLECT_DEFAULT_SRS_NAME         = "collect.default_srs_name"
-	COLLECT_EXCLUDE_LINES            = "collect.exclude_lines"
-	COLLECT_EXCLUDE_LINE_GROUPS      = "collect.exclude_line_groups"
-	COLLECT_EXCLUDE_STOP_AREAS       = "collect.exclude_stop_areas"
-	COLLECT_EXCLUDE_STOP_AREA_GROUPS = "collect.exclude_stop_area_groups"
-	COLLECT_EXCLUDE_FACILITIES       = "collect.exclude_facilities"
-	COLLECT_FILTER_GENERAL_MESSAGES  = "collect.filter_general_messages" // Kept for retro compatibility
-	COLLECT_FILTER_SITUATIONS        = "collect.filter_situations"
-	COLLECT_GTFS_TTL                 = "collect.gtfs.ttl"
-	COLLECT_INCLUDE_LINES            = "collect.include_lines"
-	COLLECT_INCLUDE_LINE_GROUPS      = "collect.include_line_groups"
-	COLLECT_INCLUDE_STOP_AREAS       = "collect.include_stop_areas"
-	COLLECT_INCLUDE_STOP_AREA_GROUPS = "collect.include_stop_area_groups"
-	COLLECT_INCLUDE_FACILITIES       = "collect.include_facilities"
-	COLLECT_PERSISTENT               = "collect.persistent"
-	COLLECT_PRIORITY                 = "collect.priority"
-	COLLECT_SITUATIONS_INTERNAL_TAGS = "collect.situations.internal_tags"
-	COLLECT_SUBSCRIPTIONS_PERSISTENT = "collect.subscriptions.persistent"
-	COLLECT_USE_DISCOVERED_LINES     = "collect.use_discovered_lines"
-	COLLECT_USE_DISCOVERED_SA        = "collect.use_discovered_stop_areas"
+	COLLECT_DEFAULT_SRS_NAME                                              = "collect.default_srs_name"
+	COLLECT_EXCLUDE_FACILITIES                                            = "collect.exclude_facilities"
+	COLLECT_EXCLUDE_LINES                                                 = "collect.exclude_lines"
+	COLLECT_EXCLUDE_LINE_GROUPS                                           = "collect.exclude_line_groups"
+	COLLECT_EXCLUDE_STOP_AREAS                                            = "collect.exclude_stop_areas"
+	COLLECT_EXCLUDE_STOP_AREA_GROUPS                                      = "collect.exclude_stop_area_groups"
+	COLLECT_FILTER_GENERAL_MESSAGES                                       = "collect.filter_general_messages" // Kept for retro compatibility
+	COLLECT_FILTER_SITUATIONS                                             = "collect.filter_situations"
+	COLLECT_GTFS_TTL                                                      = "collect.gtfs.ttl"
+	COLLECT_INCLUDE_FACILITIES                                            = "collect.include_facilities"
+	COLLECT_INCLUDE_LINES                                                 = "collect.include_lines"
+	COLLECT_INCLUDE_LINE_GROUPS                                           = "collect.include_line_groups"
+	COLLECT_INCLUDE_STOP_AREAS                                            = "collect.include_stop_areas"
+	COLLECT_INCLUDE_STOP_AREA_GROUPS                                      = "collect.include_stop_area_groups"
+	COLLECT_PERSISTENT                                                    = "collect.persistent"
+	COLLECT_PRIORITY                                                      = "collect.priority"
+	COLLECT_SITUATIONS_INTERNAL_TAGS                                      = "collect.situations.internal_tags"
+	COLLECT_SUBSCRIPTIONS_PERSISTENT                                      = "collect.subscriptions.persistent"
+	COLLECT_USE_DISCOVERED_LINES                                          = "collect.use_discovered_lines"
+	COLLECT_USE_DISCOVERED_SA                                             = "collect.use_discovered_stop_areas"
+	COLLECT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST         = "collect.siri.stop_monitoring.maximum_subscriptions_per_request"
+	COLLECT_DEFAULT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST = 1000
 
 	DISCOVERY_INTERVAL = "discovery_interval"
 
@@ -102,40 +104,41 @@ type PartnerSettings struct {
 
 	collectSettings *CollectSettings
 
-	credentials                         string
-	rateLimit                           float64
-	gtfsTTL                             time.Duration
-	gtfsCacheTimeout                    time.Duration
-	httpCustomHeaders                   []string
-	siriCredentialHeader                string
-	siriEnvelopeType                    string
-	siriSoapEmptyResponseOnNotification bool
-	httpClientOAuth                     *remote.HTTPClientOAuth
-	recordedCallsDuration               time.Duration
-	producerRef                         string
-	address                             string
-	linePublishedName                   string
-	passageOrder                        string
-	envelopeType                        string
-	collectPriority                     int
-	collectSituationsInternalTags       []string
-	broadcastSituationsInternalTags     []string
-	broadcastSituationsTTL              time.Duration
-	defaultSRSName                      string
-	noDestinationRefRewritingFrom       []string
-	noDataFrameRefRewritingFrom         []string
-	rewriteJourneyPatternRef            bool
-	preferReferentStopArea              bool
-	gzipGtfs                            bool
-	generalMessageRequestVersion22      bool
-	collectFilteredSituations           bool
-	ignoreStopWithoutLine               bool
-	smMultipleDeliveriesPerNotify       bool
-	smMaxStopVisitPerDelivery           int
-	discoveryInterval                   time.Duration
-	cacheTimeouts                       sync.Map
-	siriDirectionTypeInbound            string
-	siriDirectionTypeOutbound           string
+	credentials                                             string
+	rateLimit                                               float64
+	gtfsTTL                                                 time.Duration
+	gtfsCacheTimeout                                        time.Duration
+	httpCustomHeaders                                       []string
+	siriCredentialHeader                                    string
+	siriEnvelopeType                                        string
+	siriSoapEmptyResponseOnNotification                     bool
+	httpClientOAuth                                         *remote.HTTPClientOAuth
+	recordedCallsDuration                                   time.Duration
+	producerRef                                             string
+	address                                                 string
+	linePublishedName                                       string
+	passageOrder                                            string
+	envelopeType                                            string
+	collectPriority                                         int
+	collectSituationsInternalTags                           []string
+	broadcastSituationsInternalTags                         []string
+	broadcastSituationsTTL                                  time.Duration
+	defaultSRSName                                          string
+	noDestinationRefRewritingFrom                           []string
+	noDataFrameRefRewritingFrom                             []string
+	rewriteJourneyPatternRef                                bool
+	preferReferentStopArea                                  bool
+	gzipGtfs                                                bool
+	generalMessageRequestVersion22                          bool
+	collectFilteredSituations                               bool
+	collectSiriStopMonitoringMaximumSubscriptionsPerRequest int
+	ignoreStopWithoutLine                                   bool
+	smMultipleDeliveriesPerNotify                           bool
+	smMaxStopVisitPerDelivery                               int
+	discoveryInterval                                       time.Duration
+	cacheTimeouts                                           sync.Map
+	siriDirectionTypeInbound                                string
+	siriDirectionTypeOutbound                               string
 
 	maximumCheckstatusRetry          int
 	subscriptionMaximumResources     int
@@ -203,6 +206,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string, resolvers []
 	s.setSubscriptionMaximumResources(settings)
 	s.setCollectPriority(settings)
 	s.setCollectSituationsInternalTags(settings)
+	s.setSiriStopMonitoringMaximumSubscriptionsPerRequest(settings)
 	s.setBroadcastSituationsInternalTags(settings)
 	s.setSituationsTTL(settings)
 	s.setDefaultSRSName(settings)
@@ -462,6 +466,18 @@ func (s *PartnerSettings) setSmMultipleDeliveriesPerNotify(settings map[string]s
 
 func (s *PartnerSettings) SmMultipleDeliveriesPerNotify() bool {
 	return s.smMultipleDeliveriesPerNotify
+}
+
+func (s *PartnerSettings) setSiriStopMonitoringMaximumSubscriptionsPerRequest(settings map[string]string) {
+	max, _ := strconv.Atoi(settings[COLLECT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST])
+	if max > COLLECT_DEFAULT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST || max == 0 {
+		max = COLLECT_DEFAULT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST
+	}
+	s.collectSiriStopMonitoringMaximumSubscriptionsPerRequest = max
+}
+
+func (s *PartnerSettings) StopMonitoringMaxSubscriptionPerRequest() int {
+	return s.collectSiriStopMonitoringMaximumSubscriptionsPerRequest
 }
 
 func (s *PartnerSettings) setMaxStopVisitPerDelivery(settings map[string]string) {
