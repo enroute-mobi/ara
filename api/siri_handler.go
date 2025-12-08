@@ -109,11 +109,6 @@ func (handler *SIRIHandler) requestHandler(envelope *remote.SIRIEnvelope) SIRIRe
 			xmlRequest:  sxml.NewXMLLinesDiscoveryRequest(envelope.Body()),
 			referential: handler.referential,
 		}
-	case "GetSiriService":
-		return &SIRIServiceRequestHandler{
-			xmlRequest:  sxml.NewXMLSiriServiceRequest(envelope.Body()),
-			referential: handler.referential,
-		}
 	case "GetGeneralMessage":
 		return &SIRIGeneralMessageRequestHandler{
 			xmlRequest:  sxml.NewXMLGetGeneralMessage(envelope.Body()),

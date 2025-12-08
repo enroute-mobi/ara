@@ -111,8 +111,6 @@ func NewConnectorFactory(connectorType string) ConnectorFactory {
 		return &SIRILinesDiscoveryRequestCollectorFactory{}
 	case SIRI_LINES_DISCOVERY_REQUEST_BROADCASTER:
 		return &SIRILinesDiscoveryRequestBroadcasterFactory{}
-	case SIRI_SERVICE_REQUEST_BROADCASTER:
-		return &SIRIServiceRequestBroadcasterFactory{}
 	case SIRI_STOP_MONITORING_REQUEST_COLLECTOR:
 		return &SIRIStopMonitoringRequestCollectorFactory{}
 	case SIRI_LITE_STOP_MONITORING_REQUEST_COLLECTOR:

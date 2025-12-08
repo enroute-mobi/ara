@@ -9,7 +9,6 @@ func Test_Factories_CreateConnector(t *testing.T) {
 	partner := partners.New("slug")
 
 	partner.ConnectorTypes = []string{
-		"siri-service-request-broadcaster",
 		"siri-stop-monitoring-request-collector",
 		"siri-stop-monitoring-request-broadcaster",
 		"siri-check-status-client",
@@ -22,9 +21,6 @@ func Test_Factories_CreateConnector(t *testing.T) {
 	}
 	partner.RefreshConnectors()
 
-	if _, ok := partner.Connector("siri-service-request-broadcaster"); !ok {
-		t.Error("siri-service-request-broadcaster connector should be initialized")
-	}
 	if _, ok := partner.Connector("siri-stop-monitoring-request-collector"); !ok {
 		t.Error("siri-stop-monitoring-request-collector connector should be initialized")
 	}
