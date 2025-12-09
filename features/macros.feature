@@ -314,3 +314,111 @@ Feature: Manages Macros
       | Affects[StopArea]                                                                | 6ba7b814-9dad-11d1-0003-00c04fd430c8 |
       | Affects[StopArea=6ba7b814-9dad-11d1-0003-00c04fd430c8]/LineIds[0]                | 6ba7b814-9dad-11d1-0001-00c04fd430c8 |
       | Affects[StopArea=6ba7b814-9dad-11d1-0003-00c04fd430c8]/LineIds[1]                | 6ba7b814-9dad-11d1-0002-00c04fd430c8 |
+
+  @nostart @database @ARA-1815
+  Scenario: Handle Macro for VehicleJourney Cancellation
+    Given the table "referentials" has the following data:
+      | referential_id                         | slug   | settings | tokens          |
+      | '6ba7b814-9dad-11d1-0000-00c04fd430c8' | 'test' | '{}'     | '["testtoken"]' |
+    And the table "macros" has the following data:
+      | id                                     | referential_slug | context_id | position | type                            | model_type       | hook | attributes |
+      | '6ba7b814-9dad-11d1-0009-00c04fd430c8' | 'test'           | null       |        0 | 'SetVehicleJourneyCancellation' | 'StopVisit' | null | '{}'       |
+    And a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+      <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
+      <ServiceDeliveryInfo>
+        <siri:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</siri:ResponseTimestamp>
+        <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
+        <siri:Address>http://appli.chouette.mobi/siri_france/siri</siri:Address>
+        <siri:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd26</siri:ResponseMessageIdentifier>
+        <siri:RequestMessageRef>StopMonitoring:Test:0</siri:RequestMessageRef>
+      </ServiceDeliveryInfo>
+      <Answer>
+        <siri:StopMonitoringDelivery>
+          <siri:ResponseTimestamp>2016-09-22T08:01:20.630+02:00</siri:ResponseTimestamp>
+          <siri:Status>true</siri:Status>
+          <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+          <siri:MonitoredStopVisit>
+            <siri:RecordedAtTime>2016-09-22T07:56:53.000+02:00</siri:RecordedAtTime>
+            <siri:ItemIdentifier>NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3</siri:ItemIdentifier>
+            <siri:MonitoringRef>NINOXE:StopPoint:SP:24:LOC</siri:MonitoringRef>
+            <siri:MonitoredVehicleJourney>
+              <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+              <siri:DirectionRef>Left</siri:DirectionRef>
+              <siri:FramedVehicleJourneyRef>
+                <siri:DataFrameRef>2016-09-22</siri:DataFrameRef>
+                <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+              </siri:FramedVehicleJourneyRef>
+              <siri:JourneyPatternRef>NINOXE:JourneyPattern:3_42_62:LOC</siri:JourneyPatternRef>
+              <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+              <siri:DirectionName>Aller</siri:DirectionName>
+              <siri:ExternalLineRef>NINOXE:Line:3:LOC</siri:ExternalLineRef>
+              <siri:OperatorRef>NINOXE:Company:15563880:LOC</siri:OperatorRef>
+              <siri:OriginRef>NINOXE:StopPoint:SP:42:LOC</siri:OriginRef>
+              <siri:OriginName>Magicien Noir</siri:OriginName>
+              <siri:DestinationRef>NINOXE:StopPoint:SP:62:LOC</siri:DestinationRef>
+              <siri:DestinationName>Cimetière des Sauvages</siri:DestinationName>
+              <siri:Monitored>true</siri:Monitored>
+              <siri:ProgressRate>normalProgress</siri:ProgressRate>
+              <siri:CourseOfJourneyRef>201</siri:CourseOfJourneyRef>
+              <siri:VehicleRef>NINOXE:Vehicle:23:LOC</siri:VehicleRef>
+              <siri:MonitoredCall>
+                <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
+                <siri:Order>4</siri:Order>
+                <siri:StopPointName>Test 1</siri:StopPointName>
+                <siri:VehicleAtStop>false</siri:VehicleAtStop>
+                <siri:AimedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:AimedArrivalTime>
+                <siri:ExpectedArrivalTime>2017-01-01T12:54:00.000+02:00</siri:ExpectedArrivalTime>
+                <siri:ArrivalStatus>cancelled</siri:ArrivalStatus>
+                <siri:ArrivalBoardingActivity>alighting</siri:ArrivalBoardingActivity>
+                <siri:ArrivalStopAssignment>
+                  <siri:AimedQuayRef>NINOXE:StopPoint:Q:50:LOC</siri:AimedQuayRef>
+                  <siri:ActualQuayRef>NINOXE:StopPoint:Q:50:LOC</siri:ActualQuayRef>
+                </siri:ArrivalStopAssignment>
+                <siri:DepartureStatus>cancelled</siri:DepartureStatus>
+              </siri:MonitoredCall>
+            </siri:MonitoredVehicleJourney>
+          </siri:MonitoredStopVisit>
+        </siri:StopMonitoringDelivery>
+      </Answer>
+      <AnswerExtension/>
+      </sw:GetStopMonitoringResponse>
+      </S:Body>
+      </S:Envelope>
+      """
+    When I start Ara
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-stop-monitoring-request-collector] and the following settings:
+      | remote_url                 | http://localhost:8090      |
+      | remote_credential          | test                       |
+      | remote_code_space          | internal                   |
+      | collect.include_stop_areas | NINOXE:StopPoint:SP:24:LOC |
+    And a minute has passed
+    And a Line exists with the following attributes:
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
+    And a VehicleJourney exists with the following attributes:
+      | Name                    | Passage 32                           |
+      | Codes[internal]         | NINOXE:VehicleJourney:201            |
+      | LineId                  | 6ba7b814-9dad-11d1-0002-00c04fd430c8 |
+      | Monitored               | true                                 |
+      | DestinationName         | La fin. <TER>                        |
+      | HasCompleteStopSequence | true                                 |
+    And a StopArea exists with the following attributes:
+      | Name            | Test 1                     |
+      | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
+    And a StopVisit exists with the following attributes:
+      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | PassageOrder                   | 4                                                      |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-0004-00c04fd430c8                   |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-0003-00c04fd430c8                   |
+      | VehicleAtStop                  | true                                                   |
+      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[actual]#Arrival       | 2017-01-01T13:00:00.000Z                               |
+      | Attributes[DestinationDisplay] | Cergy le haut & Arret <RER>                            |
+    When a minute has passed
+    Then one VehicleJourney has the following attributes:
+      | Codes[internal] | NINOXE:VehicleJourney:201 |
+      | Cancellation    | true                      |

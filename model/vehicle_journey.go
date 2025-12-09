@@ -139,6 +139,14 @@ func (vehicleJourney *VehicleJourney) Reference(key string) (Reference, bool) {
 	return value, present
 }
 
+func (vehicleJouenry *VehicleJourney) IsCancelled() bool {
+	return vehicleJouenry.Cancellation
+}
+
+func (VehicleJourney *VehicleJourney) IsComplete() bool {
+	return VehicleJourney.HasCompleteStopSequence
+}
+
 func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	type Alias VehicleJourney
 	aux := &struct {

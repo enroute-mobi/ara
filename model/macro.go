@@ -10,10 +10,11 @@ type updater func(ModelInstance) error
 type updaterFactory func(updaterAttributes) (updater, error)
 
 const (
-	SetAttribute              = "SetAttribute"
-	DefineAimedScheduledTimes = "DefineAimedScheduledTimes"
-	DefineSituationAffects    = "DefineSituationAffects"
-	CreateCode                = "CreateCode"
+	SetAttribute                  = "SetAttribute"
+	DefineAimedScheduledTimes     = "DefineAimedScheduledTimes"
+	DefineSituationAffects        = "DefineSituationAffects"
+	SetVehicleJourneyCancellation = "SetVehicleJourneyCancellation"
+	CreateCode                    = "CreateCode"
 )
 
 var updaters = []string{SetAttribute, DefineAimedScheduledTimes}
@@ -69,6 +70,8 @@ func NewUpdaterFromDatabase(m *MemoryModel, sm *SelectMacro) (updater, error) {
 		return NewVehicleJourneySetAttributeUpdater(sm)
 	case sm.ModelType.String == "StopVisit" && sm.Type == DefineAimedScheduledTimes:
 		return NewStopVisitDefineAimedScheduledTimesUpdater(sm)
+	case sm.ModelType.String == "StopVisit" && sm.Type == SetVehicleJourneyCancellation:
+		return NewStopVisitSetVehicleJourneyCancellationUpdater()
 	case sm.ModelType.String == "Situation" && sm.Type == DefineSituationAffects:
 		return NewDefineSituationAffectsUpdater(sm)
 	case sm.Type == CreateCode:

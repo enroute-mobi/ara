@@ -136,6 +136,11 @@ func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 	return vehicleJourney
 }
 
+func (stopVisit *StopVisit) IsCancelled() bool {
+	return stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_CANCELLED &&
+		stopVisit.ArrivalStatus == STOP_VISIT_ARRIVAL_CANCELLED
+}
+
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	type Alias StopVisit
 	aux := struct {
