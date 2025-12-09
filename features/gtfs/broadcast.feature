@@ -521,3 +521,40 @@ Feature: Support GTFS-RT feeds
     When I send a GTFS-RT request to the Referential "test" with token "secret"
     Then I should receive a GTFS-RT response
     And this GTFS-RT response should have no entity
+
+  @ARA-1827
+  Scenario: Retrieve Trip Update with a Cancelled VehicleJourney
+    Given a Line exists with the following attributes:
+      | Name            | Test |
+      | Codes[internal] | 1234 |
+    And a VehicleJourney exists with the following attributes:
+      | Codes[internal]         | 2345                              |
+      | LineId                  | 6ba7b814-9dad-11d1-1-00c04fd430c8 |
+      | HasCompleteStopSequence | true                              |
+      | Cancellation            | true                              |
+    And a StopArea exists with the following attributes:
+      | Codes[internal] | TOTO     |
+    And a Vehicle exists with the following attributes:
+      | Codes[internal]  | 3456                              |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | StopAreaId       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+    And a StopVisit exists with the following attributes:
+      | Codes[internal]             | 2345-4567-4                        |
+      | PassageOrder                | 4                                  |
+      | StopAreaId                  | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | VehicleJourneyId            | 6ba7b814-9dad-11d1-2-00c04fd430c8  |
+      | VehicleAtStop               | true                               |
+      | Reference[OperatorRef]#Code | "internal": "CdF:Company::410:LOC" |
+      | Schedule[actual]#Arrival    | 2017-01-01T14:55:00.000+02:00      |
+      | DepartureStatus             | cancelled                          |
+      | ArrivalStatus               | cancelled                          |
+    And a Partner "test" exists with connectors [gtfs-rt-trip-updates-broadcaster] and the following settings:
+      | local_credential             | secret   |
+      | remote_code_space            | internal |
+      | gtfs_rt_trip_updates_broadcaster.cache_timeout | 2s |
+    When I send a GTFS-RT request to the Referential "test" with token "secret"
+    Then I should receive a GTFS-RT response
+    And this GTFS-RT response should contain a Trip Update with these attributes:
+      | trip_id               | 2345 |
+      | route_id              | 1234 |
+      | schedule_relationship |    3 |

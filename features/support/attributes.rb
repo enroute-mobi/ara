@@ -320,7 +320,7 @@ def gtfs_attributes(table)
   attributes = table.rows_hash.dup
 
   attributes.dup.each do |key, value|
-    if key =~ /direction_id/
+    if key =~ /direction_id|schedule_relationship/
       attributes[key] = value.to_i
     end
   end
