@@ -399,12 +399,11 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 	// VehicleJourney stop sequence
 	if !vj.IsComplete() {
-		completeStopSequence := vj.AimedStopVisitCount != 0 &&
-			vj.AimedStopVisitCount == (vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id()))
+		actualStopVisitCount := vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())
+		completeStopSequence := vj.AimedStopVisitCount != 0 && vj.AimedStopVisitCount == actualStopVisitCount
 
 		if !found {
-			completeStopSequence = vj.AimedStopVisitCount != 0 &&
-				vj.AimedStopVisitCount == (vj.model.StopVisits().StopVisitsLenByVehicleJourney(vj.Id())+1)
+			completeStopSequence = vj.AimedStopVisitCount != 0 && vj.AimedStopVisitCount == (actualStopVisitCount + 1)
 		}
 
 		if completeStopSequence {
