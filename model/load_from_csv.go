@@ -595,8 +595,8 @@ func (loader *Loader) insertLineGroups() {
 }
 
 func (loader *Loader) handleVehicleJourney(record []string) error {
-	if len(record) < 11 {
-		return fmt.Errorf("wrong number of entries, expected 11 minimun got %v", len(record))
+	if len(record) < 10 {
+		return fmt.Errorf("wrong number of entries, expected 10 minimun got %v", len(record))
 	}
 
 	err := loader.handleForce(VEHICLE_JOURNEY, record[2])
@@ -604,7 +604,18 @@ func (loader *Loader) handleVehicleJourney(record []string) error {
 		return err
 	}
 
-	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$),",
+	var aimedStopVisitCount int
+	if len(record) > 11 {
+		if record[11] != "" {
+			count, err := strconv.Atoi(record[11])
+			if err != nil {
+				return fmt.Errorf("invalid aimed_stop_visit_count, got %v", record[11])
+			}
+			aimedStopVisitCount = count
+		}
+	}
+
+	values := fmt.Sprintf("($$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,$$%v$$,%v),",
 		loader.referentialSlug,
 		record[1],
 		record[2],
@@ -616,7 +627,7 @@ func (loader *Loader) handleVehicleJourney(record []string) error {
 		record[8],
 		record[9],
 		record[10],
-		record[11],
+		aimedStopVisitCount,
 	)
 
 	loader.vehicleJourneys = append(loader.vehicleJourneys, values...)
