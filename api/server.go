@@ -330,6 +330,7 @@ func (server *Server) handleReferentialGet(response http.ResponseWriter, request
 	referentialSlug := request.PathValue("referential_slug")
 	if data == "gtfs" && referentialSlug != "_referentials" {
 		server.handleGtfs(response, request)
+		return
 	}
 
 	if referentialSlug == "_referentials" {
