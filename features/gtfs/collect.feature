@@ -107,6 +107,89 @@ Feature: Collect realtime data via GTFS-RT feeds
     And one VehicleJourney has the following attributes:
       | Codes[internal] | Trip:A                            |
       | LineId          | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | DirectionType   | nil                               |
+    And one StopVisit has the following attributes:
+      | Codes[internal]              | Trip:A-1                  |
+      | PassageOrder                 | 1                         |
+      | Schedule[expected]#Departure | 2017-01-01T13:00:00+01:00 |
+      | Schedule[expected]#Arrival   | 2017-01-01T13:00:00+01:00 |
+    And one StopVisit has the following attributes:
+      | Codes[internal]              | Trip:A-2                  |
+      | PassageOrder                 | 2                         |
+      | Schedule[expected]#Arrival   | 2017-01-01T13:01:00+01:00 |
+      | Schedule[expected]#Departure | 2017-01-01T13:01:30+01:00 |
+    And one StopVisit has the following attributes:
+      | Codes[internal]              | Trip:A-3                  |
+      | PassageOrder                 | 3                         |
+      | Schedule[expected]#Arrival   | 2017-01-01T13:02:30+01:00 |
+      | Schedule[expected]#Departure | 2017-01-01T13:02:30+01:00 |
+
+  @ARA-1770
+  Scenario: Collect GTFS TripUpdate (with stop_id) and DirectionId
+    Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
+      """
+      header {
+        gtfs_realtime_version: "2.0"
+        incrementality: FULL_DATASET
+        timestamp: 1630318853
+      }
+      entity {
+        id: "trip:ORLEANS:VehicleJourney:20_R_67_13_2067_1_152701"
+        trip_update {
+          trip {
+            trip_id: "Trip:A"
+            route_id: "Line:1"
+            direction_id: 0
+          }
+          stop_time_update {
+            stop_sequence: 0
+            stop_id: "StopArea:A"
+            arrival {
+              time: 1483272000
+            }
+            departure {
+              time: 1483272000
+            }
+          }
+          stop_time_update {
+            stop_sequence: 1
+            stop_id: "StopArea:B"
+            arrival {
+              time: 1483272060
+            }
+            departure {
+              time: 1483272090
+            }
+          }
+          stop_time_update {
+            stop_sequence: 2
+            stop_id: "StopArea:C"
+            arrival {
+              time: 1483272150
+            }
+            departure {
+              time: 1483272150
+            }
+          }
+        }
+      }
+      """
+    And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_code_space | internal              |
+    When a minute has passed
+    Then one StopArea has the following attributes:
+      | Codes[internal] | StopArea:A |
+    And one StopArea has the following attributes:
+      | Codes[internal] | StopArea:B |
+    And one StopArea has the following attributes:
+      | Codes[internal] | StopArea:C |
+    And one Line has the following attributes:
+      | Codes[internal] | Line:1 |
+    And one VehicleJourney has the following attributes:
+      | Codes[internal] | Trip:A                            |
+      | LineId          | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
+      | DirectionType   | outbound                          |
     And one StopVisit has the following attributes:
       | Codes[internal]              | Trip:A-1                  |
       | PassageOrder                 | 1                         |

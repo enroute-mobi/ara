@@ -351,6 +351,15 @@ func (connector *GtfsRequestCollector) handleTrip(events *CollectUpdateEvents, t
 			vjEvent.Occupancy = occupancyName(occupancy[0])
 		}
 
+		if trip.DirectionId != nil {
+			switch *trip.DirectionId {
+			case 0:
+				vjEvent.DirectionType = model.VEHICLE_DIRECTION_OUTBOUND
+			case 1:
+				vjEvent.DirectionType = model.VEHICLE_DIRECTION_INBOUND
+			}
+		}
+
 		events.VehicleJourneys[tid] = vjEvent
 	}
 
