@@ -36,11 +36,21 @@ func (r *Resolver) UpdateVehicle(args struct {
 	if !ok {
 		return nil, errors.Errorf("Can't find Vehicle with code %s", args.Code)
 	}
-	if args.Input.OccupancyStatus != nil && r.Partner.IsMutable(OccupancyStatus) {
+	allMutable := r.Partner.IsMutable(Vehicle)
+	if args.Input.OccupancyStatus != nil && (allMutable || r.Partner.IsMutable(OccupancyStatus)) {
 		v.Occupancy = *args.Input.OccupancyStatus
 	}
-	if args.Input.OccupancyRate != nil && r.Partner.IsMutable(OccupancyRate) {
+	if args.Input.OccupancyRate != nil && (allMutable || r.Partner.IsMutable(OccupancyRate)) {
 		v.Percentage = *args.Input.OccupancyRate
+	}
+	if args.Input.Longitude != nil && (allMutable || r.Partner.IsMutable(Longitude)) {
+		v.Longitude = *args.Input.Longitude
+	}
+	if args.Input.Latitude != nil && (allMutable || r.Partner.IsMutable(Latitude)) {
+		v.Latitude = *args.Input.Latitude
+	}
+	if args.Input.Bearing != nil && (allMutable || r.Partner.IsMutable(Bearing)) {
+		v.Bearing = *args.Input.Bearing
 	}
 
 	v.Save()

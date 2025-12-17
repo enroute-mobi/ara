@@ -38,6 +38,9 @@ var Schema = `
 	}
 
 	input VehicleInput {
+		longitude:          Float
+		latitude:           Float
+		bearing:            Float
 		occupancyStatus:	String
 		occupancyRate:		Float
 	}
