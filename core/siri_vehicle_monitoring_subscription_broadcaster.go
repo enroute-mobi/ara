@@ -17,6 +17,7 @@ type SIRIVehicleMonitoringSubscriptionBroadcaster struct {
 	connector
 
 	vjRemoteCodeSpaces           []string
+	vehicleRemoteCodeSpaces      []string
 	vehicleMonitoringBroadcaster VehicleMonitoringBroadcaster
 	toBroadcast                  map[SubscriptionId][]model.VehicleId
 
@@ -41,6 +42,7 @@ func (factory *SIRIVehicleMonitoringSubscriptionBroadcasterFactory) Validate(api
 func newSIRIVehicleMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIVehicleMonitoringSubscriptionBroadcaster {
 	connector := &SIRIVehicleMonitoringSubscriptionBroadcaster{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.vehicleRemoteCodeSpaces = partner.VehicleRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}

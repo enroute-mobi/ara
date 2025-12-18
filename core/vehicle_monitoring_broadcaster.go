@@ -125,7 +125,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			if !ok {
 				continue
 			}
-			vehicleCode, ok := vehicle.Code(vm.connector.remoteCodeSpace)
+			vehicleCode, ok := vehicle.CodeWithFallback(vm.connector.vehicleRemoteCodeSpaces)
 			if !ok {
 				continue
 			}
