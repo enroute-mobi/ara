@@ -47,7 +47,6 @@ const (
 	COLLECT_PERSISTENT                                                    = "collect.persistent"
 	COLLECT_PRIORITY                                                      = "collect.priority"
 	COLLECT_SITUATIONS_INTERNAL_TAGS                                      = "collect.situations.internal_tags"
-	COLLECT_SUBSCRIPTIONS_PERSISTENT                                      = "collect.subscriptions.persistent"
 	COLLECT_USE_DISCOVERED_LINES                                          = "collect.use_discovered_lines"
 	COLLECT_USE_DISCOVERED_SA                                             = "collect.use_discovered_stop_areas"
 	COLLECT_SIRI_STOP_MONITORING_MAXIMUM_SUBSCRIPTION_PER_REQUEST         = "collect.siri.stop_monitoring.maximum_subscriptions_per_request"
@@ -707,11 +706,9 @@ func (s *PartnerSettings) GeneralMessageRequestVersion22() bool {
 }
 
 func (s *PartnerSettings) setPersistentCollect(settings map[string]string) {
-	subscription, _ := strconv.ParseBool(settings[COLLECT_SUBSCRIPTIONS_PERSISTENT])
-	collect, _ := strconv.ParseBool(settings[COLLECT_PERSISTENT])
+	persistent, _ := strconv.ParseBool(settings[COLLECT_PERSISTENT])
 
-	peristent := subscription || collect
-	s.persistentCollect = peristent
+	s.persistentCollect = persistent
 }
 
 func (s *PartnerSettings) PersistentCollect() bool {
