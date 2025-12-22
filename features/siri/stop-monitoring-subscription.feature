@@ -2236,14 +2236,14 @@ Feature: Support SIRI StopMonitoring by subscription
     Then the SIRI server should not have received a StopMonitoringSubscription request
 
   @ARA-1306
-  Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should send StopMonitoringSubscription request to partner whith setting collect.subscriptions.persistent
+  Scenario: StopMonitoring subscription collect and partner CheckStatus is unavailable should send StopMonitoringSubscription request to partner whith setting collect.persistent
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-stop-monitoring-subscription-collector] and the following settings:
-      | remote_url                       | http://localhost:8090 |
-      | remote_credential                | test                  |
-      | remote_code_space                | internal              |
-      | local_credential                 | ara                   |
-      | collect.subscriptions.persistent | true                  |
+      | remote_url         | http://localhost:8090 |
+      | remote_credential  | test                  |
+      | remote_code_space  | internal              |
+      | local_credential   | ara                   |
+      | collect.persistent | true                  |
     And a StopArea exists with the following attributes:
       | Name            | Arletty |
       | Codes[internal] | boaarle |

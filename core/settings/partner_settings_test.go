@@ -478,17 +478,6 @@ func Test_GeneralMessageRequestVersion22(t *testing.T) {
 	assert.True(partnerSettings.GeneralMessageRequestVersion22())
 }
 
-func Test_PersistentCollect_With_Collect_Subscriptions_Persistent(t *testing.T) {
-	assert := assert.New(t)
-
-	settings := map[string]string{
-		COLLECT_SUBSCRIPTIONS_PERSISTENT: "true",
-	}
-	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
-
-	assert.True(partnerSettings.PersistentCollect())
-}
-
 func Test_PersistentCollect_With_Collect_Persistent(t *testing.T) {
 	assert := assert.New(t)
 

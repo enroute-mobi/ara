@@ -56,13 +56,12 @@ Feature: Support SIRI StopMonitoring by request
       }
       """
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
-      | remote_url                       | http://localhost:8090   |
-      | remote_credential                | test                    |
-      | remote_code_space                | internal                |
-      | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
-      | collect.subscriptions.persistent | true                    |
-      | local_credential                 | toto                    |
-      | collect.persistent               | true                    |
+      | remote_url                 | http://localhost:8090   |
+      | remote_credential          | test                    |
+      | remote_code_space          | internal                |
+      | collect.include_stop_areas | STIF:StopPoint:Q:41178: |
+      | local_credential           | toto                    |
+      | collect.persistent         | true                    |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | Test 1                  |
@@ -163,13 +162,12 @@ Feature: Support SIRI StopMonitoring by request
       }
       """
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
-      | remote_url                       | http://localhost:8090   |
-      | remote_credential                | test                    |
-      | remote_code_space                | internal                |
-      | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
-      | collect.subscriptions.persistent | true                    |
-      | local_credential                 | toto                    |
-      | collect.persistent               | true                    |
+      | remote_url                 | http://localhost:8090   |
+      | remote_credential          | test                    |
+      | remote_code_space          | internal                |
+      | collect.include_stop_areas | STIF:StopPoint:Q:41178: |
+      | local_credential           | toto                    |
+      | collect.persistent         | true                    |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | Test 1                  |
@@ -250,13 +248,12 @@ Feature: Support SIRI StopMonitoring by request
       }
       """
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
-      | remote_url                       | http://localhost:8090   |
-      | remote_credential                | test                    |
-      | remote_code_space                | internal                |
-      | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
-      | collect.subscriptions.persistent | true                    |
-      | local_credential                 | toto                    |
-      | collect.persistent               | true                    |
+      | remote_url                 | http://localhost:8090   |
+      | remote_credential          | test                    |
+      | remote_code_space          | internal                |
+      | collect.include_stop_areas | STIF:StopPoint:Q:41178: |
+      | local_credential           | toto                    |
+      | collect.persistent         | true                    |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | Test 1                  |
@@ -3317,13 +3314,12 @@ Feature: Support SIRI StopMonitoring by request
       }
       """
     And a Partner "test" exists with connectors [siri-lite-stop-monitoring-request-collector] and the following settings:
-      | remote_url                       | http://localhost:8090   |
-      | remote_credential                | test                    |
-      | remote_code_space                | internal                |
-      | collect.include_stop_areas       | STIF:StopPoint:Q:41178: |
-      | collect.subscriptions.persistent | true                    |
-      | local_credential                 | toto                    |
-      | collect.persistent               | true                    |
+      | remote_url                 | http://localhost:8090   |
+      | remote_credential          | test                    |
+      | remote_code_space          | internal                |
+      | collect.include_stop_areas | STIF:StopPoint:Q:41178: |
+      | local_credential           | toto                    |
+      | collect.persistent         | true                    |
     And a minute has passed
     And a StopArea exists with the following attributes:
       | Name            | Test 1                  |

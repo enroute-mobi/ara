@@ -608,15 +608,15 @@ Feature: Support SIRI FacilityMonitoring by subscription
     Then the SIRI server should not have received a FacilityMonitoringSubscription request
 
   @ARA-1761
-  Scenario: FacilityMonitoring subscription collect and partner CheckStatus is unavailable should send FacilityMonitoringSubscriptionRequest to partner whith setting collect.subscriptions.persistent
+  Scenario: FacilityMonitoring subscription collect and partner CheckStatus is unavailable should send FacilityMonitoringSubscriptionRequest to partner whith setting collect.persistent
     Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-facility-monitoring-subscription-collector] and the following settings:
-      | remote_url                       | http://localhost:8090 |
-      | remote_credential                | test                  |
-      | remote_code_space                | internal              |
-      | collect.include_facilities       | NINOXE:Facility:1:LOC |
-      | local_credential                 | ara                   |
-      | collect.subscriptions.persistent | true                  |
+      | remote_url                 | http://localhost:8090 |
+      | remote_credential          | test                  |
+      | remote_code_space          | internal              |
+      | collect.include_facilities | NINOXE:Facility:1:LOC |
+      | local_credential           | ara                   |
+      | collect.persistent         | true                  |
     And a minute has passed
     And a Facility exists with the following attributes:
       | Codes[internal] | NINOXE:Facility:1:LOC |

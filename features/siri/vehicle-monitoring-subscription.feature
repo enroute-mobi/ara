@@ -39,15 +39,15 @@ Feature: Support SIRI VehicleMonitoring by subscription
    Then the SIRI server should not have received a VehicleMonitoringSubscription request
 
   @ARA-1306
-  Scenario: VehicleMonitoring subscription collect and partner CheckStatus is unavailable should send VehicleMonitoringSubscriptionRequest to partner whith setting collect.subscriptions.persistent
+  Scenario: VehicleMonitoring subscription collect and partner CheckStatus is unavailable should send VehicleMonitoringSubscriptionRequest to partner whith setting collect.persistent
    Given a SIRI server on "http://localhost:8090"
     And a Partner "test" exists with connectors [siri-vehicle-monitoring-subscription-collector] and the following settings:
-      | remote_url                       | http://localhost:8090 |
-      | remote_credential                | test                  |
-      | remote_code_space                | internal              |
-      | collect.include_lines            | RLA_Bus:Line::05:LOC  |
-      | local_credential                 | ara                   |
-      | collect.subscriptions.persistent | true                  |
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | test                  |
+      | remote_code_space     | internal              |
+      | collect.include_lines | RLA_Bus:Line::05:LOC  |
+      | local_credential      | ara                   |
+      | collect.persistent    | true                  |
     And a minute has passed
     And a Line exists with the following attributes:
       | Name            | Test 1               |
