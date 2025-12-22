@@ -1210,3 +1210,97 @@ Feature: Support SIRI VehicleMonitoring by subscription
     When a minute has passed
     And a minute has passed
     Then the SIRI server should have received a SubscriptionRequest request with 2 "VehicleMonitoringRequest"
+
+  @ARA-1836
+  Scenario: Send a VehicleMonitoring notification when a vehicle changes wih fallback on vehicle code should use fallback code
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+      | remote_url                                                                 | http://localhost:8090 |
+      | remote_credential                                                          | Ara                   |
+      | local_credential                                                           | Subscriber            |
+      | remote_code_space                                                          | internal              |
+      | sort_payload_for_test                                                      | true                  |
+      | siri-vehicle-monitoring-subscription-broadcaster.vehicle_remote_code_space | TP2A                  |
+    And a Line exists with the following attributes:
+      | Codes[internal] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
+    And a VehicleJourney exists with the following attributes:
+      | Name                      | Passage 32                        |
+      | Codes[internal]           | Test:VehicleJourney:201:LOC       |
+      | LineId                    | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                 | true                              |
+      | Attributes[DirectionName] | Direction Name                    |
+    And a Vehicle exists with the following attributes:
+      | Codes[TP2A]      | Test:Vehicle:201123:LOC           |
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Occupancy        | seatsAvailable                    |
+    And a Subscription exist with the following attributes:
+      | Kind              | VehicleMonitoringBroadcast          |
+      | SubscriberRef     | Subscriber                          |
+      | ExternalId        | subscription-1                      |
+      | ReferenceArray[0] | Line, "internal": "Test:Line:3:LOC" |
+    When the Vehicle "TP2A:Test:Vehicle:201123:LOC" is edited with the following attributes:
+      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 234                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifyVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>Subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:201123:LOC</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>Test:Line:3:LOC</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>Test:VehicleJourney:201:LOC</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+                    <siri:DirectionName>Direction Name</siri:DirectionName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>234</siri:Bearing>
+                    <siri:Occupancy>seatsAvailable</siri:Occupancy>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+                 </siri:VehicleMonitoringDelivery>
+            </Notification>
+            <SiriExtension />
+          </sw:NotifyVehicleMonitoring>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                    | NotifyVehicleMonitoring         |
+      | Direction               | sent                            |
+      | Protocol                | siri                            |
+      | Partner                 | test                            |
+      | Status                  | OK                              |
+      | SubscriptionIdentifiers | ["subscription-1"]              |
+      | Lines                   | ["Test:Line:3:LOC"]             |
+      | Vehicles                | ["Test:Vehicle:201123:LOC"]     |
+      | VehicleJourneys         | ["Test:VehicleJourney:201:LOC"] |
