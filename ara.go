@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"github.com/getsentry/sentry-go"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
-	"gopkg.in/DataDog/dd-trace-go.v1/profiler"
 
 	"bitbucket.org/enroute-mobi/ara/api"
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -26,6 +24,8 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"bitbucket.org/enroute-mobi/ara/version"
+	"github.com/DataDog/dd-trace-go/v2/ddtrace/tracer"
+	"github.com/DataDog/dd-trace-go/v2/profiler"
 )
 
 func main() {

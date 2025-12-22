@@ -11,7 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/monitoring"
 	"bitbucket.org/enroute-mobi/ara/uuid"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
+	"github.com/DataDog/dd-trace-go/v2/ddtrace/tracer"
 )
 
 type ModelGuardian struct {
