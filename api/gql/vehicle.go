@@ -5,7 +5,6 @@ import (
 )
 
 const ( // Const for mutable attributes
-	Vehicle         = "vehicle.all"
 	OccupancyStatus = "vehicle.occupancyStatus"
 	OccupancyRate   = "vehicle.occupancyRate"
 	Longitude       = "vehicle.longitude"

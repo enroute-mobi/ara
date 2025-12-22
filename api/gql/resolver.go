@@ -36,20 +36,20 @@ func (r *Resolver) UpdateVehicle(args struct {
 	if !ok {
 		return nil, errors.Errorf("Can't find Vehicle with code %s", args.Code)
 	}
-	allMutable := r.Partner.IsMutable(Vehicle)
-	if args.Input.OccupancyStatus != nil && (allMutable || r.Partner.IsMutable(OccupancyStatus)) {
+
+	if args.Input.OccupancyStatus != nil && r.Partner.IsMutable(OccupancyStatus) {
 		v.Occupancy = *args.Input.OccupancyStatus
 	}
-	if args.Input.OccupancyRate != nil && (allMutable || r.Partner.IsMutable(OccupancyRate)) {
+	if args.Input.OccupancyRate != nil && r.Partner.IsMutable(OccupancyRate) {
 		v.Percentage = *args.Input.OccupancyRate
 	}
-	if args.Input.Longitude != nil && (allMutable || r.Partner.IsMutable(Longitude)) {
+	if args.Input.Longitude != nil && r.Partner.IsMutable(Longitude) {
 		v.Longitude = *args.Input.Longitude
 	}
-	if args.Input.Latitude != nil && (allMutable || r.Partner.IsMutable(Latitude)) {
+	if args.Input.Latitude != nil && r.Partner.IsMutable(Latitude) {
 		v.Latitude = *args.Input.Latitude
 	}
-	if args.Input.Bearing != nil && (allMutable || r.Partner.IsMutable(Bearing)) {
+	if args.Input.Bearing != nil && r.Partner.IsMutable(Bearing) {
 		v.Bearing = *args.Input.Bearing
 	}
 
