@@ -7,6 +7,9 @@ import (
 const ( // Const for mutable attributes
 	OccupancyStatus = "vehicle.occupancyStatus"
 	OccupancyRate   = "vehicle.occupancyRate"
+	Longitude       = "vehicle.longitude"
+	Latitude        = "vehicle.latitude"
+	Bearing         = "vehicle.bearing"
 )
 
 type vehicle struct {
@@ -30,6 +33,9 @@ type vehicle struct {
 type vehicleInput struct {
 	OccupancyStatus *string
 	OccupancyRate   *float64
+	Longitude       *float64
+	Latitude        *float64
+	Bearing         *float64
 }
 
 type vehicleResolver struct {

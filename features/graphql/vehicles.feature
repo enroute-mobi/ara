@@ -128,12 +128,12 @@ Feature: GraphQL API for vehicles
       | recordedAt      | 2017-01-01T13:00:00Z |
       | validUntil      | 2017-01-01T14:00:00Z |
 
-  @ARA-1439
+  @ARA-1439 @ARA-1800
   Scenario: Handle a Vehicle Graphql mutation with the correct settings
     Given a Partner "test" exists with connectors [graphql-server] and the following settings:
-      | local_credential           | test_token                                    |
-      | remote_code_space          | internal                                      |
-      | graphql.mutable_attributes | vehicle.occupancyStatus,vehicle.occupancyRate |
+      | local_credential           | test_token                                                                                       |
+      | remote_code_space          | internal                                                                                         |
+      | graphql.mutable_attributes | vehicle.occupancyStatus,vehicle.occupancyRate,vehicle.longitude,vehicle.latitude,vehicle.bearing |
     And a Vehicle exists with the following attributes:
       | Codes[internal] | Test:Vehicle:1:LOC       |
       | Longitude       |                    1.234 |
@@ -146,7 +146,7 @@ Feature: GraphQL API for vehicles
     When I send this GraphQL query to the Referential "test" with token "test_token"
       """
       mutation {
-        updateVehicle(code: "Test:Vehicle:1:LOC", input: { occupancyStatus: "seatsAvailable", occupancyRate: 0.65 }) {
+        updateVehicle(code: "Test:Vehicle:1:LOC", input: { longitude: 2.2919064, latitude: 48.8583701, bearing: 183, occupancyStatus: "seatsAvailable", occupancyRate: 0.65 }) {
           code
           longitude
           latitude
@@ -160,9 +160,9 @@ Feature: GraphQL API for vehicles
       """
     Then the GraphQL response should contain an updated Vehicle with these attributes:
       | code            | Test:Vehicle:1:LOC   |
-      | longitude       |                1.234 |
-      | latitude        |                5.678 |
-      | bearing         |                  123 |
+      | longitude       |            2.2919064 |
+      | latitude        |           48.8583701 |
+      | bearing         |                  183 |
       | occupancyStatus | seatsAvailable       |
       | occupancyRate   |                 0.65 |
       | recordedAt      | 2017-01-01T13:00:00Z |
