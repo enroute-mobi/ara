@@ -7,11 +7,10 @@ import (
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model/hooks"
 )
 
 func NewUnexpectedController(sc *SelectControl) (controller, error) {
-	if sc.Hook.String != string(hooks.AfterCreate) {
+	if sc.Hook.String != "AfterCreate" {
 		return nil, errors.New("'unexpected' controller must be defined AfterCreate")
 	}
 	if !slices.Contains([]string{"StopArea", "Line", "VehicleJourney"}, sc.ModelType.String) {

@@ -1,28 +1,41 @@
 package model
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
-	"bitbucket.org/enroute-mobi/ara/model/hooks"
 	"bitbucket.org/enroute-mobi/ara/model/schedules"
 )
 
 // PassingTimeChronology controller is created on StopVisits, but called on VehicleJourneys
 func NewPassingTimeChronologyController(sc *SelectControl) (controller, error) {
-	if sc.Hook.String != string(hooks.AfterSave) {
-		return nil, errors.New("'unexpected' controller must be defined AfterSave")
+	if sc.Hook.String != "AfterAllStopVisitSave" {
+		return nil, errors.New("'unexpected' controller must be defined AfterAllStopVisitSave")
 	}
 	if sc.ModelType.String != "StopVisit" {
 		return nil, fmt.Errorf("don't know how to handle model type %s in 'unexpected' controller", sc.ModelType.String)
+	}
+
+	var remoteCodeSpace string
+	attrs := make(map[string]string)
+
+	err := json.Unmarshal([]byte(sc.Attributes.String), &attrs)
+	if err == nil {
+		remoteCodeSpace = attrs["code_space"]
 	}
 
 	return func(mi ModelInstance) error {
 		vj, ok := mi.(*VehicleJourney)
 		if !ok {
 			return errors.New("PassingTimeChronologyController called on non VehicleJourney Model")
+		}
+		vjName := vj.Name
+		if vjName == "" && remoteCodeSpace != "" {
+			code, _ := vj.Code(remoteCodeSpace)
+			vjName = code.Value()
 		}
 
 		svs := vj.model.StopVisits().FindByVehicleJourneyId(vj.id)
@@ -40,7 +53,7 @@ func NewPassingTimeChronologyController(sc *SelectControl) (controller, error) {
 
 					// Attributes: vj name, departure time, arrival time
 					messageAttribute := fmt.Sprintf("%s,%s,%s",
-						vj.Name,
+						vjName,
 						svs[i].Schedules.Schedule(j).DepartureTime().Format("2006-01-02T15:04:05.000Z07:00"),
 						svs[i].Schedules.Schedule(j).ArrivalTime().Format("2006-01-02T15:04:05.000Z07:00"),
 					)
@@ -65,7 +78,7 @@ func NewPassingTimeChronologyController(sc *SelectControl) (controller, error) {
 
 					// Attributes: vj name, current departure time, next arrival time
 					messageAttribute := fmt.Sprintf("%s,%s,%s",
-						vj.Name,
+						vjName,
 						svs[i].Schedules.Schedule(j).DepartureTime().Format("2006-01-02T15:04:05.000Z07:00"),
 						svs[i+1].Schedules.Schedule(j).ArrivalTime().Format("2006-01-02T15:04:05.000Z07:00"),
 					)

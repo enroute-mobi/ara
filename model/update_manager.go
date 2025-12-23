@@ -466,7 +466,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		controls[i].Control(sv)
 	}
 
-	complexControls := manager.model.Controls().GetComplexControls(model_types.Situation)
+	complexControls := manager.model.Controls().GetComplexControls(model_types.StopVisit)
 	for h, cs := range complexControls {
 		switch h {
 		case hooks.AfterAllStopVisitSave:
