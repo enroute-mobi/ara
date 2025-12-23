@@ -12,13 +12,15 @@ type controller func(ModelInstance) error
 // type controllerFactory func(controllerAttributes) (controller, error)
 
 const (
-	Dummy      = "Dummy"
-	Unexpected = "Unexpected"
+	Dummy                 = "Dummy"
+	Unexpected            = "Unexpected"
+	PassingTimeChronology = "PassingTimeChronology"
 )
 
 var allControllers = []string{
 	Dummy,
 	Unexpected,
+	PassingTimeChronology,
 }
 
 type Control struct {
@@ -75,6 +77,8 @@ func NewControllerFromDatabase(sc *SelectControl) (controller, error) {
 		return NewDummyController(sc)
 	case sc.Type == Unexpected:
 		return NewUnexpectedController(sc)
+	case sc.Type == PassingTimeChronology:
+		return NewPassingTimeChronologyController(sc)
 	}
 
 	return nil, nil
