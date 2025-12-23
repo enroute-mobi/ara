@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -30,10 +31,32 @@ func (controller *FacilityController) findFacility(identifier string) (*model.Fa
 	return controller.referential.Model().Facilities().Find(model.FacilityId(identifier))
 }
 
-func (controller *FacilityController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *FacilityController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Facilities Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().Facilities().FindAll())
+	allFacilities := controller.referential.Model().Facilities().FindAll()
+	direction := params.Get("id")
+	switch direction {
+	case "desc":
+		sort.Slice(allFacilities, func(i, j int) bool {
+			return allFacilities[i].Id() > allFacilities[j].Id()
+		})
+	case "asc", "":
+		sort.Slice(allFacilities, func(i, j int) bool {
+			return allFacilities[i].Id() < allFacilities[j].Id()
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	paginatedFacilities, err := paginate(allFacilities, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedFacilities)
 	response.Write(jsonBytes)
 }
 
