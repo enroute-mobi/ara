@@ -44,7 +44,7 @@ func NewSIRISituationExchangeSubscriptionCollector(partner *Partner) *SIRISituat
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 	connector.situationExchangeSubscriber = NewSIRISituationExchangeSubscriber(connector)
 
 	return connector
@@ -157,7 +157,5 @@ func (connector *SIRISituationExchangeSubscriptionCollector) broadcastSituationU
 	if connector.updateSubscriber == nil {
 		return
 	}
-	for _, e := range event.Situations {
-		connector.updateSubscriber(e)
-	}
+	connector.updateSubscriber(event.SituationsUpdateEvents())
 }

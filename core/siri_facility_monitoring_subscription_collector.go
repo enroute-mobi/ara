@@ -43,7 +43,7 @@ func NewSIRIFacilityMonitoringSubscriptionCollector(partner *Partner) *SIRIFacil
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 	connector.facilityMonitoringSubscriber = NewSIRIFacilityMonitoringSubscriber(connector)
 
 	return connector
@@ -154,7 +154,5 @@ func (connector *SIRIFacilityMonitoringSubscriptionCollector) broadcastUpdateEve
 		return
 	}
 
-	for _, e := range events.Facilities {
-		connector.updateSubscriber(e)
-	}
+	connector.updateSubscriber(events.FacilitiesUpdateEvents())
 }

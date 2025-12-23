@@ -18,8 +18,8 @@ type fakeBroadcaster struct {
 	Events []model.UpdateEvent
 }
 
-func (fb *fakeBroadcaster) FakeBroadcaster(event model.UpdateEvent) {
-	fb.Events = append(fb.Events, event)
+func (fb *fakeBroadcaster) FakeBroadcaster(events []model.UpdateEvent) {
+	fb.Events = append(fb.Events, events...)
 }
 
 func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath string) []model.UpdateEvent {

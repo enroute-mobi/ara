@@ -138,7 +138,8 @@ func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 	}
 	event.attributes.Set(sattr.DirectionName, "Aller")
 
-	updateManager.Update(event)
+	updateManager.Update([]UpdateEvent{event})
+
 	updatedVehicleJourney, ok := model.VehicleJourneys().FindByCode(code)
 	assert.True(ok)
 

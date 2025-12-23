@@ -18,8 +18,8 @@ type fakeSituationBroadcaster struct {
 	Events []model.UpdateEvent
 }
 
-func (fb *fakeSituationBroadcaster) FakeBroadcaster(event model.UpdateEvent) {
-	fb.Events = append(fb.Events, event)
+func (fb *fakeSituationBroadcaster) FakeBroadcaster(events []model.UpdateEvent) {
+	fb.Events = append(fb.Events, events...)
 }
 
 func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath string) []model.UpdateEvent {

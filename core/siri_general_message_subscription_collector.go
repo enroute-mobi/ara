@@ -44,7 +44,7 @@ func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMe
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 	connector.generalMessageSubscriber = NewSIRIGeneralMessageSubscriber(connector)
 
 	return connector
@@ -179,7 +179,5 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) broadcastSituationUpda
 		return
 	}
 
-	for _, e := range events.Situations {
-		connector.updateSubscriber(e)
-	}
+	connector.updateSubscriber(events.SituationsUpdateEvents())
 }

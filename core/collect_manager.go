@@ -10,19 +10,19 @@ import (
 	"github.com/DataDog/dd-trace-go/v2/ddtrace/tracer"
 )
 
-type UpdateSubscriber func(model.UpdateEvent)
+type UpdateSubscriber func([]model.UpdateEvent)
 
 type CollectManagerInterface interface {
 	HandlePartnerStatusChange(partner string, status bool)
 
-	UpdateStopArea(request *StopAreaUpdateRequest)
-	UpdateLine(ctx context.Context, request *LineUpdateRequest)
-	UpdateVehicle(ctx context.Context, request *VehicleUpdateRequest)
-	UpdateSituation(request *SituationUpdateRequest)
-	UpdateFacility(ctx context.Context, request *FacilityUpdateRequest)
+	UpdateStopArea(*StopAreaUpdateRequest)
+	UpdateLine(context.Context, *LineUpdateRequest)
+	UpdateVehicle(context.Context, *VehicleUpdateRequest)
+	UpdateSituation(*SituationUpdateRequest)
+	UpdateFacility(context.Context, *FacilityUpdateRequest)
 
-	HandleUpdateEvent(UpdateSubscriber UpdateSubscriber)
-	BroadcastUpdateEvent(event model.UpdateEvent)
+	HandleUpdateEvent(UpdateSubscriber)
+	BroadcastUpdateEvents([]model.UpdateEvent)
 }
 
 type CollectManager struct {
@@ -59,8 +59,8 @@ func (manager *TestCollectManager) HandlePartnerStatusChange(partner string, sta
 
 // New structure
 func (manager *TestCollectManager) HandleUpdateEvent(UpdateSubscriber) {}
-func (manager *TestCollectManager) BroadcastUpdateEvent(event model.UpdateEvent) {
-	manager.UpdateEvents = append(manager.UpdateEvents, event)
+func (manager *TestCollectManager) BroadcastUpdateEvents(events []model.UpdateEvent) {
+	manager.UpdateEvents = append(manager.UpdateEvents, events...)
 }
 
 func (manager *TestCollectManager) UpdateSituation(*SituationUpdateRequest)                {}
@@ -81,16 +81,16 @@ func (manager *CollectManager) HandleUpdateEvent(UpdateSubscriber UpdateSubscrib
 	manager.UpdateSubscribers = append(manager.UpdateSubscribers, UpdateSubscriber)
 }
 
-func (manager *CollectManager) BroadcastUpdateEvent(event model.UpdateEvent) {
+func (manager *CollectManager) BroadcastUpdateEvents(events []model.UpdateEvent) {
 	for _, UpdateSubscriber := range manager.UpdateSubscribers {
-		UpdateSubscriber(event)
+		UpdateSubscriber(events)
 	}
 }
 
 func (manager *CollectManager) HandlePartnerStatusChange(partner string, status bool) {
 	for _, stopAreaId := range manager.referential.Model().StopAreas().FindByOrigin(partner) {
 		event := model.NewStatusUpdateEvent(stopAreaId, partner, status)
-		manager.BroadcastUpdateEvent(event)
+		manager.BroadcastUpdateEvents([]model.UpdateEvent{event})
 	}
 }
 

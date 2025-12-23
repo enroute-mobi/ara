@@ -19,7 +19,7 @@ type UpdateManager struct {
 	toControl map[model_types.Model]map[ModelId]map[string]Control
 }
 
-func NewUpdateManager(model Model) func(UpdateEvent) {
+func NewUpdateManager(model Model) func([]UpdateEvent) {
 	manager := newUpdateManager(model)
 	manager.resetToControl()
 	return manager.Update
@@ -54,7 +54,15 @@ func (manager *UpdateManager) addToControl(t model_types.Model, id ModelId, c Co
 
 }
 
-func (manager *UpdateManager) Update(event UpdateEvent) {
+func (manager *UpdateManager) Update(events []UpdateEvent) {
+	for i := range events {
+		manager.update(events[i])
+	}
+
+	manager.handleToControl()
+}
+
+func (manager *UpdateManager) update(event UpdateEvent) {
 	switch event.EventKind() {
 	case STOP_AREA_EVENT:
 		manager.updateStopArea(event.(*StopAreaUpdateEvent))
@@ -75,7 +83,6 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 	case FACILITY_EVENT:
 		manager.updateFacility(event.(*FacilityUpdateEvent))
 	}
-
 }
 
 func (manager *UpdateManager) updateFacility(event *FacilityUpdateEvent) {

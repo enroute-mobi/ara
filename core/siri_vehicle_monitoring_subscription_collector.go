@@ -43,7 +43,7 @@ func NewSIRIVehicleMonitoringSubscriptionCollector(partner *Partner) *SIRIVehicl
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 	connector.vehicleMonitoringSubscriber = NewSIRIVehicleMonitoringSubscriber(connector)
 
 	return connector
@@ -156,16 +156,21 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) broadcastUpdateEven
 	if connector.updateSubscriber == nil {
 		return
 	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, e := range events.StopAreas {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Lines {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.VehicleJourneys {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Vehicles {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
+
+	connector.updateSubscriber(evs)
 }

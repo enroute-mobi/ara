@@ -37,7 +37,7 @@ func NewSIRIStopPointsDiscoveryRequestCollector(partner *Partner) *SIRIStopPoint
 	connector := &SIRIStopPointsDiscoveryRequestCollector{}
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.stopAreaUpdateSubscriber = manager.BroadcastUpdateEvent
+	connector.stopAreaUpdateSubscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -50,9 +50,9 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) SetSubscriber(subscrib
 	connector.stopAreaUpdateSubscriber = subscriber
 }
 
-func (connector *SIRIStopPointsDiscoveryRequestCollector) broadcastUpdateEvent(event model.UpdateEvent) {
+func (connector *SIRIStopPointsDiscoveryRequestCollector) broadcastUpdateEvents(events []model.UpdateEvent) {
 	if connector.stopAreaUpdateSubscriber != nil {
-		connector.stopAreaUpdateSubscriber(event)
+		connector.stopAreaUpdateSubscriber(events)
 	}
 }
 
@@ -90,6 +90,8 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 	idCodeSpace := connector.remoteCodeSpace
 	partner := string(connector.Partner().Slug())
 
+	evs := []model.UpdateEvent{}
+
 	for _, annotatedStopPoint := range response.AnnotatedStopPointRefs() {
 		stopPointRefs = append(stopPointRefs, annotatedStopPoint.StopPointRef())
 		event := model.NewStopAreaUpdateEvent()
@@ -98,9 +100,10 @@ func (connector *SIRIStopPointsDiscoveryRequestCollector) RequestStopPoints() {
 		event.Code = model.NewCode(idCodeSpace, annotatedStopPoint.StopPointRef())
 		event.Name = annotatedStopPoint.StopName()
 		event.CollectedAlways = true
-
-		connector.broadcastUpdateEvent(event)
+		evs = append(evs, event)
 	}
+
+	connector.broadcastUpdateEvents(evs)
 
 	connector.partner.RegisterDiscoveredStopAreas(stopPointRefs)
 	message.StopAreas = stopPointRefs

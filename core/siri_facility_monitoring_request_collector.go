@@ -28,7 +28,7 @@ func NewSIRIFacilityMonitoringRequestCollector(partner *Partner) *SIRIFacilityMo
 	connector := &SIRIFacilityMonitoringRequestCollector{}
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -100,9 +100,8 @@ func (connector *SIRIFacilityMonitoringRequestCollector) broadcastUpdateEvents(e
 	if connector.updateSubscriber == nil {
 		return
 	}
-	for _, e := range events.Facilities {
-		connector.updateSubscriber(e)
-	}
+
+	connector.updateSubscriber(events.FacilitiesUpdateEvents())
 }
 
 // func (connector *SIRIFacilityMonitoringRequestCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {

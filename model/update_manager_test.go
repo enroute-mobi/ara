@@ -54,7 +54,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 		NextStopPointOrder: 5,
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
@@ -103,7 +103,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 		NextStopPointOrder: 5,
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
@@ -151,7 +151,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVis
 		VehicleJourneyCode: code,
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
@@ -206,7 +206,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 		VehicleJourneyCode: code,
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
@@ -240,7 +240,7 @@ func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 	updatedStopVisit, ok := model.StopVisits().FindByCode(code)
 	if !ok {
 		t.Fatalf("StopVisit should be created")
@@ -291,7 +291,7 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
 		t.Errorf("StopVisit DepartureStatus should be updated")
@@ -337,7 +337,7 @@ func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 	_, ok := model.StopVisits().FindByCode(code)
 	if ok {
 		t.Fatalf("StopVisit should not be created")
@@ -378,7 +378,7 @@ func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 		Schedules:          schedules.NewStopVisitSchedules(),
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.DepartureStatus != STOP_VISIT_DEPARTURE_CANCELLED {
 		t.Errorf("StopVisit DepartureStatus should be updated")
@@ -414,7 +414,7 @@ func Test_UpdateManager_UpdateStatus(t *testing.T) {
 	sa3.Save()
 
 	event := NewStatusUpdateEvent(sa3.Id(), "test_origin", true)
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	stopArea, _ := model.StopAreas().Find(sa.Id())
 	if status, ok := stopArea.Origins.Origin("test_origin"); !ok || !status {
@@ -455,7 +455,7 @@ func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 
 	time := time.Now()
 
-	manager.Update(NewNotCollectedUpdateEvent(code, time))
+	manager.Update([]UpdateEvent{NewNotCollectedUpdateEvent(code, time)})
 	updatedStopVisit, _ := model.StopVisits().Find(stopVisit.Id())
 
 	assert.Equal(updatedStopVisit.ArrivalStatus, STOP_VISIT_ARRIVAL_ARRIVED)
@@ -529,7 +529,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 		SiriXML:   &response.StopMonitoringDeliveries()[0].XMLMonitoredStopVisits()[0].XMLMonitoredVehicleJourney,
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedVehicleJourney, _ := vehicleJourneys.Find(vehicleJourneyId)
 	if updatedVehicleJourney.RawAttributes.IsEmpty() {
@@ -555,7 +555,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	manager := newUpdateManager(model)
 	event := completeEvent(code, testTime)
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 
@@ -580,7 +580,7 @@ func Test_FacilityUpdateManager_Update_With_Wrong_Status(t *testing.T) {
 		Status: "WRONG",
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 	updatedFacility, _ := model.Facilities().Find(facility.id)
 	assert.Equal(FacilityStatusPartiallyAvailable, updatedFacility.Status, "Should keep existing Status if new Status does not match enum status")
 }
@@ -602,7 +602,7 @@ func Test_FacilityUpdateManager_Update_With_Known_Status(t *testing.T) {
 		Status: "available",
 	}
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 	updatedFacility, _ := model.Facilities().Find(facility.id)
 	assert.Equal(FacilityStatusAvailable, updatedFacility.Status, "Should change existing Status if new Status matches enum status")
 }
@@ -622,7 +622,7 @@ func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 	manager := newUpdateManager(model)
 	event := completeEvent(code, testTime)
 
-	manager.Update(event)
+	manager.Update([]UpdateEvent{event})
 
 	updatedSituation, _ := model.Situations().Find(situation.Id())
 
