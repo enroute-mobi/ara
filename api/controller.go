@@ -74,12 +74,13 @@ func getRequestBody(response http.ResponseWriter, request *http.Request) []byte 
 }
 
 type Paginable interface {
-	model.Situation |
-		model.StopArea |
+	model.Facility |
 		model.Line |
-		model.VehicleJourney |
+		model.Operator |
+		model.StopArea |
 		model.Vehicle |
-		model.Facility
+		model.VehicleJourney |
+		model.Situation
 }
 
 type PaginatedResource[p Paginable] struct {

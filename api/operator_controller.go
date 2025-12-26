@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -30,10 +31,32 @@ func (controller *OperatorController) findOperator(identifier string) (*model.Op
 	return controller.referential.Model().Operators().Find(model.OperatorId(identifier))
 }
 
-func (controller *OperatorController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *OperatorController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Operators Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Model().Operators().FindAll())
+	allOperators := controller.referential.Model().Operators().FindAll()
+	direction := params.Get("name")
+	switch direction {
+	case "desc":
+		sort.Slice(allOperators, func(i, j int) bool {
+			return allOperators[i].Name > allOperators[j].Name
+		})
+	case "asc", "":
+		sort.Slice(allOperators, func(i, j int) bool {
+			return allOperators[i].Name < allOperators[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	paginatedOperators, err := paginate(allOperators, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedOperators)
 	response.Write(jsonBytes)
 }
 
