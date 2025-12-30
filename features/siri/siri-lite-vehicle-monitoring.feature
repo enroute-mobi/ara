@@ -848,12 +848,13 @@ Feature: Support SIRI VehicleMonitoring
 }
       """
     Then an audit event should exist with these attributes:
-        | Type              | VehicleMonitoringRequest                 |
-        | Protocol          | siri-lite                                |
-        | Direction         | received                                 |
-        | Status            | OK                                       |
-        | Partner           | test                                     |
-        | Vehicles          | ["Test:Vehicle:201123:LOC"]              |
-        | RequestIdentifier | Test:1234::LOC                           |
-        | Lines             | ["Test:Line:3:LOC"]                      |
-        | VehicleJourneys   | ["RATPDev:VehicleJourney::6ba7b814:LOC"] |
+        | Type              | VehicleMonitoringRequest                                 |
+        | Protocol          | siri-lite                                                |
+        | Direction         | received                                                 |
+        | Status            | OK                                                       |
+        | Partner           | test                                                     |
+        | Vehicles          | ["Test:Vehicle:201123:LOC"]                              |
+        | RequestIdentifier | Test:1234::LOC                                           |
+        | Lines             | ["Test:Line:3:LOC"]                                      |
+        | VehicleJourneys   | ["RATPDev:VehicleJourney::6ba7b814:LOC"]                 |
+        | RequestRawMessage | LineRef=Test:Line:3:LOC&MessageIdentifier=Test:1234::LOC |
