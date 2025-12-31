@@ -56,7 +56,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -220,7 +220,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -379,7 +379,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -538,7 +538,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -614,7 +614,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -817,7 +817,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -918,7 +918,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -1002,7 +1002,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -1059,7 +1059,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -1138,7 +1138,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -1195,7 +1195,7 @@ Feature: Support SIRI StopMonitoring
                 </ns5:MonitoredStopVisit>
               </ns5:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </ns1:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -1280,7 +1280,7 @@ Feature: Support SIRI StopMonitoring
           </ns5:MonitoredStopVisit>
         </ns5:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetStopMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1434,7 +1434,7 @@ Scenario: Update Partner Collect Settings
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>
@@ -1504,7 +1504,7 @@ Scenario: Update Partner Collect remote_code_space
                 </siri:MonitoredStopVisit>
               </siri:StopMonitoringDelivery>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </sw:GetStopMonitoringResponse>
         </soap:Body>
       </soap:Envelope>

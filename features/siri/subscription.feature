@@ -496,7 +496,7 @@ Feature: Support SIRI subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>
@@ -551,7 +551,7 @@ Feature: Support SIRI subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>

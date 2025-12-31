@@ -58,7 +58,7 @@ Feature: Support SIRI LinesDiscovery
                 <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineRef>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </sw:LinesDiscoveryResponse>
         </S:Body>
       </S:Envelope>
@@ -116,7 +116,7 @@ Feature: Support SIRI LinesDiscovery
                 <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineRef>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </sw:LinesDiscoveryResponse>
         </S:Body>
       </S:Envelope>
@@ -276,7 +276,7 @@ Feature: Support SIRI LinesDiscovery
                 <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineRef>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </sw:LinesDiscoveryResponse>
         </S:Body>
       </S:Envelope>
@@ -317,7 +317,7 @@ Feature: Support SIRI LinesDiscovery
                 <siri:Monitored>true</siri:Monitored>
               </siri:AnnotatedLineRef>
             </Answer>
-            <AnswerExtension />
+            <AnswerExtension/>
           </sw:LinesDiscoveryResponse>
         </S:Body>
       </S:Envelope>

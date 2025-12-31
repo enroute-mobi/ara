@@ -20,7 +20,7 @@
         </ns3:ErrorCondition>
         <ns3:ServiceStartedTime>2016-09-30T03:30:53.006+02:00</ns3:ServiceStartedTime>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns8:CheckStatusResponse>
   </S:Body>
 </S:Envelope>

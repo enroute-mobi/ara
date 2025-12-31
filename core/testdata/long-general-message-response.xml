@@ -50,5 +50,5 @@
 			</ns3:GeneralMessage>
 		</ns3:GeneralMessageDelivery>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns8:GetGeneralMessageResponse>

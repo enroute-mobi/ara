@@ -45,7 +45,7 @@ http_server.mount_proc options[:listen].path do |req, res|
         <ns3:Status>true</ns3:Status>
         <ns3:ServiceStartedTime>#{startedTime.strftime("%FT%T%:z")}</ns3:ServiceStartedTime>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns8:CheckStatusResponse>
   </S:Body>
 </S:Envelope>}

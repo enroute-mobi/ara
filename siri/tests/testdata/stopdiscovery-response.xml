@@ -20,7 +20,7 @@
                <ns3:StopName>Test 3</ns3:StopName>
             </ns3:AnnotatedStopPointRef>
          </Answer>
-         <AnswerExtension />
+         <AnswerExtension/>
       </ns8:StopPointsDiscoveryResponse>
    </S:Body>
 </S:Envelope>

@@ -17,5 +17,5 @@
 		</ns2:ErrorCondition>
 		<ns2:ServiceStartedTime>2016-09-21T03:30:22.996+02:00</ns2:ServiceStartedTime>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns7:CheckStatusResponse>

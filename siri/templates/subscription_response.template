@@ -22,5 +22,5 @@
         </siri:ResponseStatus>{{ end }}
         <siri:ServiceStartedTime>{{ .ServiceStartedTime.Format "2006-01-02T15:04:05.000Z07:00" }}</siri:ServiceStartedTime>
     </Answer>
-		<AnswerExtension />
+		<AnswerExtension/>
 </sw:SubscribeResponse>

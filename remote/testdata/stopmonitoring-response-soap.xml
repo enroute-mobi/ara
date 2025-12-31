@@ -106,7 +106,7 @@
           </ns3:MonitoredStopVisit>
         </ns3:StopMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns8:GetStopMonitoringResponse>
   </S:Body>
 </S:Envelope>

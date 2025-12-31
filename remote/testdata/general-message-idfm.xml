@@ -60,7 +60,7 @@
           </siri:GeneralMessage>
         </siri:GeneralMessageDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </sw:GetGeneralMessageResponse>
   </S:Body>
 </S:Envelope>

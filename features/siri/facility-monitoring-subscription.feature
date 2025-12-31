@@ -663,7 +663,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension    xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>

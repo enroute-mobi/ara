@@ -1207,7 +1207,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1325,7 +1325,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1424,7 +1424,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1537,7 +1537,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1651,7 +1651,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1754,7 +1754,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -1875,7 +1875,7 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
@@ -2345,7 +2345,7 @@ Feature: Support SIRI VehicleMonitoring by request
           </ns5:ErrorCondition>
         </ns5:VehicleMonitoringDelivery>
       </Answer>
-      <AnswerExtension />
+      <AnswerExtension/>
     </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
