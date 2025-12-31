@@ -560,9 +560,6 @@ Feature: Support SIRI SituationExchange by subscription
    <S:Body>
      <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
        <SubscriptionAnswerInfo
-         xmlns:ns2="http://www.ifopt.org.uk/acsb"
-         xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-         xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
          xmlns:ns5="http://www.siri.org.uk/siri"
          xmlns:ns6="http://wsdl.siri.org.uk/siri">
          <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -571,9 +568,6 @@ Feature: Support SIRI SituationExchange by subscription
          <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns5:RequestMessageRef>
        </SubscriptionAnswerInfo>
        <Answer
-         xmlns:ns2="http://www.ifopt.org.uk/acsb"
-         xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-         xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
          xmlns:ns5="http://www.siri.org.uk/siri"
          xmlns:ns6="http://wsdl.siri.org.uk/siri">
          <ns5:ResponseStatus>
@@ -586,7 +580,7 @@ Feature: Support SIRI SituationExchange by subscription
          </ns5:ResponseStatus>
          <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
        </Answer>
-       <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+       <AnswerExtension />
      </ns1:SubscribeResponse>
    </S:Body>
    </S:Envelope>
@@ -616,7 +610,6 @@ Feature: Support SIRI SituationExchange by subscription
               <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
-
             </ServiceDeliveryInfo>
             <Notification>
               <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>

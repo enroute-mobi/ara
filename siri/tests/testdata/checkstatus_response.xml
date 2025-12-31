@@ -1,10 +1,6 @@
 <ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
-												 xmlns:ns3="http://www.ifopt.org.uk/acsb"
-												 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-												 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-												 xmlns:ns6="http://scma/siri"
-												 xmlns:ns7="http://wsdl.siri.org.uk"
-												 xmlns:ns8="http://wsdl.siri.org.uk/siri">
+						 xmlns:ns7="http://wsdl.siri.org.uk"
+						 xmlns:ns8="http://wsdl.siri.org.uk/siri">
 	<CheckStatusAnswerInfo>
 		<ns2:ResponseTimestamp>2016-09-21T20:14:46.238+02:00</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
@@ -17,7 +13,7 @@
 		<ns2:ErrorCondition>
 			<ns2:OtherError number="103">
 				<ns2:ErrorText>UNAVAILABLE</ns2:ErrorText>
-			</ns2:ServiceNotAvailableError>
+			</ns2:OtherError>
 		</ns2:ErrorCondition>
 		<ns2:ServiceStartedTime>2016-09-21T03:30:22.996+02:00</ns2:ServiceStartedTime>
 	</Answer>

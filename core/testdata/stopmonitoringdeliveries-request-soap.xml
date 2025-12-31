@@ -1,11 +1,8 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-    xmlns:ns3="http://www.ifopt.org.uk/acsb"
-    xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-    xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-    xmlns:ns6="http://wsdl.siri.org.uk"
-    xmlns:ns7="http://wsdl.siri.org.uk/siri">
+                              xmlns:ns6="http://wsdl.siri.org.uk"
+                              xmlns:ns7="http://wsdl.siri.org.uk/siri">
       <ServiceDeliveryInfo>
         <ns2:ResponseTimestamp>
         2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>

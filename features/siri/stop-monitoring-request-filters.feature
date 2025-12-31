@@ -58,17 +58,12 @@ Feature: Support SIRI StopMonitoring by request
                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header />
         <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <ServiceRequestInfo>
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
@@ -208,17 +203,12 @@ Feature: Support SIRI StopMonitoring by request
                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header />
         <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <ServiceRequestInfo>
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
@@ -343,17 +333,12 @@ Feature: Support SIRI StopMonitoring by request
                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header />
         <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <ServiceRequestInfo>
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
@@ -479,17 +464,12 @@ Feature: Support SIRI StopMonitoring by request
                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header />
         <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <ServiceRequestInfo>
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
@@ -618,17 +598,12 @@ Feature: Support SIRI StopMonitoring by request
                   xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <SOAP-ENV:Header />
         <S:Body>
-          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                                 xmlns:siri="http://www.ifopt.org.uk/acsb"
-                                 xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                                 xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                                 xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <ServiceRequestInfo>
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
             </ServiceRequestInfo>
-
             <Request version="2.0:FR-IDF-2.4">
               <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
               <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
@@ -767,17 +742,12 @@ Feature: Support SIRI StopMonitoring by request
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header />
   <S:Body>
-    <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+    <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:RequestorRef>test</ns2:RequestorRef>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>
       </ServiceRequestInfo>
-
       <Request version="2.0:FR-IDF-2.4">
         <ns2:RequestTimestamp>2017-01-01T12:26:10.116+02:00</ns2:RequestTimestamp>
         <ns2:MessageIdentifier>StopMonitoring:Test:0</ns2:MessageIdentifier>

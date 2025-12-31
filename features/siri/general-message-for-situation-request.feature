@@ -28,7 +28,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>TestPartner</ns2:RequestorRef>
@@ -125,7 +125,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
@@ -349,13 +349,7 @@ Feature: Support SIRI GeneralMessage for Situation
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <sw:GetGeneralMessageResponse xmlns:siri="http://www.siri.org.uk/siri"
-          xmlns:ns4="http://www.ifopt.org.uk/acsb"
-          xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns7="http://scma/siri"
-          xmlns:sw="http://wsdl.siri.org.uk"
-          xmlns:ns9="http://wsdl.siri.org.uk/siri">
+          <sw:GetGeneralMessageResponse xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
               <siri:ProducerRef>Ara</siri:ProducerRef>
@@ -442,7 +436,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
@@ -779,7 +773,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>
@@ -868,7 +862,7 @@ Feature: Support SIRI GeneralMessage for Situation
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:siri="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+        <ns7:GetGeneralMessage xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
           <ServiceRequestInfo>
             <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
             <ns2:RequestorRef>NINOXE:default</ns2:RequestorRef>

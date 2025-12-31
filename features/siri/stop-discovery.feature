@@ -43,11 +43,7 @@ Feature: Support SIRI StopPointsDiscovery
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <Request>
               <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
@@ -141,11 +137,7 @@ Feature: Support SIRI StopPointsDiscovery
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <Request>
               <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
@@ -229,11 +221,7 @@ Feature: Support SIRI StopPointsDiscovery
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <Request>
               <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
@@ -733,11 +721,7 @@ Feature: Support SIRI StopPointsDiscovery
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <Request>
               <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>
@@ -782,11 +766,7 @@ Feature: Support SIRI StopPointsDiscovery
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
-          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:siri="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+          <ns7:StopPointsDiscovery xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
             <Request>
               <ns2:RequestTimestamp>2017-03-03T11:28:00.359Z</ns2:RequestTimestamp>
               <ns2:RequestorRef>test</ns2:RequestorRef>

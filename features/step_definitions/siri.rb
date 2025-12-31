@@ -156,11 +156,7 @@ When(/^I send a SIRI GetStopMonitoring request with$/) do |attributes|
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
   <SOAP-ENV:Header />
   <S:Body>
-    <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:ns3="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri" xmlns:ns7="http://wsdl.siri.org.uk">
+    <ns7:GetStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri" xmlns:ns7="http://wsdl.siri.org.uk">
       <ServiceRequestInfo>
         <ns2:RequestTimestamp>2017-01-01T12:00:00.000Z</ns2:RequestTimestamp>
         <ns2:RequestorRef>#{attributes['RequestorRef']}</ns2:RequestorRef>
