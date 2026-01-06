@@ -103,7 +103,7 @@ func Test_checklines(t *testing.T) {
 
 	// test request for subscription to all Lines having the same remote_code_space
 	request := []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-		"<Siri xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
+		"<Siri version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
 		"  <SubscriptionRequest>" +
 		"      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>" +
 		"      <RequestorRef>NINOXE:default</RequestorRef>" +
@@ -132,7 +132,7 @@ func Test_checklines(t *testing.T) {
 
 	// test subscription to a Line not having the same remote_code_space
 	request1 := []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-		"<Siri xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
+		"<Siri version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
 		"  <SubscriptionRequest>" +
 		"      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>" +
 		"      <RequestorRef>NINOXE:default</RequestorRef>" +
@@ -161,7 +161,7 @@ func Test_checklines(t *testing.T) {
 
 	// test subscription to multiple Lines with both remote_code_space from partner and unknown remote_code_space
 	request2 := []byte("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-		"<Siri xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
+		"<Siri version=\"2.0\" xmlns=\"http://www.siri.org.uk/siri\">" +
 		"  <SubscriptionRequest>" +
 		"      <RequestTimestamp>2017-01-01T12:01:00.000Z</RequestTimestamp>" +
 		"      <RequestorRef>NINOXE:default</RequestorRef>" +

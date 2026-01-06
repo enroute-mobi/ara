@@ -204,7 +204,7 @@ Feature: Support SIRI subscription
     When I send this SIRI request
         """
 <?xml version='1.0' encoding='utf-8'?>
-<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+<Siri version="2.0" xmlns="http://www.siri.org.uk/siri">
    <TerminateSubscriptionRequest>
       <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
       <RequestorRef>NINOXE:default</RequestorRef>
@@ -289,7 +289,7 @@ Feature: Support SIRI subscription
     When I send this SIRI request
         """
 <?xml version='1.0' encoding='utf-8'?>
-<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+<Siri version="2.0" xmlns="http://www.siri.org.uk/siri">
    <TerminateSubscriptionRequest>
       <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
       <RequestorRef>NINOXE:default</RequestorRef>
@@ -344,7 +344,7 @@ Feature: Support SIRI subscription
    When I send this SIRI request
         """
 <?xml version='1.0' encoding='utf-8'?>
-<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+<Siri version="2.0" xmlns="http://www.siri.org.uk/siri">
    <TerminateSubscriptionRequest>
       <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
       <RequestorRef>NINOXE:default</RequestorRef>
@@ -394,7 +394,7 @@ Feature: Support SIRI subscription
    When I send this SIRI request
         """
 <?xml version='1.0' encoding='utf-8'?>
-<Siri xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xmlns="http://www.siri.org.uk/siri">
+<Siri version="2.0" xmlns="http://www.siri.org.uk/siri">
    <TerminateSubscriptionRequest>
       <RequestTimestamp>2016-09-22T08:01:20.227+02:00</RequestTimestamp>
       <RequestorRef>NINOXE:default</RequestorRef>
