@@ -261,6 +261,7 @@ Feature: Support SIRI EstimatedTimetable
               <siri:StopPointRef>NINOXE:StopPoint:SP:24:LOC</siri:StopPointRef>
               <siri:Order>4</siri:Order>
               <siri:StopPointName>Test</siri:StopPointName>
+              <siri:DestinationDisplay>Display</siri:DestinationDisplay>
               <siri:ExpectedArrivalTime>2017-01-01T15:01:01.000Z</siri:ExpectedArrivalTime>
               <siri:ArrivalStatus>delayed</siri:ArrivalStatus>
             </siri:EstimatedCall>
@@ -288,14 +289,15 @@ Feature: Support SIRI EstimatedTimetable
       | Name            | Test                              |
       | Id              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes[internal]            | NINOXE:VehicleJourney:201-4       |
-      | PassageOrder               | 4                                 |
-      | VehicleAtStop              | false                             |
-      | ArrivalStatus              | delayed                           |
-      | DepartureStatus            | nil                               |
-      | Schedule[expected]#Arrival | 2017-01-01T15:01:01Z              |
-      | VehicleJourneyId           | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
-      | StopAreaId                 | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
+      | Codes[internal]                | NINOXE:VehicleJourney:201-4       |
+      | PassageOrder                   | 4                                 |
+      | VehicleAtStop                  | false                             |
+      | ArrivalStatus                  | delayed                           |
+      | DepartureStatus                | nil                               |
+      | Schedule[expected]#Arrival     | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId               | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | StopAreaId                     | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
+      | Attributes[DestinationDisplay] | Display                           |
     And an audit event should exist with these attributes:
       | Protocol        | siri                           |
       | Direction       | received                       |
