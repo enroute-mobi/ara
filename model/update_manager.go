@@ -260,7 +260,10 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	vj.Cancellation = event.Cancellation
 
 	vj.References.SetCode("DestinationRef", NewCode(event.Code.CodeSpace(), event.DestinationRef))
-	vj.DestinationName = event.DestinationName
+
+	if event.DestinationName != "" {
+		vj.DestinationName = event.DestinationName
+	}
 
 	if event.Direction != "" { // Only used for Push collector
 		vj.Attributes.Set(siri_attributes.DirectionName, event.Direction)
