@@ -21,6 +21,7 @@ type XMLEstimatedVehicleJourney struct {
 	datedVehicleJourneyRef string
 	destinationRef         string
 	destinationName        string
+	originName             string
 	directionRef           string
 	operatorRef            string
 	originRef              string
@@ -139,4 +140,11 @@ func (evj *XMLEstimatedVehicleJourney) DestinationName() string {
 		evj.destinationName = evj.findStringChildContent(siri_attributes.DestinationName)
 	}
 	return evj.destinationName
+}
+
+func (evj *XMLEstimatedVehicleJourney) OriginName() string {
+	if evj.originName == "" {
+		evj.originName = evj.findStringChildContent(siri_attributes.OriginName)
+	}
+	return evj.originName
 }
