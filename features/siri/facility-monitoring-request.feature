@@ -181,7 +181,7 @@ Feature: Support SIRI FacilityMonitoring by request
     Given a raw SIRI server waits FacilityMonitoring request on "http://localhost:8090" to respond with
       """
      <?xml version="1.0" encoding="UTF-8"?>
-     <Siri xmlns="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+     <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
          <ServiceDelivery>
              <ResponseTimestamp>2030-01-01T12:01:10.000Z</ResponseTimestamp>
              <FacilityMonitoringDelivery>

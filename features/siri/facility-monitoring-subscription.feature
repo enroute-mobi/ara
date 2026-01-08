@@ -301,7 +301,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
     When I send this SIRI request
       """
       <?xml version="1.0" encoding="UTF-8"?>
-      <Siri xmlns="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+      <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
        <SubscriptionRequest>
         <RequestTimestamp>2017-01-01T12:03:00.000Z</RequestTimestamp>
         <RequestorRef>NINOXE:default</RequestorRef>
@@ -361,7 +361,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
     When I send this SIRI request
       """
      <?xml version="1.0" encoding="UTF-8"?>
-      <Siri xmlns="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+      <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
        <SubscriptionRequest>
         <RequestTimestamp>2017-01-01T12:03:00.000Z</RequestTimestamp>
         <RequestorRef>NINOXE:default</RequestorRef>
@@ -476,7 +476,7 @@ Feature: Support SIRI FacilityMonitoring by subscription
     When I send this SIRI request
       """
      <?xml version="1.0" encoding="UTF-8"?>
-      <Siri xmlns="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+      <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
        <SubscriptionRequest>
         <RequestTimestamp>2017-01-01T12:03:00.000Z</RequestTimestamp>
         <RequestorRef>NINOXE:default</RequestorRef>

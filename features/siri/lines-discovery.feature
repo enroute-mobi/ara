@@ -328,7 +328,7 @@ Feature: Support SIRI LinesDiscovery
     Given a raw SIRI server waits LinesRequest request on "http://localhost:8090" to respond with
       """
       <?xml version="1.0" encoding="UTF-8"?>
-      <Siri xmlns="http://www.siri.org.uk/siri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://www.siri.org.uk/siri ../../xsd/siri.xsd">
+      <Siri xmlns="http://www.siri.org.uk/siri" version="2.0">
       <LinesDelivery>
       <ResponseTimestamp>2004-12-17T09:30:47-05:00</ResponseTimestamp>
       <Status>true</Status>
