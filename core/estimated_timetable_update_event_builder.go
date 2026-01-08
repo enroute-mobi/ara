@@ -56,15 +56,15 @@ func (builder *EstimatedTimetableUpdateEventBuilder) buildUpdateEvents(estimated
 		_, ok = builder.updateEvents.VehicleJourneys[estimatedVehicleJourney.DatedVehicleJourneyRef()]
 		if !ok {
 			vjEvent := &model.VehicleJourneyUpdateEvent{
-				Origin:    builder.origin,
-				Code:      vjCode,
-				LineCode:  lineCode,
-				OriginRef: estimatedVehicleJourney.OriginRef(),
-				// OriginName:      estimatedVehicleJourney.OriginName(),
-				DirectionType:  builder.directionRef(estimatedVehicleJourney.DirectionRef()),
-				DestinationRef: estimatedVehicleJourney.DestinationRef(),
-				// DestinationName: estimatedVehicleJourney.DestinationName(),
-				Monitored: true,
+				Origin:          builder.origin,
+				Code:            vjCode,
+				LineCode:        lineCode,
+				OriginRef:       estimatedVehicleJourney.OriginRef(),
+				OriginName:      estimatedVehicleJourney.OriginName(),
+				DirectionType:   builder.directionRef(estimatedVehicleJourney.DirectionRef()),
+				DestinationRef:  estimatedVehicleJourney.DestinationRef(),
+				DestinationName: estimatedVehicleJourney.DestinationName(),
+				Monitored:       true,
 				// Occupancy: model.NormalizedOccupancyName(estimatedVehicleJourney.Occupancy()),
 
 				CodeSpace: builder.remoteCodeSpace,
