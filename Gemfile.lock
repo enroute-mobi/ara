@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://bitbucket.org/enroute-mobi/siri-xsd.git
-  revision: 59586fa08361031008041c9259aba41a15ec1c21
+  revision: c5c27a8bec6b88744026a4b4d88015ef9b852a75
   specs:
     siri-xsd (0.1.0)
       listen
