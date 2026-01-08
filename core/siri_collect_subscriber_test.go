@@ -353,7 +353,7 @@ func Test_HandleResponse_StatusFalse(t *testing.T) {
 	testMessage := `when the requestMessageRef is OK and subscriptionRef is OK
 and Status is false, the resource should not subscribed and the subscriptionRequests must be emtpy`
 
-		assert.Equal(1, resource.RetryCount)
+	assert.Equal(1, resource.RetryCount)
 	assert.Zero(resource.SubscribedAt(), testMessage)
 	assert.Empty(subscriptionRequests, testMessage)
 }
@@ -363,21 +363,13 @@ func testSetup() (subscriber *CollectSubscriber, subscription *Subscription, res
     <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
     <soap:Body>
         <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <SubscriptionAnswerInfo xmlns:ns2="http://www.ifopt.org.uk/acsb"
-									xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-									xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-									xmlns:ns5="http://www.siri.org.uk/siri"
-									xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
                 <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
                 <ns5:Address>http://sqybus-siri:8080/ProfilSiriKidf2_4Producer-Sqybus/SiriServices</ns5:Address>
                 <ns5:ResponderRef>SQYBUS</ns5:ResponderRef>
                 <ns5:RequestMessageRef>28679112-9dad-11d1-2-00c04fd430c8</ns5:RequestMessageRef>
             </SubscriptionAnswerInfo>
-            <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb"
-	 				xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-					xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-					xmlns:ns5="http://www.siri.org.uk/siri"
-					xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
                 <ns5:ResponseStatus>
                     <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
                     <ns5:RequestMessageRef>{request_message_ref}</ns5:RequestMessageRef>
@@ -388,7 +380,7 @@ func testSetup() (subscriber *CollectSubscriber, subscription *Subscription, res
                 </ns5:ResponseStatus>
                 <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
             </Answer>
-            <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+            <AnswerExtension/>
         </ns1:SubscribeResponse>
     </soap:Body>
 </soap:Envelope>`)

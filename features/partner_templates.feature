@@ -39,12 +39,7 @@ Feature: Manages Partner templates
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-      <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri"
-      xmlns:ns3="http://www.ifopt.org.uk/acsb"
-      xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-      xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-      xmlns:ns6="http://scma/siri"
-      xmlns:sw="http://wsdl.siri.org.uk">
+      <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <Request>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>test:local:1234</siri:RequestorRef>
@@ -89,12 +84,7 @@ Feature: Manages Partner templates
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-      <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri"
-      xmlns:ns3="http://www.ifopt.org.uk/acsb"
-      xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-      xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-      xmlns:ns6="http://scma/siri"
-      xmlns:sw="http://wsdl.siri.org.uk">
+      <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <Request>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>test:local:1234</siri:RequestorRef>
@@ -131,12 +121,7 @@ Feature: Manages Partner templates
       <?xml version='1.0' encoding='utf-8'?>
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
-      <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri"
-      xmlns:ns3="http://www.ifopt.org.uk/acsb"
-      xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-      xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-      xmlns:ns6="http://scma/siri"
-      xmlns:sw="http://wsdl.siri.org.uk">
+      <sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <Request>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>test:local:5678</siri:RequestorRef>

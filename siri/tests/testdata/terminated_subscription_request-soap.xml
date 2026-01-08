@@ -3,17 +3,14 @@
   <S:Body>
     <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk">
       <ServiceRequestInfo
-       xmlns:ns2="http://www.ifopt.org.uk/acsb"
-       xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-       xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-       xmlns:ns5="http://www.siri.org.uk/siri"
-       xmlns:ns6="http://wsdl.siri.org.uk/siri">
+          xmlns:ns5="http://www.siri.org.uk/siri"
+          xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:RequestTimestamp>2009-11-10T23:00:00.000Z</ns5:RequestTimestamp>
         <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
-        <ns2:MessageIdentifier>TermSubReq:Test:0</ns2:MessageIdentifier>
+        <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
       </ServiceRequestInfo>
       <Request version="2.0:FR-IDF-2.4">
-        <ns5:SubscriptionRef>SubscriberRef</ns5:SubscriptionRef>
+        <ns1:SubscriptionRef>SubscriberRef</ns1:SubscriptionRef>
       </Request>
       <RequestExtension/>
     </ns1:DeleteSubscription>

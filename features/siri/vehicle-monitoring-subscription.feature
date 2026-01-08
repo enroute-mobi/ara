@@ -619,9 +619,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -630,9 +627,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
         <ns5:RequestMessageRef>response</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -645,7 +639,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>
@@ -677,9 +671,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -688,9 +679,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -731,8 +719,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
           <ns6:NotifyVehicleMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
           xmlns:ns5="http://www.siri.org.uk/siri"
           xmlns:ns6="http://wsdl.siri.org.uk"
           xmlns:ns7="http://wsdl.siri.org.uk/siri">
@@ -1160,9 +1146,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
       <S:Body>
       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -1171,9 +1154,6 @@ Feature: Support SIRI VehicleMonitoring by subscription
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -1186,7 +1166,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>

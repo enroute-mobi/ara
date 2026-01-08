@@ -1,10 +1,6 @@
 <ns8:GetGeneralMessageResponse xmlns:ns3="http://www.siri.org.uk/siri"
-															 xmlns:ns4="http://www.ifopt.org.uk/acsb"
-															 xmlns:ns5="http://www.ifopt.org.uk/ifopt"
-															 xmlns:ns6="http://datex2.eu/schema/2_0RC1/2_0"
-															 xmlns:ns7="http://scma/siri"
-															 xmlns:ns8="http://wsdl.siri.org.uk"
-															 xmlns:ns9="http://wsdl.siri.org.uk/siri">
+							   xmlns:ns8="http://wsdl.siri.org.uk"
+							   xmlns:ns9="http://wsdl.siri.org.uk/siri">
 	<ServiceDeliveryInfo>
 		<ns3:ResponseTimestamp>2017-03-29T16:47:52.993+02:00</ns3:ResponseTimestamp>
 		<ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>
@@ -54,5 +50,5 @@
 			</ns3:GeneralMessage>
 		</ns3:GeneralMessageDelivery>
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </ns8:GetGeneralMessageResponse>

@@ -1,8 +1,4 @@
 <ns7:GetEstimatedTimetable xmlns:ns2="http://www.siri.org.uk/siri"
-                           xmlns:ns3="http://www.ifopt.org.uk/acsb"
-                           xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-                           xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-                           xmlns:ns6="http://scma/siri"
                            xmlns:ns7="http://wsdl.siri.org.uk">
   <ServiceRequestInfo>
     <ns2:RequestTimestamp>2016-09-07T09:11:25.174Z</ns2:RequestTimestamp>
@@ -18,4 +14,4 @@
     </ns2:Lines>
   </Request>
   <RequestExtension />
-</ns7:GetStopMonitoring>
+</ns7:GetEstimatedTimetable>

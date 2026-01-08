@@ -20,11 +20,7 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <DeleteSubscriptionInfo
-             xmlns:ns2="http://www.ifopt.org.uk/acsb"
-             xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-             xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-             xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <DeleteSubscriptionInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
               <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
@@ -57,11 +53,7 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <DeleteSubscriptionInfo
-             xmlns:ns2="http://www.ifopt.org.uk/acsb"
-             xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-             xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-             xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <DeleteSubscriptionInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
               <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
@@ -128,11 +120,7 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <DeleteSubscriptionInfo
-             xmlns:ns2="http://www.ifopt.org.uk/acsb"
-             xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-             xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
-             xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <DeleteSubscriptionInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
               <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
               <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
@@ -488,9 +476,6 @@ Feature: Support SIRI subscription
       <S:Body>
       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -499,9 +484,6 @@ Feature: Support SIRI subscription
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -514,7 +496,7 @@ Feature: Support SIRI subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>
@@ -549,9 +531,6 @@ Feature: Support SIRI subscription
       <S:Body>
       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -560,9 +539,6 @@ Feature: Support SIRI subscription
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -575,7 +551,7 @@ Feature: Support SIRI subscription
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
       </ns1:SubscribeResponse>
       </S:Body>
       </S:Envelope>

@@ -11,5 +11,5 @@
 			</siri:Lines>{{ end }}
 		</siri:AnnotatedStopPointRef>{{ end }}
 	</Answer>
-	<AnswerExtension />
+	<AnswerExtension/>
 </sw:StopPointsDiscoveryResponse>

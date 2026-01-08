@@ -12,9 +12,6 @@ Feature: Audit API exchanges
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -23,9 +20,6 @@ Feature: Audit API exchanges
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -38,7 +32,7 @@ Feature: Audit API exchanges
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
     </ns1:SubscribeResponse>
   </S:Body>
   </S:Envelope>
@@ -83,12 +77,10 @@ Feature: Audit API exchanges
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ns6:NotifyStopMonitoring
+            xmlns:ns2="http://www.siri.org.uk/siri"
+            xmlns:ns6="http://wsdl.siri.org.uk"
+            xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
@@ -170,9 +162,6 @@ Feature: Audit API exchanges
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -181,9 +170,6 @@ Feature: Audit API exchanges
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -196,7 +182,7 @@ Feature: Audit API exchanges
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
     </ns1:SubscribeResponse>
   </S:Body>
   </S:Envelope>
@@ -240,12 +226,10 @@ Feature: Audit API exchanges
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ns6:NotifyStopMonitoring
+            xmlns:ns2="http://www.siri.org.uk/siri"
+            xmlns:ns6="http://wsdl.siri.org.uk"
+            xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
@@ -394,9 +378,6 @@ Feature: Audit API exchanges
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -405,9 +386,6 @@ Feature: Audit API exchanges
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -420,7 +398,7 @@ Feature: Audit API exchanges
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
     </ns1:SubscribeResponse>
   </S:Body>
   </S:Envelope>
@@ -476,12 +454,10 @@ Feature: Audit API exchanges
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ns6:NotifyStopMonitoring
+            xmlns:ns2="http://www.siri.org.uk/siri"
+            xmlns:ns6="http://wsdl.siri.org.uk"
+            xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
@@ -535,9 +511,6 @@ Feature: Audit API exchanges
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
@@ -546,9 +519,6 @@ Feature: Audit API exchanges
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns2="http://www.ifopt.org.uk/acsb"
-        xmlns:ns3="http://www.ifopt.org.uk/ifopt"
-        xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0"
         xmlns:ns5="http://www.siri.org.uk/siri"
         xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseStatus>
@@ -561,7 +531,7 @@ Feature: Audit API exchanges
         </ns5:ResponseStatus>
         <ns5:ServiceStartedTime>2016-09-22T08:01:20.227+02:00</ns5:ServiceStartedTime>
       </Answer>
-      <AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/>
+      <AnswerExtension/>
     </ns1:SubscribeResponse>
   </S:Body>
   </S:Envelope>
@@ -623,12 +593,10 @@ Feature: Audit API exchanges
       """
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyStopMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns3="http://www.ifopt.org.uk/acsb"
-          xmlns:ns4="http://www.ifopt.org.uk/ifopt"
-          xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ns6:NotifyStopMonitoring
+            xmlns:ns2="http://www.siri.org.uk/siri"
+            xmlns:ns6="http://wsdl.siri.org.uk"
+            xmlns:ns7="http://wsdl.siri.org.uk/siri">
             <ServiceDeliveryInfo>
               <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
               <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>

@@ -286,7 +286,7 @@ Feature: Support SIRI ProductionTimetable by subscription
         </siri:ResponseStatus>
         <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
     </Answer>
-<AnswerExtension />
+<AnswerExtension/>
 </sw:SubscribeResponse>
 </S:Body>
 </S:Envelope>
@@ -434,7 +434,7 @@ Feature: Support SIRI ProductionTimetable by subscription
         </siri:ResponseStatus>
         <siri:ServiceStartedTime>2017-01-01T12:00:00.000Z</siri:ServiceStartedTime>
     </Answer>
-<AnswerExtension />
+<AnswerExtension/>
 </sw:SubscribeResponse>
 </S:Body>
 </S:Envelope>

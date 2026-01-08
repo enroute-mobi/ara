@@ -34,7 +34,7 @@ func Test_NewAutodetectSIRIEnvelope(t *testing.T) {
 	if err2 != nil {
 		t.Errorf("cannot detect SIRI envelope: %s", err2)
 	}
-	expected2 := `<sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:ns3="http://www.ifopt.org.uk/acsb" xmlns:ns4="http://www.ifopt.org.uk/ifopt" xmlns:ns5="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns6="http://scma/siri" xmlns:sw="http://wsdl.siri.org.uk">
+	expected2 := `<sw:CheckStatus xmlns:siri="http://www.siri.org.uk/siri" xmlns:sw="http://wsdl.siri.org.uk">
       <Request>
         <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
         <siri:RequestorRef>test2</siri:RequestorRef>

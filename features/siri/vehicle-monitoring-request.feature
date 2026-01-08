@@ -1147,13 +1147,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1206,7 +1206,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -1263,13 +1265,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1322,7 +1324,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -1361,13 +1365,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1419,7 +1423,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -1472,13 +1478,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1530,7 +1536,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -1584,13 +1592,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1642,7 +1650,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -1685,13 +1695,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1743,7 +1753,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -1804,13 +1816,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -1862,7 +1874,9 @@ Feature: Support SIRI VehicleMonitoring by request
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney><ns5:Extensions/></ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
@@ -2313,13 +2327,13 @@ Feature: Support SIRI VehicleMonitoring by request
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
@@ -2330,7 +2344,9 @@ Feature: Support SIRI VehicleMonitoring by request
             </ns5:AllowedResourceUsageExceededError>
           </ns5:ErrorCondition>
         </ns5:VehicleMonitoringDelivery>
-      </Answer><AnswerExtension xmlns:ns2="http://www.ifopt.org.uk/acsb" xmlns:ns3="http://www.ifopt.org.uk/ifopt" xmlns:ns4="http://datex2.eu/schema/2_0RC1/2_0" xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri"/></ns1:GetVehicleMonitoringResponse>
+      </Answer>
+      <AnswerExtension/>
+    </ns1:GetVehicleMonitoringResponse>
   </soap:Body>
 </soap:Envelope>
       """
