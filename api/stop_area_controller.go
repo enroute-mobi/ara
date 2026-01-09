@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"sort"
+	"unicode"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 type StopAreaController struct {
@@ -50,13 +55,47 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 		return
 	}
 
+	// Search
+	searchName := params.Get("name")
+	var possibleStopAreas []*model.StopArea
+
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	if searchName != "" {
+		if len(searchName) < 3 {
+			http.Error(response, fmt.Sprintf("length of search name must be at least 3 characters, got: %s", searchName), http.StatusUnprocessableEntity)
+			return
+		}
+		params.Del("name")
+		normalizedSearchPattern, _, err := transform.String(t, searchName)
+		if err != nil {
+			http.Error(response, fmt.Sprintf("invalid request: query parameter \"name\" %s: cannot normalize:, %v", searchName, err.Error()), http.StatusBadRequest)
+		}
+		searchPattern, err := regexp.Compile("(?i)" + normalizedSearchPattern)
+		if err != nil {
+			http.Error(response, fmt.Sprintf("invalid request: cannot create search pattern: %v", err.Error()), http.StatusBadRequest)
+		}
+
+		for i := range allStopAreas {
+			normalizedSaName, _, _ := transform.String(t, allStopAreas[i].Name)
+			if searchPattern.MatchString(normalizedSaName) {
+				possibleStopAreas = append(possibleStopAreas, allStopAreas[i])
+			}
+		}
+		allStopAreas = possibleStopAreas
+	}
+
 	paginatedStopAreas, err := paginate(allStopAreas, params)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	jsonBytes, _ := json.Marshal(paginatedStopAreas)
+	jsonBytes, err := json.Marshal(paginatedStopAreas)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response.Write(jsonBytes)
 }
 

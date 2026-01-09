@@ -287,3 +287,150 @@ func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
 	assert.Equal("B", stopAreas[0].Name)
 	assert.Equal("A", stopAreas[1].Name)
 }
+
+func Test_StopAreaController_Index_SearchByName(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new stopAreas
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Name = "Alice"
+	referential.Model().StopAreas().Save(stopArea)
+
+	stopArea2 := referential.Model().StopAreas().New()
+	stopArea2.Name = "Bob"
+	referential.Model().StopAreas().Save(stopArea2)
+
+	stopArea3 := referential.Model().StopAreas().New()
+	stopArea3.Name = "superBobStop"
+	referential.Model().StopAreas().Save(stopArea3)
+
+	stopArea4 := referential.Model().StopAreas().New()
+	stopArea4.Name = "newBôbArret"
+	referential.Model().StopAreas().Save(stopArea4)
+
+	all := referential.Model().StopAreas().FindAll()
+	assert.Len(all, 4)
+
+	// Create a request
+	path := path.Join("default", "stop_areas")
+
+	params := url.Values{}
+	params.Add("name", "Alice")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	var paginatedResource PaginatedResource[model.StopArea]
+	err = json.Unmarshal(data, &paginatedResource)
+	assert.NoError(err)
+
+	stopAreas := paginatedResource.Models
+	assert.Len(stopAreas, 1)
+
+	// StopAreas with name matching \"Alice\" should be found
+	assert.Equal("Alice", stopAreas[0].Name)
+
+	params = url.Values{}
+	params.Add("name", "bob")
+
+	u, _ = URI("", path, params)
+
+	request, _ = http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder = httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res = responseRecorder.Result()
+	defer res.Body.Close()
+	data, err = io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	err = json.Unmarshal(data, &paginatedResource)
+	assert.NoError(err)
+
+	stopAreas = paginatedResource.Models
+
+	// StopAreas with name matching \"Bob\" should be found
+	assert.Len(stopAreas, 3)
+
+	var sa []string
+	for i := range stopAreas {
+		sa = append(sa, stopAreas[i].Name)
+	}
+
+	assert.ElementsMatch([]string{"Bob", "superBobStop", "newBôbArret"}, sa)
+}
+
+func Test_StopAreaController_Index_SearchByName_Below_Three_Characters(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new stopAreas
+	stopArea := referential.Model().StopAreas().New()
+	stopArea.Name = "Alice"
+	referential.Model().StopAreas().Save(stopArea)
+
+	// Create a request
+	path := path.Join("default", "stop_areas")
+
+	params := url.Values{}
+	params.Add("name", "XX")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	assert.Equal(res.StatusCode, 422)
+
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	assert.Equal("length of search name must be at least 3 characters, got: XX\n", string(data))
+}
