@@ -125,6 +125,10 @@ func (builder *EstimatedTimetableUpdateEventBuilder) handleCall(vjCode model.Cod
 			CodeSpace: builder.remoteCodeSpace,
 		}
 
+		siriXML := &sxml.XMLMonitoredStopVisit{}
+		siriXML.XMLMonitoredVehicleJourney.XMLCall = *call
+		svEvent.SiriXML = siriXML
+
 		if !call.AimedDepartureTime().IsZero() || !call.AimedArrivalTime().IsZero() {
 			svEvent.Schedules.SetSchedule(schedules.Aimed, call.AimedDepartureTime(), call.AimedArrivalTime())
 		}
