@@ -1,7 +1,6 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns7:NotifySubscriptionTerminated xmlns:ns2="http://www.siri.org.uk/siri"
-                                      xmlns:ns6="http://wsdl.siri.org.uk/siri"
                                       xmlns:ns7="http://wsdl.siri.org.uk">
       <Notification>
         <ns2:ResponseTimestamp>2020-01-30T10:00:00Z</ns2:ResponseTimestamp>

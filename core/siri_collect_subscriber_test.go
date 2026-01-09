@@ -363,13 +363,13 @@ func testSetup() (subscriber *CollectSubscriber, subscription *Subscription, res
     <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
     <soap:Body>
         <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-            <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri">
                 <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
                 <ns5:Address>http://sqybus-siri:8080/ProfilSiriKidf2_4Producer-Sqybus/SiriServices</ns5:Address>
                 <ns5:ResponderRef>SQYBUS</ns5:ResponderRef>
                 <ns5:RequestMessageRef>28679112-9dad-11d1-2-00c04fd430c8</ns5:RequestMessageRef>
             </SubscriptionAnswerInfo>
-            <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <Answer xmlns:ns5="http://www.siri.org.uk/siri">
                 <ns5:ResponseStatus>
                     <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
                     <ns5:RequestMessageRef>{request_message_ref}</ns5:RequestMessageRef>

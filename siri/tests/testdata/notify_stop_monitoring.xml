@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ns1:NotifyStopMonitoring xmlns:ns1="http://wsdl.siri.org.uk">
-  <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+  <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri">
     <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
     <ns5:ProducerRef>SQYBUS</ns5:ProducerRef>
     <ns5:ResponseMessageIdentifier>NAVINEO:SM:NOT:427843</ns5:ResponseMessageIdentifier>
     <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>
   </ServiceDeliveryInfo>
-  <Notification xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+  <Notification xmlns:ns5="http://www.siri.org.uk/siri">
     <ns5:StopMonitoringDelivery version="1.3">
       <ns5:ResponseTimestamp>2017-06-19T16:04:25.983+02:00</ns5:ResponseTimestamp>
       <ns5:RequestMessageRef>RATPDev:Message::f9c8aa9e-df4d-4a8e-9e25-61f717f13e12:LOC</ns5:RequestMessageRef>

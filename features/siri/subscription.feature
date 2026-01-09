@@ -20,7 +20,7 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <DeleteSubscriptionInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <DeleteSubscriptionInfo>
               <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
               <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
@@ -53,7 +53,7 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <DeleteSubscriptionInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <DeleteSubscriptionInfo>
               <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
               <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
@@ -120,7 +120,7 @@ Feature: Support SIRI subscription
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-            <DeleteSubscriptionInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
+            <DeleteSubscriptionInfo>
               <ns5:RequestTimestamp>2016-09-22T08:01:20.227+02:00</ns5:RequestTimestamp>
               <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
               <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
@@ -476,16 +476,14 @@ Feature: Support SIRI subscription
       <S:Body>
       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
@@ -531,16 +529,14 @@ Feature: Support SIRI subscription
       <S:Body>
       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
       <SubscriptionAnswerInfo
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
       <Answer
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+        xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>

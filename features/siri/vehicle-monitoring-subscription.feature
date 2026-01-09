@@ -618,17 +618,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <SubscriptionAnswerInfo
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
         <ns5:RequestMessageRef>response</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
-      <Answer
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>6ba7b814-9dad-11d1-5-00c04fd430c8</ns5:RequestMessageRef>
@@ -670,17 +666,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <SubscriptionAnswerInfo
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
-      <Answer
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
@@ -718,21 +710,18 @@ Feature: Support SIRI VehicleMonitoring by subscription
       <?xml version='1.0' encoding='utf-8'?>
       <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
         <soap:Body>
-          <ns6:NotifyVehicleMonitoring xmlns:ns2="http://www.siri.org.uk/siri"
-          xmlns:ns5="http://www.siri.org.uk/siri"
-          xmlns:ns6="http://wsdl.siri.org.uk"
-          xmlns:ns7="http://wsdl.siri.org.uk/siri">
+          <ns6:NotifyVehicleMonitoring xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk">
             <ServiceDeliveryInfo>
-              <ns2:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns2:ResponseTimestamp>
-              <ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
-              <ns2:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns2:ResponseMessageIdentifier>
-              <ns2:RequestMessageRef>VehicleMonitoring:TestDelivery:0</ns2:RequestMessageRef>
+              <ns5:ResponseTimestamp>2017-05-15T13:26:12.798+02:00</ns5:ResponseTimestamp>
+              <ns5:ProducerRef>NINOXE:default</ns5:ProducerRef>
+              <ns5:ResponseMessageIdentifier>fd0c67ac-2d3a-4ee5-9672-5f3f160cbd59</ns5:ResponseMessageIdentifier>
+              <ns5:RequestMessageRef>VehicleMonitoring:TestDelivery:0</ns5:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Notification>
               <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
                 <ns5:ResponseTimestamp>2022-06-25T15:08:14.940+02:00</ns5:ResponseTimestamp>
-                <ns2:SubscriberRef>RELAIS</ns2:SubscriberRef>
-                <ns2:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns2:SubscriptionRef>
+                <ns5:SubscriberRef>RELAIS</ns5:SubscriberRef>
+                <ns5:SubscriptionRef>RELAIS:Subscription::6ba7b814-9dad-11d1-5-00c04fd430c8:LOC</ns5:SubscriptionRef>
                 <ns5:Status>true</ns5:Status>
                 <ns5:VehicleActivity>
                   <ns5:RecordedAtTime>2022-06-25T15:08:14.928+02:00</ns5:RecordedAtTime>
@@ -1145,17 +1134,13 @@ Feature: Support SIRI VehicleMonitoring by subscription
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
       <S:Body>
       <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <SubscriptionAnswerInfo
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
         <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
         <ns5:RequestMessageRef>Subscription:Test:0</ns5:RequestMessageRef>
       </SubscriptionAnswerInfo>
-      <Answer
-        xmlns:ns5="http://www.siri.org.uk/siri"
-        xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseStatus>
             <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
             <ns5:RequestMessageRef>Ara:Subscription::6ba7b814-9dad-11d1-4-00c04fd430c8:LOC</ns5:RequestMessageRef>

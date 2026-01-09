@@ -166,7 +166,7 @@ Feature: Support SIRI Situation Exchange by request
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -494,7 +494,7 @@ Feature: Support SIRI Situation Exchange by request
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -575,7 +575,7 @@ Feature: Support SIRI Situation Exchange by request
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -1268,7 +1268,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -1575,7 +1575,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -1663,7 +1663,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -1769,7 +1769,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>
@@ -1991,7 +1991,7 @@ And a Partner "test" exists with connectors [siri-check-status-client,siri-situa
               <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
             </ServiceDeliveryInfo>
             <Answer>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
                 <siri:RequestMessageRef>33170d7c-35e3-11ee-8a32-7f95f59ec38f</siri:RequestMessageRef>
                 <siri:Status>true</siri:Status>

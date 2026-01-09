@@ -559,17 +559,13 @@ Feature: Support SIRI SituationExchange by subscription
    <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
    <S:Body>
      <ns1:SubscribeResponse xmlns:ns1="http://wsdl.siri.org.uk">
-       <SubscriptionAnswerInfo
-         xmlns:ns5="http://www.siri.org.uk/siri"
-         xmlns:ns6="http://wsdl.siri.org.uk/siri">
+       <SubscriptionAnswerInfo xmlns:ns5="http://www.siri.org.uk/siri">
          <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
          <ns5:Address>http://appli.chouette.mobi/siri_france/siri</ns5:Address>
          <ns5:ResponderRef>NINOXE:default</ns5:ResponderRef>
          <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</ns5:RequestMessageRef>
        </SubscriptionAnswerInfo>
-       <Answer
-         xmlns:ns5="http://www.siri.org.uk/siri"
-         xmlns:ns6="http://wsdl.siri.org.uk/siri">
+       <Answer xmlns:ns5="http://www.siri.org.uk/siri">
          <ns5:ResponseStatus>
              <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
              <ns5:RequestMessageRef>RATPDev:Message::6ba7b814-9dad-11d1-6-00c04fd430c8:LOC</ns5:RequestMessageRef>
@@ -883,7 +879,7 @@ Feature: Support SIRI SituationExchange by subscription
              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-a-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
            </ServiceDeliveryInfo>
            <Notification>
-             <siri:SituationExchangeDelivery version="2.0:FR-IDF-2.4" xmlns:stif="http://wsdl.siri.org.uk/siri">
+             <siri:SituationExchangeDelivery version="2.0:FR-IDF-2.4">
                <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
                <siri:SubscriberRef>subscriber</siri:SubscriberRef>
                <siri:SubscriptionRef>externalId</siri:SubscriptionRef>
@@ -1170,7 +1166,7 @@ Feature: Support SIRI SituationExchange by subscription
               <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
             </ServiceDeliveryInfo>
             <Notification>
-              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4' xmlns:stif='http://wsdl.siri.org.uk/siri'>
+              <siri:SituationExchangeDelivery version='2.0:FR-IDF-2.4'>
                 <siri:ResponseTimestamp>2017-01-01T12:00:25.000Z</siri:ResponseTimestamp>
                 <siri:SubscriberRef>subscriber</siri:SubscriberRef>
                 <siri:SubscriptionRef>externalId</siri:SubscriptionRef>

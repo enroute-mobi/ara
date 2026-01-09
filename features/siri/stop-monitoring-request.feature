@@ -1070,8 +1070,7 @@ Feature: Support SIRI StopMonitoring by request
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
         <S:Body>
           <sw:GetStopMonitoringResponse xmlns:siri="http://www.siri.org.uk/siri"
-                                        xmlns:sw="http://wsdl.siri.org.uk"
-                                        xmlns:ns9="http://wsdl.siri.org.uk/siri">
+                                        xmlns:sw="http://wsdl.siri.org.uk">
             <ServiceDeliveryInfo>
               <siri:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</siri:ResponseTimestamp>
               <siri:ProducerRef>NINOXE:default</siri:ProducerRef>
