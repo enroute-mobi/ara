@@ -333,8 +333,8 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 
 func (manager *MemoryLines) Load(referentialSlug string) error {
 	var selectLines []SelectLine
-	modelName := manager.model.Date()
-	sqlQuery := fmt.Sprintf("select * from lines where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	modelDate := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from lines where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 	_, err := Database.Select(&selectLines, sqlQuery)
 	if err != nil {
 		return err

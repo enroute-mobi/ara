@@ -388,7 +388,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 			String: "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 			Valid:  true,
 		},
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "stopArea",
 		Codes:           `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,

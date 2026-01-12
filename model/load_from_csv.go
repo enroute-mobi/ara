@@ -16,14 +16,14 @@ import (
 /*
 	CSV Structure
 
-operator,Id,ModelName,Name,Codes
-stop_area,Id,ParentId,ReferentId,ModelName,Name,Codes,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectSituations
-line,Id,ModelName,Name,Codes,Attributes,References,CollectSituations
-vehicle_journey,Id,ModelName,Name,Codes,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
-stop_visit,Id,ModelName,Codes,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
-stop_area_group,Id,ModelName,Name,ShortName,StopAreaIds
-line_group,Id,ModelName,Name,ShortName,LineIds
-facility,Id,ModelName,Codes
+operator,Id,ModelDate,Name,Codes
+stop_area,Id,ParentId,ReferentId,ModelDate,Name,Codes,LineIds,Attributes,References,CollectedAlways,CollectChildren,CollectSituations
+line,Id,ModelDate,Name,Codes,Attributes,References,CollectSituations
+vehicle_journey,Id,ModelDate,Name,Codes,LineId,OriginName,DestinationName,Attributes,References,DirectionType, Number
+stop_visit,Id,ModelDate,Codes,StopAreaId,VehicleJourneyId,PassageOrder,Schedules,Attributes,References
+stop_area_group,Id,ModelDate,Name,ShortName,StopAreaIds
+line_group,Id,ModelDate,Name,ShortName,LineIds
+facility,Id,ModelDate,Codes
 
 Comments are '#'
 Separators are ',' leading spaces are trimed
@@ -217,17 +217,17 @@ func (loader Loader) Load(reader io.Reader) Result {
 	return loader.result
 }
 
-func (loader *Loader) handleForce(klass, modelName string) error {
+func (loader *Loader) handleForce(klass, modelDate string) error {
 	if loader.force {
-		if _, ok := loader.deletedModels[klass][modelName]; !ok {
-			loader.deletedModels[klass][modelName] = struct{}{}
+		if _, ok := loader.deletedModels[klass][modelDate]; !ok {
+			loader.deletedModels[klass][modelDate] = struct{}{}
 			var araModel string
 			if klass == FACILITY {
 				araModel = "facilities"
 			} else {
 				araModel = fmt.Sprintf("%ss", klass)
 			}
-			query := fmt.Sprintf("delete from %v where model_name='%v' and referential_slug='%v';", araModel, modelName, loader.referentialSlug)
+			query := fmt.Sprintf("delete from %v where model_date='%v' and referential_slug='%v';", araModel, modelDate, loader.referentialSlug)
 			_, err := Database.Exec(query)
 			if err != nil {
 				return err
@@ -268,7 +268,7 @@ func (loader *Loader) insertOperators() {
 		loader.bulkCounter[OPERATOR] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO operators(referential_slug,id,model_name,name,codes) VALUES %v;", string(loader.operators[:len(loader.operators)-1]))
+	query := fmt.Sprintf("INSERT INTO operators(referential_slug,id,model_date,name,codes) VALUES %v;", string(loader.operators[:len(loader.operators)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("operators", err)
@@ -407,7 +407,7 @@ func (loader *Loader) insertStopAreaGroups() {
 		loader.bulkCounter[STOP_AREA_GROUP] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO stop_area_groups(referential_slug, id, model_name, name, short_name, stop_area_ids) VALUES %v;",
+	query := fmt.Sprintf("INSERT INTO stop_area_groups(referential_slug, id, model_date, name, short_name, stop_area_ids) VALUES %v;",
 		string(loader.stopAreaGroups[:len(loader.stopAreaGroups)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -433,7 +433,7 @@ func (loader *Loader) insertStopAreas() {
 		loader.bulkCounter[STOP_AREA] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_name, name, codes, line_ids, attributes, siri_references, collected_always, collect_children, collect_situations) VALUES %v;",
+	query := fmt.Sprintf("INSERT INTO stop_areas(referential_slug, id, parent_id, referent_id, model_date, name, codes, line_ids, attributes, siri_references, collected_always, collect_children, collect_situations) VALUES %v;",
 		string(loader.stopAreas[:len(loader.stopAreas)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -519,7 +519,7 @@ func (loader *Loader) insertLines() {
 		loader.bulkCounter[LINE] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_name,name,codes,attributes,siri_references,collect_situations, number, referent_id) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
+	query := fmt.Sprintf("INSERT INTO lines(referential_slug,id,model_date,name,codes,attributes,siri_references,collect_situations, number, referent_id) VALUES %v;", string(loader.lines[:len(loader.lines)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("lines", err)
@@ -578,7 +578,7 @@ func (loader *Loader) insertLineGroups() {
 		loader.bulkCounter[LINE_GROUP] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO line_groups(referential_slug, id, model_name, name, short_name, line_ids) VALUES %v;",
+	query := fmt.Sprintf("INSERT INTO line_groups(referential_slug, id, model_date, name, short_name, line_ids) VALUES %v;",
 		string(loader.lineGroups[:len(loader.lineGroups)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -650,7 +650,7 @@ func (loader *Loader) insertVehicleJourneys() {
 		loader.bulkCounter[VEHICLE_JOURNEY] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_name,name,codes,line_id,origin_name,destination_name,attributes,siri_references, direction_type, aimed_stop_visit_count) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
+	query := fmt.Sprintf("INSERT INTO vehicle_journeys(referential_slug,id,model_date,name,codes,line_id,origin_name,destination_name,attributes,siri_references, direction_type, aimed_stop_visit_count) VALUES %v;", string(loader.vehicleJourneys[:len(loader.vehicleJourneys)-1]))
 
 	result, err := Database.Exec(query)
 	if err != nil {
@@ -723,7 +723,7 @@ func (loader *Loader) insertStopVisits() {
 		loader.bulkCounter[STOP_VISIT] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO stop_visits(referential_slug,id,model_name,codes,stop_area_id,vehicle_journey_id,passage_order,schedules,attributes,siri_references) VALUES %v;", string(loader.stopVisits[:len(loader.stopVisits)-1]))
+	query := fmt.Sprintf("INSERT INTO stop_visits(referential_slug,id,model_date,codes,stop_area_id,vehicle_journey_id,passage_order,schedules,attributes,siri_references) VALUES %v;", string(loader.stopVisits[:len(loader.stopVisits)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("stopVisits", err)
@@ -782,7 +782,7 @@ func (loader *Loader) insertFacilities() {
 		loader.bulkCounter[FACILITY] = 0
 	}()
 
-	query := fmt.Sprintf("INSERT INTO facilities(referential_slug,id,model_name,codes) VALUES %v;", string(loader.facilities[:len(loader.facilities)-1]))
+	query := fmt.Sprintf("INSERT INTO facilities(referential_slug,id,model_date,codes) VALUES %v;", string(loader.facilities[:len(loader.facilities)-1]))
 	result, err := Database.Exec(query)
 	if err != nil {
 		loader.errInsert("facilities", err)

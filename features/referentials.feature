@@ -12,7 +12,7 @@ Feature: Manager Referentials
   @nostart @database
   Scenario: 2698 - Referential reloads Model at configured time
     Given the table "stop_areas" has the following data:
-      | id                                     | referential_slug     | codes                    | model_name |
+      | id                                     | referential_slug     | codes                    | model_date |
       | '6ba7b814-9dad-11d1-0011-00c04fd430c8' | 'test'               | '{"internal":"value"}'   |'2017-01-02'|
     When I start Ara
     Given a Referential "test" exists with the following settings:
@@ -41,7 +41,7 @@ Feature: Manager Referentials
     When I start Ara
     Then a StopArea "external":"H1911" should not exist in Referential "test"
     Given the table "stop_areas" has the following data:
-      | referential_slug | id                                      |  model_name  | codes                  |
+      | referential_slug | id                                      |  model_date  | codes                  |
       | 'test'           | 'c521f40d-79fb-4a2c-90f7-ea89a527a65e'  | '2017-01-01' | '{"external":"H1911"}' |
     When I reload the referential "test"
     Then a StopArea "external":"H1911" should exist in Referential "test"

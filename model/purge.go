@@ -60,5 +60,5 @@ func (p *Purifier) Purge() error {
 }
 
 func (p Purifier) query(table_name string) string {
-	return fmt.Sprintf("delete from %v where model_name < '%v';", table_name, p.date)
+	return fmt.Sprintf("delete from %v where model_date < '%v';", table_name, p.date)
 }

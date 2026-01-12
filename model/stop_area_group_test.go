@@ -167,7 +167,7 @@ func Test_MemoryStopAreaGroups_Load(t *testing.T) {
 	databaseStopAreaGroup := DatabaseStopAreaGroup{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Name:            "stopAreaGroup1",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		ReferentialSlug: "referential",
 		ShortName:       "short_name",
 		StopAreaIds:     `["d0eebc99-9c0b","e0eebc99-9c0b"]`,

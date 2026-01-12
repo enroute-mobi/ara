@@ -78,13 +78,13 @@ type DatabaseOperator struct {
 	ReferentialSlug string `db:"referential_slug"`
 	Name            string `db:"name"`
 	Codes           string `db:"codes"`
-	ModelName       string `db:"model_name"`
+	ModelDate       string `db:"model_date"`
 }
 
 type SelectOperator struct {
 	Id              string
 	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
+	ModelDate       string `db:"model_date"`
 	Name            sql.NullString
 	Codes           sql.NullString `db:"codes"`
 }
@@ -94,7 +94,7 @@ type DatabaseStopArea struct {
 	ReferentialSlug   string         `db:"referential_slug"`
 	References        string         `db:"siri_references"`
 	Attributes        string         `db:"attributes"`
-	ModelName         string         `db:"model_name"`
+	ModelDate         string         `db:"model_date"`
 	Name              string         `db:"name"`
 	Codes             string         `db:"codes"`
 	Id                string         `db:"id"`
@@ -108,7 +108,7 @@ type DatabaseStopArea struct {
 type SelectStopArea struct {
 	Id                string
 	ReferentialSlug   string `db:"referential_slug"`
-	ModelName         string `db:"model_name"`
+	ModelDate         string `db:"model_date"`
 	Name              sql.NullString
 	Codes             sql.NullString `db:"codes"`
 	ParentId          sql.NullString `db:"parent_id"`
@@ -124,7 +124,7 @@ type SelectStopArea struct {
 type DatabaseStopAreaGroup struct {
 	Id              string `db:"id"`
 	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
+	ModelDate       string `db:"model_date"`
 	Name            string `db:"name"`
 	ShortName       string `db:"short_name"`
 	StopAreaIds     string `db:"stop_area_ids"`
@@ -133,7 +133,7 @@ type DatabaseStopAreaGroup struct {
 type SelectStopAreaGroup struct {
 	Id              string
 	ReferentialSlug string         `db:"referential_slug"`
-	ModelName       string         `db:"model_name"`
+	ModelDate       string         `db:"model_date"`
 	Name            sql.NullString `db:"name"`
 	ShortName       sql.NullString `db:"short_name"`
 	StopAreaIds     sql.NullString `db:"stop_area_ids"`
@@ -142,7 +142,7 @@ type SelectStopAreaGroup struct {
 type DatabaseLine struct {
 	Id                string         `db:"id"`
 	ReferentialSlug   string         `db:"referential_slug"`
-	ModelName         string         `db:"model_name"`
+	ModelDate         string         `db:"model_date"`
 	Name              string         `db:"name"`
 	Codes             string         `db:"codes"`
 	Attributes        string         `db:"attributes"`
@@ -154,7 +154,7 @@ type DatabaseLine struct {
 type SelectLine struct {
 	Id                string
 	ReferentialSlug   string         `db:"referential_slug"`
-	ModelName         string         `db:"model_name"`
+	ModelDate         string         `db:"model_date"`
 	ReferentId        sql.NullString `db:"referent_id"`
 	Name              sql.NullString
 	Number            sql.NullString `db:"number"`
@@ -167,7 +167,7 @@ type SelectLine struct {
 type DatabaseLineGroup struct {
 	Id              string `db:"id"`
 	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
+	ModelDate       string `db:"model_date"`
 	Name            string `db:"name"`
 	ShortName       string `db:"short_name"`
 	LineIds         string `db:"line_ids"`
@@ -176,7 +176,7 @@ type DatabaseLineGroup struct {
 type SelectLineGroup struct {
 	Id              string
 	ReferentialSlug string         `db:"referential_slug"`
-	ModelName       string         `db:"model_name"`
+	ModelDate       string         `db:"model_date"`
 	Name            sql.NullString `db:"name"`
 	ShortName       sql.NullString `db:"short_name"`
 	LineIds         sql.NullString `db:"line_ids"`
@@ -185,7 +185,7 @@ type SelectLineGroup struct {
 type DatabaseVehicleJourney struct {
 	Id              string `db:"id"`
 	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
+	ModelDate       string `db:"model_date"`
 	Name            string `db:"name"`
 	Codes           string `db:"codes"`
 	LineId          string `db:"line_id"`
@@ -199,7 +199,7 @@ type DatabaseVehicleJourney struct {
 type SelectVehicleJourney struct {
 	Id                  string
 	ReferentialSlug     string `db:"referential_slug"`
-	ModelName           string `db:"model_name"`
+	ModelDate           string `db:"model_date"`
 	Name                sql.NullString
 	Codes               sql.NullString `db:"codes"`
 	LineId              sql.NullString `db:"line_id"`
@@ -214,7 +214,7 @@ type SelectVehicleJourney struct {
 type DatabaseStopVisit struct {
 	Id               string
 	ReferentialSlug  string `db:"referential_slug"`
-	ModelName        string `db:"model_name"`
+	ModelDate        string `db:"model_date"`
 	Codes            string `db:"codes"`
 	StopAreaId       string `db:"stop_area_id"`
 	VehicleJourneyId string `db:"vehicle_journey_id"`
@@ -227,7 +227,7 @@ type DatabaseStopVisit struct {
 type SelectStopVisit struct {
 	Id               string
 	ReferentialSlug  string         `db:"referential_slug"`
-	ModelName        string         `db:"model_name"`
+	ModelDate        string         `db:"model_date"`
 	Codes            sql.NullString `db:"codes"`
 	StopAreaId       sql.NullString `db:"stop_area_id"`
 	VehicleJourneyId sql.NullString `db:"vehicle_journey_id"`
@@ -240,14 +240,14 @@ type SelectStopVisit struct {
 type DatabaseFacility struct {
 	Id              string `db:"id"`
 	ReferentialSlug string `db:"referential_slug"`
-	ModelName       string `db:"model_name"`
+	ModelDate       string `db:"model_date"`
 	Codes           string `db:"codes"`
 }
 
 type SelectFacility struct {
 	Id              string
 	ReferentialSlug string         `db:"referential_slug"`
-	ModelName       string         `db:"model_name"`
+	ModelDate       string         `db:"model_date"`
 	Codes           sql.NullString `db:"codes"`
 }
 

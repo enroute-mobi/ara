@@ -268,7 +268,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	databaseStopVisit := DatabaseStopVisit{
 		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug:  "referential",
-		ModelName:        "2017-01-01",
+		ModelDate:        "2017-01-01",
 		Codes:            `{"internal":"value"}`,
 		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",

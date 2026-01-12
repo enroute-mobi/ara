@@ -145,8 +145,8 @@ func (stopAreaGroup *StopAreaGroup) MarshalJSON() ([]byte, error) {
 
 func (manager *MemoryStopAreaGroups) Load(referentialSlug string) error {
 	var selectStopAreaGroups []SelectStopAreaGroup
-	modelName := manager.model.Date()
-	sqlQuery := fmt.Sprintf("select * from stop_area_groups where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	modelDate := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from stop_area_groups where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 	_, err := Database.Select(&selectStopAreaGroups, sqlQuery)
 	if err != nil {
 		return err
