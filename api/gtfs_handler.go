@@ -74,6 +74,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	/* We check the Partner's cache for an already Marshaled FeedMessage or we fetch it */
 	d, err := partner.GtfsCache().Fetch(messageType, func() (interface{}, error) { return handler.getFeed(gc) })
 
 	if err != nil {
@@ -127,6 +128,7 @@ func (handler *GtfsHandler) getFeed(gc []core.GtfsConnector) ([]byte, error) {
 	feed.Header.Timestamp = &timestamp
 
 	for i := range gc {
+		/* We ask each individual Connector for its FeedEntities */
 		gc[i].HandleGtfs(feed)
 	}
 

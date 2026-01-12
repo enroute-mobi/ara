@@ -17,19 +17,18 @@ func NewCacheTable() *CacheTable {
 	}
 }
 
-func (table *CacheTable) Add(key string, lifeSpan time.Duration, data interface{}) *CachedItem {
+/* Add a CachedItem to the CacheTable without any specific loader */
+func (table *CacheTable) Add(key string, lifeSpan time.Duration, data any) *CachedItem {
 	item := NewCachedItem(key, lifeSpan, data, nil)
 
-	// Add item to cache.
 	table.Lock()
-
 	table.items[item.key] = item
-
 	table.Unlock()
 
 	return item
 }
 
+/* Remove a specific CachedItem */
 func (table *CacheTable) Delete(key string) (*CachedItem, error) {
 	table.Lock()
 
@@ -47,6 +46,7 @@ func (table *CacheTable) Delete(key string) (*CachedItem, error) {
 	return r, nil
 }
 
+/* Remove all CachedItems */
 func (table *CacheTable) Clear() {
 	table.Lock()
 	for k, v := range table.items {
@@ -56,7 +56,8 @@ func (table *CacheTable) Clear() {
 	table.Unlock()
 }
 
-func (table *CacheTable) Value(key string, args ...interface{}) (interface{}, error) {
+/* Get a CachedItem saved data or fetch it with its dataloader */
+func (table *CacheTable) Value(key string, args ...any) (any, error) {
 	table.RLock()
 	r, ok := table.items[key]
 	table.RUnlock()
@@ -67,7 +68,8 @@ func (table *CacheTable) Value(key string, args ...interface{}) (interface{}, er
 	return r.Value(args)
 }
 
-func (table *CacheTable) Fetch(key string, f func() (interface{}, error)) (interface{}, error) {
+/* Get a CachedItem saved data or fetch it with the given func */
+func (table *CacheTable) Fetch(key string, f func() (any, error)) (any, error) {
 	table.RLock()
 	r, ok := table.items[key]
 	table.RUnlock()
