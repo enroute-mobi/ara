@@ -1,13 +1,13 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ns1:GetVehicleMonitoringResponse xmlns:ns1="http://wsdl.siri.org.uk">
-      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceDeliveryInfo xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
         <ns5:ProducerRef>RLA_Bus</ns5:ProducerRef>
         <ns5:ResponseMessageIdentifier>RLA_Bus:ResponseMessage::23833:LOC</ns5:ResponseMessageIdentifier>
         <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>
       </ServiceDeliveryInfo>
-      <Answer xmlns:ns5="http://www.siri.org.uk/siri" xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <Answer xmlns:ns5="http://www.siri.org.uk/siri">
         <ns5:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
           <ns5:ResponseTimestamp>2021-08-02T08:50:49.660+02:00</ns5:ResponseTimestamp>
           <ns5:RequestMessageRef>Test:Message::1234:LOC</ns5:RequestMessageRef>

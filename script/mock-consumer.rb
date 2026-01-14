@@ -33,8 +33,7 @@ http_server.mount_proc options[:listen].path do |req, res|
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns8:CheckStatusResponse xmlns:ns3="http://www.siri.org.uk/siri"
-                             xmlns:ns8="http://wsdl.siri.org.uk"
-                             xmlns:ns9="http://wsdl.siri.org.uk/siri">
+                             xmlns:ns8="http://wsdl.siri.org.uk">
       <CheckStatusAnswerInfo>
         <ns3:ResponseTimestamp>#{Time.now.strftime("%FT%T%:z")}</ns3:ResponseTimestamp>
         <ns3:ProducerRef>RatpDev</ns3:ProducerRef>

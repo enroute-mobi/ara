@@ -2,8 +2,7 @@
 <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns8:GetStopMonitoringResponse xmlns:ns3="http://www.siri.org.uk/siri"
-                                   xmlns:ns8="http://wsdl.siri.org.uk"
-                                   xmlns:ns9="http://wsdl.siri.org.uk/siri">
+                                   xmlns:ns8="http://wsdl.siri.org.uk">
       <ServiceDeliveryInfo>
         <ns3:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns3:ResponseTimestamp>
         <ns3:ProducerRef>NINOXE:default</ns3:ProducerRef>

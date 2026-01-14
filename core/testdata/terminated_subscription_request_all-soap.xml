@@ -2,10 +2,10 @@
   <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
   <S:Body>
     <ns1:DeleteSubscription xmlns:ns1="http://wsdl.siri.org.uk" xmlns:ns5="http://www.siri.org.uk/siri">
-      <ServiceRequestInfo xmlns:ns6="http://wsdl.siri.org.uk/siri">
+      <ServiceRequestInfo>
         <ns5:ResponseTimestamp>2016-09-22T08:01:20.227+02:00</ns5:ResponseTimestamp>
         <ns5:RequestorRef>NINOXE:default</ns5:RequestorRef>
-        <ns6:MessageIdentifier>TermSubReq:Test:0</ns6:MessageIdentifier>
+        <ns5:MessageIdentifier>TermSubReq:Test:0</ns5:MessageIdentifier>
       </ServiceRequestInfo>
       <Request version="2.0:FR-IDF-2.4">
         <All/>

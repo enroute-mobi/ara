@@ -1,6 +1,5 @@
 <ns7:CheckStatusResponse xmlns:ns2="http://www.siri.org.uk/siri"
-						 xmlns:ns7="http://wsdl.siri.org.uk"
-						 xmlns:ns8="http://wsdl.siri.org.uk/siri">
+						 xmlns:ns7="http://wsdl.siri.org.uk">
 	<CheckStatusAnswerInfo>
 		<ns2:ResponseTimestamp>2016-09-21T20:14:46.238+02:00</ns2:ResponseTimestamp>
 		<ns2:ProducerRef>NINOXE:default</ns2:ProducerRef>
