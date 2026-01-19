@@ -16,7 +16,7 @@ func fill_purifier_test_db(t *testing.T) {
 		Name:            "stopArea",
 		Codes:           "{}",
 		LineIds:         "[]",
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      "{}",
 	}
 
@@ -62,7 +62,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ModelDate:       "2017-01-01",
 		Name:            "line",
 		Codes:           "{}",
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      "{}",
 	}
 
@@ -109,7 +109,7 @@ func fill_purifier_test_db(t *testing.T) {
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		DirectionType:   "",
 		Codes:           "{}",
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      "{}",
 	}
 
@@ -134,7 +134,7 @@ func fill_purifier_test_db(t *testing.T) {
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Codes:            "{}",
 		Schedules:        "[]",
-		Attributes:       "{}",
+		RawAttributes:    "{}",
 		References:       "{}",
 	}
 

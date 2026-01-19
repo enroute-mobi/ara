@@ -21,25 +21,25 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
-      | Attributes[VehicleMode]        | bus                               |
+      | RawAttributes[OriginName]         | Le début                          |
+      | RawAttributes[VehicleMode]        | bus                               |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     When I send this SIRI request
       """
@@ -150,24 +150,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2 |
@@ -206,7 +206,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | WITHOUT:STOP:VISITS               |
       | LineId                         | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin 2                          |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     When I send this SIRI request
@@ -350,24 +350,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2 |
@@ -539,24 +539,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-7-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2 |
@@ -726,7 +726,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a VehicleJourney exists with the following attributes:
@@ -734,24 +734,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2 |
@@ -979,24 +979,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     When I send this SIRI request
       """
         <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1103,24 +1103,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1233,25 +1233,25 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
       # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-5-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-3-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-5-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     When I send this SIRI request
       """
       <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/"
@@ -1347,7 +1347,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
@@ -1471,24 +1471,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2 |
@@ -1668,7 +1668,7 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-6-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a VehicleJourney exists with the following attributes:
@@ -1676,24 +1676,24 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:202         |
       | LineId                         | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-8-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
     #retard d'une minute
     And a StopVisit exists with the following attributes:
       | Codes[internal]             | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:25:LOC-2 |
@@ -1871,25 +1871,25 @@ Feature: Support SIRI EstimatedTimetable
       | Codes[internal]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | DirectionType                  | Aller                             |
-      | Attributes[OriginName]         | Le début                          |
+      | RawAttributes[OriginName]      | Le début                          |
       | DestinationName                | La fin.                           |
       | Reference[DestinationRef]#Code | "external": "ThisIsTheEnd"        |
       # id 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                   | 4                                                      |
-      | VehicleAtStop                  | false                                                  |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
-      | VehicleAtStop                  | false                                                  |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[aimed]#Arrival        | 2017-01-01T15:00:00.000Z                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:00.000Z                               |
-      | ArrivalStatus                  | delayed                                                |
-      | Schedule[aimed]#Departure      | 2017-01-01T15:01:00.000Z                               |
-      | Schedule[expected]#Departure   | 2017-01-01T15:02:00.000Z                               |
-      | DepartureStatus                | delayed                                                |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                      |
+      | VehicleAtStop                     | false                                                  |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-2-00c04fd430c8                      |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8                      |
+      | VehicleAtStop                     | false                                                  |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                               |
+      | ArrivalStatus                     | delayed                                                |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                               |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                               |
+      | DepartureStatus                   | delayed                                                |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                            |
       # id 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Vehicle exists with the following attributes:
       | Codes[internal] | Test:Vehicle:1:LOC                |

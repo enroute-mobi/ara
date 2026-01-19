@@ -2,19 +2,19 @@
 				<RecordedAtTime>{{ .RecordedAtTime.Format "2006-01-02T15:04:05.000Z07:00" }}</RecordedAtTime>
 				<LineRef>{{ .LineRef }}</LineRef>
 				<DirectionRef>{{ if .DirectionType }}{{ .DirectionType }}{{ else }}unknown{{ end }}</DirectionRef>
-				<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
+				<FirstOrLastJourney>{{ if .RawAttributes.FirstOrLastJourney }}{{ .RawAttributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
 				<DatedVehicleJourney>
 					<FramedVehicleJourneyRef>
 						<DataFrameRef>{{ .DataFrameRef }}</DataFrameRef>
 						<DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</DatedVehicleJourneyRef>
-					</FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
-					<VehicleMode>{{ .Attributes.VehicleMode }}</VehicleMode>{{ end }}
+					</FramedVehicleJourneyRef>{{ if .RawAttributes.VehicleMode }}
+					<VehicleMode>{{ .RawAttributes.VehicleMode }}</VehicleMode>{{ end }}
 					<PublishedLineName>{{ .PublishedLineName }}</PublishedLineName>{{ if .References.OperatorRef }}
-					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ end }}{{ if .Attributes.ProductCategoryRef }}
-					<ProductCategoryRef>{{ .Attributes.ProductCategoryRef }}</ProductCategoryRef>{{ end }}{{ if .Attributes.OriginDisplay }}
-					<OriginDisplay>{{ .Attributes.OriginDisplay }}</OriginDisplay>{{ end }}{{ if .Attributes.DestinationDisplay }}
-					<DestinationDisplay>{{ .Attributes.DestinationDisplay }}</DestinationDisplay>{{ end }}
-					<FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
+					<OperatorRef>{{ .References.OperatorRef }}</OperatorRef>{{ end }}{{ if .RawAttributes.ProductCategoryRef }}
+					<ProductCategoryRef>{{ .RawAttributes.ProductCategoryRef }}</ProductCategoryRef>{{ end }}{{ if .RawAttributes.OriginDisplay }}
+					<OriginDisplay>{{ .RawAttributes.OriginDisplay }}</OriginDisplay>{{ end }}{{ if .RawAttributes.DestinationDisplay }}
+					<DestinationDisplay>{{ .RawAttributes.DestinationDisplay }}</DestinationDisplay>{{ end }}
+					<FirstOrLastJourney>{{ if .RawAttributes.FirstOrLastJourney }}{{ .RawAttributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
 					<DatedCalls>{{ range .DatedCalls }}
 						<DatedCall>
 							<StopPointRef>{{ .StopPointRef }}</StopPointRef>{{ if .UseVisitNumber }}

@@ -135,7 +135,7 @@ func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 	event := &VehicleJourneyUpdateEvent{
 		Code:       code,
 		LineCode:   code,
-		attributes: NewAttributes(),
+		attributes: NewRawAttributes(),
 	}
 	event.attributes.Set(sattr.DirectionName, "Aller")
 

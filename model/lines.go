@@ -16,7 +16,7 @@ type Line struct {
 	model      Model
 	References References
 	CodeConsumer
-	Attributes        Attributes
+	RawAttributes     RawAttributes
 	id                LineId
 	ReferentId        LineId `json:",omitempty"`
 	Name              string `json:",omitempty"`
@@ -27,9 +27,9 @@ type Line struct {
 
 func NewLine(model Model) *Line {
 	line := &Line{
-		model:      model,
-		Attributes: NewAttributes(),
-		References: NewReferences(),
+		model:         model,
+		RawAttributes: NewRawAttributes(),
+		References:    NewReferences(),
 	}
 
 	line.codes = make(Codes)
@@ -42,7 +42,7 @@ func (line *Line) ModelId() ModelId {
 
 func (line *Line) copy() *Line {
 	l := *line
-	l.Attributes = line.Attributes.Copy()
+	l.RawAttributes = line.RawAttributes.Copy()
 	l.References = line.References.Copy()
 	return &l
 }
@@ -66,7 +66,7 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 		Codes         Codes                `json:",omitempty"`
 		NextCollectAt *time.Time           `json:",omitempty"`
 		CollectedAt   *time.Time           `json:",omitempty"`
-		Attributes    Attributes           `json:",omitempty"`
+		RawAttributes RawAttributes        `json:",omitempty"`
 		References    map[string]Reference `json:",omitempty"`
 		Id            LineId
 	}{
@@ -83,8 +83,8 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 	if !line.collectedAt.IsZero() {
 		aux.CollectedAt = &line.collectedAt
 	}
-	if !line.Attributes.IsEmpty() {
-		aux.Attributes = line.Attributes
+	if !line.RawAttributes.IsEmpty() {
+		aux.RawAttributes = line.RawAttributes
 	}
 
 	if !line.References.IsEmpty() {
@@ -161,7 +161,7 @@ func (line *Line) DiscoveryCode(codeSpace string) (Code, bool) {
 }
 
 func (line *Line) Attribute(key string) (string, bool) {
-	value, present := line.Attributes[key]
+	value, present := line.RawAttributes[key]
 	return value, present
 }
 
@@ -356,8 +356,8 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 		if sl.Number.Valid {
 			line.Number = sl.Number.String
 		}
-		if sl.Attributes.Valid && len(sl.Attributes.String) > 0 {
-			if err = json.Unmarshal([]byte(sl.Attributes.String), &line.Attributes); err != nil {
+		if sl.RawAttributes.Valid && len(sl.RawAttributes.String) > 0 {
+			if err = json.Unmarshal([]byte(sl.RawAttributes.String), &line.RawAttributes); err != nil {
 				return err
 			}
 		}

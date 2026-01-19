@@ -50,7 +50,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find VehicleJourney: \"01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 	assert.Equal("outbound", vj.DirectionType)
-	assert.Equal("bus", vj.Attributes["VehicleMode"])
+	assert.Equal("bus", vj.RawAttributes["VehicleMode"])
 	assert.Equal(1, vj.AimedStopVisitCount)
 
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -87,7 +87,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
 	assert.True(ok, "Can't find VehicleJourney: \"01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 	assert.Equal("inbound", vj.DirectionType)
-	assert.Equal("bus", vj.Attributes["VehicleMode"])
+	assert.Equal("bus", vj.RawAttributes["VehicleMode"])
 	assert.Equal(2, vj.AimedStopVisitCount)
 
 	_, ok = model.ScheduledStopVisits().Find("02eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")

@@ -18,9 +18,9 @@ const (
 type VehicleJourneyId ModelId
 
 type VehicleJourney struct {
-	References References
-	model      Model
-	Attributes Attributes
+	References    References
+	model         Model
+	RawAttributes RawAttributes
 	CodeConsumer
 	LineId                  LineId `json:",omitempty"`
 	Name                    string `json:",omitempty"`
@@ -49,9 +49,9 @@ type DetailedStopVisit struct {
 
 func NewVehicleJourney(model Model) *VehicleJourney {
 	vehicleJourney := &VehicleJourney{
-		model:      model,
-		Attributes: NewAttributes(),
-		References: NewReferences(),
+		model:         model,
+		RawAttributes: NewRawAttributes(),
+		References:    NewReferences(),
 	}
 	vehicleJourney.codes = make(Codes)
 	return vehicleJourney
@@ -63,7 +63,7 @@ func (vehicleJourney *VehicleJourney) ModelId() ModelId {
 
 func (vehicleJourney *VehicleJourney) copy() *VehicleJourney {
 	vj := *vehicleJourney
-	vj.Attributes = vehicleJourney.Attributes.Copy()
+	vj.RawAttributes = vehicleJourney.RawAttributes.Copy()
 	vj.References = vehicleJourney.References.Copy()
 	return &vj
 }
@@ -87,9 +87,9 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	type Alias VehicleJourney
 
 	aux := struct {
-		Codes      Codes                `json:",omitempty"`
-		Attributes Attributes           `json:",omitempty"`
-		References map[string]Reference `json:",omitempty"`
+		Codes         Codes                `json:",omitempty"`
+		RawAttributes RawAttributes        `json:",omitempty"`
+		References    map[string]Reference `json:",omitempty"`
 		*Alias
 		Id                 VehicleJourneyId
 		StopVisits         []StopVisitId       `json:",omitempty"`
@@ -102,8 +102,8 @@ func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
 	if !vehicleJourney.Codes().Empty() {
 		aux.Codes = vehicleJourney.Codes()
 	}
-	if !vehicleJourney.Attributes.IsEmpty() {
-		aux.Attributes = vehicleJourney.Attributes
+	if !vehicleJourney.RawAttributes.IsEmpty() {
+		aux.RawAttributes = vehicleJourney.RawAttributes
 	}
 	if !vehicleJourney.References.IsEmpty() {
 		aux.References = vehicleJourney.References.GetReferences()
@@ -130,7 +130,7 @@ func (vehicleJourney *VehicleJourney) ToFormat() []string {
 }
 
 func (vehicleJourney *VehicleJourney) Attribute(key string) (string, bool) {
-	value, present := vehicleJourney.Attributes[key]
+	value, present := vehicleJourney.RawAttributes[key]
 	return value, present
 }
 
@@ -380,8 +380,8 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 			vehicleJourney.AimedStopVisitCount = int(vj.AimedStopVisitCount.Int64)
 		}
 
-		if vj.Attributes.Valid && len(vj.Attributes.String) > 0 {
-			if err = json.Unmarshal([]byte(vj.Attributes.String), &vehicleJourney.Attributes); err != nil {
+		if vj.RawAttributes.Valid && len(vj.RawAttributes.String) > 0 {
+			if err = json.Unmarshal([]byte(vj.RawAttributes.String), &vehicleJourney.RawAttributes); err != nil {
 				return err
 			}
 		}

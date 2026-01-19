@@ -236,7 +236,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 		Name:            "vehicleJourney",
 		Codes:           `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 	}
 

@@ -146,7 +146,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		DatedVehicleJourneyRef: "dvjref1",
 		DirectionType:          "direction1",
 		DestinationName:        "destination 1",
-		Attributes: map[string]string{
+		RawAttributes: map[string]string{
 			"OriginName": "origin 1",
 		},
 		References: map[string]string{
@@ -161,8 +161,8 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		DatedVehicleJourneyRef: "dvjref2",
 		DirectionType:          "direction2",
 		DestinationName:        "destination 2",
-		Cancellation: true,
-		Attributes: map[string]string{
+		Cancellation:           true,
+		RawAttributes: map[string]string{
 			"OriginName": "origin 2",
 		},
 		References: map[string]string{
@@ -177,7 +177,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML(t *testing.T) {
 		DatedVehicleJourneyRef: "dvjref3",
 		DirectionType:          "direction3",
 		DestinationName:        "destination 3",
-		Attributes: map[string]string{
+		RawAttributes: map[string]string{
 			"OriginName": "origin 3",
 		},
 		References: map[string]string{
@@ -254,7 +254,7 @@ func Test_SIRIEstimatedTimetableResponse_BuildXML_EmptyCalls(t *testing.T) {
 		DatedVehicleJourneyRef: "dvjref1",
 		DirectionType:          "direction1",
 		DestinationName:        "destination 1",
-		Attributes: map[string]string{
+		RawAttributes: map[string]string{
 			"OriginName": "origin 1",
 		},
 		References: map[string]string{

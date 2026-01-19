@@ -178,7 +178,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{
 				LineRef:            lineRef,
 				PublishedLineName:  line.Name,
-				DirectionName:      vj.Attributes[siri_attributes.DirectionName],
+				DirectionName:      vj.RawAttributes[siri_attributes.DirectionName],
 				DirectionType:      vj.DirectionType,
 				OriginName:         vj.OriginName,
 				DestinationName:    vj.DestinationName,
@@ -202,7 +202,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 							StopPointRef:          stopAreaCode,
 							StopPointName:         stopArea.Name,
 							VehicleAtStop:         nextStopVisit.VehicleAtStop,
-							DestinationDisplay:    nextStopVisit.Attributes["DestinationDisplay"],
+							DestinationDisplay:    nextStopVisit.RawAttributes["DestinationDisplay"],
 							ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 							ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 							DepartureStatus:       string(nextStopVisit.DepartureStatus),

@@ -156,7 +156,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 
 	builder.resolveOperator(stopVisitRefCopy)
 
-	monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.Attributes
+	monitoredStopVisit.Attributes["StopVisitAttributes"] = stopVisit.RawAttributes
 	monitoredStopVisit.References["StopVisitReferences"] = stopVisitRefCopy.GetSiriReferences()
 
 	vehicle, ok := builder.partner.Model().Vehicles().FindByNextStopVisitId(stopVisit.Id())
@@ -173,7 +173,7 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		monitoredStopVisit.Bearing = vehicle.Bearing
 	}
 
-	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.Attributes
+	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.RawAttributes
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 
 	return monitoredStopVisit

@@ -16,12 +16,12 @@ import (
 type StopVisitId ModelId
 
 type StopVisit struct {
-	RecordedAt  time.Time
-	collectedAt time.Time
-	model       Model
-	References  References
-	Attributes  Attributes
-	Schedules   *schedules.StopVisitSchedules
+	RecordedAt    time.Time
+	collectedAt   time.Time
+	model         Model
+	References    References
+	RawAttributes RawAttributes
+	Schedules     *schedules.StopVisitSchedules
 	CodeConsumer
 	VehicleJourneyId VehicleJourneyId         `json:",omitempty"`
 	StopAreaId       StopAreaId               `json:",omitempty"`
@@ -37,10 +37,10 @@ type StopVisit struct {
 
 func NewStopVisit(model Model) *StopVisit {
 	stopVisit := &StopVisit{
-		model:      model,
-		Schedules:  schedules.NewStopVisitSchedules(),
-		Attributes: NewAttributes(),
-		References: NewReferences(),
+		model:         model,
+		Schedules:     schedules.NewStopVisitSchedules(),
+		RawAttributes: NewRawAttributes(),
+		References:    NewReferences(),
 	}
 	stopVisit.codes = make(Codes)
 	return stopVisit
@@ -60,7 +60,7 @@ func (stopVisit *StopVisit) copy() *StopVisit {
 		collectedAt:      stopVisit.collectedAt,
 		StopAreaId:       stopVisit.StopAreaId,
 		VehicleJourneyId: stopVisit.VehicleJourneyId,
-		Attributes:       stopVisit.Attributes.Copy(),
+		RawAttributes:    stopVisit.RawAttributes.Copy(),
 		References:       stopVisit.References.Copy(),
 		ArrivalStatus:    stopVisit.ArrivalStatus,
 		DepartureStatus:  stopVisit.DepartureStatus,
@@ -155,12 +155,12 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 		References map[string]Reference `json:",omitempty"`
 		Codes      Codes                `json:",omitempty"`
 		*Alias
-		CollectedAt *time.Time `json:",omitempty"`
-		RecordedAt  *time.Time `json:",omitempty"`
-		Attributes  Attributes `json:",omitempty"`
-		Id          StopVisitId
-		Schedules   []schedules.StopVisitSchedule `json:",omitempty"`
-		Collected   bool
+		CollectedAt   *time.Time    `json:",omitempty"`
+		RecordedAt    *time.Time    `json:",omitempty"`
+		RawAttributes RawAttributes `json:",omitempty"`
+		Id            StopVisitId
+		Schedules     []schedules.StopVisitSchedule `json:",omitempty"`
+		Collected     bool
 	}{
 		Id:        stopVisit.id,
 		Collected: stopVisit.collected,
@@ -170,8 +170,8 @@ func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
 	if !stopVisit.Codes().Empty() {
 		aux.Codes = stopVisit.Codes()
 	}
-	if !stopVisit.Attributes.IsEmpty() {
-		aux.Attributes = stopVisit.Attributes
+	if !stopVisit.RawAttributes.IsEmpty() {
+		aux.RawAttributes = stopVisit.RawAttributes
 	}
 	if !stopVisit.References.IsEmpty() {
 		aux.References = stopVisit.References.GetReferences()
@@ -230,7 +230,7 @@ func (stopVisit *StopVisit) UnmarshalJSON(data []byte) error {
 }
 
 func (stopVisit *StopVisit) Attribute(key string) (string, bool) {
-	value, present := stopVisit.Attributes[key]
+	value, present := stopVisit.RawAttributes[key]
 	return value, present
 }
 
@@ -617,8 +617,8 @@ func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 			stopVisit.PassageOrder = int(sv.PassageOrder.Int64)
 		}
 
-		if sv.Attributes.Valid && len(sv.Attributes.String) > 0 {
-			if err = json.Unmarshal([]byte(sv.Attributes.String), &stopVisit.Attributes); err != nil {
+		if sv.RawAttributes.Valid && len(sv.RawAttributes.String) > 0 {
+			if err = json.Unmarshal([]byte(sv.RawAttributes.String), &stopVisit.RawAttributes); err != nil {
 				return err
 			}
 		}

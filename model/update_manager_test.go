@@ -479,7 +479,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 		Name:            "vehicleJourney",
 		Codes:           `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      `{}`,
 	}
 
@@ -532,8 +532,8 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 	manager.Update(event)
 
 	updatedVehicleJourney, _ := vehicleJourneys.Find(vehicleJourneyId)
-	if updatedVehicleJourney.Attributes.IsEmpty() {
-		t.Fatal("Attributes shouldn't be empty after update")
+	if updatedVehicleJourney.RawAttributes.IsEmpty() {
+		t.Fatal("RawAttributes shouldn't be empty after update")
 	}
 
 	if updatedVehicleJourney.References.IsEmpty() {

@@ -2,21 +2,21 @@ package model
 
 import "testing"
 
-func Test_NewAttributes(t *testing.T) {
-	attributes := NewAttributes()
+func Test_NewRawAttributes(t *testing.T) {
+	attributes := NewRawAttributes()
 
 	if len(attributes) != 0 {
 		t.Errorf("New attributes should be empty")
 	}
 }
 
-func Test_Attributes_Set(t *testing.T) {
-	attributes := NewAttributes()
+func Test_RawAttributes_Set(t *testing.T) {
+	attributes := NewRawAttributes()
 
 	attributes.Set("key", "value")
 
 	if len(attributes) != 1 {
-		t.Errorf("Attributes should have one entry")
+		t.Errorf("RawAttributes should have one entry")
 	}
 
 	if attributes["key"] != "value" {
@@ -24,8 +24,8 @@ func Test_Attributes_Set(t *testing.T) {
 	}
 }
 
-func Test_Attributes_Set_IgnoreEmptyValues(t *testing.T) {
-	attributes := NewAttributes()
+func Test_RawAttributes_Set_IgnoreEmptyValues(t *testing.T) {
+	attributes := NewRawAttributes()
 
 	attributes.Set("key", "")
 

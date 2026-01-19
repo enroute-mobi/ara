@@ -245,11 +245,11 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 		vj.SetCode(NewCode(Default, event.Code.HashValue()))
 
 		vj.Origin = event.Origin
-		vj.Name = event.Attributes()[siri_attributes.VehicleJourneyName]
+		vj.Name = event.RawAttributes()[siri_attributes.VehicleJourneyName]
 		vj.LineId = l.Id()
 	}
 
-	maps.Copy(vj.Attributes, event.Attributes())
+	maps.Copy(vj.RawAttributes, event.RawAttributes())
 
 	if vj.References.IsEmpty() {
 		vj.References = event.References()
@@ -270,7 +270,7 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	}
 
 	if event.Direction != "" { // Only used for Push collector
-		vj.Attributes.Set(siri_attributes.DirectionName, event.Direction)
+		vj.RawAttributes.Set(siri_attributes.DirectionName, event.Direction)
 	}
 
 	if event.Occupancy != Undefined {
@@ -358,8 +358,8 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		}
 	}
 
-	if sv.Attributes.IsEmpty() {
-		sv.Attributes = event.Attributes()
+	if sv.RawAttributes.IsEmpty() {
+		sv.RawAttributes = event.RawAttributes()
 	}
 	if sv.References.IsEmpty() {
 		sv.References = event.References()
@@ -410,7 +410,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		completeStopSequence := vj.AimedStopVisitCount != 0 && vj.AimedStopVisitCount == actualStopVisitCount
 
 		if !found {
-			completeStopSequence = vj.AimedStopVisitCount != 0 && vj.AimedStopVisitCount == (actualStopVisitCount + 1)
+			completeStopSequence = vj.AimedStopVisitCount != 0 && vj.AimedStopVisitCount == (actualStopVisitCount+1)
 		}
 
 		if completeStopSequence {

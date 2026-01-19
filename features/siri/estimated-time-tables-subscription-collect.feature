@@ -289,15 +289,15 @@ Feature: Support SIRI EstimatedTimetable
       | Name            | Test                              |
       | Id              | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
     And one StopVisit has the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-4       |
-      | PassageOrder                   | 4                                 |
-      | VehicleAtStop                  | false                             |
-      | ArrivalStatus                  | delayed                           |
-      | DepartureStatus                | nil                               |
-      | Schedule[expected]#Arrival     | 2017-01-01T15:01:01Z              |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
-      | Attributes[DestinationDisplay] | Display                           |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-4       |
+      | PassageOrder                      | 4                                 |
+      | VehicleAtStop                     | false                             |
+      | ArrivalStatus                     | delayed                           |
+      | DepartureStatus                   | nil                               |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:01Z              |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-9-00c04fd430c8 |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
+      | RawAttributes[DestinationDisplay] | Display                           |
     And an audit event should exist with these attributes:
       | Protocol        | siri                           |
       | Direction       | received                       |
@@ -347,11 +347,11 @@ Feature: Support SIRI EstimatedTimetable
       | Name            | Test              |
       | Codes[internal] | NINOXE:Line:3:LOC |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[other]             | Test:VehicleJourney:201:LOC       |
-      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[other]                 | Test:VehicleJourney:201:LOC       |
+      | LineId                       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     And a StopArea exists with the following attributes:
       | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
       | Name            | Test                       |

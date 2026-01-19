@@ -205,7 +205,7 @@ func Test_MemoryLines_Load(t *testing.T) {
 		ModelDate:       "2017-01-01",
 		Name:            "line",
 		Codes:           `{"internal":"value"}`,
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 	}
 

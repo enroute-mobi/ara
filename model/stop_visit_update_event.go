@@ -11,7 +11,7 @@ import (
 type StopVisitUpdateEvent struct {
 	RecordedAt         time.Time
 	Schedules          *schedules.StopVisitSchedules
-	attributes         Attributes
+	attributes         RawAttributes
 	SiriXML            *sxml.XMLMonitoredStopVisit
 	references         *References
 	VehicleJourneyCode Code
@@ -37,11 +37,11 @@ func (ue *StopVisitUpdateEvent) EventKind() EventKind {
 	return STOP_VISIT_EVENT
 }
 
-func (ue *StopVisitUpdateEvent) Attributes() Attributes {
+func (ue *StopVisitUpdateEvent) RawAttributes() RawAttributes {
 	if ue.attributes != nil {
 		return ue.attributes
 	}
-	ue.attributes = NewAttributes()
+	ue.attributes = NewRawAttributes()
 
 	if ue.SiriXML == nil {
 		return ue.attributes

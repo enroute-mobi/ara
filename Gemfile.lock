@@ -1,6 +1,7 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: dcf636abed99c88f4489723c086188151e05e4bc
+  revision: 4629441e6b590282bf76e1fca92473ba962cc9d3
+  branch: ARA-1851-rename-attributes-to-raw-attributes
   specs:
     ara (3.5.5)
       faraday

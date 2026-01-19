@@ -171,7 +171,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 					LineRef:        lineCode.Value(),
 					DirectionType:  ptt.connector.directionType(vehicleJourney.DirectionType),
 					RecordedAtTime: currentTime,
-					Attributes:     vehicleJourney.Attributes,
+					RawAttributes:  vehicleJourney.RawAttributes,
 				}
 
 				delivery.DatedTimetableVersionFrames = append(delivery.DatedTimetableVersionFrames, datedTTVersionFrame)
@@ -198,11 +198,11 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 					DataFrameRef:           ptt.connector.dataFrameRef(),
 					DatedVehicleJourneyRef: datedVehicleJourneyRef,
 					PublishedLineName:      ptt.connector.publishedLineName(line),
-					Attributes:             make(map[string]string),
+					RawAttributes:          make(map[string]string),
 					References:             make(map[string]string),
 				}
 				datedVehicleJourney.References[siri_attributes.OperatorRef] = ptt.connector.operatorRef(stopVisit)
-				datedVehicleJourney.Attributes = vehicleJourney.Attributes
+				datedVehicleJourney.RawAttributes = vehicleJourney.RawAttributes
 
 				datedTTVersionFrame.DatedVehicleJourneys = append(datedTTVersionFrame.DatedVehicleJourneys, datedVehicleJourney)
 				vehicleJourneys[vehicleJourney.Id()] = datedVehicleJourney
@@ -215,7 +215,7 @@ func (ptt *PTTBroadcaster) prepareSIRIProductionTimetable() {
 				Order:              stopVisit.PassageOrder,
 				StopPointRef:       stopAreaId,
 				StopPointName:      stopArea.Name,
-				DestinationDisplay: stopVisit.Attributes[siri_attributes.DestinationDisplay],
+				DestinationDisplay: stopVisit.RawAttributes[siri_attributes.DestinationDisplay],
 			}
 
 			datedCall.UseVisitNumber = ptt.connector.useVisitNumber()

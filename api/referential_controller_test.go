@@ -309,7 +309,7 @@ func Test_ReferentialController_Reload(t *testing.T) {
 		Name:            "stopArea",
 		Codes:           `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 		CollectedAlways: true,
 		CollectChildren: true,

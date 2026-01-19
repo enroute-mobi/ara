@@ -93,7 +93,7 @@ type DatabaseStopArea struct {
 	LineIds           string         `db:"line_ids"`
 	ReferentialSlug   string         `db:"referential_slug"`
 	References        string         `db:"siri_references"`
-	Attributes        string         `db:"attributes"`
+	RawAttributes     string         `db:"raw_attributes"`
 	ModelDate         string         `db:"model_date"`
 	Name              string         `db:"name"`
 	Codes             string         `db:"codes"`
@@ -113,7 +113,7 @@ type SelectStopArea struct {
 	Codes             sql.NullString `db:"codes"`
 	ParentId          sql.NullString `db:"parent_id"`
 	ReferentId        sql.NullString `db:"referent_id"`
-	Attributes        sql.NullString
+	RawAttributes     sql.NullString `db:"raw_attributes"`
 	References        sql.NullString `db:"siri_references"`
 	LineIds           sql.NullString `db:"line_ids"`
 	CollectedAlways   sql.NullBool   `db:"collected_always"`
@@ -145,7 +145,7 @@ type DatabaseLine struct {
 	ModelDate         string         `db:"model_date"`
 	Name              string         `db:"name"`
 	Codes             string         `db:"codes"`
-	Attributes        string         `db:"attributes"`
+	RawAttributes     string         `db:"raw_attributes"`
 	References        string         `db:"siri_references"`
 	ReferentId        sql.NullString `db:"referent_id"`
 	CollectSituations bool           `db:"collect_situations"`
@@ -159,7 +159,7 @@ type SelectLine struct {
 	Name              sql.NullString
 	Number            sql.NullString `db:"number"`
 	Codes             sql.NullString `db:"codes"`
-	Attributes        sql.NullString
+	RawAttributes     sql.NullString `db:"raw_attributes"`
 	References        sql.NullString `db:"siri_references"`
 	CollectSituations sql.NullBool   `db:"collect_situations"`
 }
@@ -192,7 +192,7 @@ type DatabaseVehicleJourney struct {
 	OriginName      string `db:"origin_name"`
 	DestinationName string `db:"destination_name"`
 	DirectionType   string `db:"direction_type"`
-	Attributes      string `db:"attributes"`
+	RawAttributes   string `db:"raw_attributes"`
 	References      string `db:"siri_references"`
 }
 
@@ -206,7 +206,7 @@ type SelectVehicleJourney struct {
 	OriginName          sql.NullString `db:"origin_name"`
 	DestinationName     sql.NullString `db:"destination_name"`
 	DirectionType       sql.NullString `db:"direction_type"`
-	Attributes          sql.NullString
+	RawAttributes       sql.NullString `db:"raw_attributes"`
 	References          sql.NullString `db:"siri_references"`
 	AimedStopVisitCount sql.NullInt64  `db:"aimed_stop_visit_count"`
 }
@@ -219,7 +219,7 @@ type DatabaseStopVisit struct {
 	StopAreaId       string `db:"stop_area_id"`
 	VehicleJourneyId string `db:"vehicle_journey_id"`
 	Schedules        string `db:"schedules"`
-	Attributes       string `db:"attributes"`
+	RawAttributes    string `db:"raw_attributes"`
 	References       string `db:"siri_references"`
 	PassageOrder     int    `db:"passage_order"`
 }
@@ -232,7 +232,7 @@ type SelectStopVisit struct {
 	StopAreaId       sql.NullString `db:"stop_area_id"`
 	VehicleJourneyId sql.NullString `db:"vehicle_journey_id"`
 	Schedules        sql.NullString `db:"schedules"`
-	Attributes       sql.NullString `db:"attributes"`
+	RawAttributes    sql.NullString `db:"raw_attributes"`
 	References       sql.NullString `db:"siri_references"`
 	PassageOrder     sql.NullInt64  `db:"passage_order"`
 }
