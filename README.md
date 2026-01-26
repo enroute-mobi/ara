@@ -3,7 +3,7 @@
 ## An innovative and modular solution
 
 * Modular architecture organized in Collection, Model & Broadcast
-* Multi-protocol connectors: SIRI, SIRI Lite (GTFS-RT soon)
+* Multi-protocol connectors: SIRI, SIRI Lite, GTFS-RT
 * Real time Visualization / management of data by API
 * Loading theoretical offer and / or network structure into a database
 * Real time and parameterizable logging
@@ -44,11 +44,34 @@ Related projects :
 
 ## License
 
-Copyright 2017-2021 enRoute
+Copyright (c) 2019-2026 enRoute SAS
 
-Licensed under the [Apache License, Version 2.0](./LICENSE) (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+Licensed under GNU Affero General Public License as stated in the [LICENSE](LICENSE):
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions limitations under the License.
+```text
+Copyright (c) 2019-2026 enRoute SaS & other contributors
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see https://www.gnu.org/licenses/
+```
+
+## Roadmap and Features
+
+Our Roadmap and Features are available on [enRoute products wiki](https://enroute.atlassian.net/wiki/spaces/PUBLIC/overview)
+
+## User Manual
+
+The [Ara SaaS User Manual](https://enroute.atlassian.net/wiki/spaces/PUBLIC/pages/383287420/Ara+SaaS) is online.
 
 ## Support
 
