@@ -475,7 +475,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 	databaseVehicleJourney := DatabaseVehicleJourney{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "vehicleJourney",
 		Codes:           `{"internal":"value"}`,
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",

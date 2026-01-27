@@ -504,9 +504,9 @@ func (manager *MemoryStopAreas) findAscendantsWithCodeSpace(stopAreaId StopAreaI
 
 func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 	var selectStopAreas []SelectStopArea
-	modelName := manager.model.Date()
+	modelDate := manager.model.Date()
 
-	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from stop_areas where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 	_, err := Database.Select(&selectStopAreas, sqlQuery)
 	if err != nil {
 		return err

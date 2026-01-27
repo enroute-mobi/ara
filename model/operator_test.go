@@ -185,13 +185,13 @@ func Test_MemoryOperators_Load(t *testing.T) {
 		ReferentialSlug string `db:"referential_slug"`
 		Name            string `db:"name"`
 		Codes           string `db:"codes"`
-		ModelName       string `db:"model_name"`
+		ModelDate       string `db:"model_date"`
 	}{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
 		Name:            "operator",
 		Codes:           `{"internal":"value"}`,
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 	}
 
 	Database.AddTableWithName(databaseOperator, "operators")

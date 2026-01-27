@@ -145,8 +145,8 @@ func (lineGroup *LineGroup) MarshalJSON() ([]byte, error) {
 
 func (manager *MemoryLineGroups) Load(referentialSlug string) error {
 	var selectLineGroups []SelectLineGroup
-	modelName := manager.model.Date()
-	sqlQuery := fmt.Sprintf("select * from line_groups where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	modelDate := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from line_groups where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 	_, err := Database.Select(&selectLineGroups, sqlQuery)
 	if err != nil {
 		return err

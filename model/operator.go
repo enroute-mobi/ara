@@ -177,9 +177,9 @@ func (manager *MemoryOperators) Delete(operator *Operator) bool {
 
 func (manager *MemoryOperators) Load(referentialSlug string) error {
 	var selectOperators []SelectOperator
-	modelName := manager.model.Date()
+	modelDate := manager.model.Date()
 
-	sqlQuery := fmt.Sprintf("select * from operators where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from operators where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 
 	_, err := Database.Select(&selectOperators, sqlQuery)
 	if err != nil {

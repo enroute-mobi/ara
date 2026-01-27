@@ -224,9 +224,9 @@ func (facility *Facility) UnmarshalJSON(data []byte) error {
 
 func (manager *MemoryFacilities) Load(referentialSlug string) error {
 	var selectFacilities []SelectFacility
-	modelName := manager.model.Date()
+	modelDate := manager.model.Date()
 
-	sqlQuery := fmt.Sprintf("select * from facilities where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from facilities where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 
 	_, err := Database.Select(&selectFacilities, sqlQuery)
 	if err != nil {

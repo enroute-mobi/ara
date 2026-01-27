@@ -589,9 +589,9 @@ func (manager *MemoryStopVisits) UnsafeDelete(stopVisit *StopVisit) {
 
 func (manager *MemoryStopVisits) Load(referentialSlug string) error {
 	var selectStopVisits []SelectStopVisit
-	modelName := manager.model.Date()
+	modelDate := manager.model.Date()
 
-	sqlQuery := fmt.Sprintf("select * from stop_visits where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	sqlQuery := fmt.Sprintf("select * from stop_visits where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 	_, err := Database.Select(&selectStopVisits, sqlQuery)
 	if err != nil {
 		return err

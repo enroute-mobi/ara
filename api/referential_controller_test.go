@@ -305,7 +305,7 @@ func Test_ReferentialController_Reload(t *testing.T) {
 	databaseStopArea := model.DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "1984-04-04",
+		ModelDate:       "1984-04-04",
 		Name:            "stopArea",
 		Codes:           `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,

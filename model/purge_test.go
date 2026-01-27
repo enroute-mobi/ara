@@ -12,7 +12,7 @@ func fill_purifier_test_db(t *testing.T) {
 	databaseStopArea := DatabaseStopArea{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "stopArea",
 		Codes:           "{}",
 		LineIds:         "[]",
@@ -27,7 +27,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseStopArea.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseStopArea.ModelName = "2017-01-02"
+	databaseStopArea.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseStopArea)
 	if err != nil {
 		t.Fatal(err)
@@ -36,7 +36,7 @@ func fill_purifier_test_db(t *testing.T) {
 	databaseStopAreaGroup := DatabaseStopAreaGroup{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "stopAreaGroup",
 		ShortName:       "stop_area_group_short_name",
 		StopAreaIds:     `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
@@ -49,7 +49,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseStopAreaGroup.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseStopAreaGroup.ModelName = "2017-01-02"
+	databaseStopAreaGroup.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseStopAreaGroup)
 	if err != nil {
 		t.Fatal(err)
@@ -59,7 +59,7 @@ func fill_purifier_test_db(t *testing.T) {
 	databaseLine := DatabaseLine{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "line",
 		Codes:           "{}",
 		Attributes:      "{}",
@@ -73,7 +73,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseLine.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseLine.ModelName = "2017-01-02"
+	databaseLine.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseLine)
 	if err != nil {
 		t.Fatal(err)
@@ -82,7 +82,7 @@ func fill_purifier_test_db(t *testing.T) {
 	databaseLineGroup := DatabaseLineGroup{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "lineGroup",
 		ShortName:       "line_group_short_name",
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
@@ -95,7 +95,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseLineGroup.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseLineGroup.ModelName = "2017-01-02"
+	databaseLineGroup.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseLineGroup)
 	if err != nil {
 		t.Fatal(err)
@@ -104,7 +104,7 @@ func fill_purifier_test_db(t *testing.T) {
 	databaseVehicleJourney := DatabaseVehicleJourney{
 		Id:              "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug: "referential",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 		Name:            "vehicleJourney",
 		LineId:          "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		DirectionType:   "",
@@ -120,7 +120,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseVehicleJourney.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseVehicleJourney.ModelName = "2017-01-02"
+	databaseVehicleJourney.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseVehicleJourney)
 	if err != nil {
 		t.Fatal(err)
@@ -129,7 +129,7 @@ func fill_purifier_test_db(t *testing.T) {
 	databaseStopVisit := DatabaseStopVisit{
 		Id:               "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		ReferentialSlug:  "referential",
-		ModelName:        "2017-01-01",
+		ModelDate:        "2017-01-01",
 		StopAreaId:       "c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Codes:            "{}",
@@ -145,7 +145,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseStopVisit.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseStopVisit.ModelName = "2017-01-02"
+	databaseStopVisit.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseStopVisit)
 	if err != nil {
 		t.Fatal(err)
@@ -156,7 +156,7 @@ func fill_purifier_test_db(t *testing.T) {
 		ReferentialSlug: "referential",
 		Name:            "operator",
 		Codes:           "{}",
-		ModelName:       "2017-01-01",
+		ModelDate:       "2017-01-01",
 	}
 
 	Database.AddTableWithName(databaseOperator, "operators")
@@ -166,7 +166,7 @@ func fill_purifier_test_db(t *testing.T) {
 	}
 
 	databaseOperator.Id = "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12"
-	databaseOperator.ModelName = "2017-01-02"
+	databaseOperator.ModelDate = "2017-01-02"
 	err = Database.Insert(&databaseOperator)
 	if err != nil {
 		t.Fatal(err)

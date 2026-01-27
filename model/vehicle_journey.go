@@ -351,8 +351,8 @@ func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 
 func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 	var selectVehicleJourneys []SelectVehicleJourney
-	modelName := manager.model.Date()
-	sqlQuery := fmt.Sprintf("select * from vehicle_journeys where referential_slug = '%s' and model_name = '%s'", referentialSlug, modelName.String())
+	modelDate := manager.model.Date()
+	sqlQuery := fmt.Sprintf("select * from vehicle_journeys where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
 	_, err := Database.Select(&selectVehicleJourneys, sqlQuery)
 	if err != nil {
 		return err
