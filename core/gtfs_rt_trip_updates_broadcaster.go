@@ -60,6 +60,10 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 	stopVisits := connector.partner.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME))
 	linesCode := make(map[model.VehicleJourneyId]model.Code)
 	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
+	gtfsStopSequenceOffset := uint32(0)
+	if connector.partner.GtfsEnforceStopSequence() {
+		gtfsStopSequenceOffset += uint32(1)
+	}
 
 	for i := range stopVisits {
 		sa, ok := connector.partner.Model().StopAreas().Find(stopVisits[i].StopAreaId)
@@ -145,7 +149,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 		}
 
 		stopId := saId.Value()
-		stopSequence := connector.gtfsStopSequence(stopVisits[i].PassageOrder)
+		stopSequence := uint32(stopVisits[i].PassageOrder)
 
 		stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
 			StopSequence: &stopSequence,
@@ -176,22 +180,29 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 	}
 
 	for _, entity := range feedEntities {
-		if len(entity.TripUpdate.StopTimeUpdate) == 0 {
-			continue
-		}
-		sort.Slice(entity.TripUpdate.StopTimeUpdate, func(i, j int) bool {
-			return *entity.TripUpdate.StopTimeUpdate[i].StopSequence < *entity.TripUpdate.StopTimeUpdate[j].StopSequence
-		})
-		// ARA-829
-		// if entity.TripUpdate.StopTimeUpdate[0].Departure.Time != nil {
-		// 	startTime := time.Unix(*entity.TripUpdate.StopTimeUpdate[0].Departure.Time, 0).Format("15:04:05")
-		// 	entity.TripUpdate.Trip.StartTime = &startTime
-		// }
+		connector.rewriteStopSequence(entity, gtfsStopSequenceOffset)
 		entities = append(entities, entity)
 	}
+
 	return
 }
 
-func (connector *TripUpdatesBroadcaster) gtfsStopSequence(stopSequence int) uint32 {
-	return uint32(stopSequence - 1)
+func (connector *TripUpdatesBroadcaster) rewriteStopSequence(entity *gtfs.FeedEntity, gtfsStopSequenceOffset uint32) {
+	if len(entity.TripUpdate.StopTimeUpdate) == 0 {
+		return
+	}
+
+	sort.Slice(entity.TripUpdate.StopTimeUpdate, func(i, j int) bool {
+		return *entity.TripUpdate.StopTimeUpdate[i].StopSequence < *entity.TripUpdate.StopTimeUpdate[j].StopSequence
+	})
+
+	for i := range entity.TripUpdate.StopTimeUpdate {
+		*entity.TripUpdate.StopTimeUpdate[i].StopSequence = uint32(i) + gtfsStopSequenceOffset
+	}
+
+	// ARA-829
+	// if entity.TripUpdate.StopTimeUpdate[0].Departure.Time != nil {
+	// 	startTime := time.Unix(*entity.TripUpdate.StopTimeUpdate[0].Departure.Time, 0).Format("15:04:05")
+	// 	entity.TripUpdate.Trip.StartTime = &startTime
+	// }
 }
