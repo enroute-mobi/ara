@@ -1,8 +1,10 @@
 package apierrs
 
+import "slices"
+
 import "fmt"
 
-type Errors map[string]interface{}
+type Errors map[string]any
 
 func NewErrors() Errors {
 	return make(Errors)
@@ -70,13 +72,7 @@ func (errors Errors) added(attribute, message string) bool {
 	if !ok {
 		return true // Shouldn't happen, but if it does we want to do nothing
 	}
-	for _, m := range messageArray {
-		if m == message {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(messageArray, message)
 }
 
 func (errors Errors) GetSettingError(attribute string) []string {

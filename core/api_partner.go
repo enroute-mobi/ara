@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/core/partners"
@@ -110,10 +111,8 @@ func (partner *APIPartner) ValidatePresenceOfLightRemoteCredentials() bool {
 }
 
 func (partner *APIPartner) ValidatePresenceOfConnector(connector string) bool {
-	for _, listedConnector := range partner.ConnectorTypes {
-		if listedConnector == connector {
-			return true
-		}
+	if slices.Contains(partner.ConnectorTypes, connector) {
+		return true
 	}
 	partner.Errors.Add(fmt.Sprintf("Connector %s", connector), e.ERROR_BLANK)
 	return false

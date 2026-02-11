@@ -130,7 +130,7 @@ func Test_MemoryLineGroups_FindAll(t *testing.T) {
 	assert := assert.New(t)
 
 	lineGroups := NewMemoryLineGroups()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingLineGroup := lineGroups.New()
 		lineGroups.Save(existingLineGroup)
 	}

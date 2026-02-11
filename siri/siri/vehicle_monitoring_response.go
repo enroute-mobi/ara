@@ -11,19 +11,19 @@ import (
 )
 
 type SIRIVehicleMonitoringResponse struct {
-	ResponseTimestamp         time.Time `json:",omitempty"`
-	ProducerRef               string    `json:",omitempty"`
-	ResponseMessageIdentifier string    `json:",omitempty"`
-	RequestMessageRef         string    `json:",omitempty"`
-	Address                   string    `json:".omitempty"`
+	ResponseTimestamp         time.Time
+	ProducerRef               string `json:",omitempty"`
+	ResponseMessageIdentifier string `json:",omitempty"`
+	RequestMessageRef         string `json:",omitempty"`
+	Address                   string `json:".omitempty"`
 
 	SIRIVehicleMonitoringDelivery
 }
 
 type SIRIVehicleMonitoringDelivery struct {
 	Version           string
-	ResponseTimestamp time.Time `json:",omitempty"`
-	RequestMessageRef string    `json:",omitempty"`
+	ResponseTimestamp time.Time
+	RequestMessageRef string `json:",omitempty"`
 	Status            bool
 	ErrorCondition    *ErrorCondition `json:",omitempty"`
 	VehicleActivity   []*SIRIVehicleActivity
@@ -34,8 +34,8 @@ type SIRIVehicleMonitoringDelivery struct {
 }
 
 type SIRIVehicleActivity struct {
-	RecordedAtTime       time.Time                 `json:",omitempty"`
-	ValidUntilTime       time.Time                 `json:",omitempty"`
+	RecordedAtTime       time.Time
+	ValidUntilTime       time.Time
 	VehicleMonitoringRef string                    `json:",omitempty"`
 	ProgressBetweenStops *SIRIProgressBetweenStops `json:",omitempty"`
 
@@ -65,20 +65,20 @@ type SIRIMonitoredVehicleJourney struct {
 }
 
 type MonitoredCall struct {
-	StopPointRef          string    `json:",omitempty"`
-	StopPointName         string    `json:",omitempty"`
-	VehicleAtStop         bool      `json:",omitempty"`
-	DestinationDisplay    string    `json:",omitempty"`
-	ExpectedArrivalTime   time.Time `json:",omitempty"`
-	ExpectedDepartureTime time.Time `json:",omitempty"`
-	DepartureStatus       string    `json:",omitempty"`
-	Order                 *int      `json:",omitempty"`
-	AimedArrivalTime      time.Time `json:",omitempty"`
-	ArrivalPlatformName   string    `json:",omitempty"`
-	AimedDepartureTime    time.Time `json:",omitempty"`
-	ArrivalStatus         string    `json:",omitempty"`
-	ActualArrivalTime     time.Time `json:",omitempty"`
-	ActualDepartureTime   time.Time `json:",omitempty"`
+	StopPointRef          string `json:",omitempty"`
+	StopPointName         string `json:",omitempty"`
+	VehicleAtStop         bool   `json:",omitempty"`
+	DestinationDisplay    string `json:",omitempty"`
+	ExpectedArrivalTime   time.Time
+	ExpectedDepartureTime time.Time
+	DepartureStatus       string `json:",omitempty"`
+	Order                 *int   `json:",omitempty"`
+	AimedArrivalTime      time.Time
+	ArrivalPlatformName   string `json:",omitempty"`
+	AimedDepartureTime    time.Time
+	ArrivalStatus         string `json:",omitempty"`
+	ActualArrivalTime     time.Time
+	ActualDepartureTime   time.Time
 }
 
 type SIRIFramedVehicleJourneyRef struct {

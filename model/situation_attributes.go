@@ -20,7 +20,7 @@ const (
 	SituationSeverityVerySevere SituationSeverity = "verySevere"
 )
 
-func (s *SituationSeverity) FromProto(value interface{}) error {
+func (s *SituationSeverity) FromProto(value any) error {
 	switch v := value.(type) {
 	case gtfs.Alert_SeverityLevel:
 		switch v {
@@ -41,7 +41,7 @@ func (s *SituationSeverity) FromProto(value interface{}) error {
 	return nil
 }
 
-func (s SituationSeverity) ToProto(dest interface{}) error {
+func (s SituationSeverity) ToProto(dest any) error {
 	switch v := dest.(type) {
 	case *gtfs.Alert_SeverityLevel:
 		switch s {
@@ -348,7 +348,7 @@ const (
 	SituationAlertCauseWorktorule                        SituationAlertCause = "workToRule"
 )
 
-func (ac *SituationAlertCause) FromProto(value interface{}) error {
+func (ac *SituationAlertCause) FromProto(value any) error {
 	switch v := value.(type) {
 	case gtfs.Alert_Cause:
 		switch v {
@@ -387,7 +387,7 @@ func (ac *SituationAlertCause) FromProto(value interface{}) error {
 	return nil
 }
 
-func (ac SituationAlertCause) ToProto(dest interface{}) error {
+func (ac SituationAlertCause) ToProto(dest any) error {
 	switch v := dest.(type) {
 	case *gtfs.Alert_Cause:
 		switch ac {
@@ -1061,7 +1061,7 @@ func (condition *SituationCondition) FromString(c string) error {
 	}
 }
 
-func (c *SituationCondition) FromProto(value interface{}) error {
+func (c *SituationCondition) FromProto(value any) error {
 	switch v := value.(type) {
 	case gtfs.Alert_Effect:
 		switch v {
@@ -1088,7 +1088,7 @@ func (c *SituationCondition) FromProto(value interface{}) error {
 	return nil
 }
 
-func (c SituationCondition) ToProto(dest interface{}) error {
+func (c SituationCondition) ToProto(dest any) error {
 	switch v := dest.(type) {
 	case *gtfs.Alert_Effect:
 		switch c {

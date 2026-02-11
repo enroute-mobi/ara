@@ -107,9 +107,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			continue
 		}
 
-		sort.Slice(annotedStopPoint.Lines, func(i, j int) bool {
-			return annotedStopPoint.Lines[i] < annotedStopPoint.Lines[j]
-		})
+		slices.Sort(annotedStopPoint.Lines)
 
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 

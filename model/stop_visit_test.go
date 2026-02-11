@@ -185,7 +185,7 @@ func Test_MemoryStopVisits_Find(t *testing.T) {
 func Test_MemoryStopVisits_FindAll(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingStopVisit := stopVisits.New()
 		stopVisits.Save(existingStopVisit)
 	}
@@ -200,7 +200,7 @@ func Test_MemoryStopVisits_FindAll(t *testing.T) {
 func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		sv := stopVisits.New()
 		sv.Schedules.SetArrivalTime(schedules.Actual, time.Now().Add(-time.Duration(i)*time.Minute))
 		stopVisits.Save(sv)

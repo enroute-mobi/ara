@@ -334,7 +334,7 @@ func (bq *BigQueryClient) run() {
 	}
 }
 
-func (bq *BigQueryClient) send(message interface{}, inserter *bigquery.Inserter) {
+func (bq *BigQueryClient) send(message any, inserter *bigquery.Inserter) {
 	if inserter == nil {
 		return
 	}

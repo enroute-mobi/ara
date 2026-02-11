@@ -184,7 +184,7 @@ func Test_MemoryVehicleJourneys_Find(t *testing.T) {
 func Test_MemoryVehicleJourneys_FindAll(t *testing.T) {
 	vehicleJourneys := NewMemoryVehicleJourneys()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingVehicleJourney := vehicleJourneys.New()
 		vehicleJourneys.Save(existingVehicleJourney)
 	}

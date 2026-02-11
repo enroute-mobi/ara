@@ -130,7 +130,7 @@ func Test_MemoryStopAreaGroups_FindAll(t *testing.T) {
 	assert := assert.New(t)
 
 	stopAreaGroups := NewMemoryStopAreaGroups()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingStopAreaGroup := stopAreaGroups.New()
 		stopAreaGroups.Save(existingStopAreaGroup)
 	}

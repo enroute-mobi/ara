@@ -178,7 +178,7 @@ func Test_MemoryFacilities_FindAll(t *testing.T) {
 
 	facilities := NewMemoryFacilities()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingFacility := facilities.New()
 		facilities.Save(existingFacility)
 	}

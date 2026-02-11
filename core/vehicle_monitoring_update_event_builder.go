@@ -176,8 +176,8 @@ func (builder *VehicleMonitoringUpdateEventBuilder) formatSRSNameWithDefaut(srs 
 		return convertSRSNameToValue(strings.TrimPrefix(builder.partner.DefaultSRSName(), "EPSG:"))
 	}
 
-	if strings.HasPrefix(srs, "EPSG:") {
-		return convertSRSNameToValue(strings.TrimPrefix(srs, "EPSG:"))
+	if after, ok := strings.CutPrefix(srs, "EPSG:"); ok {
+		return convertSRSNameToValue(after)
 	}
 
 	return convertSRSNameToValue(srs)

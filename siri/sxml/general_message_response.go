@@ -36,7 +36,7 @@ type XMLGeneralMessage struct {
 	recordedAtTime time.Time
 	validUntilTime time.Time
 
-	content interface{}
+	content any
 }
 
 type IDFGeneralMessageStructure struct {
@@ -54,8 +54,8 @@ type IDFGeneralMessageStructure struct {
 type XMLMessage struct {
 	XMLStructure
 
-	messageTexts  map[string]string
-	messageType   string
+	messageTexts map[string]string
+	messageType  string
 }
 
 type IDFLineSectionStructure struct {
@@ -198,7 +198,7 @@ func (visit *XMLGeneralMessage) createNewContent() IDFGeneralMessageStructure {
 	return content
 }
 
-func (visit *XMLGeneralMessage) Content() interface{} {
+func (visit *XMLGeneralMessage) Content() any {
 	if visit.content != nil {
 		return visit.content
 	}

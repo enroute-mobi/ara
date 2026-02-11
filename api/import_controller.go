@@ -38,7 +38,7 @@ func (controller *ImportController) serve(response http.ResponseWriter, request 
 		return
 	}
 	mr := multipart.NewReader(request.Body, params["boundary"])
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		p, err := mr.NextPart()
 		if err != nil {
 			http.Error(response, "Can't parse multipart content", http.StatusBadRequest)

@@ -1,5 +1,7 @@
 package model
 
+import "slices"
+
 type StopAreaLineIds []LineId
 
 func (ids *StopAreaLineIds) Add(id LineId) {
@@ -9,12 +11,7 @@ func (ids *StopAreaLineIds) Add(id LineId) {
 }
 
 func (ids StopAreaLineIds) Contains(id LineId) bool {
-	for _, lineId := range ids {
-		if lineId == id {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(ids, id)
 }
 
 func (ids StopAreaLineIds) Copy() (t StopAreaLineIds) {

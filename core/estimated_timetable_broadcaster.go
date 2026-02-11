@@ -1,6 +1,7 @@
 package core
 
 import (
+	"slices"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -426,12 +427,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) dataFrameRef() s
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) noDestinationRefRewrite(origin string) bool {
-	for _, o := range connector.Partner().NoDestinationRefRewritingFrom() {
-		if origin == o {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(connector.Partner().NoDestinationRefRewritingFrom(), origin)
 }
 
 func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimetable) {

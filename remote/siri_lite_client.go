@@ -26,7 +26,7 @@ type siriLiteClientArguments struct {
 	params           url.Values
 	requestType      requestType
 	expectedResponse string
-	destination      interface{}
+	destination      any
 }
 
 func NewSIRILiteClient(c *HTTPClient, credential SiriCredentialHeader) *SIRILiteClient {

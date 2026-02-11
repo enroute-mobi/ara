@@ -16,7 +16,7 @@ type VehicleId ModelId
 
 type Vehicle struct {
 	RecordedAtTime time.Time
-	ValidUntilTime time.Time `json:",omitempty"`
+	ValidUntilTime time.Time
 	model          Model
 	CodeConsumer
 	RawAttributes    RawAttributes

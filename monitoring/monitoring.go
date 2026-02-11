@@ -25,7 +25,7 @@ func HandlePanic() {
 	}
 }
 
-func ReportError(err interface{}) {
+func ReportError(err any) {
 	logger.Log.Printf("Error in processing: %v", err)
 	sentry.CurrentHub().Recover(err)
 	sentry.Flush(time.Second * 5)

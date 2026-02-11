@@ -18,40 +18,40 @@ type MonitoredCall struct {
 	StopPointName         string    `json:"StopPointName,omitempty"`
 	VehicleAtStop         bool      `json:"VehicleAtStop,omitempty"`
 	DestinationDisplay    string    `json:"DestinationDisplay,omitempty"`
-	ExpectedArrivalTime   time.Time `json:"ExpectedArrivalTime,omitempty"`
-	ExpectedDepartureTime time.Time `json:"ExpectedDepartureTime,omitempty"`
+	ExpectedArrivalTime   time.Time `json:"ExpectedArrivalTime"`
+	ExpectedDepartureTime time.Time `json:"ExpectedDepartureTime"`
 	DepartureStatus       string    `json:"DepartureStatus,omitempty"`
 	Order                 *int      `json:"Order,omitempty"`
-	AimedArrivalTime      time.Time `json:"AimedArrivalTime,omitempty"`
+	AimedArrivalTime      time.Time `json:"AimedArrivalTime"`
 	ArrivalPlatformName   string    `json:"ArrivalPlatformName,omitempty"`
-	AimedDepartureTime    time.Time `json:"AimedDepartureTime,omitempty"`
+	AimedDepartureTime    time.Time `json:"AimedDepartureTime"`
 	ArrivalStatus         string    `json:"ArrivalStatus,omitempty"`
-	ActualArrivalTime     time.Time `json:"ActualArrivalTime,omitempty"`
-	ActualDepartureTime   time.Time `json:"ActualDepartureTime,omitempty"`
+	ActualArrivalTime     time.Time `json:"ActualArrivalTime"`
+	ActualDepartureTime   time.Time `json:"ActualDepartureTime"`
 }
 type MonitoredVehicleJourney struct {
 	LineRef                 string                  `json:"LineRef,omitempty"`
 	OperatorRef             string                  `json:"OperatorRef,omitempty"`
-	FramedVehicleJourneyRef FramedVehicleJourneyRef `json:"FramedVehicleJourneyRef,omitempty"`
+	FramedVehicleJourneyRef FramedVehicleJourneyRef `json:"FramedVehicleJourneyRef"`
 	DestinationRef          string                  `json:"DestinationRef,omitempty"`
 	DestinationName         string                  `json:"DestinationName,omitempty"`
 	JourneyNote             string                  `json:"JourneyNote,omitempty"`
 	Monitored               *bool                   `json:"Monitored"`
-	MonitoredCall           MonitoredCall           `json:"MonitoredCall,omitempty"`
+	MonitoredCall           MonitoredCall           `json:"MonitoredCall"`
 }
 type MonitoredStopVisit struct {
-	RecordedAtTime          time.Time               `json:"RecordedAtTime,omitempty"`
+	RecordedAtTime          time.Time               `json:"RecordedAtTime"`
 	ItemIdentifier          *string                 `json:"ItemIdentifier"`
 	MonitoringRef           string                  `json:"MonitoringRef,omitempty"`
 	StopPointRef            *string                 `json:"StopPointRef"`
-	MonitoredVehicleJourney MonitoredVehicleJourney `json:"MonitoredVehicleJourney,omitempty"`
+	MonitoredVehicleJourney MonitoredVehicleJourney `json:"MonitoredVehicleJourney"`
 }
 type StopMonitoringDelivery struct {
-	ResponseTimestamp  time.Time            `json:"ResponseTimestamp,omitempty"`
+	ResponseTimestamp  time.Time            `json:"ResponseTimestamp"`
 	Version            string               `json:"Version,omitempty"`
 	Status             string               `json:"Status,omitempty"`
 	MonitoredStopVisit []MonitoredStopVisit `json:"MonitoredStopVisit,omitempty"`
-	ErrorCondition     ErrorCondition       `json:"ErrorCondition,omitempty"`
+	ErrorCondition     ErrorCondition       `json:"ErrorCondition"`
 }
 
 type ErrorInformation struct {
@@ -59,17 +59,17 @@ type ErrorInformation struct {
 	ErrorDescription string `json:"ErrorDescription,omitempty"`
 }
 type ErrorCondition struct {
-	ErrorInformation ErrorInformation `json:"ErrorInformation,omitempty"`
+	ErrorInformation ErrorInformation `json:"ErrorInformation"`
 }
 
 type ServiceDelivery struct {
-	ResponseTimestamp         time.Time                `json:"ResponseTimestamp,omitempty"`
+	ResponseTimestamp         time.Time                `json:"ResponseTimestamp"`
 	ProducerRef               string                   `json:"ProducerRef,omitempty"`
 	ResponseMessageIdentifier string                   `json:"ResponseMessageIdentifier,omitempty"`
 	StopMonitoringDelivery    []StopMonitoringDelivery `json:"StopMonitoringDelivery,omitempty"`
 }
 type Siri struct {
-	ServiceDelivery ServiceDelivery `json:"ServiceDelivery,omitempty"`
+	ServiceDelivery ServiceDelivery `json:"ServiceDelivery"`
 }
 
 func (msv *MonitoredStopVisit) HasOrder() bool {

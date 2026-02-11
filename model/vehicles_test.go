@@ -231,7 +231,7 @@ func Test_MemoryVehicles_Find(t *testing.T) {
 func Test_MemoryVehicles_FindAll(t *testing.T) {
 	vehicles := NewMemoryVehicles()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingVehicle := vehicles.New()
 		vehicles.Save(existingVehicle)
 	}

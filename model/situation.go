@@ -515,12 +515,7 @@ func (situation *Situation) containsKeyword(str string) bool {
 	if len(situation.Keywords) == 0 {
 		return false
 	}
-	for _, v := range situation.Keywords {
-		if v == str {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(situation.Keywords, str)
 }
 
 type APISituation struct {
@@ -528,13 +523,13 @@ type APISituation struct {
 	Origin string      `json:",omitempty"`
 	CodeConsumer
 
-	CodeSpace             string    `json:",omitempty"`
-	SituationNumber       string    `json:",omitempty"`
-	ExistingSituationCode bool      `json:"-"`
-	RecordedAt            time.Time `json:",omitempty"`
-	Version               int       `json:",omitempty"`
+	CodeSpace             string `json:",omitempty"`
+	SituationNumber       string `json:",omitempty"`
+	ExistingSituationCode bool   `json:"-"`
+	RecordedAt            time.Time
+	Version               int `json:",omitempty"`
 
-	VersionedAt        time.Time    `json:",omitempty"`
+	VersionedAt        time.Time
 	ValidityPeriods    []*TimeRange `json:",omitempty"`
 	PublicationWindows []*TimeRange `json:",omitempty"`
 
@@ -867,7 +862,7 @@ func (ts *TranslatedString) ToProto(dest *gtfs.TranslatedString) {
 	dest.Translation = translations
 }
 
-func (t *TimeRange) FromProto(value interface{}) error {
+func (t *TimeRange) FromProto(value any) error {
 	var timeRange TimeRange
 	switch v := value.(type) {
 	case *gtfs.TimeRange:
@@ -888,7 +883,7 @@ func (t *TimeRange) FromProto(value interface{}) error {
 	return nil
 }
 
-func (t *TimeRange) ToProto(dest interface{}) error {
+func (t *TimeRange) ToProto(dest any) error {
 	if t == nil {
 		return errors.New("nil TimeRange")
 	}
@@ -914,7 +909,7 @@ type AffectRefs struct {
 	LineRefs       map[string]struct{}
 }
 
-func AffectFromProto(value interface{}, remoteCodeSpace string, m Model) (Affect, *AffectRefs, error) {
+func AffectFromProto(value any, remoteCodeSpace string, m Model) (Affect, *AffectRefs, error) {
 	collectedRefs := &AffectRefs{
 		MonitoringRefs: make(map[string]struct{}),
 		LineRefs:       make(map[string]struct{}),

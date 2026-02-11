@@ -437,7 +437,7 @@ func Test_MemorySituations_Find(t *testing.T) {
 func Test_MemorySituations_FindAll(t *testing.T) {
 	situations := NewMemorySituations()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingSituation := situations.New()
 		situations.Save(existingSituation)
 	}
@@ -632,50 +632,50 @@ func Test_AffectToProto(t *testing.T) {
 	wrongLine.Save()
 
 	var TestCases = []struct {
-		affect                Affect
-		remoteCodeSpace       string
-		valid                 bool
-		expectedStopId        *string
-		expectedRouteId       *string
+		affect                 Affect
+		remoteCodeSpace        string
+		valid                  bool
+		expectedStopId         *string
+		expectedRouteId        *string
 		expectedMonitoringRefs []string
-		expectedLineRefs 	[]string
-		message               string
+		expectedLineRefs       []string
+		message                string
 	}{
 		{
 			affect: &AffectedLine{
 				LineId: line.Id(),
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  nil,
-			expectedRouteId: &lineValue,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         nil,
+			expectedRouteId:        &lineValue,
 			expectedMonitoringRefs: []string{},
-			expectedLineRefs: []string{"1"},
-			message:         `AffectedLine with valid line should create RouteId`,
+			expectedLineRefs:       []string{"1"},
+			message:                `AffectedLine with valid line should create RouteId`,
 		},
 		{
 			affect: &AffectedStopArea{
 				StopAreaId: stopArea.Id(),
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  &stopAreaValue,
-			expectedRouteId: nil,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         &stopAreaValue,
+			expectedRouteId:        nil,
 			expectedMonitoringRefs: []string{"A"},
-			expectedLineRefs: []string{},
-			message:         `AffectedStopArea with valid stopArea should create StopId`,
+			expectedLineRefs:       []string{},
+			message:                `AffectedStopArea with valid stopArea should create StopId`,
 		},
 		{
 			affect: &AffectedStopArea{
 				StopAreaId: stopArea.Id(),
 				LineIds:    []LineId{line.Id()},
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  &stopAreaValue,
-			expectedRouteId: &lineValue,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         &stopAreaValue,
+			expectedRouteId:        &lineValue,
 			expectedMonitoringRefs: []string{"A"},
-			expectedLineRefs: []string{"1"},
+			expectedLineRefs:       []string{"1"},
 			message: `AffectedStopArea with valid StopArea and LineIds should
 create StopId and RouteId`,
 		},
@@ -692,12 +692,12 @@ create StopId and RouteId`,
 				StopAreaId: stopArea.Id(),
 				LineIds:    []LineId{wrongLine.Id()},
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  &stopAreaValue,
-			expectedRouteId: nil,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         &stopAreaValue,
+			expectedRouteId:        nil,
 			expectedMonitoringRefs: []string{"A"},
-			expectedLineRefs: []string{},
+			expectedLineRefs:       []string{},
 			message: `AffectedStopArea with valid stopArea and unknwon line
 should create StopId only`,
 		},
@@ -705,12 +705,12 @@ should create StopId only`,
 			affect: &AffectedLine{
 				LineId: particularLine.Id(),
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  nil,
-			expectedRouteId: &lineValue,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         nil,
+			expectedRouteId:        &lineValue,
 			expectedMonitoringRefs: []string{},
-			expectedLineRefs: []string{"1"},
+			expectedLineRefs:       []string{"1"},
 			message: `AffectedLine with valid line having a Referent
 should create RouteId with the Referent value`,
 		},
@@ -719,12 +719,12 @@ should create RouteId with the Referent value`,
 				StopAreaId: stopArea.Id(),
 				LineIds:    []LineId{particularLine.Id()},
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  &stopAreaValue,
-			expectedRouteId: &lineValue,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         &stopAreaValue,
+			expectedRouteId:        &lineValue,
 			expectedMonitoringRefs: []string{"A"},
-			expectedLineRefs: []string{"1"},
+			expectedLineRefs:       []string{"1"},
 			message: `AffectedStopArea with valid stopArea and line
 having a Referent should create StopId and RouteId with the Referent value`,
 		},
@@ -732,12 +732,12 @@ having a Referent should create StopId and RouteId with the Referent value`,
 			affect: &AffectedStopArea{
 				StopAreaId: particularStopArea.Id(),
 			},
-			remoteCodeSpace: "external",
-			valid:           true,
-			expectedStopId:  &stopAreaValue,
-			expectedRouteId: nil,
+			remoteCodeSpace:        "external",
+			valid:                  true,
+			expectedStopId:         &stopAreaValue,
+			expectedRouteId:        nil,
 			expectedMonitoringRefs: []string{"A"},
-			expectedLineRefs: []string{},
+			expectedLineRefs:       []string{},
 			message: `AffectedStopArea with valid stopArea
 having a Referent should create StopId with the Refefent value`,
 		},

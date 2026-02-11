@@ -92,9 +92,9 @@ func (server *Server) getToken(r *http.Request) string {
 	if !strings.HasPrefix(auth, prefix) {
 		return ""
 	}
-	s := strings.IndexByte(auth, '=')
+	_, after, _ := strings.Cut(auth, "=")
 
-	return auth[s+1:]
+	return after
 }
 
 func (server *Server) isAdmin(r *http.Request) bool {
@@ -108,13 +108,7 @@ func (server *Server) isAuth(referential *core.Referential, request *http.Reques
 		return false
 	}
 
-	for _, token := range referential.Tokens {
-		if authToken == token {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(referential.Tokens, authToken)
 }
 
 func (server *Server) isAuthForImport(referential *core.Referential, request *http.Request) bool {
@@ -124,10 +118,8 @@ func (server *Server) isAuthForImport(referential *core.Referential, request *ht
 		return false
 	}
 
-	for _, token := range referential.Tokens {
-		if authToken == token {
-			return true
-		}
+	if slices.Contains(referential.Tokens, authToken) {
+		return true
 	}
 
 	return slices.Contains(referential.ImportTokens, authToken)

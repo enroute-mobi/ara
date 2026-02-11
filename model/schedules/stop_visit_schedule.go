@@ -51,7 +51,7 @@ func (schedule *StopVisitSchedule) SetDepartureTime(t time.Time) time.Time {
 }
 
 func (schedule *StopVisitSchedule) MarshalJSON() ([]byte, error) {
-	jsonSchedule := map[string]interface{}{
+	jsonSchedule := map[string]any{
 		"Kind": schedule.kind,
 	}
 	if !schedule.departureTime.IsZero() {

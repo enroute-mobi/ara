@@ -177,13 +177,7 @@ func (builder *BroadcastGeneralMessageBuilder) checkInfoChannelRef(requestChanne
 		return true
 	}
 
-	for i := range requestChannels {
-		if requestChannels[i] == channel {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(requestChannels, channel)
 }
 
 func (builder *BroadcastGeneralMessageBuilder) buildAffectedStopArea(message *siri.SIRIGeneralMessage, affect model.Affect) {

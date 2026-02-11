@@ -2,6 +2,7 @@ package settings
 
 import (
 	"encoding/json"
+	"maps"
 	"sync"
 )
 
@@ -44,9 +45,7 @@ func (s *Settings) SetSetting(k, v string) {
 func (s *Settings) SettingsDefinition() (m map[string]string) {
 	m = make(map[string]string)
 	s.m.RLock()
-	for k, v := range s.s {
-		m[k] = v
-	}
+	maps.Copy(m, s.s)
 	s.m.RUnlock()
 	return
 }
@@ -57,9 +56,7 @@ func (s *Settings) SetSettingsDefinition(m map[string]string) {
 	}
 	s.m.Lock()
 	s.s = make(map[string]string)
-	for k, v := range m {
-		s.s[k] = v
-	}
+	maps.Copy(s.s, m)
 	s.r()
 	s.m.Unlock()
 }

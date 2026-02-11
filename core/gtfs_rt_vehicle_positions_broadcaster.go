@@ -39,7 +39,7 @@ func (connector *VehiclePositionBroadcaster) Start() {
 	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
 	connector.vehicleRemoteCodeSpaces = connector.partner.VehicleRemoteCodeSpaceWithFallback(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER)
-	connector.cache = cache.NewCachedItem("VehiclePositions", connector.partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
+	connector.cache = cache.NewCachedItem("VehiclePositions", connector.partner.CacheTimeout(GTFS_RT_VEHICLE_POSITIONS_BROADCASTER), nil, func(...any) (any, error) { return connector.handleGtfs() })
 }
 
 func (connector *VehiclePositionBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {
