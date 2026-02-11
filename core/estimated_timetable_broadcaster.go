@@ -271,6 +271,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *mo
 			StopPointRef:          saId,
 			StopPointName:         sa.Name,
 			DestinationDisplay:    sv.Attributes[siri_attributes.DestinationDisplay],
+			Cancellation:          sv.IsCancelled(),
 		}
 
 		recordedCall.UseVisitNumber = useVisitNumber
@@ -290,6 +291,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *mo
 			StopPointName:         sa.Name,
 			DestinationDisplay:    sv.Attributes[siri_attributes.DestinationDisplay],
 			VehicleAtStop:         sv.VehicleAtStop,
+			Cancellation:          sv.IsCancelled(),
 		}
 
 		estimatedCall.UseVisitNumber = useVisitNumber

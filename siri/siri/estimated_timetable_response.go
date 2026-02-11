@@ -93,6 +93,7 @@ type SIRIEstimatedCall struct {
 
 	Order          int
 	UseVisitNumber bool
+	Cancellation   bool
 
 	AimedArrivalTime    time.Time
 	ExpectedArrivalTime time.Time
@@ -110,6 +111,7 @@ type SIRIRecordedCall struct {
 
 	Order          int
 	UseVisitNumber bool
+	Cancellation   bool
 
 	AimedArrivalTime    time.Time
 	ExpectedArrivalTime time.Time
