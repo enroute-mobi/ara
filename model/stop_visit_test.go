@@ -324,6 +324,57 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	}
 }
 
+func TestStopVisit_IsCancelled(t *testing.T) {
+	assert := assert.New(t)
+
+	tests := []struct {
+		name            string
+		arrivalStatus   StopVisitArrivalStatus
+		departureStatus StopVisitDepartureStatus
+		expected        bool
+	}{
+		{
+			name:            "arrival cancelled and departure cancelled",
+			arrivalStatus:   STOP_VISIT_ARRIVAL_CANCELLED,
+			departureStatus: STOP_VISIT_DEPARTURE_CANCELLED,
+			expected:        true,
+		},
+		{
+			name:            "arrival undefined and departure cancelled",
+			arrivalStatus:   STOP_VISIT_ARRIVAL_UNDEFINED,
+			departureStatus: STOP_VISIT_DEPARTURE_CANCELLED,
+			expected:        true,
+		},
+		{
+			name:            "arrival cancelled and departure undefined",
+			arrivalStatus:   STOP_VISIT_ARRIVAL_CANCELLED,
+			departureStatus: STOP_VISIT_DEPARTURE_UNDEFINED,
+			expected:        true,
+		},
+		{
+			name:            "arrival undefined and departure undefined",
+			arrivalStatus:   STOP_VISIT_ARRIVAL_UNDEFINED,
+			departureStatus: STOP_VISIT_DEPARTURE_UNDEFINED,
+			expected:        false,
+		},
+		{
+			name:            "arrival no report and departure delayed for other case",
+			arrivalStatus:   STOP_VISIT_ARRIVAL_NOREPORT,
+			departureStatus: STOP_VISIT_DEPARTURE_DELAYED,
+			expected:        false,
+		},
+	}
+
+	for _, tt := range tests {
+		stopVisit := &StopVisit{
+			ArrivalStatus:   tt.arrivalStatus,
+			DepartureStatus: tt.departureStatus,
+		}
+
+		assert.Equal(tt.expected, stopVisit.IsCancelled(), tt.name)
+	}
+}
+
 var r []byte //against Compilator optimisation
 
 func benchmarkStopVisitsMarshal10000(sv int, b *testing.B) {

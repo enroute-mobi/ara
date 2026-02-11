@@ -137,8 +137,16 @@ func (stopVisit *StopVisit) VehicleJourney() *VehicleJourney {
 }
 
 func (stopVisit *StopVisit) IsCancelled() bool {
-	return (stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_CANCELLED || stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_UNDEFINED) &&
-		(stopVisit.ArrivalStatus == STOP_VISIT_ARRIVAL_CANCELLED || stopVisit.ArrivalStatus == STOP_VISIT_ARRIVAL_UNDEFINED)
+	switch {
+	case stopVisit.ArrivalStatus == STOP_VISIT_ARRIVAL_CANCELLED && stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_CANCELLED:
+		return true
+	case stopVisit.ArrivalStatus == STOP_VISIT_ARRIVAL_UNDEFINED && stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_CANCELLED:
+		return true
+	case stopVisit.ArrivalStatus == STOP_VISIT_ARRIVAL_CANCELLED && stopVisit.DepartureStatus == STOP_VISIT_DEPARTURE_UNDEFINED:
+		return true
+	default:
+		return false
+	}
 }
 
 func (stopVisit *StopVisit) MarshalJSON() ([]byte, error) {
