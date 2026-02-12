@@ -2757,6 +2757,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
                  <StopPointRef>NINOXE:StopPoint:SP:24:LOC</StopPointRef>
                  <Order>1</Order>
                  <StopPointName>Test</StopPointName>
+                 <Cancellation>true</Cancellation>
                  <ExpectedArrivalTime>2017-01-01T15:01:01.000Z</ExpectedArrivalTime>
                  <ArrivalStatus>cancelled</ArrivalStatus>
                  <ExpectedDepartureTime>2017-01-01T15:01:11.000Z</ExpectedDepartureTime>
