@@ -11,11 +11,11 @@ Feature: Support SIRI VehicleMonitoring
       | Codes[internal] | Test:Line:3:LOC |
       | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[internal]              | Test:VehicleJourney:201:LOC       |
+      | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -33,20 +33,20 @@ Feature: Support SIRI VehicleMonitoring
       | Name            | Carabacel                  |
     # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes[internal]               | Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1 |
-      | PassageOrder                  | 4                                                        |
-      | VehicleAtStop                 | false                                                    |
-      | StopAreaId                    | 6ba7b814-9dad-11d1-5-00c04fd430c8                        |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-3-00c04fd430c8                        |
-      | VehicleAtStop                 | false                                                    |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"                       |
-      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z                                 |
-      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z                                 |
-      | ArrivalStatus                 | delayed                                                  |
-      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z                                 |
-      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z                                 |
-      | DepartureStatus               | delayed                                                  |
-      | Attributes[DestinationDisplay] | Pouet-pouet                                              |
+      | Codes[internal]                   | Test:VehicleJourney:202:LOC-NINOXE:StopPoint:SP:24:LOC-1 |
+      | PassageOrder                      | 4                                                        |
+      | VehicleAtStop                     | false                                                    |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-5-00c04fd430c8                        |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-3-00c04fd430c8                        |
+      | VehicleAtStop                     | false                                                    |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                       |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z                                 |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z                                 |
+      | ArrivalStatus                     | delayed                                                  |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z                                 |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z                                 |
+      | DepartureStatus                   | delayed                                                  |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                                              |
     # 6ba7b814-9dad-11d1-5-00c04fd430c8
     When I send a vehicle-monitoring SIRI Lite request with the following parameters
       | Token             | test            |
@@ -124,12 +124,12 @@ Feature: Support SIRI VehicleMonitoring
       | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
       # 6ba7b814-9dad-11d1-3-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[rdbievre]          | bievre-VehicleJourney             |
-      | Codes[internal]          | STIF:bievre-VehicleJourney        |
-      | LineId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[rdbievre]              | bievre-VehicleJourney             |
+      | Codes[internal]              | STIF:bievre-VehicleJourney        |
+      | LineId                       | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a Vehicle exists with the following attributes:
       | Codes[rdbievre]  | bievre-Vehicle                    |
@@ -150,20 +150,20 @@ Feature: Support SIRI VehicleMonitoring
       | ReferentId      | 6ba7b814-9dad-11d1-b-00c04fd430c8 | # Stop Referent
     # 6ba7b814-9dad-11d1-6-00c04fd430c8
     And a StopVisit exists with the following attributes:
-      | Codes[internal]               | bievre-VehicleJourney-bievre-Vehicle |
-      | PassageOrder                  | 4                                    |
-      | VehicleAtStop                 | false                                |
-      | StopAreaId                    | 6ba7b814-9dad-11d1-6-00c04fd430c8    |
-      | VehicleJourneyId              | 6ba7b814-9dad-11d1-4-00c04fd430c8    |
-      | VehicleAtStop                 | false                                |
-      | Reference[OperatorRef]#Code   | "internal": "CdF:Company::410:LOC"   |
-      | Schedule[aimed]#Arrival       | 2017-01-01T15:00:00.000Z             |
-      | Schedule[expected]#Arrival    | 2017-01-01T15:01:00.000Z             |
-      | ArrivalStatus                 | delayed                              |
-      | Schedule[aimed]#Departure     | 2017-01-01T15:01:00.000Z             |
-      | Schedule[expected]#Departure  | 2017-01-01T15:02:00.000Z             |
-      | DepartureStatus               | delayed                              |
-      | Attributes[DestinationDisplay] | Pouet-pouet                          |
+      | Codes[internal]                   | bievre-VehicleJourney-bievre-Vehicle |
+      | PassageOrder                      | 4                                    |
+      | VehicleAtStop                     | false                                |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-6-00c04fd430c8    |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-4-00c04fd430c8    |
+      | VehicleAtStop                     | false                                |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"   |
+      | Schedule[aimed]#Arrival           | 2017-01-01T15:00:00.000Z             |
+      | Schedule[expected]#Arrival        | 2017-01-01T15:01:00.000Z             |
+      | ArrivalStatus                     | delayed                              |
+      | Schedule[aimed]#Departure         | 2017-01-01T15:01:00.000Z             |
+      | Schedule[expected]#Departure      | 2017-01-01T15:02:00.000Z             |
+      | DepartureStatus                   | delayed                              |
+      | RawAttributes[DestinationDisplay] | Pouet-pouet                          |
     # 6ba7b814-9dad-11d1-7-00c04fd430c8
     And a Line exists with the following attributes:
       | Codes[rdmantois] | Line-2                            |
@@ -171,12 +171,12 @@ Feature: Support SIRI VehicleMonitoring
       | ReferentId       | 6ba7b814-9dad-11d1-2-00c04fd430c8 | # Line Referent 1
     # 6ba7b814-9dad-11d1-8-00c04fd430c8
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[rdmantois]         | mantois-VehicleJourney            |
-      | Codes[internal]          | STIF:mantois-VehicleJourney       |
-      | LineId                   | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Another Direction Name            |
+      | Name                         | Passage 32                        |
+      | Codes[rdmantois]             | mantois-VehicleJourney            |
+      | Codes[internal]              | STIF:mantois-VehicleJourney       |
+      | LineId                       | 6ba7b814-9dad-11d1-8-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Another Direction Name            |
     # 6ba7b814-9dad-11d1-9-00c04fd430c8
     And a Vehicle exists with the following attributes:
       | Codes[rdmantois] | mantois-Vehicle                   |
@@ -503,11 +503,11 @@ Feature: Support SIRI VehicleMonitoring
      | Codes[internal] | Test:Line:3:LOC |
      | Name            | Ligne 3 Metro   |
    And a VehicleJourney exists with the following attributes:
-     | Name                     | Passage 32                        |
-     | Codes[internal]          | Test:VehicleJourney:201:LOC       |
-     | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-     | Monitored                | true                              |
-     | Attributes[DirectionName] | Direction Name                    |
+     | Name                         | Passage 32                        |
+     | Codes[internal]              | Test:VehicleJourney:201:LOC       |
+     | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+     | Monitored                    | true                              |
+     | RawAttributes[DirectionName] | Direction Name                    |
    And a Vehicle exists with the following attributes:
      | Codes[other]     | Test:Vehicle:201123:LOC           |
      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -557,11 +557,11 @@ Feature: Support SIRI VehicleMonitoring
       | Codes[internal] | Test:Line:3:LOC |
       | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[internal]          | Test:VehicleJourney:201:LOC       |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[internal]              | Test:VehicleJourney:201:LOC       |
+      | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[other]     | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -634,11 +634,11 @@ Feature: Support SIRI VehicleMonitoring
       | Codes[other] | Test:Line:3:LOC |
       | Name         | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[other]             | Test:VehicleJourney:201:LOC       |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[other]                 | Test:VehicleJourney:201:LOC       |
+      | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[other]     | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -702,12 +702,12 @@ Feature: Support SIRI VehicleMonitoring
       | Codes[internal] | Test:Line:3:LOC |
       | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[_default]          | 6ba7b814                          |
-      | Codes[external]          | Test:VehicleJourney:201:LOC       |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[_default]              | 6ba7b814                          |
+      | Codes[external]              | Test:VehicleJourney:201:LOC       |
+      | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
@@ -785,12 +785,12 @@ Feature: Support SIRI VehicleMonitoring
       | Codes[internal] | Test:Line:3:LOC |
       | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[_default]          | 6ba7b814                          |
-      | Codes[external]          | Test:VehicleJourney:201:LOC       |
-      | LineId                   | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | Direction Name                    |
+      | Name                         | Passage 32                        |
+      | Codes[_default]              | 6ba7b814                          |
+      | Codes[external]              | Test:VehicleJourney:201:LOC       |
+      | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
       | Codes[internal]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |

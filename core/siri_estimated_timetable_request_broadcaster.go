@@ -132,11 +132,11 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 					DataFrameRef:           connector.dataFrameRef(),
 					PublishedLineName:      connector.publishedLineName(line),
 					DestinationName:        vjs[i].DestinationName,
-					Attributes:             make(map[string]string),
+					RawAttributes:          make(map[string]string),
 					References:             make(map[string]string),
 				}
 				estimatedVehicleJourney.References = connector.getEstimatedVehicleJourneyReferences(vjs[i], vjs[i].Origin)
-				estimatedVehicleJourney.Attributes = vjs[i].Attributes
+				estimatedVehicleJourney.RawAttributes = vjs[i].RawAttributes
 
 				// SIRIEstimatedCall
 				connector.Partner().RecordedCallsDuration()
@@ -167,7 +167,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 							Order:                 svs[i].PassageOrder,
 							StopPointRef:          stopAreaId,
 							StopPointName:         stopArea.Name,
-							DestinationDisplay:    svs[i].Attributes[siri_attributes.DestinationDisplay],
+							DestinationDisplay:    svs[i].RawAttributes[siri_attributes.DestinationDisplay],
 						}
 
 						recordedCall.UseVisitNumber = connector.useVisitNumber
@@ -182,7 +182,7 @@ func (connector *SIRIEstimatedTimetableRequestBroadcaster) getEstimatedTimetable
 							Order:              svs[i].PassageOrder,
 							StopPointRef:       stopAreaId,
 							StopPointName:      stopArea.Name,
-							DestinationDisplay: svs[i].Attributes[siri_attributes.DestinationDisplay],
+							DestinationDisplay: svs[i].RawAttributes[siri_attributes.DestinationDisplay],
 							VehicleAtStop:      svs[i].VehicleAtStop,
 						}
 

@@ -1,14 +1,16 @@
 package model
 
 import (
-	"bitbucket.org/enroute-mobi/ara/clock"
 	"database/sql"
 	"encoding/json"
 
-	"github.com/stretchr/testify/assert"
+	"bitbucket.org/enroute-mobi/ara/clock"
+
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_StopArea_Id(t *testing.T) {
@@ -392,7 +394,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		Name:            "stopArea",
 		Codes:           `{"internal":"value"}`,
 		LineIds:         `["d0eebc99-9c0b","e0eebc99-9c0b"]`,
-		Attributes:      "{}",
+		RawAttributes:   "{}",
 		References:      `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 		CollectedAlways: true,
 		CollectChildren: true,

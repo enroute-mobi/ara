@@ -23,13 +23,13 @@ func benchmarkPTTNotifyBuildXML(pc int, b *testing.B) {
 			&siri.SIRIDatedTimetableVersionFrame{
 				LineRef:        "LineRef",
 				RecordedAtTime: time.Now(),
-				Attributes:     make(map[string]string),
+				RawAttributes:  make(map[string]string),
 				DatedVehicleJourneys: []*siri.SIRIDatedVehicleJourney{
 					&siri.SIRIDatedVehicleJourney{
 						DataFrameRef:           "DataFrameRef",
 						DatedVehicleJourneyRef: "DatedVehicleJourneyRef",
 						PublishedLineName:      "PublishedLineName",
-						Attributes:             make(map[string]string),
+						RawAttributes:          make(map[string]string),
 						References:             make(map[string]string),
 					},
 				},

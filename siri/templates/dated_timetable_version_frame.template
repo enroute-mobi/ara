@@ -3,20 +3,20 @@
 				<siri:LineRef>{{ .LineRef }}</siri:LineRef>{{ if .DirectionType }}
 				<siri:DirectionRef>{{ .DirectionType }}</siri:DirectionRef>{{ else }}
 				<siri:DirectionRef/>{{ end }}
-				<siri:FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
+				<siri:FirstOrLastJourney>{{ if .RawAttributes.FirstOrLastJourney }}{{ .RawAttributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ range .DatedVehicleJourneys }}
 				<siri:DatedVehicleJourney>
 					<siri:FramedVehicleJourneyRef>
 							<siri:DataFrameRef>{{ .DataFrameRef }}</siri:DataFrameRef>
 							<siri:DatedVehicleJourneyRef>{{ .DatedVehicleJourneyRef }}</siri:DatedVehicleJourneyRef>
-					</siri:FramedVehicleJourneyRef>{{ if .Attributes.VehicleMode }}
-					<siri:VehicleMode>{{ .Attributes.VehicleMode }}</siri:VehicleMode>{{ end }}
+					</siri:FramedVehicleJourneyRef>{{ if .RawAttributes.VehicleMode }}
+					<siri:VehicleMode>{{ .RawAttributes.VehicleMode }}</siri:VehicleMode>{{ end }}
 					<siri:PublishedLineName>{{ .PublishedLineName }}</siri:PublishedLineName>{{ if .References.OperatorRef }}
 					<siri:OperatorRef>{{ .References.OperatorRef }}</siri:OperatorRef>{{ else }}
-					<siri:OperatorRef/>{{ end }}{{ if .Attributes.ProductCategoryRef }}
-					<siri:ProductCategoryRef>{{ .Attributes.ProductCategoryRef }}</siri:ProductCategoryRef>{{ end }}{{ if .Attributes.OriginDisplay }}
-					<siri:OriginDisplay>{{ .Attributes.OriginDisplay }}</siri:OriginDisplay>{{ end }}{{ if .Attributes.DestinationDisplay }}
-					<siri:DestinationDisplay>{{ .Attributes.DestinationDisplay }}</siri:DestinationDisplay>{{ end }}
-					<siri:FirstOrLastJourney>{{ if .Attributes.FirstOrLastJourney }}{{ .Attributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
+					<siri:OperatorRef/>{{ end }}{{ if .RawAttributes.ProductCategoryRef }}
+					<siri:ProductCategoryRef>{{ .RawAttributes.ProductCategoryRef }}</siri:ProductCategoryRef>{{ end }}{{ if .RawAttributes.OriginDisplay }}
+					<siri:OriginDisplay>{{ .RawAttributes.OriginDisplay }}</siri:OriginDisplay>{{ end }}{{ if .RawAttributes.DestinationDisplay }}
+					<siri:DestinationDisplay>{{ .RawAttributes.DestinationDisplay }}</siri:DestinationDisplay>{{ end }}
+					<siri:FirstOrLastJourney>{{ if .RawAttributes.FirstOrLastJourney }}{{ .RawAttributes.FirstOrLastJourney }}{{ else }}unspecified{{ end }}</siri:FirstOrLastJourney>{{ if ne (len .DatedCalls) 0 }}
 					<siri:DatedCalls>{{ range .DatedCalls }}
 						<siri:DatedCall>
 							<siri:StopPointRef>{{ .StopPointRef }}</siri:StopPointRef>{{ if .UseVisitNumber }}

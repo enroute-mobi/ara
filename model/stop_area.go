@@ -21,7 +21,7 @@ type StopArea struct {
 	References     References
 	CodeConsumer
 	Origins           *StopAreaOrigins
-	Attributes        Attributes
+	RawAttributes     RawAttributes
 	ReferentId        StopAreaId `json:",omitempty"`
 	id                StopAreaId
 	ParentId          StopAreaId `json:",omitempty"`
@@ -39,7 +39,7 @@ func NewStopArea(model Model) *StopArea {
 	stopArea := &StopArea{
 		model:           model,
 		Origins:         NewStopAreaOrigins(),
-		Attributes:      NewAttributes(),
+		RawAttributes:   NewRawAttributes(),
 		References:      NewReferences(),
 		CollectedAlways: true,
 	}
@@ -70,7 +70,7 @@ func (stopArea *StopArea) copy() *StopArea {
 		Name:              stopArea.Name,
 		LineIds:           stopArea.LineIds.Copy(),
 		CollectChildren:   stopArea.CollectChildren,
-		Attributes:        stopArea.Attributes.Copy(),
+		RawAttributes:     stopArea.RawAttributes.Copy(),
 		References:        stopArea.References.Copy(),
 		Longitude:         stopArea.Longitude,
 		Latitude:          stopArea.Latitude,
@@ -89,7 +89,7 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 		NextCollectAt  *time.Time           `json:",omitempty"`
 		CollectedAt    *time.Time           `json:",omitempty"`
 		CollectedUntil *time.Time           `json:",omitempty"`
-		Attributes     Attributes           `json:",omitempty"`
+		RawAttributes  RawAttributes        `json:",omitempty"`
 		*Alias
 		Id StopAreaId
 	}{
@@ -100,8 +100,8 @@ func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	if !stopArea.Codes().Empty() {
 		aux.Codes = stopArea.Codes()
 	}
-	if !stopArea.Attributes.IsEmpty() {
-		aux.Attributes = stopArea.Attributes
+	if !stopArea.RawAttributes.IsEmpty() {
+		aux.RawAttributes = stopArea.RawAttributes
 	}
 	if !stopArea.References.IsEmpty() {
 		aux.References = stopArea.References.GetReferences()
@@ -151,7 +151,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 }
 
 func (stopArea *StopArea) Attribute(key string) (value string, present bool) {
-	value, present = stopArea.Attributes[key]
+	value, present = stopArea.RawAttributes[key]
 	return
 }
 
@@ -548,8 +548,8 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 			}
 		}
 
-		if sa.Attributes.Valid && len(sa.Attributes.String) > 0 {
-			if err = json.Unmarshal([]byte(sa.Attributes.String), &stopArea.Attributes); err != nil {
+		if sa.RawAttributes.Valid && len(sa.RawAttributes.String) > 0 {
+			if err = json.Unmarshal([]byte(sa.RawAttributes.String), &stopArea.RawAttributes); err != nil {
 				return err
 			}
 		}

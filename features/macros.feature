@@ -181,9 +181,9 @@ Feature: Manages Macros
     When a minute has passed
     And the SIRI server has received a GetStopMonitoring request
     Then one VehicleJourney has the following attributes:
-      | Codes[internal]          | NINOXE:VehicleJourney:201 |
-      | Attributes[DirectionName] | Aller                     |
-      | DirectionType            | outbound                  |
+      | Codes[internal]              | NINOXE:VehicleJourney:201 |
+      | RawAttributes[DirectionName] | Aller                     |
+      | DirectionType                | outbound                  |
 
   @nostart @database
   Scenario: Handle a Situation Macro
@@ -410,14 +410,14 @@ Feature: Manages Macros
       | Name            | Test 1                     |
       | Codes[internal] | NINOXE:StopPoint:SP:24:LOC |
     And a StopVisit exists with the following attributes:
-      | Codes[internal]                | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
-      | PassageOrder                   | 4                                                      |
-      | StopAreaId                     | 6ba7b814-9dad-11d1-0004-00c04fd430c8                   |
-      | VehicleJourneyId               | 6ba7b814-9dad-11d1-0003-00c04fd430c8                   |
-      | VehicleAtStop                  | true                                                   |
-      | Reference[OperatorRef]#Code    | "internal": "CdF:Company::410:LOC"                     |
-      | Schedule[actual]#Arrival       | 2017-01-01T13:00:00.000Z                               |
-      | Attributes[DestinationDisplay] | Cergy le haut & Arret <RER>                            |
+      | Codes[internal]                   | NINOXE:VehicleJourney:201-NINOXE:StopPoint:SP:24:LOC-3 |
+      | PassageOrder                      | 4                                                      |
+      | StopAreaId                        | 6ba7b814-9dad-11d1-0004-00c04fd430c8                   |
+      | VehicleJourneyId                  | 6ba7b814-9dad-11d1-0003-00c04fd430c8                   |
+      | VehicleAtStop                     | true                                                   |
+      | Reference[OperatorRef]#Code       | "internal": "CdF:Company::410:LOC"                     |
+      | Schedule[actual]#Arrival          | 2017-01-01T13:00:00.000Z                               |
+      | RawAttributes[DestinationDisplay] | Cergy le haut & Arret <RER>                            |
     When a minute has passed
     Then one VehicleJourney has the following attributes:
       | Codes[internal] | NINOXE:VehicleJourney:201 |

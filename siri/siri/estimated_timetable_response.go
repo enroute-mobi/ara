@@ -52,8 +52,8 @@ type SIRIEstimatedVehicleJourney struct {
 
 	IsCompleteStopSequence bool
 
-	Attributes map[string]string
-	References map[string]string
+	RawAttributes map[string]string
+	References    map[string]string
 
 	EstimatedCalls []*SIRIEstimatedCall
 	RecordedCalls  []*SIRIRecordedCall

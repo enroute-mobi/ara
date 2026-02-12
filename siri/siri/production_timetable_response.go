@@ -13,7 +13,7 @@ type SIRIDatedTimetableVersionFrame struct {
 	DirectionType  string
 	RecordedAtTime time.Time
 
-	Attributes map[string]string
+	RawAttributes map[string]string
 
 	DatedVehicleJourneys []*SIRIDatedVehicleJourney
 }
@@ -23,7 +23,7 @@ type SIRIDatedVehicleJourney struct {
 	DatedVehicleJourneyRef string
 	PublishedLineName      string
 
-	Attributes map[string]string
+	RawAttributes map[string]string
 	References map[string]string
 
 	DatedCalls []*SIRIDatedCall

@@ -274,7 +274,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 		VehicleJourneyId: "d0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
 		Schedules:        `[{"CodeSpace":"expected","DepartureTime":"2017-08-17T10:45:55+02:00"}]`,
 		PassageOrder:     1,
-		Attributes:       "{}",
+		RawAttributes:    "{}",
 		References:       `{"Ref":{"Type":"Ref","Code":{"kind":"value"}}}`,
 	}
 

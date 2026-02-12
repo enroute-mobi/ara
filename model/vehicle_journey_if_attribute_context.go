@@ -20,13 +20,13 @@ type vehicleJourneyIfAttributeContextAttributes struct {
 
 func NewVehicleJourneyIfAttributeContext(attributes sql.NullString) (Context, error) {
 	if !attributes.Valid {
-		return nil, errors.New("empty Attributes")
+		return nil, errors.New("empty RawAttributes")
 	}
 
 	var attrs vehicleJourneyIfAttributeContextAttributes
 	err := json.Unmarshal([]byte(attributes.String), &attrs)
 	if err != nil {
-		return nil, fmt.Errorf("can't parse Attributes: %v", err)
+		return nil, fmt.Errorf("can't parse RawAttributes: %v", err)
 	}
 
 	f, ok := vehicleJourneyIfAttributeContextFactories[attrs.AttributeName]
@@ -40,6 +40,6 @@ func NewVehicleJourneyIfAttributeContext(attributes sql.NullString) (Context, er
 func newVehicleJourneyDirectionNameContext(d ContextAttributes) (Context, error) {
 	return func(mi ModelInstance) bool {
 		vj := mi.(*VehicleJourney)
-		return vj.Attributes[siri_attributes.DirectionName] == d.(string)
+		return vj.RawAttributes[siri_attributes.DirectionName] == d.(string)
 	}, nil
 }

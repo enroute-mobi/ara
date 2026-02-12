@@ -195,12 +195,12 @@ func (ett *ETTBroadcaster) prepareSIRIEstimatedTimetable() {
 					Cancellation:           vehicleJourney.Cancellation,
 					PublishedLineName:      ett.connector.publishedLineName(line),
 					DestinationName:        vehicleJourney.DestinationName,
-					Attributes:             make(map[string]string),
+					RawAttributes:          make(map[string]string),
 					References:             make(map[string]string),
 				}
 
 				estimatedVehicleJourney.References = ett.connector.getEstimatedVehicleJourneyReferences(vehicleJourney, stopVisit)
-				estimatedVehicleJourney.Attributes = vehicleJourney.Attributes
+				estimatedVehicleJourney.RawAttributes = vehicleJourney.RawAttributes
 
 				journeyFrame.EstimatedVehicleJourneys = append(journeyFrame.EstimatedVehicleJourneys, estimatedVehicleJourney)
 				vehicleJourneys[vehicleJourney.Id()] = estimatedVehicleJourney
@@ -270,7 +270,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *mo
 			Order:                 sv.PassageOrder,
 			StopPointRef:          saId,
 			StopPointName:         sa.Name,
-			DestinationDisplay:    sv.Attributes[siri_attributes.DestinationDisplay],
+			DestinationDisplay:    sv.RawAttributes[siri_attributes.DestinationDisplay],
 			Cancellation:          sv.IsCancelled(),
 		}
 
@@ -289,7 +289,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionBroadcaster) buildCall(sv *mo
 			Order:                 sv.PassageOrder,
 			StopPointRef:          saId,
 			StopPointName:         sa.Name,
-			DestinationDisplay:    sv.Attributes[siri_attributes.DestinationDisplay],
+			DestinationDisplay:    sv.RawAttributes[siri_attributes.DestinationDisplay],
 			VehicleAtStop:         sv.VehicleAtStop,
 			Cancellation:          sv.IsCancelled(),
 		}

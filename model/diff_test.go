@@ -74,7 +74,7 @@ func Test_Equal_Unexported(t *testing.T) {
 // 	model := NewTestMemoryModel()
 // 	testTime := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
 
-// 	attributes := NewAttributes()
+// 	attributes := NewRawAttributes()
 // 	attributes.Set("key", "value")
 
 // 	references := NewReferences()
@@ -92,7 +92,7 @@ func Test_Equal_Unexported(t *testing.T) {
 // 		CollectedAlways: true,
 // 		Name:            "Name",
 // 		LineIds:         []LineId{"1234"},
-// 		Attributes:      attributes,
+// 		RawAttributes:      attributes,
 // 		Origins:         NewStopAreaOrigins(),
 // 		//		References:      references, Test fail if added
 // 	}
@@ -105,7 +105,7 @@ func Test_Equal_Unexported(t *testing.T) {
 // 		CollectedAlways: true,
 // 		Name:            "Name",
 // 		LineIds:         []LineId{"1234"},
-// 		Attributes:      attributes,
+// 		RawAttributes:      attributes,
 // 		Origins:         NewStopAreaOrigins(),
 // 		//		References:      references, Test fail if added
 // 	}

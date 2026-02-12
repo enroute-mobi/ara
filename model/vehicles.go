@@ -19,7 +19,7 @@ type Vehicle struct {
 	ValidUntilTime time.Time `json:",omitempty"`
 	model          Model
 	CodeConsumer
-	Attributes       Attributes
+	RawAttributes    RawAttributes
 	StopAreaId       StopAreaId       `json:",omitempty"`
 	Occupancy        string           `json:",omitempty"`
 	LineId           LineId           `json:",omitempty"`
@@ -36,8 +36,8 @@ type Vehicle struct {
 
 func NewVehicle(model Model) *Vehicle {
 	vehicle := &Vehicle{
-		model:      model,
-		Attributes: NewAttributes(),
+		model:         model,
+		RawAttributes: NewRawAttributes(),
 	}
 	vehicle.codes = make(Codes)
 	return vehicle
@@ -64,7 +64,7 @@ func (vehicle *Vehicle) copy() *Vehicle {
 		ValidUntilTime:   vehicle.ValidUntilTime,
 		Occupancy:        vehicle.Occupancy,
 		RecordedAtTime:   vehicle.RecordedAtTime,
-		Attributes:       vehicle.Attributes.Copy(),
+		RawAttributes:    vehicle.RawAttributes.Copy(),
 		NextStopVisitId:  vehicle.NextStopVisitId,
 	}
 }
@@ -88,8 +88,8 @@ func (vehicle *Vehicle) VehicleJourney() *VehicleJourney {
 func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 	type Alias Vehicle
 	aux := struct {
-		Codes      Codes      `json:",omitempty"`
-		Attributes Attributes `json:",omitempty"`
+		Codes         Codes         `json:",omitempty"`
+		RawAttributes RawAttributes `json:",omitempty"`
 		*Alias
 		Id VehicleId
 	}{
@@ -100,8 +100,8 @@ func (vehicle *Vehicle) MarshalJSON() ([]byte, error) {
 	if !vehicle.Codes().Empty() {
 		aux.Codes = vehicle.Codes()
 	}
-	if !vehicle.Attributes.IsEmpty() {
-		aux.Attributes = vehicle.Attributes
+	if !vehicle.RawAttributes.IsEmpty() {
+		aux.RawAttributes = vehicle.RawAttributes
 	}
 
 	return json.Marshal(&aux)

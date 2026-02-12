@@ -98,7 +98,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(fi
 			activity.VehicleMonitoringRef = vehicleId.Value()
 			activity.MonitoredVehicleJourney.LineRef = lineRef
 			activity.MonitoredVehicleJourney.PublishedLineName = requestedLine.Name
-			activity.MonitoredVehicleJourney.DirectionName = vj.Attributes[siri_attributes.DirectionName]
+			activity.MonitoredVehicleJourney.DirectionName = vj.RawAttributes[siri_attributes.DirectionName]
 			activity.MonitoredVehicleJourney.OriginName = vj.OriginName
 			activity.MonitoredVehicleJourney.DestinationName = vj.DestinationName
 			activity.MonitoredVehicleJourney.Monitored = vj.Monitored
@@ -118,7 +118,7 @@ func (connector *SIRILiteVehicleMonitoringRequestBroadcaster) RequestVehicles(fi
 						monitoredCall.StopPointRef = stopAreaCode
 						monitoredCall.StopPointName = stopArea.Name
 						monitoredCall.VehicleAtStop = nextStopVisit.VehicleAtStop
-						monitoredCall.DestinationDisplay = nextStopVisit.Attributes["DestinationDisplay"]
+						monitoredCall.DestinationDisplay = nextStopVisit.RawAttributes["DestinationDisplay"]
 						monitoredCall.ExpectedArrivalTime = nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
 						monitoredCall.ExpectedDepartureTime = nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected})
 						monitoredCall.DepartureStatus = string(nextStopVisit.DepartureStatus)

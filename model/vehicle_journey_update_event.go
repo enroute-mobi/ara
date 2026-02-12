@@ -8,7 +8,7 @@ import (
 type VehicleJourneyUpdateEvent struct {
 	references            *References
 	SiriXML               *sxml.XMLMonitoredVehicleJourney
-	attributes            Attributes
+	attributes            RawAttributes
 	Cancellation          bool
 	Code                  Code
 	LineCode              Code
@@ -33,11 +33,11 @@ func (ue *VehicleJourneyUpdateEvent) EventKind() EventKind {
 	return VEHICLE_JOURNEY_EVENT
 }
 
-func (ue *VehicleJourneyUpdateEvent) Attributes() Attributes {
+func (ue *VehicleJourneyUpdateEvent) RawAttributes() RawAttributes {
 	if ue.attributes != nil {
 		return ue.attributes
 	}
-	ue.attributes = NewAttributes()
+	ue.attributes = NewRawAttributes()
 
 	if ue.SiriXML == nil {
 		return ue.attributes

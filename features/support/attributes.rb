@@ -63,8 +63,8 @@ def model_attributes(table)
     # | KEY[B]  | value2 |
     # into
     # "KEY" => {"A" => "value1", "B" => "value2" }
-    # With KEY either Codes, Attributes
-    if key =~ /(Codes|Attributes)\[([^\]]+)\]/
+    # With KEY either Codes, RawAttributes
+    if key =~ /(Codes|RawAttributes)\[([^\]]+)\]/
       attr = Regexp.last_match(1)
       name = Regexp.last_match(2)
 

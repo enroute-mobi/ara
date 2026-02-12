@@ -181,7 +181,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 	monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{
 		LineRef:            lineRef,
 		PublishedLineName:  line.Name,
-		DirectionName:      vj.Attributes["DirectionName"],
+		DirectionName:      vj.RawAttributes["DirectionName"],
 		DirectionType:      vj.DirectionType,
 		OriginName:         vj.OriginName,
 		DestinationName:    vj.DestinationName,
@@ -205,7 +205,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 					StopPointRef:          stopAreaCode,
 					StopPointName:         stopArea.Name,
 					VehicleAtStop:         nextStopVisit.VehicleAtStop,
-					DestinationDisplay:    nextStopVisit.Attributes["DestinationDisplay"],
+					DestinationDisplay:    nextStopVisit.RawAttributes["DestinationDisplay"],
 					ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 					ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 					DepartureStatus:       string(nextStopVisit.DepartureStatus),

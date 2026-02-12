@@ -567,11 +567,11 @@ Feature: Audit API exchanges
       | Kind              | StopMonitoringCollect                              |
       | ReferenceArray[1] | StopArea, "internal": "NINOXE:StopPoint:SP:25:LOC" |
     And a VehicleJourney exists with the following attributes:
-      | Name                     | Passage 32                        |
-      | Codes[internal]          | NINOXE:VehicleJourney:201         |
-      | LineId                   | 6ba7b814-9dad-11d1-c-00c04fd430c8 |
-      | Monitored                | true                              |
-      | Attributes[DirectionName] | A Direction Name                  |
+      | Name                         | Passage 32                        |
+      | Codes[internal]              | NINOXE:VehicleJourney:201         |
+      | LineId                       | 6ba7b814-9dad-11d1-c-00c04fd430c8 |
+      | Monitored                    | true                              |
+      | RawAttributes[DirectionName] | A Direction Name                  |
     And a minute has passed
     When I send this SIRI request
       """
