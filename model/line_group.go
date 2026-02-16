@@ -12,10 +12,10 @@ type LineGroupId ModelId
 
 type LineGroup struct {
 	model     Model
-	id        LineGroupId `json:",omitempty"`
-	Name      string      `json:",omitempty"`
-	ShortName string      `json:",omitempty"`
-	LineIds   []LineId    `json:",omitempty"`
+	id        LineGroupId
+	Name      string   `json:",omitempty"`
+	ShortName string   `json:",omitempty"`
+	LineIds   []LineId `json:",omitempty"`
 }
 
 func NewLineGroup(model Model) *LineGroup {

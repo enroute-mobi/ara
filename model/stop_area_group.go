@@ -12,10 +12,10 @@ type StopAreaGroupId ModelId
 
 type StopAreaGroup struct {
 	model       Model
-	id          StopAreaGroupId `json:",omitempty"`
-	Name        string          `json:",omitempty"`
-	ShortName   string          `json:",omitempty"`
-	StopAreaIds []StopAreaId    `json:",omitempty"`
+	id          StopAreaGroupId
+	Name        string       `json:",omitempty"`
+	ShortName   string       `json:",omitempty"`
+	StopAreaIds []StopAreaId `json:",omitempty"`
 }
 
 func NewStopAreaGroup(model Model) *StopAreaGroup {
