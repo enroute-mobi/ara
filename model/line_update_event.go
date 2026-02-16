@@ -4,7 +4,7 @@ type LineUpdateEvent struct {
 	Origin string
 
 	Code Code
-	Name     string
+	Name string
 }
 
 func NewLineUpdateEvent() *LineUpdateEvent {

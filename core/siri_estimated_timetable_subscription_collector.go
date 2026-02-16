@@ -92,7 +92,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) RequestLineUpdate(
 	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(EstimatedTimetableCollect)
 	ref := model.Reference{
 		Code: &lineCode,
-		Type:     "Line",
+		Type: "Line",
 	}
 
 	newSubscription.CreateAndAddNewResource(ref)

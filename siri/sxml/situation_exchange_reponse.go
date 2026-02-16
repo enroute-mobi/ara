@@ -794,7 +794,7 @@ func (wa *XMLPublishToMobileAction) HomePage() *bool {
 }
 
 func (visit *XMLPtSituationElement) PublishToDisplayActions() []*XMLPublishToDisplayAction {
-		if len(visit.publishToDisplayActions) == 0 {
+	if len(visit.publishToDisplayActions) == 0 {
 		nodes := visit.findNodes("PublishToDisplayAction")
 		for _, publishToDisplay := range nodes {
 			visit.publishToDisplayActions = append(visit.publishToDisplayActions, NewXMLPublishToDisplayAction(publishToDisplay))

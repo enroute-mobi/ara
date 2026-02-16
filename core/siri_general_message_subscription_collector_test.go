@@ -74,7 +74,7 @@ func Test_SIRIGeneralMessageSubscriptionCollector(t *testing.T) {
 	assert.Equal("http://example.com/test/siri", request.ConsumerAddress())
 	assert.Len(request.XMLSubscriptionGMEntries(), 1)
 	assert.ElementsMatch(
-	   request.XMLSubscriptionGMEntries()[0].LineRef(),
+		request.XMLSubscriptionGMEntries()[0].LineRef(),
 		[]string{"line value", "line value2"},
 	)
 }

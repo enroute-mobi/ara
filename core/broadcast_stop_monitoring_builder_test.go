@@ -44,7 +44,7 @@ func Test_EstimatedTimetableBroadcaster_BuildDepartureSchedues(t *testing.T) {
 	}{
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "expected",
 					departureTime: timeA,
 				},
@@ -55,7 +55,7 @@ if only Expected time is provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeA,
 				},
@@ -66,7 +66,7 @@ if only Aimed time is provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "actual",
 					departureTime: timeA,
 				},
@@ -77,11 +77,11 @@ if only Actual time is provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "expected",
 					departureTime: timeA,
 				},
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeB,
 				},
@@ -93,15 +93,15 @@ and AimedDepartureTime if Expected and Aimed time are provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "expected",
 					departureTime: timeA,
 				},
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeB,
 				},
-				schedule{
+				{
 					kind:          "actual",
 					departureTime: timeC,
 				},
@@ -113,11 +113,11 @@ and AimedDepartureTime if Expected and Aimed time are provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "actual",
 					departureTime: timeC,
 				},
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeB,
 				},
@@ -182,7 +182,7 @@ func Test_EstimatedTimetableBroadcaster_BuildArrivalSchedues(t *testing.T) {
 	}{
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "expected",
 					departureTime: timeA,
 				},
@@ -193,7 +193,7 @@ if only Expected time is provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeA,
 				},
@@ -204,7 +204,7 @@ if only Aimed time is provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "actual",
 					departureTime: timeA,
 				},
@@ -215,11 +215,11 @@ if only Actual time is provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "expected",
 					departureTime: timeA,
 				},
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeB,
 				},
@@ -231,15 +231,15 @@ and AimedArrivalTime if Expected and Aimed time are provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "expected",
 					departureTime: timeA,
 				},
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeB,
 				},
-				schedule{
+				{
 					kind:          "actual",
 					departureTime: timeC,
 				},
@@ -251,11 +251,11 @@ and AimedArrivalTime if Expected and Aimed time are provided`,
 		},
 		{
 			schedules: []schedule{
-				schedule{
+				{
 					kind:          "actual",
 					departureTime: timeC,
 				},
-				schedule{
+				{
 					kind:          "aimed",
 					departureTime: timeB,
 				},

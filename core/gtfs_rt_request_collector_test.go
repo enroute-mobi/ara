@@ -182,7 +182,7 @@ func tripUpdate() *gtfs.FeedEntity {
 				RouteId: &rid,
 			},
 			StopTimeUpdate: []*gtfs.TripUpdate_StopTimeUpdate{
-				&gtfs.TripUpdate_StopTimeUpdate{
+				{
 					StopSequence: &ss1,
 					StopId:       &sid1,
 					Arrival: &gtfs.TripUpdate_StopTimeEvent{
@@ -192,7 +192,7 @@ func tripUpdate() *gtfs.FeedEntity {
 						Time: &dt1,
 					},
 				},
-				&gtfs.TripUpdate_StopTimeUpdate{
+				{
 					StopSequence: &ss2,
 					StopId:       &sid2,
 					Arrival: &gtfs.TripUpdate_StopTimeEvent{

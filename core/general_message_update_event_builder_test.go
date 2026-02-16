@@ -423,7 +423,7 @@ func Test_setAffectedDestination(t *testing.T) {
 			expectedAffectedLine: &model.AffectedLine{
 				LineId: line.Id(),
 				AffectedDestinations: []*model.AffectedDestination{
-					&model.AffectedDestination{StopAreaId: stopArea.Id()},
+					{StopAreaId: stopArea.Id()},
 				},
 			},
 			message: "Should create an AffectedDestination for known StopArea",
@@ -513,7 +513,7 @@ func Test_setAffectedSection(t *testing.T) {
 			expectedAffectedLine: &model.AffectedLine{
 				LineId: line.Id(),
 				AffectedSections: []*model.AffectedSection{
-					&model.AffectedSection{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
+					{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
 				},
 			},
 			message: "Should create an AffectedSection if lineRef, firstStop and lastStop exists",
@@ -526,10 +526,10 @@ func Test_setAffectedSection(t *testing.T) {
 			expectedAffectedLine: &model.AffectedLine{
 				LineId: line.Id(),
 				AffectedSections: []*model.AffectedSection{
-					&model.AffectedSection{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
+					{FirstStop: firstStop.Id(), LastStop: lastStop.Id()},
 				},
 				AffectedDestinations: []*model.AffectedDestination{
-					&model.AffectedDestination{StopAreaId: firstStop.Id()},
+					{StopAreaId: firstStop.Id()},
 				},
 			},
 			message: "Should add AffectedSection to existing AffectedLine",
@@ -549,7 +549,7 @@ func Test_setAffectedSection(t *testing.T) {
 			existingAffectedLine := &model.AffectedLine{
 				LineId: line.Id(),
 				AffectedDestinations: []*model.AffectedDestination{
-					&model.AffectedDestination{StopAreaId: firstStop.Id()},
+					{StopAreaId: firstStop.Id()},
 				},
 			}
 			affectedLines[line.Id()] = existingAffectedLine

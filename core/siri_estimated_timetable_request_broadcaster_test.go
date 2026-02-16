@@ -22,7 +22,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                   "codeSpace",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -188,7 +188,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                   "codeSpace",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -322,7 +322,7 @@ func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 
 	apiPartner.Settings = map[string]string{
 		"remote_code_space": "remote_code_space",
-		"local_credential":     "local_credential",
+		"local_credential":  "local_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {

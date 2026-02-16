@@ -91,7 +91,7 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) RequestStopAreaUpdate(
 	newSubscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
 	ref := model.Reference{
 		Code: &stopAreaCode,
-		Type:     "StopArea",
+		Type: "StopArea",
 	}
 
 	newSubscription.CreateAndAddNewResource(ref)
