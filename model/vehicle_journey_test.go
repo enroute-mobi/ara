@@ -221,7 +221,7 @@ func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
 	ok = vehicleJourneys.FullVehicleJourneyExistBySubscriptionId("subscription2", existingVehicleJourney.id)
 	assert.False(ok, "Deleted VehicleJourney should not exist in full broadcasted list for subscription 2")
 
-	assert.Equal(vehicleJourneys.TestLenFullVehicleJourneyBySubscriptionId(), 0, "List of full broadcasted Vehicle journey must be empty")
+	assert.Equal(vehicleJourneys.(*memoryVehicleJourneys).testLenFullVehicleJourneyBySubscriptionId(), 0, "List of full broadcasted Vehicle journey must be empty")
 }
 
 func Test_MemoryVehicleJourneys_Load(t *testing.T) {
@@ -248,12 +248,12 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	vehicleJourneys := model.VehicleJourneys().(*MemoryVehicleJourneys)
+	})
+	vehicleJourneys := model.VehicleJourneys().(*memoryVehicleJourneys)
 	err = vehicleJourneys.Load("referential")
 	if err != nil {
 		t.Fatal(err)

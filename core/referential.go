@@ -38,7 +38,7 @@ type Referential struct {
 	collectManager    CollectManagerInterface
 	broacasterManager BroadcastManagerInterface
 	manager           Referentials
-	model             *model.MemoryModel
+	model             model.Model
 	modelGuardian     *ModelGuardian
 	partners          Partners
 	partnerTemplates  PartnerTemplates

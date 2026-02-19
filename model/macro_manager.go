@@ -12,31 +12,34 @@ import (
 type macros [][][]Macro
 
 type Macros interface {
+	Loadable
+
+	SetModel(Model)
 	GetMacros(hooks.Type, model_types.Model) []Macro
 }
 
-type MacroManager struct {
-	mutex *sync.RWMutex
+type macroManager struct {
+	memoryManager
 
-	model  *MemoryModel
+	mutex  *sync.RWMutex
 	macros macros
 }
 
-func NewMacroManager() *MacroManager {
-	m := &MacroManager{
+func NewMacroManager() Macros {
+	m := &macroManager{
 		mutex: &sync.RWMutex{},
 	}
 	m.reset()
 	return m
 }
 
-func (mm *MacroManager) Reset() {
+func (mm *macroManager) Reset() {
 	mm.mutex.Lock()
 	mm.reset()
 	mm.mutex.Unlock()
 }
 
-func (mm *MacroManager) reset() {
+func (mm *macroManager) reset() {
 	mm.macros = make([][][]Macro, hooks.Total)
 	for i := range hooks.Total {
 		mm.macros[i] = make([][]Macro, model_types.Total)
@@ -57,7 +60,7 @@ func (mm *MacroManager) setMacro(h hooks.Type, t ModelType, m Macro) {
 */
 
 // If we ask for AfterCreate, we'll also get AfterSave Macros
-func (mm MacroManager) GetMacros(h hooks.Type, t model_types.Model) (m []Macro) {
+func (mm macroManager) GetMacros(h hooks.Type, t model_types.Model) (m []Macro) {
 	for i := h; i < hooks.Total; i++ {
 		m = append(m, mm.macros[i][t]...)
 	}
@@ -65,7 +68,7 @@ func (mm MacroManager) GetMacros(h hooks.Type, t model_types.Model) (m []Macro) 
 }
 
 type macroBuilder struct {
-	manager        *MacroManager
+	manager        *macroManager
 	initialContext []*macroContextBuilder
 	contexes       map[string]*macroContextBuilder
 }
@@ -149,7 +152,7 @@ func (b *macroBuilder) handleContexes(c *macroContextBuilder, m *Macro) []error 
 	return e
 }
 
-func (manager *MacroManager) Load(referentialSlug string) error {
+func (manager *macroManager) Load(referentialSlug string) error {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 

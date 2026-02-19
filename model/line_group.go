@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
-
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type LineGroupId ModelId
@@ -38,10 +36,9 @@ func (lineGroup *LineGroup) Save() bool {
 	return lineGroup.model.LineGroups().Save(lineGroup)
 }
 
-type MemoryLineGroups struct {
-	uuid.UUIDConsumer
+type memoryLineGroups struct {
+	memoryManager
 
-	model *MemoryModel
 	mutex *sync.RWMutex
 
 	byIdentifier map[LineGroupId]*LineGroup
@@ -49,26 +46,21 @@ type MemoryLineGroups struct {
 }
 
 type LineGroups interface {
-	uuid.UUIDInterface
+	ModelManager[LineGroupId, *LineGroup]
+	Loadable
 
-	New() *LineGroup
-
-	Find(LineGroupId) (*LineGroup, bool)
 	FindByShortName(string) (*LineGroup, bool)
-	FindAll() []*LineGroup
-	Save(*LineGroup) bool
-	Delete(*LineGroup) bool
 }
 
-func NewMemoryLineGroups() *MemoryLineGroups {
-	return &MemoryLineGroups{
+func NewMemoryLineGroups() LineGroups {
+	return &memoryLineGroups{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineGroupId]*LineGroup),
 		byShortName:  make(map[string]*LineGroup),
 	}
 }
 
-func (manager *MemoryLineGroups) Find(id LineGroupId) (*LineGroup, bool) {
+func (manager *memoryLineGroups) Find(id LineGroupId) (*LineGroup, bool) {
 	manager.mutex.RLock()
 	lineGroup, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -79,7 +71,7 @@ func (manager *MemoryLineGroups) Find(id LineGroupId) (*LineGroup, bool) {
 	return &LineGroup{}, false
 }
 
-func (manager *MemoryLineGroups) FindByShortName(shortName string) (*LineGroup, bool) {
+func (manager *memoryLineGroups) FindByShortName(shortName string) (*LineGroup, bool) {
 	manager.mutex.RLock()
 	lineGroup, ok := manager.byShortName[shortName]
 	manager.mutex.RUnlock()
@@ -90,11 +82,11 @@ func (manager *MemoryLineGroups) FindByShortName(shortName string) (*LineGroup, 
 	return &LineGroup{}, false
 }
 
-func (manager *MemoryLineGroups) New() *LineGroup {
+func (manager *memoryLineGroups) New() *LineGroup {
 	return NewLineGroup(manager.model)
 }
 
-func (manager *MemoryLineGroups) FindAll() (lineGroups []*LineGroup) {
+func (manager *memoryLineGroups) FindAll() (lineGroups []*LineGroup) {
 	manager.mutex.RLock()
 
 	for _, lineGroup := range manager.byIdentifier {
@@ -105,7 +97,7 @@ func (manager *MemoryLineGroups) FindAll() (lineGroups []*LineGroup) {
 	return
 }
 
-func (manager *MemoryLineGroups) Save(lineGroup *LineGroup) bool {
+func (manager *memoryLineGroups) Save(lineGroup *LineGroup) bool {
 	manager.mutex.Lock()
 
 	if lineGroup.Id() == "" {
@@ -119,7 +111,7 @@ func (manager *MemoryLineGroups) Save(lineGroup *LineGroup) bool {
 	return true
 }
 
-func (manager *MemoryLineGroups) Delete(lineGroup *LineGroup) bool {
+func (manager *memoryLineGroups) Delete(lineGroup *LineGroup) bool {
 	manager.mutex.Lock()
 
 	delete(manager.byIdentifier, lineGroup.Id())
@@ -143,7 +135,7 @@ func (lineGroup *LineGroup) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (manager *MemoryLineGroups) Load(referentialSlug string) error {
+func (manager *memoryLineGroups) Load(referentialSlug string) error {
 	var selectLineGroups []SelectLineGroup
 	modelDate := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from line_groups where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())

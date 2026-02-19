@@ -17,7 +17,7 @@ type createCodeUpdaterAttributes struct {
 	TargetPattern   string `json:"target_pattern"`
 }
 
-func NewCreateCodeUpdater(m *MemoryModel, sm *SelectMacro) (updater, error) {
+func NewCreateCodeUpdater(m Model, sm *SelectMacro) (updater, error) {
 	if !sm.Attributes.Valid {
 		return nil, errors.New("empty Attributes")
 	}
@@ -55,18 +55,18 @@ func NewCreateCodeUpdater(m *MemoryModel, sm *SelectMacro) (updater, error) {
 	}, nil
 }
 
-func manager(m *MemoryModel, t string) ModelManager {
+func manager(m Model, t string) CodeValidator {
 	switch t {
 	case "StopArea":
-		return m.stopAreas
+		return m.StopAreas()
 	case "Line":
-		return m.lines
+		return m.Lines()
 	case "VehicleJourney":
-		return m.vehicleJourneys
+		return m.VehicleJourneys()
 	case "StopVisit":
-		return m.stopVisits
+		return m.StopVisits()
 	case "Vehicle":
-		return m.vehicles
+		return m.Vehicles()
 	}
 	return nil
 }

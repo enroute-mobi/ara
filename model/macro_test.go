@@ -11,7 +11,7 @@ import (
 func Test_MacroBuilder_Ok(t *testing.T) {
 	assert := assert.New(t)
 
-	manager := NewMacroManager()
+	manager := NewMacroManager().(*macroManager)
 
 	sm := &SelectMacro{
 		Id:              "id",
@@ -42,7 +42,7 @@ func Test_MacroBuilder_Ok(t *testing.T) {
 func Test_MacroBuilder_NOk(t *testing.T) {
 	assert := assert.New(t)
 
-	manager := NewMacroManager()
+	manager := NewMacroManager().(*macroManager)
 
 	sm := &SelectMacro{
 		Id:              "id",
@@ -73,8 +73,8 @@ func Test_MacroBuilder_NOk(t *testing.T) {
 func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
-	manager := NewMacroManager()
+	model := NewTestMemoryModel().(*memoryModel)
+	manager := NewMacroManager().(*macroManager)
 
 	smc := &SelectMacro{
 		Id:              "id",

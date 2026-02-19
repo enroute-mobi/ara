@@ -56,7 +56,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 
 	manager.Update(event)
 
-	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
 	assert.Equal(stopVisit.Id(), updatedVehicle.NextStopVisitId)
 }
@@ -105,7 +105,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 
 	manager.Update(event)
 
-	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
 	assert.Equal(StopVisitId(""), updatedVehicle.NextStopVisitId)
 }
@@ -153,7 +153,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVis
 
 	manager.Update(event)
 
-	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
 	assert.Equal(stopVisit.Id(), updatedVehicle.NextStopVisitId)
 }
@@ -208,7 +208,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 
 	manager.Update(event)
 
-	updatedVehicle, _ := model.vehicles.Find(vehicle.Id())
+	updatedVehicle, _ := model.Vehicles().Find(vehicle.Id())
 
 	assert.Equal(StopVisitId(""), updatedVehicle.NextStopVisitId)
 }
@@ -491,12 +491,12 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	vehicleJourneys := model.VehicleJourneys().(*MemoryVehicleJourneys)
+	})
+	vehicleJourneys := model.VehicleJourneys().(*memoryVehicleJourneys)
 	err = vehicleJourneys.Load("referential")
 	if err != nil {
 		t.Fatal(err)
@@ -581,7 +581,7 @@ func Test_FacilityUpdateManager_Update_With_Wrong_Status(t *testing.T) {
 	}
 
 	manager.Update(event)
-	updatedFacility, _ := model.facilities.Find(facility.id)
+	updatedFacility, _ := model.Facilities().Find(facility.id)
 	assert.Equal(FacilityStatusPartiallyAvailable, updatedFacility.Status, "Should keep existing Status if new Status does not match enum status")
 }
 
@@ -603,7 +603,7 @@ func Test_FacilityUpdateManager_Update_With_Known_Status(t *testing.T) {
 	}
 
 	manager.Update(event)
-	updatedFacility, _ := model.facilities.Find(facility.id)
+	updatedFacility, _ := model.Facilities().Find(facility.id)
 	assert.Equal(FacilityStatusAvailable, updatedFacility.Status, "Should change existing Status if new Status matches enum status")
 }
 

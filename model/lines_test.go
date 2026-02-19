@@ -217,12 +217,12 @@ func Test_MemoryLines_Load(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	lines := model.Lines().(*MemoryLines)
+	})
+	lines := model.Lines().(*memoryLines)
 	err = lines.Load("referential")
 	if err != nil {
 		t.Fatal(err)

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/model/schedules"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 const (
@@ -55,7 +54,7 @@ func NewVehicleJourney(model Model) *VehicleJourney {
 		RawAttributes: NewRawAttributes(),
 		References:    NewReferences(),
 	}
-	vehicleJourney.codes = make(Codes)
+	vehicleJourney.InitCodes()
 	return vehicleJourney
 }
 
@@ -179,7 +178,7 @@ func (vehicleJourney *VehicleJourney) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		vehicleJourney.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		vehicleJourney.SetCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -206,11 +205,9 @@ func (vehicleJourney *VehicleJourney) Save() bool {
 	return vehicleJourney.model.VehicleJourneys().Save(vehicleJourney)
 }
 
-type MemoryVehicleJourneys struct {
-	uuid.UUIDConsumer
+type memoryVehicleJourneys struct {
 	IndexHandler
-
-	model Model
+	memoryManager
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleJourneyId]*VehicleJourney
@@ -218,22 +215,18 @@ type MemoryVehicleJourneys struct {
 }
 
 type VehicleJourneys interface {
-	uuid.UUIDInterface
+	ModelManager[VehicleJourneyId, *VehicleJourney]
+	CodeHandler[*VehicleJourney]
+	Loadable
 
-	New() *VehicleJourney
-	Find(VehicleJourneyId) (*VehicleJourney, bool)
-	FindByCode(code Code) (*VehicleJourney, bool)
 	FindByLineId(LineId) []*VehicleJourney
 	FullVehicleJourneyExistBySubscriptionId(string, VehicleJourneyId) bool
-	FindAll() []*VehicleJourney
-	Save(*VehicleJourney) bool
 	SetFullVehicleJourneyBySubscriptionId(string, VehicleJourneyId)
-	Delete(*VehicleJourney) bool
 	DeleteById(VehicleJourneyId) bool
 }
 
-func NewMemoryVehicleJourneys() (m *MemoryVehicleJourneys) {
-	m = &MemoryVehicleJourneys{
+func NewMemoryVehicleJourneys() VehicleJourneys {
+	m := &memoryVehicleJourneys{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleJourneyId]*VehicleJourney),
 		byBroadcastedFull: make(map[string]map[VehicleJourneyId]struct{}),
@@ -241,14 +234,14 @@ func NewMemoryVehicleJourneys() (m *MemoryVehicleJourneys) {
 	m.InitIndexes()
 	m.AddIndex(ByLine, OneToMany, VjLineExtractor)
 
-	return
+	return m
 }
 
-func (manager *MemoryVehicleJourneys) New() *VehicleJourney {
+func (manager *memoryVehicleJourneys) New() *VehicleJourney {
 	return NewVehicleJourney(manager.model)
 }
 
-func (manager *MemoryVehicleJourneys) SetFullVehicleJourneyBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) {
+func (manager *memoryVehicleJourneys) SetFullVehicleJourneyBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) {
 	manager.mutex.Lock()
 	vjIds, ok := manager.byBroadcastedFull[id]
 	if !ok {
@@ -259,7 +252,7 @@ func (manager *MemoryVehicleJourneys) SetFullVehicleJourneyBySubscriptionId(id s
 	manager.mutex.Unlock()
 }
 
-func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) bool {
+func (manager *memoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id string, vehicleJourneyId VehicleJourneyId) bool {
 	manager.mutex.RLock()
 	_, ok := manager.byBroadcastedFull[id][vehicleJourneyId]
 	manager.mutex.RUnlock()
@@ -267,13 +260,14 @@ func (manager *MemoryVehicleJourneys) FullVehicleJourneyExistBySubscriptionId(id
 	return ok
 }
 
-func (manager *MemoryVehicleJourneys) TestLenFullVehicleJourneyBySubscriptionId() int {
+// Test method
+func (manager *memoryVehicleJourneys) testLenFullVehicleJourneyBySubscriptionId() int {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 	return len(manager.byBroadcastedFull)
 }
 
-func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney, bool) {
+func (manager *memoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney, bool) {
 	manager.mutex.RLock()
 	vehicleJourney, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -284,7 +278,7 @@ func (manager *MemoryVehicleJourneys) Find(id VehicleJourneyId) (*VehicleJourney
 	return &VehicleJourney{}, false
 }
 
-func (manager *MemoryVehicleJourneys) FindByCode(code Code) (*VehicleJourney, bool) {
+func (manager *memoryVehicleJourneys) FindByCode(code Code) (*VehicleJourney, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -296,7 +290,7 @@ func (manager *MemoryVehicleJourneys) FindByCode(code Code) (*VehicleJourney, bo
 	return &VehicleJourney{}, false
 }
 
-func (manager *MemoryVehicleJourneys) CodeExists(code Code) bool {
+func (manager *memoryVehicleJourneys) CodeExists(code Code) bool {
 	manager.mutex.RLock()
 	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
@@ -304,7 +298,7 @@ func (manager *MemoryVehicleJourneys) CodeExists(code Code) bool {
 	return ok
 }
 
-func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []*VehicleJourney) {
+func (manager *memoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []*VehicleJourney) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.FindBy(ByLine, ModelId(id))
@@ -318,7 +312,7 @@ func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys [
 	return
 }
 
-func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []*VehicleJourney) {
+func (manager *memoryVehicleJourneys) FindAll() (vehicleJourneys []*VehicleJourney) {
 	manager.mutex.RLock()
 
 	for _, vehicleJourney := range manager.byIdentifier {
@@ -329,7 +323,7 @@ func (manager *MemoryVehicleJourneys) FindAll() (vehicleJourneys []*VehicleJourn
 	return
 }
 
-func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool {
+func (manager *memoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -344,11 +338,11 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 	return true
 }
 
-func (manager *MemoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) bool {
+func (manager *memoryVehicleJourneys) Delete(vehicleJourney *VehicleJourney) bool {
 	return manager.DeleteById(vehicleJourney.id)
 }
 
-func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
+func (manager *memoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -364,7 +358,7 @@ func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	return true
 }
 
-func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
+func (manager *memoryVehicleJourneys) Load(referentialSlug string) error {
 	var selectVehicleJourneys []SelectVehicleJourney
 	modelDate := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from vehicle_journeys where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
@@ -414,7 +408,7 @@ func (manager *MemoryVehicleJourneys) Load(referentialSlug string) error {
 			if err = json.Unmarshal([]byte(vj.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			vehicleJourney.codes = NewCodesFromMap(codeMap)
+			vehicleJourney.SetCodesFromMap(codeMap)
 		}
 
 		manager.Save(vehicleJourney)

@@ -11,7 +11,6 @@ import (
 	e "bitbucket.org/enroute-mobi/ara/core/apierrs"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 	"github.com/sym01/htmlsanitizer"
 	"golang.org/x/exp/maps"
 )
@@ -24,6 +23,8 @@ const (
 	SituationTypeLine           SituationType = "Line"
 	SituationTypeStopArea       SituationType = "StopArea"
 	SituationTypeAllLines       SituationType = "AllLines"
+	GMbroadcastEvent                          = "GMbroadcastEvent"
+	SXbroadcastEvent                          = "SXbroadcastEvent"
 )
 
 type ReportType string
@@ -265,7 +266,7 @@ func NewSituation(model Model) *Situation {
 		model: model,
 	}
 
-	situation.codes = make(Codes)
+	situation.InitCodes()
 	return situation
 }
 
@@ -350,7 +351,7 @@ func (situation *APISituation) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		situation.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		situation.SetCodesFromMap(aux.Codes)
 	}
 
 	situation.Summary = aux.Summary
@@ -664,7 +665,7 @@ func (situation *Situation) Definition() *APISituation {
 		IgnoreValidation:        false,
 	}
 
-	apiSituation.codes = make(Codes)
+	apiSituation.InitCodes()
 	return apiSituation
 }
 
@@ -696,7 +697,7 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 
 	if apiSituation.codes.Empty() {
 		if apiSituation.CodeSpace != "" && apiSituation.SituationNumber != "" {
-			situation.codes = make(Codes)
+			situation.InitCodes()
 			code := NewCode(apiSituation.CodeSpace, apiSituation.SituationNumber)
 			situation.SetCode(code)
 		}
@@ -706,40 +707,47 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 	}
 }
 
-type MemorySituations struct {
-	uuid.UUIDConsumer
-
-	model *MemoryModel
+type memorySituations struct {
+	memoryManager
 
 	mutex            *sync.RWMutex
 	GMbroadcastEvent func(event SituationBroadcastEvent)
 	SXbroadcastEvent func(event SituationBroadcastEvent)
 	byIdentifier     map[SituationId]*Situation
+	byCode           *CodeIndex
 }
 
 type Situations interface {
-	uuid.UUIDInterface
-
-	New() *Situation
-	Find(id SituationId) (*Situation, bool)
-	FindByCode(code Code) (*Situation, bool)
-	FindAll() []*Situation
-	Save(situation *Situation) bool
-	Delete(situation *Situation) bool
+	ModelManager[SituationId, *Situation]
+	CodeHandler[*Situation]
+	Broadcaster[SituationBroadcastEvent]
 }
 
-func NewMemorySituations() *MemorySituations {
-	return &MemorySituations{
+func NewMemorySituations() Situations {
+	return &memorySituations{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[SituationId]*Situation),
+		byCode:       NewCodeIndex(),
 	}
 }
 
-func (manager *MemorySituations) New() *Situation {
+func (manager *memorySituations) SetBroadcaster(f func(SituationBroadcastEvent), t ...string) {
+	if len(t) != 1 {
+		return
+	}
+	switch t[0] {
+	case GMbroadcastEvent:
+		manager.GMbroadcastEvent = f
+	case SXbroadcastEvent:
+		manager.SXbroadcastEvent = f
+	}
+}
+
+func (manager *memorySituations) New() *Situation {
 	return NewSituation(manager.model)
 }
 
-func (manager *MemorySituations) Find(id SituationId) (*Situation, bool) {
+func (manager *memorySituations) Find(id SituationId) (*Situation, bool) {
 	manager.mutex.RLock()
 	situation, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -750,7 +758,7 @@ func (manager *MemorySituations) Find(id SituationId) (*Situation, bool) {
 	return &Situation{}, false
 }
 
-func (manager *MemorySituations) FindAll() (situations []*Situation) {
+func (manager *memorySituations) FindAll() (situations []*Situation) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -760,20 +768,27 @@ func (manager *MemorySituations) FindAll() (situations []*Situation) {
 	return
 }
 
-func (manager *MemorySituations) FindByCode(code Code) (*Situation, bool) {
+func (manager *memorySituations) FindByCode(code Code) (*Situation, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	for _, situation := range manager.byIdentifier {
-		situationCode, _ := situation.Code(code.CodeSpace())
-		if situationCode.Value() == code.Value() {
-			return situation.copy(), true
-		}
+	id, ok := manager.byCode.Find(code)
+	if ok {
+		return manager.byIdentifier[SituationId(id)].copy(), true
 	}
+
 	return &Situation{}, false
 }
 
-func (manager *MemorySituations) Save(situation *Situation) bool {
+func (manager *memorySituations) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
+}
+
+func (manager *memorySituations) Save(situation *Situation) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -782,6 +797,7 @@ func (manager *MemorySituations) Save(situation *Situation) bool {
 	}
 	situation.model = manager.model
 	manager.byIdentifier[situation.Id()] = situation
+	manager.byCode.Index(situation)
 
 	event := SituationBroadcastEvent{
 		SituationId: situation.id,
@@ -797,11 +813,13 @@ func (manager *MemorySituations) Save(situation *Situation) bool {
 	return true
 }
 
-func (manager *MemorySituations) Delete(situation *Situation) bool {
+func (manager *memorySituations) Delete(situation *Situation) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, situation.Id())
+	manager.byCode.Delete(ModelId(situation.id))
+
 	return true
 }
 

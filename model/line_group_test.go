@@ -179,12 +179,12 @@ func Test_MemoryLineGroups_Load(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	lineGroups := model.LineGroups().(*MemoryLineGroups)
+	})
+	lineGroups := model.LineGroups().(*memoryLineGroups)
 	err = lineGroups.Load("referential")
 	require.NoError(err)
 

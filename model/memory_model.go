@@ -3,52 +3,33 @@ package model
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-type ModelId string
+type memoryManager struct {
+	uuid.UUIDConsumer
 
-type ModelInstance interface {
-	CodeConsumerInterface
-
-	ModelId() ModelId
+	model Model
 }
 
-type ModelManager interface {
-	CodeExists(Code) bool
+func (mm *memoryManager) SetModel(m Model) {
+	mm.model = m
 }
 
-type Model interface {
-	Date() Date
-	Referential() string
-	Lines() Lines
-	LineGroups() LineGroups
-	StopAreaGroups() StopAreaGroups
-	Situations() Situations
-	StopAreas() StopAreas
-	StopVisits() StopVisits
-	ScheduledStopVisits() StopVisits
-	VehicleJourneys() VehicleJourneys
-	Operators() Operators
-	Vehicles() Vehicles
-	Macros() Macros
-	Controls() Controls
-	Facilities() Facilities
-}
-
-type MemoryModel struct {
-	lines               *MemoryLines
-	lineGroups          *MemoryLineGroups
-	stopAreaGroups      *MemoryStopAreaGroups
-	vehicles            *MemoryVehicles
-	stopAreas           *MemoryStopAreas
-	stopVisits          *MemoryStopVisits
-	scheduledStopVisits *MemoryStopVisits
-	vehicleJourneys     *MemoryVehicleJourneys
-	situations          *MemorySituations
-	operators           *MemoryOperators
-	macros              *MacroManager
-	controls            *ControlManager
-	facilities          *MemoryFacilities
+type memoryModel struct {
+	lines               Lines
+	lineGroups          LineGroups
+	stopAreaGroups      StopAreaGroups
+	vehicles            Vehicles
+	stopAreas           StopAreas
+	stopVisits          StopVisits
+	scheduledStopVisits StopVisits
+	vehicleJourneys     VehicleJourneys
+	situations          Situations
+	operators           Operators
+	macros              Macros
+	controls            Controls
+	facilities          Facilities
 	SMEventsChan        chan StopMonitoringBroadcastEvent
 	GMEventsChan        chan SituationBroadcastEvent
 	SXEventsChan        chan SituationBroadcastEvent
@@ -58,8 +39,8 @@ type MemoryModel struct {
 	date                Date
 }
 
-func NewMemoryModel(referential string) *MemoryModel {
-	model := &MemoryModel{
+func NewMemoryModel(referential string) Model {
+	model := &memoryModel{
 		date:        NewDate(clock.DefaultClock().Now()),
 		referential: referential,
 	}
@@ -69,8 +50,8 @@ func NewMemoryModel(referential string) *MemoryModel {
 	return model
 }
 
-func NewTestMemoryModel(referential ...string) *MemoryModel {
-	model := &MemoryModel{
+func NewTestMemoryModel(referential ...string) Model {
+	model := &memoryModel{
 		date: NewDate(clock.DefaultClock().Now()),
 	}
 
@@ -83,103 +64,103 @@ func NewTestMemoryModel(referential ...string) *MemoryModel {
 	return model
 }
 
-func (model *MemoryModel) refresh() {
+func (model *memoryModel) refresh() {
 	lines := NewMemoryLines()
-	lines.model = model
+	lines.SetModel(model)
 	model.lines = lines
 
 	situations := NewMemorySituations()
-	situations.model = model
+	situations.SetModel(model)
 	model.situations = situations
-	model.situations.GMbroadcastEvent = model.broadcastGMEvent
-	model.situations.SXbroadcastEvent = model.broadcastSXEvent
+	model.situations.SetBroadcaster(model.broadcastGMEvent, GMbroadcastEvent)
+	model.situations.SetBroadcaster(model.broadcastSXEvent, SXbroadcastEvent)
 
 	stopAreas := NewMemoryStopAreas()
-	stopAreas.model = model
+	stopAreas.SetModel(model)
 	model.stopAreas = stopAreas
-	model.stopAreas.broadcastEvent = model.broadcastSMEvent
+	model.stopAreas.SetBroadcaster(model.broadcastSMEvent)
 
 	stopVisits := NewMemoryStopVisits()
-	stopVisits.model = model
+	stopVisits.SetModel(model)
 	model.stopVisits = stopVisits
-	model.stopVisits.broadcastEvent = model.broadcastSMEvent
+	model.stopVisits.SetBroadcaster(model.broadcastSMEvent)
 
 	scheduledStopVisits := NewMemoryStopVisits()
-	scheduledStopVisits.model = model
+	scheduledStopVisits.SetModel(model)
 	model.scheduledStopVisits = scheduledStopVisits
 
 	vehicleJourneys := NewMemoryVehicleJourneys()
-	vehicleJourneys.model = model
+	vehicleJourneys.SetModel(model)
 	model.vehicleJourneys = vehicleJourneys
 
 	operators := NewMemoryOperators()
-	operators.model = model
+	operators.SetModel(model)
 	model.operators = operators
 
 	lineGroups := NewMemoryLineGroups()
-	lineGroups.model = model
+	lineGroups.SetModel(model)
 	model.lineGroups = lineGroups
 
 	stopAreaGroups := NewMemoryStopAreaGroups()
-	stopAreaGroups.model = model
+	stopAreaGroups.SetModel(model)
 	model.stopAreaGroups = stopAreaGroups
 
 	vehicles := NewMemoryVehicles()
-	vehicles.model = model
+	vehicles.SetModel(model)
 	model.vehicles = vehicles
-	model.vehicles.broadcastEvent = model.broadcastVeEvent
+	model.vehicles.SetBroadcaster(model.broadcastVeEvent)
 
 	macros := NewMacroManager()
-	macros.model = model
+	macros.SetModel(model)
 	model.macros = macros
 
 	facilities := NewMemoryFacilities()
-	facilities.model = model
+	facilities.SetModel(model)
 	model.facilities = facilities
-	model.facilities.broadcastEvent = model.broadcastFMEvent
+	model.facilities.SetBroadcaster(model.broadcastFMEvent)
 
 	model.controls = NewControlManager()
 }
 
-func (model *MemoryModel) RefreshMacros() {
+func (model *memoryModel) RefreshMacros() {
 	model.macros = NewMacroManager()
 	model.macros.Load(model.referential)
 }
 
-func (model *MemoryModel) RefreshControls() {
+func (model *memoryModel) RefreshControls() {
 	model.controls = NewControlManager()
 	model.controls.Load(model.referential)
 }
 
-func (model *MemoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
+func (model *memoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
 	model.SMEventsChan = broadcastSMEventChan
 }
 
-func (model *MemoryModel) SetBroadcastGMChan(broadcastGMEventChan chan SituationBroadcastEvent) {
+func (model *memoryModel) SetBroadcastGMChan(broadcastGMEventChan chan SituationBroadcastEvent) {
 	model.GMEventsChan = broadcastGMEventChan
 }
 
-func (model *MemoryModel) SetBroadcastSXChan(broadcastSXEventChan chan SituationBroadcastEvent) {
+func (model *memoryModel) SetBroadcastSXChan(broadcastSXEventChan chan SituationBroadcastEvent) {
 	model.SXEventsChan = broadcastSXEventChan
 }
 
-func (model *MemoryModel) SetBroadcastVeChan(broadcastVeEventChan chan VehicleBroadcastEvent) {
+func (model *memoryModel) SetBroadcastVeChan(broadcastVeEventChan chan VehicleBroadcastEvent) {
 	model.VeEventChan = broadcastVeEventChan
 }
 
-func (model *MemoryModel) SetBroadcastFMChan(broadcastFMEventChan chan FacilityBroadcastEvent) {
+func (model *memoryModel) SetBroadcastFMChan(broadcastFMEventChan chan FacilityBroadcastEvent) {
 	model.FMEventChan = broadcastFMEventChan
 }
 
-func (model *MemoryModel) Referential() string {
+func (model *memoryModel) Referential() string {
 	return model.referential
 }
 
-func (model *MemoryModel) SetReferential(referential string) {
+func (model *memoryModel) SetReferential(referential string) {
 	model.referential = referential
 }
 
-func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
+func (model *memoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
 	select {
 	case model.SMEventsChan <- event:
 	default:
@@ -187,7 +168,7 @@ func (model *MemoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) broadcastVeEvent(event VehicleBroadcastEvent) {
+func (model *memoryModel) broadcastVeEvent(event VehicleBroadcastEvent) {
 	select {
 	case model.VeEventChan <- event:
 	default:
@@ -195,7 +176,7 @@ func (model *MemoryModel) broadcastVeEvent(event VehicleBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) broadcastGMEvent(event SituationBroadcastEvent) {
+func (model *memoryModel) broadcastGMEvent(event SituationBroadcastEvent) {
 	select {
 	case model.GMEventsChan <- event:
 	default:
@@ -203,7 +184,7 @@ func (model *MemoryModel) broadcastGMEvent(event SituationBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) broadcastSXEvent(event SituationBroadcastEvent) {
+func (model *memoryModel) broadcastSXEvent(event SituationBroadcastEvent) {
 	select {
 	case model.SXEventsChan <- event:
 	default:
@@ -211,7 +192,7 @@ func (model *MemoryModel) broadcastSXEvent(event SituationBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) broadcastFMEvent(event FacilityBroadcastEvent) {
+func (model *memoryModel) broadcastFMEvent(event FacilityBroadcastEvent) {
 	select {
 	case model.FMEventChan <- event:
 	default:
@@ -219,70 +200,74 @@ func (model *MemoryModel) broadcastFMEvent(event FacilityBroadcastEvent) {
 	}
 }
 
-func (model *MemoryModel) Reload() *MemoryModel {
+func (model *memoryModel) Reload() Model {
 	model.refresh()
 	model.date = NewDate(clock.DefaultClock().Now())
 	model.Load()
 	return model
 }
 
-func (model *MemoryModel) Date() Date {
+func (model *memoryModel) Date() Date {
 	return model.date
 }
 
-func (model *MemoryModel) Situations() Situations {
+func (model *memoryModel) SetDate(d Date) {
+	model.date = d
+}
+
+func (model *memoryModel) Situations() Situations {
 	return model.situations
 }
 
-func (model *MemoryModel) StopAreas() StopAreas {
+func (model *memoryModel) StopAreas() StopAreas {
 	return model.stopAreas
 }
 
-func (model *MemoryModel) StopVisits() StopVisits {
+func (model *memoryModel) StopVisits() StopVisits {
 	return model.stopVisits
 }
 
-func (model *MemoryModel) ScheduledStopVisits() StopVisits {
+func (model *memoryModel) ScheduledStopVisits() StopVisits {
 	return model.scheduledStopVisits
 }
 
-func (model *MemoryModel) VehicleJourneys() VehicleJourneys {
+func (model *memoryModel) VehicleJourneys() VehicleJourneys {
 	return model.vehicleJourneys
 }
 
-func (model *MemoryModel) Lines() Lines {
+func (model *memoryModel) Lines() Lines {
 	return model.lines
 }
 
-func (model *MemoryModel) LineGroups() LineGroups {
+func (model *memoryModel) LineGroups() LineGroups {
 	return model.lineGroups
 }
 
-func (model *MemoryModel) StopAreaGroups() StopAreaGroups {
+func (model *memoryModel) StopAreaGroups() StopAreaGroups {
 	return model.stopAreaGroups
 }
 
-func (model *MemoryModel) Operators() Operators {
+func (model *memoryModel) Operators() Operators {
 	return model.operators
 }
 
-func (model *MemoryModel) Vehicles() Vehicles {
+func (model *memoryModel) Vehicles() Vehicles {
 	return model.vehicles
 }
 
-func (model *MemoryModel) Macros() Macros {
+func (model *memoryModel) Macros() Macros {
 	return model.macros
 }
 
-func (model *MemoryModel) Controls() Controls {
+func (model *memoryModel) Controls() Controls {
 	return model.controls
 }
 
-func (model *MemoryModel) Facilities() Facilities {
+func (model *memoryModel) Facilities() Facilities {
 	return model.facilities
 }
 
-func (model *MemoryModel) Load() error {
+func (model *memoryModel) Load() error {
 	err := model.stopAreas.Load(model.referential)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopAreas: %v", err)
