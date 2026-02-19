@@ -715,6 +715,7 @@ type memorySituations struct {
 	GMbroadcastEvent func(event SituationBroadcastEvent)
 	SXbroadcastEvent func(event SituationBroadcastEvent)
 	byIdentifier     map[SituationId]*Situation
+	byCode           *CodeIndex
 }
 
 type Situations interface {
@@ -727,6 +728,7 @@ func NewMemorySituations() Situations {
 	s := &memorySituations{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[SituationId]*Situation),
+		byCode:       NewCodeIndex(),
 	}
 	s.InitIndexes()
 	return s
