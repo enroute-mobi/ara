@@ -11,6 +11,8 @@ import (
 
 type LineId ModelId
 
+var lineReferentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Line)).ReferentId) }
+
 type Line struct {
 	Collectable
 	model      Model
@@ -176,13 +178,12 @@ func (line *Line) Save() bool {
 
 type MemoryLines struct {
 	uuid.UUIDConsumer
+	IndexHandler
 
 	model Model
 
 	mutex        *sync.RWMutex
 	byIdentifier map[LineId]*Line
-	byReferent   *Index
-	byCode       *CodeIndex
 }
 
 type Lines interface {
@@ -198,15 +199,15 @@ type Lines interface {
 	Delete(*Line) bool
 }
 
-func NewMemoryLines() *MemoryLines {
-	referentExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*Line)).ReferentId) }
-
-	return &MemoryLines{
+func NewMemoryLines() (m *MemoryLines) {
+	m = &MemoryLines{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineId]*Line),
-		byReferent:   NewIndex(referentExtractor),
-		byCode:       NewCodeIndex(),
 	}
+	m.InitIndexes()
+	m.AddIndex(ByReferent, OneToMany, lineReferentExtractor)
+
+	return
 }
 
 func (manager *MemoryLines) New() *Line {
@@ -227,7 +228,7 @@ func (manager *MemoryLines) Find(id LineId) (*Line, bool) {
 func (manager *MemoryLines) FindByReferentId(id LineId) (lines []*Line) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byReferent.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByReferent, ModelId(id))
 
 	for _, id := range ids {
 		l := manager.byIdentifier[LineId(id)]
@@ -242,7 +243,7 @@ func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if ok {
 		return manager.byIdentifier[LineId(id)].copy(), true
 	}
@@ -252,7 +253,7 @@ func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
 
 func (manager *MemoryLines) CodeExists(code Code) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byCode.Find(code)
+	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
 
 	return ok
@@ -283,7 +284,7 @@ func (manager *MemoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if !ok {
 		return
 	}
@@ -296,7 +297,7 @@ func (manager *MemoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
 func (manager *MemoryLines) findFamily(lineId LineId) (lineIds []LineId) {
 	lineIds = []LineId{lineId}
 
-	ids, _ := manager.byReferent.Find(ModelId(lineId))
+	ids, _ := manager.FindBy(ByReferent, ModelId(lineId))
 	for _, id := range ids {
 		lineIds = append(lineIds, manager.findFamily(LineId(id))...)
 	}
@@ -314,8 +315,7 @@ func (manager *MemoryLines) Save(line *Line) bool {
 
 	line.model = manager.model
 	manager.byIdentifier[line.Id()] = line
-	manager.byReferent.Index(line)
-	manager.byCode.Index(line)
+	manager.Index(line)
 
 	return true
 }
@@ -325,8 +325,7 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, line.Id())
-	manager.byReferent.Delete(ModelId(line.id))
-	manager.byCode.Delete(ModelId(line.id))
+	manager.Deindex(ModelId(line.id))
 
 	return true
 }

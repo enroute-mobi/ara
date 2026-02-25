@@ -14,6 +14,9 @@ import (
 
 type VehicleId ModelId
 
+var vehicleLineExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Vehicle)).LineId) }
+var vehicleVjExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Vehicle)).VehicleJourneyId) }
+
 type Vehicle struct {
 	RecordedAtTime time.Time
 	ValidUntilTime time.Time
@@ -130,12 +133,12 @@ func (vehicle *Vehicle) UnmarshalJSON(data []byte) error {
 type MemoryVehicles struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
+	IndexHandler
 
 	model *MemoryModel
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleId]*Vehicle
-	byCode            *CodeIndex
 	byNextStopVisitId map[StopVisitId]VehicleId
 
 	broadcastEvent func(event VehicleBroadcastEvent)
@@ -148,19 +151,25 @@ type Vehicles interface {
 	Find(VehicleId) (*Vehicle, bool)
 	FindByCode(Code) (*Vehicle, bool)
 	FindByLineId(LineId) []*Vehicle
+	FindByVehicleJourneyId(VehicleJourneyId) (*Vehicle, bool)
 	FindByNextStopVisitId(StopVisitId) (*Vehicle, bool)
 	FindAll() []*Vehicle
 	Save(*Vehicle) bool
 	Delete(*Vehicle) bool
 }
 
-func NewMemoryVehicles() *MemoryVehicles {
-	return &MemoryVehicles{
+func NewMemoryVehicles() (v *MemoryVehicles) {
+
+	v = &MemoryVehicles{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleId]*Vehicle),
-		byCode:            NewCodeIndex(),
 		byNextStopVisitId: make(map[StopVisitId]VehicleId),
 	}
+	v.InitIndexes()
+	v.AddIndex(ByLine, OneToMany, vehicleLineExtractor)
+	v.AddIndex(ByVehicleJourney, OneToOne, vehicleVjExtractor)
+
+	return
 }
 
 func (manager *MemoryVehicles) New() *Vehicle {
@@ -182,7 +191,7 @@ func (manager *MemoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if ok {
 		return manager.byIdentifier[VehicleId(id)].copy(), true
 	}
@@ -191,7 +200,7 @@ func (manager *MemoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 
 func (manager *MemoryVehicles) CodeExists(code Code) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byCode.Find(code)
+	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
 
 	return ok
@@ -199,14 +208,27 @@ func (manager *MemoryVehicles) CodeExists(code Code) bool {
 
 func (manager *MemoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	manager.mutex.RLock()
+
+	ids, _ := manager.FindBy(ByLine, ModelId(id))
+
+	for _, id := range ids {
+		v := manager.byIdentifier[VehicleId(id)]
+		vehicles = append(vehicles, v.copy())
+	}
+
+	manager.mutex.RUnlock()
+	return
+}
+
+func (manager *MemoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*Vehicle, bool) {
+	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	for _, vehicle := range manager.byIdentifier {
-		if vehicle.LineId == id {
-			vehicles = append(vehicles, vehicle.copy())
-		}
+	id, ok := manager.FindOneBy(ByVehicleJourney, ModelId(vjId))
+	if ok {
+		return manager.byIdentifier[VehicleId(id)].copy(), true
 	}
-	return
+	return &Vehicle{}, false
 }
 
 func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
@@ -259,7 +281,7 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 
 	vehicle.model = manager.model
 	manager.byIdentifier[vehicle.Id()] = vehicle
-	manager.byCode.Index(vehicle)
+	manager.Index(vehicle)
 
 	if vehicle.NextStopVisitId != StopVisitId("") {
 		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle.Id()
@@ -299,7 +321,7 @@ func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
-	manager.byCode.Delete(ModelId(vehicle.id))
+	manager.Deindex(ModelId(vehicle.id))
 
 	return true
 }

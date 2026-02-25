@@ -1,22 +1,20 @@
 package model
 
-type IndexableExtractor func(ModelInstance) ModelId
-
-type Index struct {
+type indexOneToMany struct {
 	extractor    IndexableExtractor
 	byIndexable  map[ModelId][]ModelId
 	byIdentifier map[ModelId]ModelId
 }
 
-func NewIndex(extractor IndexableExtractor) *Index {
-	return &Index{
+func NewIndex(extractor IndexableExtractor) *indexOneToMany {
+	return &indexOneToMany{
 		extractor:    extractor,
 		byIndexable:  make(map[ModelId][]ModelId),
 		byIdentifier: make(map[ModelId]ModelId),
 	}
 }
 
-func (index *Index) Index(model ModelInstance) {
+func (index *indexOneToMany) Index(model ModelInstance) {
 	modelId := model.ModelId()
 	indexable := index.extractor(model)
 
@@ -33,12 +31,21 @@ func (index *Index) Index(model ModelInstance) {
 	index.byIdentifier[modelId] = indexable
 }
 
-func (index *Index) Find(indexable ModelId) ([]ModelId, bool) {
+func (index *indexOneToMany) Find(indexable ModelId) ([]ModelId, bool) {
 	modelIds, ok := index.byIndexable[indexable]
 	return modelIds, ok
 }
 
-func (index *Index) Delete(modelId ModelId) {
+func (index *indexOneToMany) FindOne(indexable ModelId) (ModelId, bool) {
+	modelIds, ok := index.byIndexable[indexable]
+	if len(modelIds) != 0 {
+		return modelIds[0], ok
+	}
+	var id ModelId
+	return id, ok
+}
+
+func (index *indexOneToMany) Delete(modelId ModelId) {
 	currentIndexable, ok := index.byIdentifier[modelId]
 	if !ok {
 		return
@@ -48,11 +55,11 @@ func (index *Index) Delete(modelId ModelId) {
 	delete(index.byIdentifier, modelId)
 }
 
-func (index *Index) IndexableLength(indexable ModelId) int {
+func (index *indexOneToMany) IndexableLength(indexable ModelId) int {
 	return len(index.byIndexable[indexable])
 }
 
-func (index *Index) removeFromIndexable(indexable, modelId ModelId) {
+func (index *indexOneToMany) removeFromIndexable(indexable, modelId ModelId) {
 	if len(index.byIndexable[indexable]) == 0 {
 		return
 	}

@@ -15,6 +15,9 @@ import (
 
 type StopVisitId ModelId
 
+var svStopExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).StopAreaId) }
+var svVjExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).VehicleJourneyId) }
+
 type StopVisit struct {
 	RecordedAt    time.Time
 	collectedAt   time.Time
@@ -264,14 +267,12 @@ func (a ByTime) Less(i, j int) bool { return !a[i].ReferenceTime().After(a[j].Re
 type MemoryStopVisits struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
+	IndexHandler
 
 	model Model
 
 	mutex                             *sync.RWMutex
 	byIdentifier                      map[StopVisitId]*StopVisit
-	byCode                            *CodeIndex
-	byStopArea                        *Index
-	byVehicleJourney                  *Index
 	byVehicleJourneyIdAndPassageOrder map[vehicleJourneyStopVisitOrder]StopVisitId
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
@@ -307,18 +308,17 @@ type StopVisits interface {
 	DeleteMultiple([]*StopVisit) bool
 }
 
-func NewMemoryStopVisits() *MemoryStopVisits {
-	stopExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).StopAreaId) }
-	vjExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopVisit)).VehicleJourneyId) }
-
-	return &MemoryStopVisits{
+func NewMemoryStopVisits() (m *MemoryStopVisits) {
+	m = &MemoryStopVisits{
 		mutex:                             &sync.RWMutex{},
 		byIdentifier:                      make(map[StopVisitId]*StopVisit),
-		byCode:                            NewCodeIndex(),
-		byStopArea:                        NewIndex(stopExtractor),
-		byVehicleJourney:                  NewIndex(vjExtractor),
 		byVehicleJourneyIdAndPassageOrder: make(map[vehicleJourneyStopVisitOrder]StopVisitId),
 	}
+	m.InitIndexes()
+	m.AddIndex(ByStopArea, OneToMany, svStopExtractor)
+	m.AddIndex(ByVehicleJourney, OneToMany, svVjExtractor)
+
+	return
 }
 
 func (manager *MemoryStopVisits) New() *StopVisit {
@@ -340,7 +340,7 @@ func (manager *MemoryStopVisits) FindByCode(code Code) (*StopVisit, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if ok {
 		return manager.byIdentifier[StopVisitId(id)].copy(), true
 	}
@@ -350,7 +350,7 @@ func (manager *MemoryStopVisits) FindByCode(code Code) (*StopVisit, bool) {
 
 func (manager *MemoryStopVisits) CodeExists(code Code) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byCode.Find(code)
+	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
 
 	return ok
@@ -374,7 +374,7 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopVisitOrder(vjId Ve
 func (manager *MemoryStopVisits) FindByVehicleJourneyId(id VehicleJourneyId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByVehicleJourney, ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
@@ -391,7 +391,7 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopAreaId(vjId Vehicl
 
 	var stopVisitIds []StopVisitId
 
-	ids, _ := manager.byVehicleJourney.Find(ModelId(vjId))
+	ids, _ := manager.FindBy(ByVehicleJourney, ModelId(vjId))
 	for _, id := range ids {
 		stopVisit := manager.byIdentifier[StopVisitId(id)]
 		if stopVisit.StopAreaId == saId {
@@ -405,7 +405,7 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyIdAndStopAreaId(vjId Vehicl
 func (manager *MemoryStopVisits) StopVisitsLenByVehicleJourney(id VehicleJourneyId) int {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
-	return manager.byVehicleJourney.IndexableLength(ModelId(id))
+	return manager.IndexableLength(ByVehicleJourney, ModelId(id))
 }
 
 func (manager *MemoryStopVisits) VehicleJourneyHasStopVisits(id VehicleJourneyId) bool {
@@ -419,7 +419,7 @@ func (manager *MemoryStopVisits) FindFollowingByVehicleJourneyId(id VehicleJourn
 func (manager *MemoryStopVisits) FindByVehicleJourneyIdAfter(id VehicleJourneyId, t time.Time) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byVehicleJourney.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByVehicleJourney, ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
@@ -436,7 +436,7 @@ func (manager *MemoryStopVisits) FindByVehicleJourneyIdAfter(id VehicleJourneyId
 func (manager *MemoryStopVisits) FindByStopAreaId(id StopAreaId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byStopArea.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByStopArea, ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
@@ -463,7 +463,7 @@ func (manager *MemoryStopVisits) FindMonitoredByOriginByStopAreaId(id StopAreaId
 func (manager *MemoryStopVisits) FindFollowingByStopAreaId(id StopAreaId) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byStopArea.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByStopArea, ModelId(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
@@ -482,7 +482,7 @@ func (manager *MemoryStopVisits) FindFollowingByStopAreaIds(stopAreaIds []StopAr
 
 	var ids []ModelId
 	for _, id := range stopAreaIds {
-		saids, _ := manager.byStopArea.Find(ModelId(id))
+		saids, _ := manager.FindBy(ByStopArea, ModelId(id))
 		ids = append(ids, saids...)
 	}
 
@@ -544,9 +544,8 @@ func (manager *MemoryStopVisits) Save(stopVisit *StopVisit) bool {
 
 	stopVisit.model = manager.model
 	manager.byIdentifier[stopVisit.id] = stopVisit
-	manager.byCode.Index(stopVisit)
-	manager.byStopArea.Index(stopVisit)
-	manager.byVehicleJourney.Index(stopVisit)
+	manager.Index(stopVisit)
+
 	manager.byVehicleJourneyIdAndPassageOrder[vehicleJourneyStopVisitOrder{
 		vehicleJourneyId:      stopVisit.VehicleJourneyId,
 		stopVisitPassageOrder: stopVisit.PassageOrder}] = stopVisit.id
@@ -585,9 +584,8 @@ func (manager *MemoryStopVisits) Delete(stopVisit *StopVisit) bool {
 
 func (manager *MemoryStopVisits) UnsafeDelete(stopVisit *StopVisit) {
 	delete(manager.byIdentifier, stopVisit.id)
-	manager.byCode.Delete(ModelId(stopVisit.id))
-	manager.byStopArea.Delete(ModelId(stopVisit.id))
-	manager.byVehicleJourney.Delete(ModelId(stopVisit.id))
+	manager.Deindex(ModelId(stopVisit.id))
+
 	delete(manager.byVehicleJourneyIdAndPassageOrder, vehicleJourneyStopVisitOrder{
 		vehicleJourneyId:      stopVisit.VehicleJourneyId,
 		stopVisitPassageOrder: stopVisit.PassageOrder,
