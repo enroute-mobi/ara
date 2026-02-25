@@ -24,7 +24,7 @@ type SIRIDatedVehicleJourney struct {
 	PublishedLineName      string
 
 	RawAttributes map[string]string
-	References map[string]string
+	References    map[string]string
 
 	DatedCalls []*SIRIDatedCall
 }

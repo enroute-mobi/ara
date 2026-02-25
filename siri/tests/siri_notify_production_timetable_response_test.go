@@ -20,12 +20,12 @@ func benchmarkPTTNotifyBuildXML(pc int, b *testing.B) {
 		ResponseTimestamp:      time.Now(),
 		Status:                 true,
 		DatedTimetableVersionFrames: []*siri.SIRIDatedTimetableVersionFrame{
-			&siri.SIRIDatedTimetableVersionFrame{
+			{
 				LineRef:        "LineRef",
 				RecordedAtTime: time.Now(),
 				RawAttributes:  make(map[string]string),
 				DatedVehicleJourneys: []*siri.SIRIDatedVehicleJourney{
-					&siri.SIRIDatedVehicleJourney{
+					{
 						DataFrameRef:           "DataFrameRef",
 						DatedVehicleJourneyRef: "DatedVehicleJourneyRef",
 						PublishedLineName:      "PublishedLineName",

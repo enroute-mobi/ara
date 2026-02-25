@@ -20,7 +20,7 @@ func Test_PTT_checklines(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"local_url":            "http://ara",
+		"local_url":         "http://ara",
 		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)

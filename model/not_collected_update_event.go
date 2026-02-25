@@ -3,13 +3,13 @@ package model
 import "time"
 
 type NotCollectedUpdateEvent struct {
-	Code       Code
+	Code           Code
 	NotCollectedAt time.Time
 }
 
 func NewNotCollectedUpdateEvent(obj Code, t time.Time) *NotCollectedUpdateEvent {
 	return &NotCollectedUpdateEvent{
-		Code:       obj,
+		Code:           obj,
 		NotCollectedAt: t,
 	}
 }

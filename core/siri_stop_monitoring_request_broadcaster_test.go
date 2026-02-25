@@ -22,7 +22,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                   "codeSpace",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -145,7 +145,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
-		"local_url":            "http://ara",
+		"local_url":         "http://ara",
 		"remote_code_space": "codeSpace",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -247,7 +247,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                   "codeSpace",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -327,7 +327,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                   "codeSpace",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -398,7 +398,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                   "codeSpace",
+		"remote_code_space":                      "codeSpace",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -459,7 +459,7 @@ func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
 
 	apiPartner.Settings = map[string]string{
 		"remote_code_space": "remote_code_space",
-		"local_credential":     "local_credential",
+		"local_credential":  "local_credential",
 	}
 	apiPartner.Validate()
 	if !apiPartner.Errors.Empty() {

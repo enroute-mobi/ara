@@ -109,7 +109,9 @@ func (idg *IdentifierGenerator) formatString(kind []string, attributes Identifie
 	return idg.formatStrings[Reference]
 }
 
-/* We check in order :
+/*
+	We check in order :
+
 * If a kind is specified
 * If a Type is specified
 Otherwise we return 'Reference'

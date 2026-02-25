@@ -3,8 +3,8 @@ package model
 type StopAreaUpdateEvent struct {
 	Origin string
 
-	Code        Code
-	ParentCode  Code
+	Code            Code
+	ParentCode      Code
 	Name            string
 	CollectedAlways bool
 	Longitude       float64

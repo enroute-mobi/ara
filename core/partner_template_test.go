@@ -24,8 +24,8 @@ func TestFindByCredential(t *testing.T) {
 	pt.CredentialType = FormatMatching
 
 	okTests := map[string][]string{
-		"%{value}":          []string{"1234", "abcneizp", "ab_A12-32"},
-		"test:%{value}:LOC": []string{"test:1234:LOC", "test:test-abcd:LOC"},
+		"%{value}":          {"1234", "abcneizp", "ab_A12-32"},
+		"test:%{value}:LOC": {"test:1234:LOC", "test:test-abcd:LOC"},
 	}
 
 	for k, s := range okTests {
@@ -39,8 +39,8 @@ func TestFindByCredential(t *testing.T) {
 	}
 
 	nokTests := map[string][]string{
-		"%{value}":          []string{"12\\34", "&abcneizp"},
-		"test:%{value}:LOC": []string{"nok:test:1234:LOC", "test:1234:LOC123"},
+		"%{value}":          {"12\\34", "&abcneizp"},
+		"test:%{value}:LOC": {"nok:test:1234:LOC", "test:1234:LOC123"},
 	}
 
 	for k, s := range nokTests {
@@ -77,10 +77,10 @@ func TestValidate(t *testing.T) {
 				ConnectorTypes: []string{},
 			},
 			errs: map[string][]string{
-				"CredentialType":   []string{e.ERROR_BLANK},
-				"LocalCredential":  []string{e.ERROR_BLANK},
-				"RemoteCredential": []string{e.ERROR_BLANK},
-				"Slug":             []string{e.ERROR_BLANK},
+				"CredentialType":   {e.ERROR_BLANK},
+				"LocalCredential":  {e.ERROR_BLANK},
+				"RemoteCredential": {e.ERROR_BLANK},
+				"Slug":             {e.ERROR_BLANK},
 			},
 			settingErrs: map[string][]string{},
 		},
@@ -95,10 +95,10 @@ func TestValidate(t *testing.T) {
 				Slug:             "WRONG",
 			},
 			errs: map[string][]string{
-				"CredentialType":   []string{e.ERROR_FORMAT},
-				"LocalCredential":  []string{e.ERROR_FORMAT},
-				"RemoteCredential": []string{e.ERROR_FORMAT},
-				"Slug":             []string{e.ERROR_SLUG_FORMAT},
+				"CredentialType":   {e.ERROR_FORMAT},
+				"LocalCredential":  {e.ERROR_FORMAT},
+				"RemoteCredential": {e.ERROR_FORMAT},
+				"Slug":             {e.ERROR_SLUG_FORMAT},
 			},
 			settingErrs: map[string][]string{},
 		},
@@ -113,8 +113,8 @@ func TestValidate(t *testing.T) {
 				Slug:             "test",
 			},
 			errs: map[string][]string{
-				"LocalCredential": []string{e.ERROR_UNIQUE},
-				"Slug":            []string{e.ERROR_UNIQUE},
+				"LocalCredential": {e.ERROR_UNIQUE},
+				"Slug":            {e.ERROR_UNIQUE},
 			},
 			settingErrs: map[string][]string{},
 		},
@@ -148,7 +148,7 @@ func TestValidate(t *testing.T) {
 			},
 			errs: map[string][]string{},
 			settingErrs: map[string][]string{
-				"remote_code_space": []string{e.ERROR_BLANK},
+				"remote_code_space": {e.ERROR_BLANK},
 			},
 		},
 		{
