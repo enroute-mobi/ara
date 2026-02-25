@@ -44,6 +44,12 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	vehicleJourney.DirectionType = model.VEHICLE_DIRECTION_OUTBOUND
 	vehicleJourney.Save()
 
+	vehicle := referential.model.Vehicles().New()
+	vId := model.NewCode("codeSpace", "vId")
+	vehicle.SetCode(vId)
+	vehicle.VehicleJourneyId = vehicleJourney.Id()
+	vehicle.Save()
+
 	stopVisit := referential.model.StopVisits().New()
 	svId1 := model.NewCode("codeSpace", "svId1")
 	stopVisit.SetCode(svId1)
@@ -101,6 +107,10 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	assert.Equal("lId", tripUpdate.Trip.GetRouteId())
 	assert.Equal(uint32(0), tripUpdate.Trip.GetDirectionId())
 	assert.Len(tripUpdate.StopTimeUpdate, 1)
+
+	vehicleDescriptor := tripUpdate.Vehicle
+	assert.NotNil(vehicleDescriptor)
+	assert.Equal("vId", vehicleDescriptor.GetId())
 
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
 	assert.Equal(uint32(0), stopTimeUpdate.GetStopSequence())
