@@ -73,7 +73,7 @@ func Test_MemorySubscriptions_Find(t *testing.T) {
 func Test_MemorySubscriptions_FindAll(t *testing.T) {
 	subscriptions := NewMemorySubscriptions(NewPartner())
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		subscriptions.New("kind")
 	}
 

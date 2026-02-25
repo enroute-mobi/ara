@@ -5,7 +5,7 @@ import (
 )
 
 type MacroId string
-type updaterAttributes interface{}
+type updaterAttributes any
 type updater func(ModelInstance) error
 type updaterFactory func(updaterAttributes) (updater, error)
 

@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+	"maps"
 	"sync"
 )
 
@@ -17,9 +18,7 @@ func NewStopAreaOrigins() *StopAreaOrigins {
 func (origins *StopAreaOrigins) MarshalJSON() ([]byte, error) {
 	origins.RLock()
 	aux := make(map[string]bool)
-	for partner, status := range origins.partners {
-		aux[partner] = status
-	}
+	maps.Copy(aux, origins.partners)
 	origins.RUnlock()
 	return json.Marshal(aux)
 }
@@ -27,9 +26,7 @@ func (origins *StopAreaOrigins) MarshalJSON() ([]byte, error) {
 func (origins *StopAreaOrigins) SetOriginsFromMap(originMap map[string]bool) {
 	origins.Lock()
 	origins.partners = make(map[string]bool)
-	for partner, status := range originMap {
-		origins.partners[partner] = status
-	}
+	maps.Copy(origins.partners, originMap)
 	origins.Unlock()
 }
 
@@ -37,9 +34,7 @@ func (origins *StopAreaOrigins) Copy() *StopAreaOrigins {
 	cpy := NewStopAreaOrigins()
 
 	origins.RLock()
-	for key, value := range origins.partners {
-		cpy.partners[key] = value
-	}
+	maps.Copy(cpy.partners, origins.partners)
 	origins.RUnlock()
 	return cpy
 }
@@ -54,9 +49,7 @@ func (origins *StopAreaOrigins) Origin(partner string) (status bool, present boo
 func (origins *StopAreaOrigins) AllOrigin() map[string]bool {
 	a := make(map[string]bool)
 	origins.RLock()
-	for k, v := range origins.partners {
-		a[k] = v
-	}
+	maps.Copy(a, origins.partners)
 	origins.RUnlock()
 	return a
 }

@@ -52,9 +52,9 @@ func (handler *GraphqlHandler) serve(response http.ResponseWriter, request *http
 	}()
 
 	var params struct {
-		Query         string                 `json:"query"`
-		OperationName string                 `json:"operationName"`
-		Variables     map[string]interface{} `json:"variables"`
+		Query         string         `json:"query"`
+		OperationName string         `json:"operationName"`
+		Variables     map[string]any `json:"variables"`
 	}
 	if err := json.NewDecoder(request.Body).Decode(&params); err != nil {
 		e := fmt.Sprintf("Error while reading body: %v", err)

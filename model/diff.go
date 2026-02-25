@@ -8,9 +8,9 @@ import (
 	"unsafe"
 )
 
-var timeType = reflect.TypeOf(time.Time{})
-var codeConsumerType = reflect.TypeOf(CodeConsumer{})
-var codeType = reflect.TypeOf(Code{})
+var timeType = reflect.TypeFor[time.Time]()
+var codeConsumerType = reflect.TypeFor[CodeConsumer]()
+var codeType = reflect.TypeFor[Code]()
 
 type visit struct {
 	a1  unsafe.Pointer
@@ -19,11 +19,11 @@ type visit struct {
 }
 
 type DiffResult struct {
-	DiffMap map[string]interface{}
+	DiffMap map[string]any
 	Equal   bool
 }
 
-func Equal(x, y interface{}) (*DiffResult, error) {
+func Equal(x, y any) (*DiffResult, error) {
 	if x == nil || y == nil {
 		return nil, errors.New("use of Equal with nil value")
 	}
@@ -34,7 +34,7 @@ func Equal(x, y interface{}) (*DiffResult, error) {
 	}
 
 	result := &DiffResult{
-		DiffMap: make(map[string]interface{}),
+		DiffMap: make(map[string]any),
 		Equal:   true,
 	}
 
@@ -58,7 +58,7 @@ func Equal(x, y interface{}) (*DiffResult, error) {
 }
 
 func handlePtr(v reflect.Value) reflect.Value {
-	if v.Kind() == reflect.Ptr {
+	if v.Kind() == reflect.Pointer {
 		return v.Elem()
 	}
 	return v
@@ -125,7 +125,7 @@ func deepValueEqual(v1, v2 reflect.Value, visited map[visit]bool) bool {
 			return v1.IsNil() == v2.IsNil()
 		}
 		return deepValueEqual(v1.Elem(), v2.Elem(), visited)
-	case reflect.Ptr:
+	case reflect.Pointer:
 		return deepValueEqual(v1.Elem(), v2.Elem(), visited)
 	case reflect.Struct:
 		if v1.Type() == codeConsumerType {

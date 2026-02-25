@@ -75,7 +75,7 @@ func (handler *GtfsHandler) serve(response http.ResponseWriter, request *http.Re
 	}
 
 	/* We check the Partner's cache for an already Marshaled FeedMessage or we fetch it */
-	d, err := partner.GtfsCache().Fetch(messageType, func() (interface{}, error) { return handler.getFeed(gc) })
+	d, err := partner.GtfsCache().Fetch(messageType, func() (any, error) { return handler.getFeed(gc) })
 
 	if err != nil {
 		handler.logError(message, startTime, "%v", err)
@@ -145,7 +145,7 @@ func (handler *GtfsHandler) newBQMessage(slug, remoteAddress string) *audit.BigQ
 	}
 }
 
-func (handler *GtfsHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...interface{}) {
+func (handler *GtfsHandler) logError(m *audit.BigQueryMessage, startTime time.Time, format string, values ...any) {
 	m.ProcessingTime = handler.referential.Clock().Since(startTime).Seconds()
 	m.Status = "Error"
 	errorString := fmt.Sprintf(format, values...)

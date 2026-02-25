@@ -8,7 +8,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model/model_types"
 )
 
-type ContextAttributes interface{}
+type ContextAttributes any
 type Context func(ModelInstance) bool
 type ContexFactory func(ContextAttributes) (Context, error)
 

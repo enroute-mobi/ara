@@ -44,7 +44,7 @@ type DetailedStopVisit struct {
 	Schedules       []schedules.StopVisitSchedule `json:",omitempty"`
 	ArrivalStatus   StopVisitArrivalStatus        `json:",omitempty"`
 	DepartureStatus StopVisitDepartureStatus      `json:",omitempty"`
-	CollectedAt     time.Time                     `json:",omitempty"`
+	CollectedAt     time.Time
 }
 
 func NewVehicleJourney(model Model) *VehicleJourney {

@@ -818,7 +818,7 @@ func Test_PartnerManager_FindBySlug(t *testing.T) {
 func Test_PartnerManager_FindAll(t *testing.T) {
 	partnerManager := createTestPartnerManager()
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		existingPartner := partnerManager.New(p.Slug(strconv.Itoa(i)))
 		partnerManager.Save(existingPartner)
 	}

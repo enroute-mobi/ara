@@ -148,7 +148,7 @@ func Test_MemoryOperators_Find(t *testing.T) {
 func Test_MemoryOperators_FindAll(t *testing.T) {
 	operators := NewMemoryOperators()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingOperator := operators.New()
 		operators.Save(existingOperator)
 	}

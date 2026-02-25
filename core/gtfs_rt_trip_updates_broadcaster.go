@@ -44,7 +44,7 @@ func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 func (connector *TripUpdatesBroadcaster) Start() {
 	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
-	connector.cache = cache.NewCachedItem("TripUpdates", connector.partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
+	connector.cache = cache.NewCachedItem("TripUpdates", connector.partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...any) (any, error) { return connector.handleGtfs() })
 }
 
 func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {

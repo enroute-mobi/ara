@@ -278,7 +278,7 @@ func Test_MemoryStopAreas_Find(t *testing.T) {
 func Test_MemoryStopAreas_FindAll(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingStopArea := stopAreas.New()
 		stopAreas.Save(existingStopArea)
 	}

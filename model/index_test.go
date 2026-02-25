@@ -108,7 +108,7 @@ var benchmarkResultId []ModelId
 func benchmarkFindWithoutIndex(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
 
-	for i := 0; i < sv; i++ {
+	for range sv {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = VehicleJourneyId(uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.Save()
@@ -128,7 +128,7 @@ func benchmarkFindWithIndex(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
 	index := createTestIndex()
 
-	for i := 0; i < sv; i++ {
+	for range sv {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = VehicleJourneyId(uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.Save()
@@ -150,7 +150,7 @@ func benchmarkIndexing(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
 	index := createTestIndex()
 
-	for i := 0; i < sv; i++ {
+	for range sv {
 		stopVisit := model.StopVisits().New()
 		stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 		stopVisit.Save()

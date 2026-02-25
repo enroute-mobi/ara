@@ -3,7 +3,7 @@ package slite
 import "encoding/json"
 
 func RewriteValues(jsonPayload []byte) ([]byte, error) {
-	jsonMap := make(map[string]interface{})
+	jsonMap := make(map[string]any)
 
 	err := json.Unmarshal(jsonPayload, &jsonMap)
 	if err != nil {
@@ -20,11 +20,11 @@ type rewriteParent interface {
 }
 
 type rewriteMapParent struct {
-	content map[string]interface{}
+	content map[string]any
 	key     string
 }
 
-func newRewriteMapParent(content map[string]interface{}, key string) *rewriteMapParent {
+func newRewriteMapParent(content map[string]any, key string) *rewriteMapParent {
 	return &rewriteMapParent{content, key}
 }
 
@@ -42,7 +42,7 @@ func newRewriteRootParent() *rewriteRootParent {
 func (parent *rewriteRootParent) SetText(text string) {
 }
 
-func rewriteVisit(parent rewriteParent, content map[string]interface{}) {
+func rewriteVisit(parent rewriteParent, content map[string]any) {
 	if len(content) == 1 {
 		value, ok := content["value"]
 		if ok {
@@ -52,13 +52,13 @@ func rewriteVisit(parent rewriteParent, content map[string]interface{}) {
 	}
 
 	for key, value := range content {
-		if mapValue, ok := value.(map[string]interface{}); ok {
+		if mapValue, ok := value.(map[string]any); ok {
 			rewriteVisit(newRewriteMapParent(content, key), mapValue)
 
 			if len(mapValue) == 0 {
 				delete(content, key)
 			}
-		} else if arrayValue, ok := value.([]interface{}); ok {
+		} else if arrayValue, ok := value.([]any); ok {
 			if len(arrayValue) == 0 {
 				delete(content, key)
 			} else {
@@ -67,7 +67,7 @@ func rewriteVisit(parent rewriteParent, content map[string]interface{}) {
 					switch ent := entry.(type) {
 					case string:
 						parent.SetText(ent)
-					case map[string]interface{}:
+					case map[string]any:
 						rewriteVisit(parent, ent)
 					}
 				}

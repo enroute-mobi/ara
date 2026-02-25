@@ -77,7 +77,7 @@ func (logger *Logger) Debug(s string) {
 	}
 }
 
-func (logger *Logger) Debugf(format string, values ...interface{}) {
+func (logger *Logger) Debugf(format string, values ...any) {
 	if logger.DebugEnabled {
 		logger.Writer().Debug(fmt.Sprintf(format, values...))
 	}
@@ -87,11 +87,11 @@ func (logger *Logger) Print(s string) {
 	logger.Writer().Info(s)
 }
 
-func (logger *Logger) Printf(format string, values ...interface{}) {
+func (logger *Logger) Printf(format string, values ...any) {
 	logger.Writer().Info(fmt.Sprintf(format, values...))
 }
 
-func (logger *Logger) Panicf(format string, values ...interface{}) {
+func (logger *Logger) Panicf(format string, values ...any) {
 	message := fmt.Sprintf(format, values...)
 	logger.Writer().Emerg(message)
 	panic(message)

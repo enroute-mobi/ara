@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -285,13 +286,7 @@ func (manager *MemorySubscriptions) unsafeIndex(subscription *Subscription) {
 
 // Check if a SubscriptionId is in a Slice of SubscriptionIds
 func newSubscriptionForKindAndResourceId(s []SubscriptionId, id SubscriptionId) bool {
-	for _, subscriptionId := range s {
-		if subscriptionId == id {
-			// The Subscription is already associated to this kindAndResourceId
-			return false
-		}
-	}
-	return true
+	return !slices.Contains(s, id)
 }
 
 func (manager *MemorySubscriptions) Delete(subscription *Subscription) bool {

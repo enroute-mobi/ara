@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"maps"
 	"sync"
 	"time"
 
@@ -113,9 +114,7 @@ func (subscription *Subscription) Delete() (ok bool) {
 func (subscription *Subscription) ResourcesByCodeCopy() map[string]*SubscribedResource {
 	m := make(map[string]*SubscribedResource)
 	subscription.RLock()
-	for k, v := range subscription.resourcesByCode {
-		m[k] = v
-	}
+	maps.Copy(m, subscription.resourcesByCode)
 	subscription.RUnlock()
 	return m
 }

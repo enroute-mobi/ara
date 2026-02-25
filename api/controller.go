@@ -161,11 +161,7 @@ func paginate[P Paginable](p []*P, params url.Values) (PaginatedResource[P], err
 
 func paginateSlice(pageNum int, pageSize int, sliceLength int) (int, int) {
 	firstEntry := (pageNum - 1) * pageSize
-	lastEntry := firstEntry + pageSize
-
-	if lastEntry > sliceLength {
-		lastEntry = sliceLength
-	}
+	lastEntry := min(firstEntry+pageSize, sliceLength)
 
 	return firstEntry, lastEntry
 }

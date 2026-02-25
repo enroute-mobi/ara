@@ -129,7 +129,7 @@ var benchmarkCodeResultId ModelId
 func benchmarkCodeFindWithoutIndex(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
 
-	for i := 0; i < sv; i++ {
+	for range sv {
 		stopVisit := model.StopVisits().New()
 		code := NewCode("codeSpace", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetCode(code)
@@ -151,7 +151,7 @@ func benchmarkCodeFindWithIndex(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
 	index := NewCodeIndex()
 
-	for i := 0; i < sv; i++ {
+	for range sv {
 		stopVisit := model.StopVisits().New()
 		code := NewCode("codeSpace", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetCode(code)

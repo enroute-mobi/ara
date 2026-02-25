@@ -30,7 +30,7 @@ func NewStopAreaLogger(referential *Referential, stopArea *model.StopArea) *Stop
 	return logger
 }
 
-func (stopAreaLogger *StopAreaLogger) Printf(format string, values ...interface{}) {
+func (stopAreaLogger *StopAreaLogger) Printf(format string, values ...any) {
 	if stopAreaLogger.verbose {
 		logger.Log.Printf(format, values...)
 	} else {

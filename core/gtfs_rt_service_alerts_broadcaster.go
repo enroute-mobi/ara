@@ -37,7 +37,7 @@ func NewServiceAlertsBroadcaster(partner *Partner) *ServiceAlertsBroadcaster {
 
 func (connector *ServiceAlertsBroadcaster) Start() {
 	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(GTFS_RT_SERVICE_ALERTS_BROADCASTER)
-	connector.cache = cache.NewCachedItem("ServiceAlerts", connector.partner.CacheTimeout(GTFS_RT_SERVICE_ALERTS_BROADCASTER), nil, func(...interface{}) (interface{}, error) { return connector.handleGtfs() })
+	connector.cache = cache.NewCachedItem("ServiceAlerts", connector.partner.CacheTimeout(GTFS_RT_SERVICE_ALERTS_BROADCASTER), nil, func(...any) (any, error) { return connector.handleGtfs() })
 }
 
 func (connector *ServiceAlertsBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {

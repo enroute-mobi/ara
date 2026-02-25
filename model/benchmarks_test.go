@@ -28,7 +28,7 @@ func benchmarkMutexMap(size int, b *testing.B) {
 		rwm: &sync.RWMutex{},
 		m:   make(map[string]int, size),
 	}
-	for i := 0; i < size; i++ {
+	for i := range size {
 		mm.m[strconv.Itoa(i)] = i
 	}
 
@@ -47,7 +47,7 @@ func BenchmarkMutexMap1000(b *testing.B) { benchmarkMutexMap(999, b) }
 
 func benchmarkSyncMap(size int, b *testing.B) {
 	m := &sync.Map{}
-	for i := 0; i < size; i++ {
+	for i := range size {
 		m.Store(strconv.Itoa(i), i)
 	}
 

@@ -113,14 +113,14 @@ func LoadDatabaseConfig(configPath string) error {
 		return err
 	}
 
-	rawYaml := make(map[interface{}]interface{})
+	rawYaml := make(map[any]any)
 
 	err = yaml.Unmarshal(data, &rawYaml)
 	if err != nil {
 		return err
 	}
 
-	databaseYaml := rawYaml[Environment()].(map[interface{}]interface{})
+	databaseYaml := rawYaml[Environment()].(map[any]any)
 
 	Config.DB.Name = databaseYaml["name"].(string)
 	if databaseYaml["user"] != nil {

@@ -163,7 +163,7 @@ func Test_MemoryLines_Find(t *testing.T) {
 func Test_MemoryLines_FindAll(t *testing.T) {
 	lines := NewMemoryLines()
 
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		existingLine := lines.New()
 		lines.Save(existingLine)
 	}
