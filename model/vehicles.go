@@ -11,10 +11,10 @@ import (
 	"cloud.google.com/go/civil"
 )
 
-type VehicleId ModelId
+type VehicleId string
 
-var vehicleLineExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Vehicle)).LineId) }
-var vehicleVjExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Vehicle)).VehicleJourneyId) }
+var vehicleLineExtractor = func(instance ModelInstance) string { return string((instance.(*Vehicle)).LineId) }
+var vehicleVjExtractor = func(instance ModelInstance) string { return string((instance.(*Vehicle)).VehicleJourneyId) }
 
 type Vehicle struct {
 	RecordedAtTime time.Time
@@ -45,8 +45,8 @@ func NewVehicle(model Model) *Vehicle {
 	return vehicle
 }
 
-func (vehicle *Vehicle) ModelId() ModelId {
-	return ModelId(vehicle.id)
+func (vehicle *Vehicle) ModelId() string {
+	return string(vehicle.id)
 }
 
 func (vehicle *Vehicle) copy() *Vehicle {
@@ -205,7 +205,7 @@ func (manager *memoryVehicles) CodeExists(code Code) bool {
 func (manager *memoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByLine, ModelId(id))
+	ids, _ := manager.FindBy(ByLine, string(id))
 
 	for _, id := range ids {
 		v := manager.byIdentifier[VehicleId(id)]
@@ -220,7 +220,7 @@ func (manager *memoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*V
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.FindOneBy(ByVehicleJourney, ModelId(vjId))
+	id, ok := manager.FindOneBy(ByVehicleJourney, string(vjId))
 	if ok {
 		return manager.byIdentifier[VehicleId(id)].copy(), true
 	}
@@ -317,7 +317,7 @@ func (manager *memoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
-	manager.Deindex(ModelId(vehicle.id))
+	manager.Deindex(string(vehicle.id))
 
 	return true
 }

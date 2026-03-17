@@ -22,14 +22,14 @@ const (
 	ByReferent
 )
 
-type IndexableExtractor func(ModelInstance) ModelId
+type IndexableExtractor func(ModelInstance) string
 
 type Index interface {
 	Index(ModelInstance)
-	Find(ModelId) ([]ModelId, bool)
-	FindOne(ModelId) (ModelId, bool)
-	Delete(ModelId)
-	IndexableLength(ModelId) int
+	Find(string) ([]string, bool)
+	FindOne(string) (string, bool)
+	Delete(string)
+	IndexableLength(string) int
 }
 
 type IndexHandler struct {
@@ -67,15 +67,15 @@ func (is *IndexHandler) GetIndex(n int) Index {
 	return is.i[n]
 }
 
-func (is *IndexHandler) FindBy(n int, i ModelId) ([]ModelId, bool) {
+func (is *IndexHandler) FindBy(n int, i string) ([]string, bool) {
 	return is.i[n].Find(i)
 }
 
-func (is *IndexHandler) FindOneBy(n int, i ModelId) (ModelId, bool) {
+func (is *IndexHandler) FindOneBy(n int, i string) (string, bool) {
 	return is.i[n].FindOne(i)
 }
 
-func (is *IndexHandler) IndexableLength(n int, i ModelId) int {
+func (is *IndexHandler) IndexableLength(n int, i string) int {
 	return is.i[n].IndexableLength(i)
 }
 
@@ -83,7 +83,7 @@ func (is *IndexHandler) ByCode() *codeIndex {
 	return is.ci
 }
 
-func (is *IndexHandler) Deindex(mid ModelId) {
+func (is *IndexHandler) Deindex(mid string) {
 	for _, v := range is.i {
 		v.Delete(mid)
 	}

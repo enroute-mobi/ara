@@ -48,7 +48,7 @@ func (event *SituationUpdateEvent) SetId(id SituationUpdateRequestId) {
 func (event *SituationUpdateEvent) TestFindAffectByLineId(lineId LineId) (bool, *AffectedLine) {
 	for _, affect := range event.Affects {
 		if affect.GetType() == SituationTypeLine &&
-			affect.GetId() == ModelId(lineId) {
+			affect.GetId() == string(lineId) {
 			return true, affect.(*AffectedLine)
 		}
 	}
@@ -58,7 +58,7 @@ func (event *SituationUpdateEvent) TestFindAffectByLineId(lineId LineId) (bool, 
 func (event *SituationUpdateEvent) TestFindAffectByStopAreaId(stopAreaId StopAreaId) (bool, *AffectedStopArea) {
 	for _, affect := range event.Affects {
 		if affect.GetType() == SituationTypeStopArea &&
-			affect.GetId() == ModelId(stopAreaId) {
+			affect.GetId() == string(stopAreaId) {
 			return true, affect.(*AffectedStopArea)
 		}
 	}

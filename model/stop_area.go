@@ -11,10 +11,10 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
-type StopAreaId ModelId
+type StopAreaId string
 
-var saReferentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ReferentId) }
-var saParentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ParentId) }
+var saReferentExtractor = func(instance ModelInstance) string { return string((instance.(*StopArea)).ReferentId) }
+var saParentExtractor = func(instance ModelInstance) string { return string((instance.(*StopArea)).ParentId) }
 
 type StopArea struct {
 	Collectable
@@ -49,8 +49,8 @@ func NewStopArea(model Model) *StopArea {
 	return stopArea
 }
 
-func (stopArea *StopArea) ModelId() ModelId {
-	return ModelId(stopArea.id)
+func (stopArea *StopArea) ModelId() string {
+	return string(stopArea.id)
 }
 
 func (stopArea *StopArea) copy() *StopArea {
@@ -328,7 +328,7 @@ func (manager *memoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAre
 func (manager *memoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByReferent, ModelId(id))
+	ids, _ := manager.FindBy(ByReferent, string(id))
 
 	for _, id := range ids {
 		sa := manager.byIdentifier[StopAreaId(id)]
@@ -342,7 +342,7 @@ func (manager *memoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*St
 func (manager *memoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByParent, ModelId(id))
+	ids, _ := manager.FindBy(ByParent, string(id))
 
 	for _, id := range ids {
 		sa := manager.byIdentifier[StopAreaId(id)]
@@ -405,7 +405,7 @@ func (manager *memoryStopAreas) Delete(stopArea *StopArea) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, stopArea.Id())
-	manager.Deindex(ModelId(stopArea.id))
+	manager.Deindex(string(stopArea.id))
 
 	return true
 }
@@ -423,11 +423,11 @@ func (manager *memoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 func (manager *memoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	stopAreaIds = []StopAreaId{stopAreaId}
 
-	ids, _ := manager.FindBy(ByParent, ModelId(stopAreaId))
+	ids, _ := manager.FindBy(ByParent, string(stopAreaId))
 	for _, id := range ids {
 		stopAreaIds = append(stopAreaIds, manager.findFamily(StopAreaId(id))...)
 	}
-	ids, _ = manager.FindBy(ByReferent, ModelId(stopAreaId))
+	ids, _ = manager.FindBy(ByReferent, string(stopAreaId))
 	for _, id := range ids {
 		stopAreaIds = append(stopAreaIds, manager.findFamily(StopAreaId(id))...)
 	}

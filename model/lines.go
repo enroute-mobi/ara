@@ -7,9 +7,9 @@ import (
 	"time"
 )
 
-type LineId ModelId
+type LineId string
 
-var lineReferentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Line)).ReferentId) }
+var lineReferentExtractor = func(instance ModelInstance) string { return string((instance.(*Line)).ReferentId) }
 
 type Line struct {
 	Collectable
@@ -36,8 +36,8 @@ func NewLine(model Model) *Line {
 	return line
 }
 
-func (line *Line) ModelId() ModelId {
-	return ModelId(line.id)
+func (line *Line) ModelId() string {
+	return string(line.id)
 }
 
 func (line *Line) GetName() string {
@@ -224,7 +224,7 @@ func (manager *memoryLines) Find(id LineId) (*Line, bool) {
 func (manager *memoryLines) FindByReferentId(id LineId) (lines []*Line) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByReferent, ModelId(id))
+	ids, _ := manager.FindBy(ByReferent, string(id))
 
 	for _, id := range ids {
 		l := manager.byIdentifier[LineId(id)]
@@ -293,7 +293,7 @@ func (manager *memoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
 func (manager *memoryLines) findFamily(lineId LineId) (lineIds []LineId) {
 	lineIds = []LineId{lineId}
 
-	ids, _ := manager.FindBy(ByReferent, ModelId(lineId))
+	ids, _ := manager.FindBy(ByReferent, string(lineId))
 	for _, id := range ids {
 		lineIds = append(lineIds, manager.findFamily(LineId(id))...)
 	}
@@ -321,7 +321,7 @@ func (manager *memoryLines) Delete(line *Line) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, line.Id())
-	manager.Deindex(ModelId(line.id))
+	manager.Deindex(string(line.id))
 
 	return true
 }

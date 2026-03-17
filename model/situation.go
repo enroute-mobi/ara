@@ -15,7 +15,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-type SituationId ModelId
+type SituationId string
 
 const (
 	SituationReportTypeGeneral  ReportType    = "general"
@@ -145,7 +145,7 @@ type Blocking struct {
 // SubTypes of Affect
 type Affect interface {
 	GetType() SituationType
-	GetId() ModelId
+	GetId() string
 }
 
 type Affects []Affect
@@ -155,8 +155,8 @@ type AffectedStopArea struct {
 	LineIds    []LineId   `json:",omitempty"`
 }
 
-func (a AffectedStopArea) GetId() ModelId {
-	return ModelId(a.StopAreaId)
+func (a AffectedStopArea) GetId() string {
+	return string(a.StopAreaId)
 }
 
 func (a AffectedStopArea) GetType() SituationType {
@@ -169,8 +169,8 @@ func NewAffectedStopArea() *AffectedStopArea {
 
 type AffectedAllLines struct{}
 
-func (a AffectedAllLines) GetId() ModelId {
-	return ModelId("")
+func (a AffectedAllLines) GetId() string {
+	return ""
 }
 
 func (a AffectedAllLines) GetType() SituationType {
@@ -202,8 +202,8 @@ type AffectedRoute struct {
 	StopAreaIds []StopAreaId `json:",omitempty"`
 }
 
-func (a AffectedLine) GetId() ModelId {
-	return ModelId(a.LineId)
+func (a AffectedLine) GetId() string {
+	return string(a.LineId)
 }
 
 func (a AffectedLine) GetType() SituationType {
@@ -446,8 +446,8 @@ func (t *TimeRange) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (situation *Situation) ModelId() ModelId {
-	return ModelId(situation.id)
+func (situation *Situation) ModelId() string {
+	return string(situation.id)
 }
 
 func (situation *Situation) copy() *Situation {
@@ -715,7 +715,6 @@ type memorySituations struct {
 	GMbroadcastEvent func(event SituationBroadcastEvent)
 	SXbroadcastEvent func(event SituationBroadcastEvent)
 	byIdentifier     map[SituationId]*Situation
-	byCode           *CodeIndex
 }
 
 type Situations interface {
@@ -728,7 +727,6 @@ func NewMemorySituations() Situations {
 	s := &memorySituations{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[SituationId]*Situation),
-		byCode:       NewCodeIndex(),
 	}
 	s.InitIndexes()
 	return s
@@ -821,7 +819,7 @@ func (manager *memorySituations) Delete(situation *Situation) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, situation.Id())
-	manager.Deindex(ModelId(situation.id))
+	manager.Deindex(string(situation.id))
 
 	return true
 }

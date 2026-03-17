@@ -7,9 +7,9 @@ import (
 )
 
 func createTestIndex() *indexOneToMany {
-	extractor := func(instance ModelInstance) ModelId {
+	extractor := func(instance ModelInstance) string {
 		stopVisit := (instance.(*StopVisit))
-		return ModelId(stopVisit.VehicleJourneyId)
+		return string(stopVisit.VehicleJourneyId)
 	}
 
 	return NewIndex(extractor)
@@ -21,7 +21,7 @@ func Test_Index_simple(t *testing.T) {
 	stopVisit := &StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"}
 	index.Index(stopVisit)
 
-	foundStopVisits, ok := index.Find(ModelId("dummy"))
+	foundStopVisits, ok := index.Find("dummy")
 	if !ok {
 		t.Error("Can't find StopVisit after index: ", index)
 	}
@@ -37,7 +37,7 @@ func Test_Index_MultipleIndex(t *testing.T) {
 	index.Index(stopVisit)
 	index.Index(stopVisit)
 
-	foundStopVisits, ok := index.Find(ModelId("dummy"))
+	foundStopVisits, ok := index.Find("dummy")
 	if !ok {
 		t.Error("Can't find StopVisit after index: ", index)
 	}
@@ -55,7 +55,7 @@ func Test_Index_Multiple(t *testing.T) {
 	stopVisit2 := &StopVisit{id: "stopVisitId2", VehicleJourneyId: "dummy"}
 	index.Index(stopVisit2)
 
-	foundStopVisits, ok := index.Find(ModelId("dummy"))
+	foundStopVisits, ok := index.Find("dummy")
 	if !ok {
 		t.Error("Can't find StopVisit after index: ", index)
 	}
@@ -73,11 +73,11 @@ func Test_Index_Change(t *testing.T) {
 	stopVisit.VehicleJourneyId = "dummy2"
 	index.Index(stopVisit)
 
-	_, ok := index.Find(ModelId("dummy"))
+	_, ok := index.Find("dummy")
 	if ok {
 		t.Error("Can find StopVisit after changing index: ", index)
 	}
-	foundStopVisits, ok := index.Find(ModelId("dummy2"))
+	foundStopVisits, ok := index.Find("dummy2")
 	if !ok {
 		t.Error("Can't find StopVisit after index: ", index)
 	}
@@ -93,7 +93,7 @@ func Test_Index_Delete(t *testing.T) {
 	index.Index(stopVisit)
 	index.Delete("stopVisitId")
 
-	foundStopVisits, ok := index.Find(ModelId("dummy"))
+	foundStopVisits, ok := index.Find("dummy")
 	if ok {
 		t.Error("Can find StopVisit after delete: ", index)
 	}
@@ -103,7 +103,7 @@ func Test_Index_Delete(t *testing.T) {
 }
 
 var benchmarkResult []*StopVisit
-var benchmarkResultId []ModelId
+var benchmarkResultId []string
 
 func benchmarkFindWithoutIndex(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
@@ -139,7 +139,7 @@ func benchmarkFindWithIndex(sv int, b *testing.B) {
 	stopVisit.Save()
 	index.Index(stopVisit)
 
-	var foundStopVisits []ModelId
+	var foundStopVisits []string
 	for n := 0; n < b.N; n++ {
 		foundStopVisits, _ = index.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	}
@@ -163,7 +163,7 @@ func benchmarkIndexing(sv int, b *testing.B) {
 
 	for n := 0; n < b.N; n++ {
 		index.Index(stopVisit)
-		index.Delete(ModelId(stopVisit.Id()))
+		index.Delete(stopVisit.ModelId())
 	}
 }
 

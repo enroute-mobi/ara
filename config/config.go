@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -28,6 +29,9 @@ type config struct {
 	BigQueryDatasetPrefix string
 	BigQueryTest          string
 	Sentry                string
+	RedisAddr             string
+	RedisPassword         string
+	RedisDB               int
 	Syslog                bool
 	ColorizeLog           bool
 	LoadMaxInsert         int
@@ -72,6 +76,18 @@ func LoadConfig(path string) error {
 	fakeUUIDReal := os.Getenv("ARA_FAKEUUID_REAL")
 	if strings.ToLower(fakeUUIDReal) == "true" {
 		Config.FakeUUIDRealFormat = true
+	}
+	redisAddr := os.Getenv("ARA_REDIS_ADDR")
+	if redisAddr != "" {
+		Config.RedisAddr = redisAddr
+	}
+	redisPassword := os.Getenv("ARA_REDIS_PASSWORD")
+	if redisPassword != "" {
+		Config.RedisPassword = redisPassword
+	}
+	redisDB := os.Getenv("ARA_REDIS_DB")
+	if redisDB != "" {
+		Config.RedisDB, _ = strconv.Atoi(redisDB)
 	}
 
 	logger.Log.Syslog = Config.Syslog

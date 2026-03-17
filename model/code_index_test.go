@@ -124,7 +124,7 @@ func Test_CodeIndex_Delete(t *testing.T) {
 }
 
 var benchmarkCodeResult *StopVisit
-var benchmarkCodeResultId ModelId
+var benchmarkCodeResultId string
 
 func benchmarkCodeFindWithoutIndex(sv int, b *testing.B) {
 	model := NewTestMemoryModel()
@@ -164,7 +164,7 @@ func benchmarkCodeFindWithIndex(sv int, b *testing.B) {
 	stopVisit.Save()
 	index.Index(stopVisit)
 
-	var foundStopVisit ModelId
+	var foundStopVisit string
 	for n := 0; n < b.N; n++ {
 		foundStopVisit, _ = index.Find(code)
 	}
