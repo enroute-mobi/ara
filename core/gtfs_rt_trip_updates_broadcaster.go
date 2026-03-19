@@ -20,8 +20,9 @@ type TripUpdatesBroadcaster struct {
 	state.Startable
 	connector
 
-	vjRemoteCodeSpaces []string
-	cache              *cache.CachedItem
+	vjRemoteCodeSpaces      []string
+	vehicleRemoteCodeSpaces []string
+	cache                   *cache.CachedItem
 }
 
 type TripUpdatesBroadcasterFactory struct{}
@@ -44,6 +45,7 @@ func NewTripUpdatesBroadcaster(partner *Partner) *TripUpdatesBroadcaster {
 func (connector *TripUpdatesBroadcaster) Start() {
 	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
+	connector.vehicleRemoteCodeSpaces = connector.partner.VehicleRemoteCodeSpaceWithFallback(GTFS_RT_TRIP_UPDATES_BROADCASTER)
 	connector.cache = cache.NewCachedItem("TripUpdates", connector.partner.CacheTimeout(GTFS_RT_TRIP_UPDATES_BROADCASTER), nil, func(...any) (any, error) { return connector.handleGtfs() })
 }
 
@@ -120,9 +122,9 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			if v != nil {
 				vd := &gtfs.VehicleDescriptor{}
 
-				vid, ok := v.Code(connector.remoteCodeSpace)
+				vehicleId, ok := v.CodeWithFallback(connector.vehicleRemoteCodeSpaces)
 				if ok {
-					vehicleId := vid.Value()
+					vehicleId := vehicleId.Value()
 					vd.Id = &vehicleId
 				}
 
