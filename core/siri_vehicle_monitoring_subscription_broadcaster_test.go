@@ -16,7 +16,7 @@ func Test_VehicleMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestMemoryModel()
+	referential.model = model.NewTestModel()
 
 	referential.model.SetBroadcastVeChan(referential.broacasterManager.GetVehicleBroadcastEventChan())
 	referential.broacasterManager.Start()

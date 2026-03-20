@@ -2,18 +2,15 @@ package redisclient
 
 import (
 	"fmt"
+	"strings"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"github.com/redis/go-redis/v9"
 )
 
-func (rc *Client) InitIndexes() (err error) {
-	logger.Log.Debugf("Creating Line index")
-	err = rc.createIndex("line", "referent_id")
-	if err != nil {
-		return err
-	}
-	err = rc.createIndex("line", "code", true)
+func (rc *client) initIndexes() (err error) {
+	logger.Log.Debugf("Creating Line indexes")
+	err = rc.createIndex(Line, []string{ByReferentID}, true)
 	if err != nil {
 		return err
 	}
@@ -22,12 +19,33 @@ func (rc *Client) InitIndexes() (err error) {
 	return err
 }
 
-func (rc *Client) createIndex(model, index string, array ...bool) (err error) {
-	indexKey := rc.prefixIndex(model, index)
-	prefix := rc.prefix(model, ":")
-	fieldName := fmt.Sprintf("$.%s", index)
-	if len(array) != 0 {
-		fieldName += "[*]"
+func (rc *client) createIndex(model string, indexes []string, indexcodespaces bool) (err error) {
+	indexKey := rc.prefixIndex(model)
+
+	schema := []*redis.FieldSchema{
+		{
+			FieldName: "$.id",
+			As:        "id",
+			FieldType: redis.SearchFieldTypeTag,
+		},
+	}
+
+	for _, i := range indexes {
+		schema = append(schema, &redis.FieldSchema{
+			FieldName: fmt.Sprintf("$.%s", i),
+			As:        i,
+			FieldType: redis.SearchFieldTypeTag,
+		})
+	}
+
+	if indexcodespaces {
+		for _, i := range rc.codespaces {
+			schema = append(schema, &redis.FieldSchema{
+				FieldName: fmt.Sprintf("$.codes.%v.value", i),
+				As:        fmt.Sprintf("codespace_%v", i),
+				FieldType: redis.SearchFieldTypeTag,
+			})
+		}
 	}
 
 	_, err = rc.c.FTCreate(
@@ -36,20 +54,24 @@ func (rc *Client) createIndex(model, index string, array ...bool) (err error) {
 		// Options:
 		&redis.FTCreateOptions{
 			OnJSON: true,
-			Prefix: []any{prefix},
+			Prefix: []any{rc.prefix(model, ":")},
 		},
-		// Index schema fields:
-		&redis.FieldSchema{
-			FieldName: fmt.Sprintf("$.%s", index),
-			As:        index,
-			FieldType: redis.SearchFieldTypeTag,
-		},
+		schema...,
 	).Result()
 	if err != nil {
-		logger.Log.Debugf("Error while creating %s index '%s': %v", model, index, err)
-		return err
+		logger.Log.Debugf("Error while creating %s indexes: %v", model, err)
+	} else {
+		logger.Log.Debugf("%v Indexes created", model)
 	}
-	logger.Log.Debugf("%v Index '%v' created", model, index)
 
 	return err
+}
+
+func (rc *client) prefixIndex(modelName string) string {
+	b := strings.Builder{}
+	b.Grow(60)
+	b.WriteString(rc.p)
+	b.WriteString("indexes:")
+	b.WriteString(modelName)
+	return b.String()
 }

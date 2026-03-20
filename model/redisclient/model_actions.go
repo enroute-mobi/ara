@@ -17,11 +17,11 @@ type model interface {
 // --------------------------------- \\
 
 type Batch struct {
-	rc   *Client
+	rc   *client
 	docs []redis.JSONSetArgs
 }
 
-func (rc *Client) NewBatch() Batch {
+func (rc *client) NewBatch() Batch {
 	return Batch{rc: rc}
 }
 
@@ -47,24 +47,40 @@ func (b *Batch) Save(doc redis.JSONSetArgs) error {
 
 // --------------------------------- \\
 
-func (rc *Client) Save(value model) error {
+func (rc *client) Set(value model) error {
 	_, err := rc.c.JSONSet(rc.ctx, value.ModelId(), "$", value).Result()
 	return err
 }
 
-func (rc *Client) Get(id string) (string, error) {
-	return rc.c.JSONGet(rc.ctx, rc.prefix(id), "$").Result()
+func (rc *client) Get(modelName, id string) (string, error) {
+	return rc.c.JSONGet(rc.ctx, rc.prefix(modelName, ":", id), "$").Result()
 }
 
-func (rc *Client) FindBy(modelName, indexName, id string, uuid ...bool) ([]redis.Document, error) {
-	if len(uuid) != 0 {
-		id = strings.ReplaceAll(id, "-", "\\-")
-	}
+func (rc *client) GetPath(modelName, id, path string) (string, error) {
+	return rc.c.JSONGet(rc.ctx, rc.prefix(modelName, ":", id), path).Result()
+}
 
+func (rc *client) FindAll(modelName string) ([]redis.Document, error) {
+	return rc.findBy(modelName, "*")
+}
+
+func (rc *client) FindByCode(modelName, codespace, id string) ([]redis.Document, error) {
+	// We suppose we can't have any '"' or ':' in codespaces or ids
+	return rc.findBy(modelName, codeQuery(codespace, id))
+}
+
+// https://redis.io/docs/latest/develop/ai/search-and-query/query/exact-match/#em3?lang=Go
+func (rc *client) FindBy(modelName, fieldName, id string) ([]redis.Document, error) {
+	// We suppose we can't have any '"' in ids
+	// id = strings.ReplaceAll(id, "\"", "\\\"")
+	return rc.findBy(modelName, query(fieldName, id))
+}
+
+func (rc *client) findBy(modelName, query string) ([]redis.Document, error) {
 	r, err := rc.c.FTSearch(
 		rc.ctx,
-		rc.prefixIndex(modelName, indexName),
-		query(indexName, id),
+		rc.prefixIndex(modelName),
+		query,
 	).Result()
 	if err != nil {
 		return nil, err
@@ -73,17 +89,27 @@ func (rc *Client) FindBy(modelName, indexName, id string, uuid ...bool) ([]redis
 	return r.Docs, nil
 }
 
-func query(indexName, id string) string {
+func (rc *client) Delete(id string) error {
+	_, err := rc.c.JSONDel(rc.ctx, rc.prefix(id), "$").Result()
+	return err
+}
+
+func query(fieldName, id string) string {
 	b := strings.Builder{}
 	b.WriteString("@")
-	b.WriteString(indexName)
-	b.WriteString(":{")
+	b.WriteString(fieldName)
+	b.WriteString(":{\"")
 	b.WriteString(id)
-	b.WriteRune('}')
+	b.WriteString("\"}")
 	return b.String()
 }
 
-func (rc *Client) Delete(id string) error {
-	_, err := rc.c.JSONDel(rc.ctx, rc.prefix(id), "$").Result()
-	return err
+func codeQuery(codespace, id string) string {
+	b := strings.Builder{}
+	b.WriteString("@codespace_")
+	b.WriteString(codespace)
+	b.WriteString(":{\"")
+	b.WriteString(id)
+	b.WriteString("\"}")
+	return b.String()
 }

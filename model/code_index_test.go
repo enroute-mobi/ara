@@ -127,7 +127,7 @@ var benchmarkCodeResult *StopVisit
 var benchmarkCodeResultId string
 
 func benchmarkCodeFindWithoutIndex(sv int, b *testing.B) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 
 	for range sv {
 		stopVisit := model.StopVisits().New()
@@ -148,7 +148,7 @@ func benchmarkCodeFindWithoutIndex(sv int, b *testing.B) {
 }
 
 func benchmarkCodeFindWithIndex(sv int, b *testing.B) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	index := NewCodeIndex()
 
 	for range sv {

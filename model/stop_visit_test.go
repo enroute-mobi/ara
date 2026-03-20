@@ -80,7 +80,7 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_StopVisit_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	stopVisit := model.StopVisits().New()
 	code := NewCode("codeSpace", "value")
 	stopVisit.SetCode(code)
@@ -285,7 +285,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

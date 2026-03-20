@@ -32,7 +32,7 @@ func Test_SIRIFacilityMonitoringSubscriptionCollector(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestMemoryModel()
+	referential.model = model.NewTestModel()
 	referentials.Save(referential)
 
 	partners := NewPartnerManager(referential)

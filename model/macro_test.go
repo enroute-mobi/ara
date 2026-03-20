@@ -73,7 +73,7 @@ func Test_MacroBuilder_NOk(t *testing.T) {
 func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel().(*memoryModel)
+	model := NewTestModel().(*memoryModel)
 	manager := NewMacroManager().(*macroManager)
 
 	smc := &SelectMacro{

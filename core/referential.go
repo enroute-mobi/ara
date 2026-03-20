@@ -15,6 +15,7 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/redisclient"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -37,6 +38,7 @@ type Referential struct {
 
 	collectManager    CollectManagerInterface
 	broacasterManager BroadcastManagerInterface
+	redisClient       redisclient.Client
 	manager           Referentials
 	model             model.Model
 	modelGuardian     *ModelGuardian
@@ -173,6 +175,8 @@ func (referential *Referential) Start() {
 		audit.CurrentBigQuery(string(referential.slug)).Start()
 	}
 
+	referential.redisClient.Start(referential.startedAt)
+
 	referential.partners.Start()
 	referential.modelGuardian.Start()
 
@@ -191,6 +195,7 @@ func (referential *Referential) Stop() {
 	referential.partners.Stop()
 	referential.modelGuardian.Stop()
 	referential.broacasterManager.Stop()
+	referential.redisClient.Stop()
 	audit.CurrentBigQuery(string(referential.slug)).Stop()
 }
 
@@ -310,13 +315,22 @@ func CurrentReferentials() Referentials {
 }
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
-	model := model.NewMemoryModel(string(slug))
-
 	referential := &Referential{
 		ReferentialSettings: s.NewReferentialSettings(),
 		manager:             manager,
-		model:               model,
 		slug:                slug,
+	}
+
+	if config.Config.RedisAddr != "" {
+		c, err := redisclient.New(string(slug), config.Config.CodeSpaces)
+		if err != nil {
+			logger.Log.Printf("Error while creating Redis Client for referential %v: %v", slug, err)
+			return nil
+		}
+
+		referential.model = model.NewHybridModel(string(slug), c)
+	} else {
+		referential.model = model.NewMemoryModel(string(slug))
 	}
 
 	referential.partners = NewPartnerManager(referential)

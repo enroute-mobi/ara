@@ -48,7 +48,7 @@ func Test_Referential_StartedAt(t *testing.T) {
 }
 
 func Test_Referential_Model(t *testing.T) {
-	model := model.NewTestMemoryModel()
+	model := model.NewTestModel()
 	referential := Referential{
 		model: model,
 	}

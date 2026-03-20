@@ -15,7 +15,7 @@ import (
 func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -64,7 +64,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.
 func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -113,7 +113,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderNotExisting(t *testi
 func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVisit(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -161,7 +161,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutORder_With_One_StopVis
 func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_One_StopVisit(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 
 	sa := model.StopAreas().New()
@@ -214,7 +214,7 @@ func Test_UpdateManager_UpdateVehicle_WithNextStop_WithoutOrder_With_More_Than_O
 }
 
 func Test_UpdateManager_CreateStopVisit(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -261,7 +261,7 @@ func Test_UpdateManager_CreateStopVisit(t *testing.T) {
 }
 
 func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -311,7 +311,7 @@ func Test_UpdateManager_UpdateStopVisit(t *testing.T) {
 func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 	emptyCode := NewCode("codeSpace", "")
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -347,7 +347,7 @@ func Test_UpdateManager_CreateStopVisit_NoStopAreaId(t *testing.T) {
 func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 	emptyCode := NewCode("codeSpace", "")
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	code := NewCode("codeSpace", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
@@ -396,7 +396,7 @@ func Test_UpdateManager_UpdateStopVisit_NoStopAreaId(t *testing.T) {
 }
 
 func Test_UpdateManager_UpdateStatus(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	manager := newUpdateManager(model)
 
 	sa := model.StopAreas().New()
@@ -435,7 +435,7 @@ func Test_UpdateManager_UpdateStatus(t *testing.T) {
 func Test_UpdateManager_UpdateNotCollected(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	manager := newUpdateManager(model)
 	code := NewCode("codeSpace", "value")
 
@@ -490,7 +490,7 @@ func Test_UpdateManager_UpdateFreshVehicleJourney(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
@@ -546,7 +546,7 @@ func Test_SituationUpdateManager_Update(t *testing.T) {
 	code := NewCode("codeSpace", "value")
 	testTime := time.Now()
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	situation := model.Situations().New()
 	situation.SetCode(code)
 	situation.SetCode(NewCode("_default", code.HashValue()))
@@ -567,7 +567,7 @@ func Test_FacilityUpdateManager_Update_With_Wrong_Status(t *testing.T) {
 	assert := assert.New(t)
 	code := NewCode("codeSpace", "value")
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	facility := model.Facilities().New()
 	facility.SetCode(code)
 	facility.Status = FacilityStatusPartiallyAvailable
@@ -589,7 +589,7 @@ func Test_FacilityUpdateManager_Update_With_Known_Status(t *testing.T) {
 	assert := assert.New(t)
 	code := NewCode("codeSpace", "value")
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	facility := model.Facilities().New()
 	facility.SetCode(code)
 	facility.Status = FacilityStatusPartiallyAvailable
@@ -612,7 +612,7 @@ func Test_SituationUpdateManager_SameRecordedAtAndSameVersion(t *testing.T) {
 	code := NewCode("codeSpace", "value")
 	testTime := time.Now()
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	situation := model.Situations().New()
 	situation.SetCode(code)
 	situation.RecordedAt = testTime

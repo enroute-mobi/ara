@@ -36,6 +36,9 @@ type config struct {
 	ColorizeLog           bool
 	LoadMaxInsert         int
 	FakeUUIDRealFormat    bool
+
+	// Temp field while we wait for a true solution
+	CodeSpaces []string
 }
 
 var Config = config{}
@@ -88,6 +91,10 @@ func LoadConfig(path string) error {
 	redisDB := os.Getenv("ARA_REDIS_DB")
 	if redisDB != "" {
 		Config.RedisDB, _ = strconv.Atoi(redisDB)
+	}
+	redisCS := os.Getenv("ARA_REDIS_CODESPACES")
+	if redisDB != "" {
+		Config.CodeSpaces = strings.Split(redisCS, ",")
 	}
 
 	logger.Log.Syslog = Config.Syslog

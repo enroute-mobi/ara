@@ -26,7 +26,7 @@ func Test_StopArea_Id(t *testing.T) {
 func Test_StopArea_Lines(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	line := model.Lines().New()
 	line.Save()
 
@@ -177,7 +177,7 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_StopArea_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	stopArea := model.StopAreas().New()
 	code := NewCode("codeSpace", "value")
 	stopArea.SetCode(code)
@@ -407,7 +407,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

@@ -81,7 +81,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	defer testSpan.Finish()
 
 	referential := &Referential{
-		model:          model.NewTestMemoryModel(),
+		model:          model.NewTestModel(),
 		collectManager: NewTestCollectManager(),
 	}
 	referential.modelGuardian = NewModelGuardian(referential)

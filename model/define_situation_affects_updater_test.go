@@ -10,7 +10,7 @@ import (
 func Test_Macro_DefineSituationAffects(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel().(*memoryModel)
+	model := NewTestModel().(*memoryModel)
 	manager := NewMacroManager().(*macroManager)
 
 	sm := &SelectMacro{

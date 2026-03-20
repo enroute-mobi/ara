@@ -10,7 +10,7 @@ import (
 func Test_Macro_CreateCode_StopArea(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	manager := model.Macros().(*macroManager)
 	attributes := `{"source_code_space": "sae", "target_code_space": "regional", "target_pattern": "prefix:%{value}:suffix"}`
 
@@ -96,7 +96,7 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 func Test_Macro_CreateCode_Line(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	manager := model.Macros().(*macroManager)
 	attributes := `{"source_code_space": "sae", "target_code_space": "regional", "target_pattern": "prefix:%{value}:suffix"}`
 

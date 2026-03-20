@@ -125,17 +125,19 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 }
 
 func (line *Line) Referent() (*Line, bool) {
+	if line.ReferentId == "" {
+		return nil, false
+	}
 	return line.model.Lines().Find(line.ReferentId)
 }
 
 func (line *Line) ReferentOrSelfCode(codeSpace string) (Code, bool) {
-	ref, ok := line.Referent()
-	if ok {
-		code, ok := ref.Code(codeSpace)
-		if ok {
-			return code, true
+	if line.ReferentId != "" {
+		if refCode, ok := line.model.Lines().FindCode(line.ReferentId, codeSpace); ok {
+			return refCode, true
 		}
 	}
+
 	code, ok := line.Code(codeSpace)
 	if ok {
 		return code, true
@@ -150,13 +152,12 @@ We only send the Line if it has no referent with a correct codeSpace.
 If that's the case, we'll send the Referent instead
 */
 func (line *Line) DiscoveryCode(codeSpace string) (Code, bool) {
-	ref, ok := line.Referent()
-	if ok {
-		_, ok := ref.Code(codeSpace)
-		if ok {
+	if line.ReferentId != "" {
+		if _, ok := line.model.Lines().FindCode(line.ReferentId, codeSpace); ok {
 			return Code{}, false
 		}
 	}
+
 	code, ok := line.Code(codeSpace)
 	if ok {
 		return code, true
@@ -193,6 +194,7 @@ type Lines interface {
 
 	FindFamily(LineId) []LineId
 	FindFamilyFromCode(Code) []LineId
+	FindCode(LineId, string) (Code, bool)
 }
 
 func NewMemoryLines() Lines {
@@ -253,6 +255,17 @@ func (manager *memoryLines) CodeExists(code Code) bool {
 	manager.mutex.RUnlock()
 
 	return ok
+}
+
+func (manager *memoryLines) FindCode(id LineId, codespace string) (Code, bool) {
+	manager.mutex.RLock()
+	line, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
+	if ok {
+		return line.Code(codespace)
+	}
+	return Code{}, false
 }
 
 func (manager *memoryLines) FindAll() (lines []*Line) {

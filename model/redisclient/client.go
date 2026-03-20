@@ -11,14 +11,61 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Client struct {
+var TestClient Client
+
+type Client interface {
+	Start(t time.Time) error
+	Stop()
+
+	Set(model) error
+	Get(string, string) (string, error)
+	GetPath(string, string, string) (string, error)
+	FindAll(string) ([]redis.Document, error)
+	FindBy(string, string, string) ([]redis.Document, error)
+	FindByCode(string, string, string) ([]redis.Document, error)
+	Delete(string) error
+	FlushAll()
+}
+
+type client struct {
 	c   *redis.Client
 	ctx context.Context
 
-	p string
+	slug       string
+	p          string
+	codespaces []string
 }
 
-func New(slug string, t time.Time, ctxs ...context.Context) (rc *Client, err error) {
+func New(slug string, codespaces []string, ctxs ...context.Context) (rc Client, err error) {
+	var ctx context.Context
+	if len(ctxs) != 0 {
+		ctx = ctxs[0]
+	} else {
+		ctx = context.Background()
+	}
+
+	rc = &client{
+		ctx:        ctx,
+		slug:       slug,
+		codespaces: codespaces,
+	}
+
+	return
+}
+
+func (rc *client) Start(t time.Time) error {
+	rc.p = fmt.Sprintf("%s:%v:", rc.slug, t.UnixNano())
+
+	var err error
+	rc.c, err = newRedisclient(rc.ctx)
+	if err != nil {
+		return err
+	}
+
+	return rc.initIndexes()
+}
+
+func newRedisclient(ctx context.Context) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:        config.Config.RedisAddr,
 		Password:    config.Config.RedisPassword,
@@ -27,52 +74,32 @@ func New(slug string, t time.Time, ctxs ...context.Context) (rc *Client, err err
 		DialTimeout: 5 * time.Second,
 		ReadTimeout: 5 * time.Second,
 	})
-	var ctx context.Context
-	if len(ctxs) != 0 {
-		ctx = ctxs[0]
-	} else {
-		ctx = context.Background()
-	}
 
-	err = client.Ping(ctx).Err()
+	err := client.Ping(ctx).Err()
 	if err != nil {
+		logger.Log.Debugf("Can't Ping Redis database: %v", err)
 		return nil, err
 	}
 
 	logger.Log.Debugf("Connected to Redis on %s", client.Options().Addr)
+	return client, nil
 
-	rc = &Client{
-		c:   client,
-		ctx: ctx,
-		p:   fmt.Sprintf("%s:%v:", slug, t.UnixNano()),
-	}
-
-	rc.InitIndexes()
-
-	return
 }
 
-func (rc *Client) Close() {
+func (rc *client) Stop() {
 	rc.c.Close()
 }
 
-func (rc *Client) prefix(s ...string) string {
+func (rc *client) FlushAll() {
+	rc.c.FlushAll(rc.ctx)
+}
+
+func (rc *client) prefix(s ...string) string {
 	b := strings.Builder{}
 	b.Grow(60)
 	b.WriteString(rc.p)
 	for i := range s {
 		b.WriteString(s[i])
 	}
-	return b.String()
-}
-
-func (rc *Client) prefixIndex(modelName, indexName string) string {
-	b := strings.Builder{}
-	b.Grow(60)
-	b.WriteString(rc.p)
-	b.WriteString("indexes:")
-	b.WriteString(modelName)
-	b.WriteString(":by_")
-	b.WriteString(indexName)
 	return b.String()
 }

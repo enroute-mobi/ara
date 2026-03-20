@@ -215,7 +215,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Situation_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	situation := model.Situations().New()
 	code := NewCode("codeSpace", "value")
 	situation.SetCode(code)
@@ -466,7 +466,7 @@ func Test_MemorySituations_Delete(t *testing.T) {
 
 func Test_AffectFromProto(t *testing.T) {
 	assert := assert.New(t)
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 
 	stopArea := model.StopAreas().New()
 	code := NewCode("external", "A")
@@ -596,7 +596,7 @@ func GetReferencesSlice(refs map[string]struct{}) []string {
 
 func Test_AffectToProto(t *testing.T) {
 	assert := assert.New(t)
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 
 	stopArea := model.StopAreas().New()
 	code := NewCode("external", "A")

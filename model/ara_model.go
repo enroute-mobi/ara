@@ -1,6 +1,7 @@
 package model
 
 import (
+	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -69,4 +70,11 @@ type Model interface {
 	SetBroadcastSXChan(chan SituationBroadcastEvent)
 	SetBroadcastVeChan(chan VehicleBroadcastEvent)
 	SetBroadcastFMChan(chan FacilityBroadcastEvent)
+}
+
+func NewTestModel(referential ...string) Model {
+	if config.Config.RedisAddr != "" {
+		return NewTestHybridModel(config.Config.CodeSpaces, referential...)
+	}
+	return NewTestMemoryModel(referential...)
 }

@@ -43,7 +43,7 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 }
 
 func Test_StopVisitSelectorByLine(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 
 	line := model.Lines().New()
 	code := NewCode("codeSpace", "value")
@@ -86,7 +86,7 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	startTime := time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC)
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 
 	// Good VehicleJourney
 	line := model.Lines().New()

@@ -3,6 +3,7 @@ package model
 import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
+	"bitbucket.org/enroute-mobi/ara/model/redisclient"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
@@ -17,6 +18,8 @@ func (mm *hybridManager) SetModel(m Model) {
 }
 
 type hybridModel struct {
+	client redisclient.Client
+
 	lines               Lines
 	lineGroups          LineGroups
 	stopAreaGroups      StopAreaGroups
@@ -39,8 +42,9 @@ type hybridModel struct {
 	date                Date
 }
 
-func NewHybridModel(referential string) Model {
+func NewHybridModel(referential string, client redisclient.Client) Model {
 	model := &hybridModel{
+		client:      client,
 		date:        NewDate(clock.DefaultClock().Now()),
 		referential: referential,
 	}
@@ -50,9 +54,10 @@ func NewHybridModel(referential string) Model {
 	return model
 }
 
-func NewTestHybridModel(referential ...string) Model {
+func NewTestHybridModel(codespaces []string, referential ...string) Model {
 	model := &hybridModel{
-		date: NewDate(clock.DefaultClock().Now()),
+		date:   NewDate(clock.DefaultClock().Now()),
+		client: redisclient.TestClient,
 	}
 
 	if len(referential) != 0 {
@@ -65,7 +70,7 @@ func NewTestHybridModel(referential ...string) Model {
 }
 
 func (model *hybridModel) refresh() {
-	lines := NewMemoryLines()
+	lines := NewRedisLines(model.client)
 	lines.SetModel(model)
 	model.lines = lines
 

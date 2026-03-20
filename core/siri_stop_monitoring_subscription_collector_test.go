@@ -20,7 +20,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	collectManager := NewTestCollectManager()
 	referential := &Referential{
 		collectManager: collectManager,
-		model:          model.NewTestMemoryModel(),
+		model:          model.NewTestModel(),
 	}
 	referential.Model().StopAreas().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -89,7 +89,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	// Create a SIRIStopMonitoringRequestCollector
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestMemoryModel()
+	referential.model = model.NewTestModel()
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
@@ -134,7 +134,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	// Create a SIRIStopMonitoringRequestCollector
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestMemoryModel()
+	referential.model = model.NewTestModel()
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 
@@ -273,7 +273,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 
 	referentials := NewMemoryReferentials()
 	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestMemoryModel()
+	referential.model = model.NewTestModel()
 	referentials.Save(referential)
 	partners := NewPartnerManager(referential)
 

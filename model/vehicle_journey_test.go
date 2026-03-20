@@ -23,7 +23,7 @@ func Test_VehicleJourney_Id(t *testing.T) {
 func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	generator := uuid.NewFakeUUIDGenerator()
 	// Create a StopVisit
 	model.StopVisits().SetUUIDGenerator(generator)
@@ -84,7 +84,7 @@ func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_VehicleJourney_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	vehicleJourney := model.VehicleJourneys().New()
 	code := NewCode("codeSpace", "value")
 	vehicleJourney.SetCode(code)
@@ -247,7 +247,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

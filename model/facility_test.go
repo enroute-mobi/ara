@@ -95,7 +95,7 @@ func Test_Facility_UnmarshalJSON_WithoutStatus(t *testing.T) {
 func Test_Facility_Save(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := NewTestModel()
 	facility := model.Facilities().New()
 	code := NewCode("codeSpace", "value")
 	facility.SetCode(code)
