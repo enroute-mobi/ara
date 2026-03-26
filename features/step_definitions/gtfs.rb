@@ -27,8 +27,19 @@ end
 Then('this GTFS-RT response should contain a Trip Update with these attributes:') do |attributes|
   debug @gtfs_response.trip_updates.inspect
 
-  @gtfs_response = @gtfs_response.trip_updates.map(&:trip)
-  expect(@gtfs_response).to include(an_object_having_attributes(gtfs_attributes(attributes)))
+  attributes = attributes.rows_hash.dup
+
+  # Support vehicle/id attribute outside trip
+  vehicle_matcher = nil
+  if attributes.key?('vehicle/id')
+    vehicle_matcher = an_object_having_attributes(id: attributes.delete('vehicle/id'))
+  end
+
+  trip_matcher = an_object_having_attributes(gtfs_attributes(attributes))
+  trip_update_matcher = an_object_having_attributes(**({ "trip" => trip_matcher, "vehicle" => vehicle_matcher }.compact))
+
+  @gtfs_response = @gtfs_response.trip_updates
+  expect(@gtfs_response).to include(trip_update_matcher)
 end
 
 Then('this GTFS-RT response should contain an Alert with these attributes:') do |attributes|

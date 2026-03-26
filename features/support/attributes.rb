@@ -316,8 +316,13 @@ def has_attributes(response_array, attributes)
   expect(found_value).to include(parsed_attributes)
 end
 
-def gtfs_attributes(table)
-  attributes = table.rows_hash.dup
+def gtfs_attributes(attributes_or_table)
+  attributes =
+    if attributes_or_table.respond_to?(:rows_hash)
+      attributes_or_table.rows_hash.dup
+    else
+      attributes_or_table
+    end
 
   attributes.dup.each do |key, value|
     if key =~ /direction_id|schedule_relationship/
@@ -338,8 +343,6 @@ def gtfs_attributes(table)
 
       attributes.delete key
     end
-
-
   end
 
   attributes
