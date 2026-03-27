@@ -14,6 +14,9 @@ import (
 
 type StopAreaId ModelId
 
+var saReferentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ReferentId) }
+var saParentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ParentId) }
+
 type StopArea struct {
 	Collectable
 	CollectedUntil time.Time
@@ -219,14 +222,12 @@ func (stopArea *StopArea) Save() bool {
 
 type MemoryStopAreas struct {
 	uuid.UUIDConsumer
+	IndexHandler
 
 	model *MemoryModel
 
 	mutex        *sync.RWMutex
 	byIdentifier map[StopAreaId]*StopArea
-	byParent     *Index
-	byReferent   *Index
-	byCode       *CodeIndex
 
 	broadcastEvent func(event StopMonitoringBroadcastEvent)
 }
@@ -249,17 +250,16 @@ type StopAreas interface {
 	Delete(*StopArea) bool
 }
 
-func NewMemoryStopAreas() *MemoryStopAreas {
-	referentExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ReferentId) }
-	parentExtractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*StopArea)).ParentId) }
-
-	return &MemoryStopAreas{
+func NewMemoryStopAreas() (m *MemoryStopAreas) {
+	m = &MemoryStopAreas{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaId]*StopArea),
-		byReferent:   NewIndex(referentExtractor),
-		byParent:     NewIndex(parentExtractor),
-		byCode:       NewCodeIndex(),
 	}
+	m.InitIndexes()
+	m.AddIndex(ByParent, OneToMany, saParentExtractor)
+	m.AddIndex(ByReferent, OneToMany, saReferentExtractor)
+
+	return
 }
 
 func (manager *MemoryStopAreas) New() *StopArea {
@@ -281,7 +281,7 @@ func (manager *MemoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if ok {
 		return manager.byIdentifier[StopAreaId(id)].copy(), true
 	}
@@ -291,7 +291,7 @@ func (manager *MemoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
 
 func (manager *MemoryStopAreas) CodeExists(code Code) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byCode.Find(code)
+	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
 
 	return ok
@@ -326,7 +326,7 @@ func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAre
 func (manager *MemoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byReferent.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByReferent, ModelId(id))
 
 	for _, id := range ids {
 		sa := manager.byIdentifier[StopAreaId(id)]
@@ -340,7 +340,7 @@ func (manager *MemoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*St
 func (manager *MemoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byParent.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByParent, ModelId(id))
 
 	for _, id := range ids {
 		sa := manager.byIdentifier[StopAreaId(id)]
@@ -382,9 +382,7 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 
 	stopArea.model = manager.model
 	manager.byIdentifier[stopArea.Id()] = stopArea
-	manager.byReferent.Index(stopArea)
-	manager.byParent.Index(stopArea)
-	manager.byCode.Index(stopArea)
+	manager.Index(stopArea)
 
 	manager.mutex.Unlock()
 
@@ -405,9 +403,7 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, stopArea.Id())
-	manager.byReferent.Delete(ModelId(stopArea.id))
-	manager.byParent.Delete(ModelId(stopArea.id))
-	manager.byCode.Delete(ModelId(stopArea.id))
+	manager.Deindex(ModelId(stopArea.id))
 
 	return true
 }
@@ -425,11 +421,11 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 func (manager *MemoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	stopAreaIds = []StopAreaId{stopAreaId}
 
-	ids, _ := manager.byParent.Find(ModelId(stopAreaId))
+	ids, _ := manager.FindBy(ByParent, ModelId(stopAreaId))
 	for _, id := range ids {
 		stopAreaIds = append(stopAreaIds, manager.findFamily(StopAreaId(id))...)
 	}
-	ids, _ = manager.byReferent.Find(ModelId(stopAreaId))
+	ids, _ = manager.FindBy(ByReferent, ModelId(stopAreaId))
 	for _, id := range ids {
 		stopAreaIds = append(stopAreaIds, manager.findFamily(StopAreaId(id))...)
 	}

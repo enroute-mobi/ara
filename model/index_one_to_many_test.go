@@ -6,7 +6,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-func createTestIndex() *Index {
+func createTestIndex() *indexOneToMany {
 	extractor := func(instance ModelInstance) ModelId {
 		stopVisit := (instance.(*StopVisit))
 		return ModelId(stopVisit.VehicleJourneyId)

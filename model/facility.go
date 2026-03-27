@@ -67,7 +67,7 @@ type MemoryFacilities struct {
 	model        *MemoryModel
 	mutex        *sync.RWMutex
 	byIdentifier map[FacilityId]*Facility
-	byCode       *CodeIndex
+	byCode       *codeIndex
 
 	broadcastEvent func(event FacilityBroadcastEvent)
 }

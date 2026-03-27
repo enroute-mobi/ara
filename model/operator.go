@@ -91,7 +91,7 @@ type MemoryOperators struct {
 	mutex *sync.RWMutex
 
 	byIdentifier map[OperatorId]*Operator
-	byCode       *CodeIndex
+	byCode       *codeIndex
 }
 
 type Operators interface {

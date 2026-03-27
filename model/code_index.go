@@ -1,18 +1,18 @@
 package model
 
-type CodeIndex struct {
+type codeIndex struct {
 	byCode       map[Code]ModelId
 	byIdentifier map[ModelId]Codes
 }
 
-func NewCodeIndex() *CodeIndex {
-	return &CodeIndex{
+func NewCodeIndex() *codeIndex {
+	return &codeIndex{
 		byCode:       make(map[Code]ModelId),
 		byIdentifier: make(map[ModelId]Codes),
 	}
 }
 
-func (index *CodeIndex) Index(model ModelInstance) {
+func (index *codeIndex) Index(model ModelInstance) {
 	if currentIndexable, ok := index.byIdentifier[model.ModelId()]; ok {
 		for indexedCodeSpace, indexedCode := range currentIndexable {
 			modelCode, ok := model.Code(indexedCodeSpace)
@@ -30,12 +30,12 @@ func (index *CodeIndex) Index(model ModelInstance) {
 	}
 }
 
-func (index *CodeIndex) Find(code Code) (ModelId, bool) {
+func (index *codeIndex) Find(code Code) (ModelId, bool) {
 	modelId, ok := index.byCode[code]
 	return modelId, ok
 }
 
-func (index *CodeIndex) Delete(modelId ModelId) {
+func (index *codeIndex) Delete(modelId ModelId) {
 	currentIndexable, ok := index.byIdentifier[modelId]
 	if !ok {
 		return

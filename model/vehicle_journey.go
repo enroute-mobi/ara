@@ -17,6 +17,8 @@ const (
 
 type VehicleJourneyId ModelId
 
+var VjLineExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*VehicleJourney)).LineId) }
+
 type VehicleJourney struct {
 	References    References
 	model         Model
@@ -81,6 +83,17 @@ func (vehicleJourney *VehicleJourney) Line() *Line {
 		return nil
 	}
 	return line
+}
+
+func (vehicleJourney *VehicleJourney) Vehicle() *Vehicle {
+	if vehicleJourney.model == nil {
+		return nil
+	}
+	vehicle, ok := vehicleJourney.model.Vehicles().FindByVehicleJourneyId(vehicleJourney.id)
+	if !ok {
+		return nil
+	}
+	return vehicle
 }
 
 func (vehicleJourney *VehicleJourney) MarshalJSON() ([]byte, error) {
@@ -191,13 +204,12 @@ func (vehicleJourney *VehicleJourney) Save() bool {
 
 type MemoryVehicleJourneys struct {
 	uuid.UUIDConsumer
+	IndexHandler
 
 	model Model
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleJourneyId]*VehicleJourney
-	byCode            *CodeIndex
-	byLine            *Index
 	byBroadcastedFull map[string]map[VehicleJourneyId]struct{}
 }
 
@@ -216,16 +228,16 @@ type VehicleJourneys interface {
 	DeleteById(VehicleJourneyId) bool
 }
 
-func NewMemoryVehicleJourneys() *MemoryVehicleJourneys {
-	extractor := func(instance ModelInstance) ModelId { return ModelId((instance.(*VehicleJourney)).LineId) }
-
-	return &MemoryVehicleJourneys{
+func NewMemoryVehicleJourneys() (m *MemoryVehicleJourneys) {
+	m = &MemoryVehicleJourneys{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleJourneyId]*VehicleJourney),
-		byCode:            NewCodeIndex(),
-		byLine:            NewIndex(extractor),
 		byBroadcastedFull: make(map[string]map[VehicleJourneyId]struct{}),
 	}
+	m.InitIndexes()
+	m.AddIndex(ByLine, OneToMany, VjLineExtractor)
+
+	return
 }
 
 func (manager *MemoryVehicleJourneys) New() *VehicleJourney {
@@ -272,7 +284,7 @@ func (manager *MemoryVehicleJourneys) FindByCode(code Code) (*VehicleJourney, bo
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if ok {
 		return manager.byIdentifier[VehicleJourneyId(id)].copy(), true
 	}
@@ -282,7 +294,7 @@ func (manager *MemoryVehicleJourneys) FindByCode(code Code) (*VehicleJourney, bo
 
 func (manager *MemoryVehicleJourneys) CodeExists(code Code) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byCode.Find(code)
+	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
 
 	return ok
@@ -291,7 +303,7 @@ func (manager *MemoryVehicleJourneys) CodeExists(code Code) bool {
 func (manager *MemoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []*VehicleJourney) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.byLine.Find(ModelId(id))
+	ids, _ := manager.FindBy(ByLine, ModelId(id))
 
 	for _, id := range ids {
 		vj := manager.byIdentifier[VehicleJourneyId(id)]
@@ -323,8 +335,7 @@ func (manager *MemoryVehicleJourneys) Save(vehicleJourney *VehicleJourney) bool 
 
 	vehicleJourney.model = manager.model
 	manager.byIdentifier[vehicleJourney.Id()] = vehicleJourney
-	manager.byCode.Index(vehicleJourney)
-	manager.byLine.Index(vehicleJourney)
+	manager.Index(vehicleJourney)
 
 	return true
 }
@@ -338,8 +349,8 @@ func (manager *MemoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, id)
-	manager.byCode.Delete(ModelId(id))
-	manager.byLine.Delete(ModelId(id))
+	manager.Deindex(ModelId(id))
+
 	for subscriptionId, vehicleJourneyIds := range manager.byBroadcastedFull {
 		delete(vehicleJourneyIds, id)
 		if len(vehicleJourneyIds) == 0 {
