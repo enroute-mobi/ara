@@ -38,8 +38,22 @@ Then('this GTFS-RT response should contain a Trip Update with these attributes:'
   trip_matcher = an_object_having_attributes(gtfs_attributes(attributes))
   trip_update_matcher = an_object_having_attributes(**({ "trip" => trip_matcher, "vehicle" => vehicle_matcher }.compact))
 
-  @gtfs_response = @gtfs_response.trip_updates
-  expect(@gtfs_response).to include(trip_update_matcher)
+  expect(@gtfs_response.trip_updates).to include(trip_update_matcher)
+end
+
+Then('this GTFS-RT response should contain a Trip Update {string} with these stop time updates:') do |trip_id, attributes| 
+  debug @gtfs_response.trip_updates.inspect
+
+  stop_time_update_matchers = attributes.hashes.map do |stop_time_update_attributes|
+    stop_time_update_attributes = stop_time_update_attributes.map do |key, value|
+      value = value.to_i if key =='stop_sequence'
+      [ key , value ]
+    end.to_h
+    an_object_having_attributes stop_time_update_attributes
+  end
+
+  trip_update = @gtfs_response.trip_updates.find { |update| update.trip.trip_id == trip_id }
+  expect(trip_update.stop_time_update).to include(*stop_time_update_matchers)
 end
 
 Then('this GTFS-RT response should contain an Alert with these attributes:') do |attributes|
