@@ -56,6 +56,7 @@ const (
 
 	BROADCAST_GTFS_CACHE_TIMEOUT                          = "broadcast.gtfs.cache_timeout"
 	BROADCAST_GZIP_GTFS                                   = "broadcast.gzip_gtfs"
+	BROADCAST_GTFS_STOP_SEQUENCE_FROM_ONE                 = "broadcast.gtfs.stop_sequence_from_one"
 	BROADCAST_NO_DATAFRAMEREF_REWRITING_FROM              = "broadcast.no_dataframeref_rewriting_from"
 	BROADCAST_NO_DESTINATIONREF_REWRITING_FROM            = "broadcast.no_destinationref_rewriting_from"
 	BROADCAST_PREFER_REFERENT_STOP_AREAS                  = "broadcast.prefer_referent_stop_areas"
@@ -107,6 +108,7 @@ type PartnerSettings struct {
 	rateLimit                                               float64
 	gtfsTTL                                                 time.Duration
 	gtfsCacheTimeout                                        time.Duration
+	gtfsEnforceStopSequence                                 bool
 	httpCustomHeaders                                       []string
 	siriCredentialHeader                                    string
 	siriEnvelopeType                                        string
@@ -188,6 +190,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string, resolvers []
 	s.setRateLimit(settings)
 	s.setGtfsTTL(settings)
 	s.setGtfsCacheTimeout(settings)
+	s.setGtfsEnforceStopSequence(settings)
 	s.setRecordedCallsDuration(settings)
 
 	s.setSIRIEnvelopeType(settings)
@@ -397,6 +400,15 @@ func (s *PartnerSettings) setGtfsTTL(settings map[string]string) {
 
 func (s *PartnerSettings) GtfsTTL() (t time.Duration) {
 	return s.gtfsTTL
+}
+
+func (s *PartnerSettings) setGtfsEnforceStopSequence(settings map[string]string) {
+	enforceStopSequence, _ := strconv.ParseBool(settings[BROADCAST_GTFS_STOP_SEQUENCE_FROM_ONE])
+	s.gtfsEnforceStopSequence = enforceStopSequence
+}
+
+func (s *PartnerSettings) GtfsEnforceStopSequence() bool {
+	return s.gtfsEnforceStopSequence
 }
 
 func (s *PartnerSettings) setRecordedCallsDuration(settings map[string]string) {

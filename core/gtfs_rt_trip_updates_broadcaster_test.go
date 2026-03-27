@@ -1,6 +1,7 @@
 package core
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -56,7 +57,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
-	stopVisit.PassageOrder = 1
+	stopVisit.PassageOrder = 12
 	stopVisit.Save()
 
 	line2 := referential.model.Lines().New()
@@ -76,6 +77,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit2.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit2.PassageOrder = 34
 	stopVisit2.Save()
 
 	stopVisit3 := referential.model.StopVisits().New()
@@ -84,6 +86,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	stopVisit3.StopAreaId = stopArea.Id()
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(10*time.Minute))
+	stopVisit3.PassageOrder = 56
 	stopVisit3.Save()
 
 	gtfsFeed := &gtfs.FeedMessage{}
@@ -469,4 +472,58 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	if r := "saId"; stopTimeUpdate.GetStopId() != r {
 		t.Errorf("Incorrect StopId in StopTimeUpdate:\n got: %v\n want: %v", stopTimeUpdate.GetStopId(), r)
 	}
+}
+
+func Test_rewriteStopSequence(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("referential")
+	partner := referential.Partners().New("partner")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	connector := NewTripUpdatesBroadcaster(partner)
+	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
+
+	number := 1
+
+	tripId := "tripId"
+	routeId := "routeId"
+	tripDescriptor := &gtfs.TripDescriptor{
+		TripId:  &tripId,
+		RouteId: &routeId,
+	}
+
+	id := strconv.Itoa(number)
+	entity := &gtfs.FeedEntity{
+		Id:         &id,
+		TripUpdate: &gtfs.TripUpdate{Trip: tripDescriptor},
+	}
+
+	for number <= 5 {
+		stopId := "stopId"
+		stopSequence := uint32(number + number*2)
+		stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
+			StopSequence: &stopSequence,
+			StopId:       &stopId,
+		}
+
+		entity.TripUpdate.StopTimeUpdate = append(entity.TripUpdate.StopTimeUpdate, stopTimeUpdate)
+		number++
+	}
+
+	var actualStopSequences []int
+	for i := range entity.TripUpdate.StopTimeUpdate {
+		actualStopSequences = append(actualStopSequences, int(*entity.TripUpdate.StopTimeUpdate[i].StopSequence))
+	}
+	assert.Equal([]int{3, 6, 9, 12, 15}, actualStopSequences)
+
+	// Rewrite and order from zero
+	connector.rewriteStopSequence(entity, uint32(0))
+
+	var newStopSequences []int
+	for i := range entity.TripUpdate.StopTimeUpdate {
+		newStopSequences = append(newStopSequences, int(*entity.TripUpdate.StopTimeUpdate[i].StopSequence))
+	}
+	assert.Equal([]int{0, 1, 2, 3, 4}, newStopSequences)
 }
