@@ -78,7 +78,7 @@ func Test_Equal_Unexported(t *testing.T) {
 // 	attributes.Set("key", "value")
 
 // 	references := NewReferences()
-// 	obj := NewCode("codeSpace", "value")
+// 	obj := NewCode("internal", "value")
 
 // 	reference := Reference{Code: &obj}
 // 	references.Set("key", reference)

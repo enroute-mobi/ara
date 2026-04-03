@@ -457,6 +457,6 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		t.Errorf("Wrong LineIds:\n got: %v\n expected: [d0eebc99-9c0b,e0eebc99-9c0b]", stopArea.LineIds)
 	}
 	if ref, ok := stopArea.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
 }

@@ -19,8 +19,8 @@ func (rc *client) initIndexes() (err error) {
 	return err
 }
 
-func (rc *client) createIndex(model string, indexes []string, indexcodespaces bool) (err error) {
-	indexKey := rc.prefixIndex(model)
+func (rc *client) createIndex(modelName string, indexes []string, indexcodespaces bool) (err error) {
+	indexKey := rc.prefixIndex(modelName)
 
 	schema := []*redis.FieldSchema{
 		{
@@ -41,7 +41,8 @@ func (rc *client) createIndex(model string, indexes []string, indexcodespaces bo
 	if indexcodespaces {
 		for _, i := range rc.codespaces {
 			schema = append(schema, &redis.FieldSchema{
-				FieldName: fmt.Sprintf("$.codes.%v.value", i),
+				FieldName: fmt.Sprintf("$.Codes.%v", i),
+				// FieldName: fmt.Sprintf("$.codes.%v.Value", i),
 				As:        fmt.Sprintf("codespace_%v", i),
 				FieldType: redis.SearchFieldTypeTag,
 			})
@@ -54,14 +55,14 @@ func (rc *client) createIndex(model string, indexes []string, indexcodespaces bo
 		// Options:
 		&redis.FTCreateOptions{
 			OnJSON: true,
-			Prefix: []any{rc.prefix(model, ":")},
+			Prefix: []any{rc.prefix(modelName, ":")},
 		},
 		schema...,
 	).Result()
 	if err != nil {
-		logger.Log.Debugf("Error while creating %s indexes: %v", model, err)
+		logger.Log.Debugf("Error while creating %s indexes: %v", modelName, err)
 	} else {
-		logger.Log.Debugf("%v Indexes created", model)
+		logger.Log.Debugf("%v Indexes created", modelName)
 	}
 
 	return err

@@ -181,7 +181,7 @@ func (m *redisManager[Id, P, T]) SetModel(model Model) {
 }
 
 /*
-   For managers which handles code
+   For managers that handles code
    If we need to have more embedded structs like that, we should use another pattern:
 
    type codeHandler[Id ~string, P any, T RedisModelInstance[Id, P]] struct{
@@ -207,7 +207,9 @@ func (m *redisCodeHandlerManager[Id, P, T]) FindByCode(c Code) (T, bool) {
 		logger.Log.Debugf("Error While finding %v by code: %v", m.modelName, err)
 		return nil, false
 	}
-
+	if len(docs) == 0 {
+		return nil, false
+	}
 	t := m.new(m.model)
 	err = json.Unmarshal([]byte(docs[0].Fields["$"]), t)
 	if err != nil {

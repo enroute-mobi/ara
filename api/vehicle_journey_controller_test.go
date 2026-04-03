@@ -269,7 +269,7 @@ func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 	ref := core.NewMemoryReferentials().New("test")
 
 	vehicleJourney := ref.Model().VehicleJourneys().New()
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	vehicleJourney.SetCode(code)
 	ref.Model().VehicleJourneys().Save(vehicleJourney)
 
@@ -277,7 +277,7 @@ func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 		referential: ref,
 	}
 
-	_, ok := controller.findVehicleJourney("codeSpace:value")
+	_, ok := controller.findVehicleJourney("internal:value")
 	assert.True(ok, "Can't find VehicleJourney by Code")
 
 	_, ok = controller.findVehicleJourney(string(vehicleJourney.Id()))

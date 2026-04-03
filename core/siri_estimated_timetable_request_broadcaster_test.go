@@ -21,7 +21,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -30,42 +30,42 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
+	stopArea.SetCode(model.NewCode("internal", "stopArea1"))
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetCode(model.NewCode("codeSpace", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("internal", "stopArea2"))
 	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line := referential.model.Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("internal", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("internal", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("internal", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
-	vehicleJourney2.SetCode(model.NewCode("codeSpace", "vehicleJourney2"))
+	vehicleJourney2.SetCode(model.NewCode("internal", "vehicleJourney2"))
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	vehicleJourney3 := referential.model.VehicleJourneys().New()
-	vehicleJourney3.SetCode(model.NewCode("codeSpace", "vehicleJourney3"))
+	vehicleJourney3.SetCode(model.NewCode("internal", "vehicleJourney3"))
 	vehicleJourney3.LineId = line2.Id()
 	vehicleJourney3.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("internal", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -75,7 +75,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit.Save()
 
 	stopVisit2 := referential.model.StopVisits().New()
-	stopVisit2.SetCode(model.NewCode("codeSpace", "stopVisit2"))
+	stopVisit2.SetCode(model.NewCode("internal", "stopVisit2"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.StopAreaId = stopArea2.Id()
 	stopVisit2.PassageOrder = 2
@@ -85,7 +85,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit2.Save()
 
 	stopVisit3 := referential.model.StopVisits().New()
-	stopVisit3.SetCode(model.NewCode("codeSpace", "stopVisit3"))
+	stopVisit3.SetCode(model.NewCode("internal", "stopVisit3"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.StopAreaId = stopArea.Id()
 	stopVisit3.PassageOrder = 1
@@ -95,7 +95,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 	stopVisit3.Save()
 
 	stopVisit4 := referential.model.StopVisits().New()
-	stopVisit4.SetCode(model.NewCode("codeSpace", "stopVisit4"))
+	stopVisit4.SetCode(model.NewCode("internal", "stopVisit4"))
 	stopVisit4.VehicleJourneyId = vehicleJourney3.Id()
 	stopVisit4.StopAreaId = stopArea.Id()
 	stopVisit4.PassageOrder = 1
@@ -186,7 +186,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -195,7 +195,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
+	stopArea.SetCode(model.NewCode("internal", "stopArea1"))
 	stopArea.Monitored = true
 	stopArea.Save()
 
@@ -206,27 +206,27 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	stopArea2.Save()
 
 	line := referential.model.Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("internal", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("internal", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("internal", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
-	vehicleJourney2.SetCode(model.NewCode("codeSpace", "vehicleJourney2"))
+	vehicleJourney2.SetCode(model.NewCode("internal", "vehicleJourney2"))
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("internal", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -236,7 +236,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	stopVisit.Save()
 
 	stopVisit3 := referential.model.StopVisits().New()
-	stopVisit3.SetCode(model.NewCode("codeSpace", "stopVisit3"))
+	stopVisit3.SetCode(model.NewCode("internal", "stopVisit3"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.StopAreaId = stopArea2.Id()
 	stopVisit3.PassageOrder = 1

@@ -13,6 +13,15 @@ import (
 
 var TestClient Client
 
+// var replacer = strings.NewReplacer(
+// 	"$", "\\$",
+// 	"{", "\\{",
+// 	"}", "\\}",
+// 	"\\", "\\\\",
+// 	"|", "\\|",
+// 	":", "\\:",
+// )
+
 type Client interface {
 	Start(t time.Time) error
 	Stop()
@@ -31,6 +40,7 @@ type client struct {
 	c   *redis.Client
 	ctx context.Context
 
+	replacer   *strings.Replacer
 	slug       string
 	p          string
 	codespaces []string

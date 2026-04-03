@@ -20,19 +20,19 @@ func Test_PTT_checklines(t *testing.T) {
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
 		"local_url":         "http://ara",
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := newSIRIProductionTimetableSubscriptionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("internal", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("internal", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 

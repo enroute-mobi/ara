@@ -244,6 +244,6 @@ func Test_MemoryLines_Load(t *testing.T) {
 		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
 	if ref, ok := line.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
 }

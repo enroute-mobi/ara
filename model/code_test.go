@@ -8,10 +8,10 @@ import (
 
 func Test_Code_CodeSpace(t *testing.T) {
 	code := Code{
-		codeSpace: "codeSpace",
+		codeSpace: "internal",
 	}
 
-	if expected := "codeSpace"; code.CodeSpace() != expected {
+	if expected := "internal"; code.CodeSpace() != expected {
 		t.Errorf("Code.CodeSpace() returns wrong value, got: %s, required: %s", code.CodeSpace(), expected)
 	}
 }
@@ -28,10 +28,10 @@ func Test_Code_Value(t *testing.T) {
 
 func Test_Code_String(t *testing.T) {
 	code := Code{
-		codeSpace: "codeSpace",
+		codeSpace: "internal",
 		value:     "value",
 	}
-	if expected := "codeSpace:value"; code.String() != expected {
+	if expected := "internal:value"; code.String() != expected {
 		t.Errorf("Code.String() returns wrong value, got: %s, required: %s", code.String(), expected)
 	}
 }
@@ -71,15 +71,15 @@ func Test_Codes_UnmarshalJSON(t *testing.T) {
 
 func Test_Code_ToSlice(t *testing.T) {
 	m := map[string]string{
-		"codeSpace":  "value",
-		"codeSpace2": "value2",
+		"internal": "value",
+		"external": "value2",
 	}
 	objs := NewCodesFromMap(m)
 	s := objs.ToSlice()
 	if len(s) != 2 {
 		t.Errorf("Wrong number of entries in code slice, want: 2 got: %v", len(s))
 	}
-	if s[0] != "codeSpace:value" && s[1] != "codeSpace:value" {
+	if s[0] != "internal:value" && s[1] != "internal:value" {
 		t.Errorf("We should find 'kind:value' in result slice, got %v", s)
 	}
 }

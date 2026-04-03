@@ -4,7 +4,7 @@ package redisclient
 
 const (
 	ModelID      = "id"
-	ReferentID   = "referent_id"
+	ReferentID   = "ReferentId"
 	ByReferentID = ReferentID
 
 	Line = "line"

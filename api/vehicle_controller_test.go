@@ -176,7 +176,7 @@ func Test_VehicleController_FindVehicle(t *testing.T) {
 	ref := core.NewMemoryReferentials().New("test")
 
 	vehicle := ref.Model().Vehicles().New()
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	vehicle.SetCode(code)
 	ref.Model().Vehicles().Save(vehicle)
 
@@ -184,7 +184,7 @@ func Test_VehicleController_FindVehicle(t *testing.T) {
 		referential: ref,
 	}
 
-	_, ok := controller.findVehicle("codeSpace:value")
+	_, ok := controller.findVehicle("internal:value")
 	assert.True(ok, "Can't find Vehicle by Code")
 
 	_, ok = controller.findVehicle(string(vehicle.Id()))

@@ -16,17 +16,17 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 	partner.RefreshConnectors()
 
 	stopArea := referential.Model().StopAreas().New()
-	saCode := model.NewCode("codeSpace", "saValue")
+	saCode := model.NewCode("internal", "saValue")
 	stopArea.SetCode(saCode)
 	stopArea.Save()
 
 	vj := referential.Model().VehicleJourneys().New()
-	vjCode := model.NewCode("codeSpace", "vjValue")
+	vjCode := model.NewCode("internal", "vjValue")
 	vj.SetCode(vjCode)
 	vj.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	stopVisit.SetCode(code)
 	stopVisit.Save()
 

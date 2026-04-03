@@ -17,6 +17,9 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(err)
 	}
+	if len(config.Config.CodeSpaces) == 0 {
+		config.Config.CodeSpaces = []string{"internal", "external"}
+	}
 
 	if config.Config.RedisAddr == "" {
 		return
@@ -34,6 +37,7 @@ func TestMain(m *testing.M) {
 	c := m.Run()
 
 	if config.Config.RedisAddr != "" {
+		TestClient.FlushAll()
 		TestClient.Stop()
 	}
 

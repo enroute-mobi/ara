@@ -21,7 +21,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -30,21 +30,21 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	connector.SetClock(clock.NewFakeClock())
 	connector.Start()
 
-	code := model.NewCode("codeSpace", "modelOperatorRef")
+	code := model.NewCode("internal", "modelOperatorRef")
 
 	operator := referential.Model().Operators().New()
 	operator.SetCode(code)
 
 	operator.Save()
 
-	code = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code = model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopVisit := referential.model.StopVisits().New()
 	stopVisitRef := model.Reference{}
-	obj1 := model.NewCode("codeSpace", "modelOperatorRef")
+	obj1 := model.NewCode("internal", "modelOperatorRef")
 	stopVisitRef.Code = &obj1
 
 	stopVisit.SetCode(obj1)
@@ -55,14 +55,14 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisit.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	obj := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:26:LOC")
+	obj := model.NewCode("internal", "NINOXE:StopPoint:SP:26:LOC")
 	vehicleJourney.SetCode(obj)
 	vehicleJourney.Save()
 
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 
 	line := referential.model.Lines().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:27:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:27:LOC")
 	line.SetCode(obj)
 	line.Save()
 
@@ -70,7 +70,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 
 	stopVisit2 := referential.model.StopVisits().New()
 	stopVisitRef2 := model.Reference{}
-	obj2 := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:28:LOC")
+	obj2 := model.NewCode("internal", "NINOXE:StopPoint:SP:28:LOC")
 	stopVisitRef2.Code = &obj2
 
 	stopVisit2.SetCode(obj2)
@@ -81,7 +81,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisit2.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
-	obj2 = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:29:LOC")
+	obj2 = model.NewCode("internal", "NINOXE:StopPoint:SP:29:LOC")
 	vehicleJourney2.SetCode(obj2)
 	vehicleJourney2.Save()
 
@@ -144,14 +144,14 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 
 	settings := map[string]string{
 		"local_url":         "http://ara",
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 	connector.Start()
 
-	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
@@ -164,7 +164,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 
 	stopVisit := referential.model.StopVisits().New()
 	stopVisitRef := model.Reference{}
-	obj1 := model.NewCode("codeSpace", "modelOperatorRef")
+	obj1 := model.NewCode("internal", "modelOperatorRef")
 	stopVisitRef.Code = &obj1
 
 	stopVisit.SetCode(obj1)
@@ -175,21 +175,21 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	stopVisit.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	obj := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:26:LOC")
+	obj := model.NewCode("internal", "NINOXE:StopPoint:SP:26:LOC")
 	vehicleJourney.SetCode(obj)
 	vehicleJourney.Save()
 
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 
 	line := referential.model.Lines().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:27:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:27:LOC")
 	line.SetCode(obj)
 	line.Save()
 
 	vehicleJourney.LineId = line.Id()
 
 	stopVisit2 := referential.model.StopVisits().New()
-	obj2 := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:28:LOC")
+	obj2 := model.NewCode("internal", "NINOXE:StopPoint:SP:28:LOC")
 	stopVisit2.SetCode(obj2)
 	stopVisit2.References.Set("OperatorRef", stopVisitRef)
 	stopVisit2.StopAreaId = stopArea2.Id()
@@ -244,7 +244,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -253,23 +253,23 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
-	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	stopArea.SetCode(code)
 	stopArea.Save()
 
 	line := referential.model.Lines().New()
-	obj := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:27:LOC")
+	obj := model.NewCode("internal", "NINOXE:StopPoint:SP:27:LOC")
 	line.SetCode(obj)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:26:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:26:LOC")
 	vehicleJourney.SetCode(obj)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	stopVisit := referential.model.StopVisits().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:25:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:25:LOC")
 	stopVisit.SetCode(obj)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
@@ -277,18 +277,18 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 	stopVisit.Save()
 
 	line2 := referential.model.Lines().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:7:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:7:LOC")
 	line2.SetCode(obj)
 	line.Save()
 
 	vehicleJourney2 := referential.model.VehicleJourneys().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:6:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:6:LOC")
 	vehicleJourney2.SetCode(obj)
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	stopVisit2 := referential.model.StopVisits().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:5:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:5:LOC")
 	stopVisit2.SetCode(obj)
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney2.Id()
@@ -323,7 +323,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -332,17 +332,17 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	connector.Start()
 
 	stopArea := referential.Model().StopAreas().New()
-	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	stopArea.SetCode(code)
 	stopArea.Save()
 
 	line := referential.model.Lines().New()
-	obj := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:27:LOC")
+	obj := model.NewCode("internal", "NINOXE:StopPoint:SP:27:LOC")
 	line.SetCode(obj)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:26:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:26:LOC")
 	vehicleJourney.SetCode(obj)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
@@ -350,7 +350,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	startTime, _ := time.Parse(time.RFC3339, "2016-09-22T07:54:52.977Z")
 
 	stopVisit := referential.model.StopVisits().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:25:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:25:LOC")
 	stopVisit.SetCode(obj)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
@@ -358,7 +358,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 	stopVisit.Save()
 
 	stopVisit2 := referential.model.StopVisits().New()
-	obj = model.NewCode("codeSpace", "NINOXE:StopPoint:SP:5:LOC")
+	obj = model.NewCode("internal", "NINOXE:StopPoint:SP:5:LOC")
 	stopVisit2.SetCode(obj)
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
@@ -393,7 +393,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testin
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
