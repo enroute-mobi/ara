@@ -17,13 +17,13 @@ type Client interface {
 	Start(t time.Time) error
 	Stop()
 
-	Set(model) error
+	Set(string, model) error
 	Get(string, string) (string, error)
 	GetPath(string, string, string) (string, error)
 	FindAll(string) ([]redis.Document, error)
 	FindBy(string, string, string) ([]redis.Document, error)
 	FindByCode(string, string, string) ([]redis.Document, error)
-	Delete(string) error
+	Delete(string, string) error
 	FlushAll()
 }
 
@@ -87,7 +87,9 @@ func newRedisclient(ctx context.Context) (*redis.Client, error) {
 }
 
 func (rc *client) Stop() {
-	rc.c.Close()
+	if rc.c != nil {
+		rc.c.Close()
+	}
 }
 
 func (rc *client) FlushAll() {

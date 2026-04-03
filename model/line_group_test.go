@@ -58,7 +58,7 @@ func Test_LineGroup_UnmarshalJSON(t *testing.T) {
 func Test_LineGroup_Save(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestModel()
+	model := newTestModel(t)
 	lineGroup := model.LineGroups().New()
 	assert.Equal(model, lineGroup.model, "New lineGroup model should be MemoryLineGroup model")
 
@@ -178,7 +178,7 @@ func Test_MemoryLineGroups_Load(t *testing.T) {
 	require.NoError(err)
 
 	// Fetch data from the db
-	model := NewTestModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

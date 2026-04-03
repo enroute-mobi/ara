@@ -38,7 +38,7 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 	defer ts.Close()
 
 	// Create a SIRIStopMonitoringRequestCollector
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 
 	settings := map[string]string{

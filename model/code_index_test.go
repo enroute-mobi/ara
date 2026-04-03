@@ -9,7 +9,7 @@ import (
 func Test_CodeIndex_simple(t *testing.T) {
 	index := NewCodeIndex()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit := &StopVisit{id: "stopVisitId"}
 	stopVisit.codes = make(Codes)
 	stopVisit.SetCode(code)
@@ -28,7 +28,7 @@ func Test_CodeIndex_simple(t *testing.T) {
 func Test_CodeIndex_MultipleIndex(t *testing.T) {
 	index := NewCodeIndex()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit := &StopVisit{id: "stopVisitId"}
 	stopVisit.codes = make(Codes)
 	stopVisit.SetCode(code)
@@ -48,14 +48,14 @@ func Test_CodeIndex_MultipleIndex(t *testing.T) {
 func Test_CodeIndex_Multiple(t *testing.T) {
 	index := NewCodeIndex()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit := &StopVisit{id: "stopVisitId"}
 	stopVisit.codes = make(Codes)
 	stopVisit.SetCode(code)
 
 	index.Index(stopVisit)
 
-	code2 := NewCode("codeSpace", "value2")
+	code2 := NewCode("internal", "value2")
 	stopVisit2 := &StopVisit{id: "stopVisitId2"}
 	stopVisit2.codes = make(Codes)
 	stopVisit2.SetCode(code2)
@@ -82,14 +82,14 @@ func Test_CodeIndex_Multiple(t *testing.T) {
 func Test_CodeIndex_Change(t *testing.T) {
 	index := NewCodeIndex()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit := &StopVisit{id: "stopVisitId"}
 	stopVisit.codes = make(Codes)
 	stopVisit.SetCode(code)
 
 	index.Index(stopVisit)
 
-	code2 := NewCode("codeSpace", "value2")
+	code2 := NewCode("internal", "value2")
 	stopVisit.SetCode(code2)
 	index.Index(stopVisit)
 
@@ -109,7 +109,7 @@ func Test_CodeIndex_Change(t *testing.T) {
 func Test_CodeIndex_Delete(t *testing.T) {
 	index := NewCodeIndex()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit := &StopVisit{id: "stopVisitId"}
 	stopVisit.codes = make(Codes)
 	stopVisit.SetCode(code)
@@ -127,16 +127,16 @@ var benchmarkCodeResult *StopVisit
 var benchmarkCodeResultId string
 
 func benchmarkCodeFindWithoutIndex(sv int, b *testing.B) {
-	model := NewTestModel()
+	model := NewTestMemoryModel()
 
 	for range sv {
 		stopVisit := model.StopVisits().New()
-		code := NewCode("codeSpace", uuid.DefaultUUIDGenerator().NewUUID())
+		code := NewCode("internal", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetCode(code)
 		stopVisit.Save()
 	}
 	stopVisit := model.StopVisits().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit.SetCode(code)
 	stopVisit.Save()
 
@@ -148,18 +148,18 @@ func benchmarkCodeFindWithoutIndex(sv int, b *testing.B) {
 }
 
 func benchmarkCodeFindWithIndex(sv int, b *testing.B) {
-	model := NewTestModel()
+	model := NewTestMemoryModel()
 	index := NewCodeIndex()
 
 	for range sv {
 		stopVisit := model.StopVisits().New()
-		code := NewCode("codeSpace", uuid.DefaultUUIDGenerator().NewUUID())
+		code := NewCode("internal", uuid.DefaultUUIDGenerator().NewUUID())
 		stopVisit.SetCode(code)
 		stopVisit.Save()
 		index.Index(stopVisit)
 	}
 	stopVisit := model.StopVisits().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit.SetCode(code)
 	stopVisit.Save()
 	index.Index(stopVisit)

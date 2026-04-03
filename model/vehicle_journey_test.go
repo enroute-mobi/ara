@@ -23,7 +23,7 @@ func Test_VehicleJourney_Id(t *testing.T) {
 func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestModel()
+	model := newTestModel(t)
 	generator := uuid.NewFakeUUIDGenerator()
 	// Create a StopVisit
 	model.StopVisits().SetUUIDGenerator(generator)
@@ -34,12 +34,12 @@ func Test_VehicleJourney_MarshalJSON(t *testing.T) {
 	// Create the vehicleJourney
 	model.VehicleJourneys().SetUUIDGenerator(generator)
 	vehicleJourney := model.VehicleJourneys().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
 	expected := `
-{"Codes":{"codeSpace":"value"},
+{"Codes":{"internal":"value"},
 "Monitored":false,
 "HasCompleteStopSequence":false,
 "Cancellation":false,
@@ -84,9 +84,9 @@ func Test_VehicleJourney_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_VehicleJourney_Save(t *testing.T) {
-	model := NewTestModel()
+	model := newTestModel(t)
 	vehicleJourney := model.VehicleJourneys().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicleJourney.SetCode(code)
 
 	if vehicleJourney.model != model {
@@ -112,10 +112,10 @@ func Test_VehicleJourney_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	vehicleJourney.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicleJourney.SetCode(code)
 
-	foundCode, ok := vehicleJourney.Code("codeSpace")
+	foundCode, ok := vehicleJourney.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -201,7 +201,7 @@ func Test_MemoryVehicleJourneys_Delete(t *testing.T) {
 
 	vehicleJourneys := NewMemoryVehicleJourneys()
 	existingVehicleJourney := vehicleJourneys.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingVehicleJourney.SetCode(code)
 	vehicleJourneys.Save(existingVehicleJourney)
 
@@ -247,7 +247,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
@@ -278,7 +278,7 @@ func Test_MemoryVehicleJourneys_Load(t *testing.T) {
 		t.Errorf("Wrong LineId:\n got: %v\n expected: c0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11", vehicleJourney.LineId)
 	}
 	if ref, ok := vehicleJourney.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
 }
 

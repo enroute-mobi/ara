@@ -5,7 +5,7 @@ import (
 )
 
 func Test_Factories_CreateConnector(t *testing.T) {
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 
 	partner.ConnectorTypes = []string{

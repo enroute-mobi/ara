@@ -143,6 +143,10 @@ func (referential *Referential) Model() model.Model {
 	return referential.model
 }
 
+func (referential *Referential) RedisClient() redisclient.Client {
+	return referential.redisClient
+}
+
 func (referential *Referential) ModelGuardian() *ModelGuardian {
 	return referential.modelGuardian
 }
@@ -175,8 +179,6 @@ func (referential *Referential) Start() {
 		audit.CurrentBigQuery(string(referential.slug)).Start()
 	}
 
-	referential.redisClient.Start(referential.startedAt)
-
 	referential.partners.Start()
 	referential.modelGuardian.Start()
 
@@ -195,7 +197,6 @@ func (referential *Referential) Stop() {
 	referential.partners.Stop()
 	referential.modelGuardian.Stop()
 	referential.broacasterManager.Stop()
-	referential.redisClient.Stop()
 	audit.CurrentBigQuery(string(referential.slug)).Stop()
 }
 
@@ -266,6 +267,12 @@ func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 func (referential *Referential) NextReloadAt() time.Time {
 	return referential.nextReloadAt
 }
+func (referential *Referential) SetModel(m model.Model) {
+	referential.model = m
+	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
+
+}
 
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model for referential %v", referential.slug)
@@ -324,10 +331,13 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	if config.Config.RedisAddr != "" {
 		c, err := redisclient.New(string(slug), config.Config.CodeSpaces)
 		if err != nil {
-			logger.Log.Printf("Error while creating Redis Client for referential %v: %v", slug, err)
-			return nil
+			panic(err)
 		}
-
+		err = c.Start(time.Now())
+		if err != nil {
+			panic(err)
+		}
+		referential.redisClient = c
 		referential.model = model.NewHybridModel(string(slug), c)
 	} else {
 		referential.model = model.NewMemoryModel(string(slug))

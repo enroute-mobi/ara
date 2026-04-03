@@ -15,15 +15,11 @@ import (
 func Test_EstimatedTimetableBroadcaster_Create_Events(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
-
-	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	_, referential := newTestReferential(t)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 	}
@@ -73,31 +69,30 @@ func Test_checklines(t *testing.T) {
 	assert := assert.New(t)
 
 	// Test Setup
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
 		"local_url":         "http://ara",
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := newSIRIEstimatedTimetableSubscriptionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.model.Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("internal", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.model.Lines().New()
-	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("internal", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	line3 := referential.model.Lines().New()
-	line3.SetCode(model.NewCode("AnotherCodeSpace", "NINOXE:Line:A:BUS"))
+	line3.SetCode(model.NewCode("external", "NINOXE:Line:A:BUS"))
 	line3.Name = "lineName3"
 	line3.Save()
 

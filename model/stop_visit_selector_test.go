@@ -43,10 +43,10 @@ func Test_StopVisitSelectorByTime(t *testing.T) {
 }
 
 func Test_StopVisitSelectorByLine(t *testing.T) {
-	model := NewTestModel()
+	model := newTestModel(t)
 
 	line := model.Lines().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	line.SetCode(code)
 	line.Save()
 
@@ -64,7 +64,7 @@ func Test_StopVisitSelectorByLine(t *testing.T) {
 		t.Errorf("Selector should return true, got false")
 	}
 
-	code2 := NewCode("codeSpace", "value2")
+	code2 := NewCode("internal", "value2")
 	line2 := model.Lines().New()
 	line2.SetCode(code2)
 	line2.Save()
@@ -86,11 +86,11 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	startTime := time.Date(2017, time.April, 1, 1, 0, 0, 0, time.UTC)
 	endTime := time.Date(2017, time.April, 1, 2, 0, 0, 0, time.UTC)
 
-	model := NewTestModel()
+	model := newTestModel(t)
 
 	// Good VehicleJourney
 	line := model.Lines().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	line.SetCode(code)
 	line.Save()
 
@@ -117,7 +117,7 @@ func Test_CompositeStopVisitSelector(t *testing.T) {
 	}
 
 	// Wrong Line
-	code2 := NewCode("codeSpace", "value2")
+	code2 := NewCode("internal", "value2")
 	line2 := model.Lines().New()
 	line2.SetCode(code2)
 	line2.Save()

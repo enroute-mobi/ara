@@ -215,9 +215,9 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Situation_Save(t *testing.T) {
-	model := NewTestModel()
+	model := newTestModel(t)
 	situation := model.Situations().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	situation.SetCode(code)
 
 	if situation.model != model {
@@ -239,10 +239,10 @@ func Test_Situation_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	situation.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	situation.SetCode(code)
 
-	foundCode, ok := situation.Code("codeSpace")
+	foundCode, ok := situation.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -452,7 +452,7 @@ func Test_MemorySituations_FindAll(t *testing.T) {
 func Test_MemorySituations_Delete(t *testing.T) {
 	situations := NewMemorySituations()
 	existingSituation := situations.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingSituation.SetCode(code)
 	situations.Save(existingSituation)
 
@@ -466,7 +466,7 @@ func Test_MemorySituations_Delete(t *testing.T) {
 
 func Test_AffectFromProto(t *testing.T) {
 	assert := assert.New(t)
-	model := NewTestModel()
+	model := newTestModel(t)
 
 	stopArea := model.StopAreas().New()
 	code := NewCode("external", "A")
@@ -578,6 +578,9 @@ any affect`,
 			continue
 		}
 		assert.Nil(err)
+		if err != nil {
+			continue
+		}
 		assert.Equalf(tt.expectedAffect, affect, tt.message)
 		assert.Equal(tt.expectedMonitoringRefs, GetReferencesSlice(collectedRefs.MonitoringRefs))
 		assert.Equal(tt.expectedLineRefs, GetReferencesSlice(collectedRefs.LineRefs))
@@ -596,7 +599,7 @@ func GetReferencesSlice(refs map[string]struct{}) []string {
 
 func Test_AffectToProto(t *testing.T) {
 	assert := assert.New(t)
-	model := NewTestModel()
+	model := newTestModel(t)
 
 	stopArea := model.StopAreas().New()
 	code := NewCode("external", "A")
@@ -623,7 +626,7 @@ func Test_AffectToProto(t *testing.T) {
 	particularStopArea.Save()
 
 	wrongStopArea := model.StopAreas().New()
-	code = NewCode("WRONG", "B")
+	code = NewCode("internal", "B")
 	wrongStopArea.SetCode(code)
 	wrongStopArea.Save()
 

@@ -15,8 +15,7 @@ import (
 )
 
 func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -181,8 +180,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaNoSelector(t *testing
 }
 
 func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 

@@ -19,14 +19,12 @@ import (
 func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER}
@@ -36,7 +34,7 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	line := referential.Model().Lines().New()
-	code := model.NewCode("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
+	code := model.NewCode("internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
 	line.SetCode(code)
 	line.Save()
 
@@ -62,13 +60,11 @@ func Test_SubscriptionRequest_Dispatch_ETT(t *testing.T) {
 func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_PRODUCTION_TIMETABLE_SUBSCRIPTION_BROADCASTER}
@@ -78,7 +74,7 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 	connector, _ := partner.Connector(SIRI_SUBSCRIPTION_REQUEST_DISPATCHER)
 
 	line := referential.Model().Lines().New()
-	code := model.NewCode("_internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
+	code := model.NewCode("internal", "6ba7b814-9dad-11d1-1-00c04fd430c8")
 	line.SetCode(code)
 	line.Save()
 
@@ -101,13 +97,11 @@ func Test_SubscriptionRequest_Dispatch_PTT(t *testing.T) {
 }
 
 func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
@@ -119,7 +113,7 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
 
-	code := model.NewCode("_internal", "coicogn2")
+	code := model.NewCode("internal", "coicogn2")
 
 	stopArea.SetCode(code)
 	stopArea.Save()
@@ -155,13 +149,11 @@ func Test_SubscriptionRequest_Dispatch_SM(t *testing.T) {
 }
 
 func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_GENERAL_MESSAGE_SUBSCRIPTION_BROADCASTER}
@@ -201,13 +193,11 @@ func Test_SubscriptionRequest_Dispatch_GM(t *testing.T) {
 func Test_CancelSubscription(t *testing.T) {
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
@@ -241,13 +231,11 @@ func Test_CancelSubscription(t *testing.T) {
 func Test_CancelSubscriptionAll(t *testing.T) {
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{SIRI_SUBSCRIPTION_REQUEST_DISPATCHER}
@@ -298,18 +286,16 @@ func Test_ReceiveStateSM(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
 	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 		"remote_credential": "external",
 		"remote_url":        ts.URL,
 	}
@@ -328,7 +314,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Save()
 
-	code := model.NewCode("_internal", "coicogn2")
+	code := model.NewCode("internal", "coicogn2")
 
 	stopArea.SetCode(code)
 	stopArea.Save()
@@ -342,7 +328,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 	vehicleJourney.SetCode(code)
 	vehicleJourney.Save()
 
-	code = model.NewCode("_internal", "value")
+	code = model.NewCode("internal", "value")
 
 	sv1 := referential.Model().StopVisits().New()
 	sv1.SetCode(code)
@@ -351,7 +337,7 @@ func Test_ReceiveStateSM(t *testing.T) {
 	sv1.Schedules.SetArrivalTime("actual", fakeClock.Now().Add(5*time.Minute))
 	sv1.Save()
 
-	code = model.NewCode("_internal", "value2")
+	code = model.NewCode("internal", "value2")
 	sv2 := referential.Model().StopVisits().New()
 	sv2.SetCode(code)
 	sv2.StopAreaId = stopArea.Id()
@@ -399,18 +385,16 @@ func Test_ReceiveStateGM(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
 	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 
 	settings := map[string]string{
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 		"remote_credential": "external",
 		"remote_url":        ts.URL,
 	}
@@ -428,12 +412,12 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation := referential.Model().Situations().New()
 
 	line := referential.Model().Lines().New()
-	code0 := model.NewCode("_internal", "line1")
+	code0 := model.NewCode("internal", "line1")
 	line.SetCode(code0)
 	line.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	code1 := model.NewCode("_internal", "coicogn1")
+	code1 := model.NewCode("internal", "coicogn1")
 	stopArea.SetCode(code1)
 	stopArea.Save()
 
@@ -443,7 +427,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 	situation.Affects = append(situation.Affects, affectedStopArea)
 
 	stopArea2 := referential.Model().StopAreas().New()
-	code2 := model.NewCode("_internal", "coicogn2")
+	code2 := model.NewCode("internal", "coicogn2")
 	stopArea2.SetCode(code2)
 	stopArea2.Save()
 
@@ -451,7 +435,7 @@ func Test_ReceiveStateGM(t *testing.T) {
 	affectedStopArea2.StopAreaId = stopArea2.Id()
 	situation.Affects = append(situation.Affects, affectedStopArea2)
 
-	code3 := model.NewCode("_internal", string(situation.Id()))
+	code3 := model.NewCode("internal", string(situation.Id()))
 	situation.Keywords = []string{"Perturbation"}
 	period := &model.TimeRange{EndTime: fakeClock.Now().Add(10 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
@@ -512,12 +496,12 @@ func Test_HandleSubscriptionTerminatedNotification(t *testing.T) {
 
 	response, _ := sxml.NewXMLSubscriptionTerminatedNotificationFromContent(content)
 
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 
 	settings := map[string]string{
 		"remote_url":        "une url",
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
@@ -555,13 +539,13 @@ func Test_HandleNotifySubscriptionTerminated(t *testing.T) {
 
 	response, _ := sxml.NewXMLNotifySubscriptionTerminatedFromContent(content)
 
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 
 	partner := partners.New("slug")
 
 	settings := map[string]string{
 		"remote_url":        "une url",
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 

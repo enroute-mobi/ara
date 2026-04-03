@@ -10,8 +10,8 @@ import (
 func Test_Macro_DefineSituationAffects(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestModel().(*memoryModel)
-	manager := NewMacroManager().(*macroManager)
+	model := newTestModel(t)
+	manager := model.Macros().(*macroManager)
 
 	sm := &SelectMacro{
 		Id:              "id2",
@@ -40,7 +40,6 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 	if len(err) != 0 {
 		t.Fatal("Macro should be created: ", err)
 	}
-	model.macros = manager
 
 	asa := AffectedStopArea{
 		StopAreaId: "said",
@@ -54,7 +53,7 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 		LineId: "lid",
 	}
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 
 	c1 := &Consequence{
 		Affects: []Affect{asa},

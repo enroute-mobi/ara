@@ -80,9 +80,9 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_StopVisit_Save(t *testing.T) {
-	model := NewTestModel()
+	model := newTestModel(t)
 	stopVisit := model.StopVisits().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit.SetCode(code)
 	stopVisit.VehicleJourneyId = "6ba7b814-9dad-11d1-0-00c04fd430c8"
 
@@ -113,10 +113,10 @@ func Test_StopVisit_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	stopVisit.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopVisit.SetCode(code)
 
-	foundCode, ok := stopVisit.Code("codeSpace")
+	foundCode, ok := stopVisit.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -216,7 +216,7 @@ func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
 func Test_MemoryStopVisits_Delete(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 	existingStopVisit := stopVisits.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingStopVisit.SetCode(code)
 	stopVisits.Save(existingStopVisit)
 
@@ -238,8 +238,8 @@ func Test_MemoryStopVisits_DeleteMultiple(t *testing.T) {
 	stopVisits := NewMemoryStopVisits()
 	stopVisit1 := stopVisits.New()
 	stopVisit2 := stopVisits.New()
-	code1 := NewCode("codeSpace", "value1")
-	code2 := NewCode("codeSpace", "value2")
+	code1 := NewCode("internal", "value1")
+	code2 := NewCode("internal", "value2")
 	stopVisit1.SetCode(code1)
 	stopVisit2.SetCode(code2)
 	stopVisits.Save(stopVisit1)
@@ -285,7 +285,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
@@ -313,7 +313,7 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 		t.Errorf("StopVisit has wrong PassageOrder, got: %v want: 1", stopVisit.PassageOrder)
 	}
 	if ref, ok := stopVisit.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
 	svs := stopVisit.Schedules.Schedule("expected")
 	if svs == nil {

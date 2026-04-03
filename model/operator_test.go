@@ -52,9 +52,9 @@ func Test_Operator_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Operator_Save(t *testing.T) {
-	model := NewTestModel()
+	model := newTestModel(t)
 	operator := model.Operators().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	operator.SetCode(code)
 
 	if operator.model != model {
@@ -76,10 +76,10 @@ func Test_Operator_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	operator.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	operator.SetCode(code)
 
-	foundCode, ok := operator.Code("codeSpace")
+	foundCode, ok := operator.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -163,7 +163,7 @@ func Test_MemoryOperators_FindAll(t *testing.T) {
 func Test_MemoryOperators_Delete(t *testing.T) {
 	operators := NewMemoryOperators()
 	existingOperator := operators.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingOperator.SetCode(code)
 	operators.Save(existingOperator)
 
@@ -199,7 +199,7 @@ func Test_MemoryOperators_Load(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	model := NewTestModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

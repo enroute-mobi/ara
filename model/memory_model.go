@@ -35,14 +35,14 @@ type memoryModel struct {
 	SXEventsChan        chan SituationBroadcastEvent
 	VeEventChan         chan VehicleBroadcastEvent
 	FMEventChan         chan FacilityBroadcastEvent
-	referential         string
+	referentialSlug     string
 	date                Date
 }
 
 func NewMemoryModel(referential string) Model {
 	model := &memoryModel{
-		date:        NewDate(clock.DefaultClock().Now()),
-		referential: referential,
+		date:            NewDate(clock.DefaultClock().Now()),
+		referentialSlug: referential,
 	}
 
 	model.refresh()
@@ -50,13 +50,9 @@ func NewMemoryModel(referential string) Model {
 	return model
 }
 
-func NewTestMemoryModel(referential ...string) Model {
+func NewTestMemoryModel() Model {
 	model := &memoryModel{
 		date: NewDate(clock.DefaultClock().Now()),
-	}
-
-	if len(referential) != 0 {
-		model.referential = referential[0]
 	}
 
 	model.refresh()
@@ -124,12 +120,12 @@ func (model *memoryModel) refresh() {
 
 func (model *memoryModel) RefreshMacros() {
 	model.macros = NewMacroManager()
-	model.macros.Load(model.referential)
+	model.macros.Load(model.referentialSlug)
 }
 
 func (model *memoryModel) RefreshControls() {
 	model.controls = NewControlManager()
-	model.controls.Load(model.referential)
+	model.controls.Load(model.referentialSlug)
 }
 
 func (model *memoryModel) SetBroadcastSMChan(broadcastSMEventChan chan StopMonitoringBroadcastEvent) {
@@ -153,11 +149,11 @@ func (model *memoryModel) SetBroadcastFMChan(broadcastFMEventChan chan FacilityB
 }
 
 func (model *memoryModel) Referential() string {
-	return model.referential
+	return model.referentialSlug
 }
 
 func (model *memoryModel) SetReferential(referential string) {
-	model.referential = referential
+	model.referentialSlug = referential
 }
 
 func (model *memoryModel) broadcastSMEvent(event StopMonitoringBroadcastEvent) {
@@ -268,43 +264,43 @@ func (model *memoryModel) Facilities() Facilities {
 }
 
 func (model *memoryModel) Load() error {
-	err := model.stopAreas.Load(model.referential)
+	err := model.stopAreas.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopAreas: %v", err)
 	}
-	err = model.stopAreaGroups.Load(model.referential)
+	err = model.stopAreaGroups.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopAreaGroups: %v", err)
 	}
-	err = model.lines.Load(model.referential)
+	err = model.lines.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Lines: %v", err)
 	}
-	err = model.lineGroups.Load(model.referential)
+	err = model.lineGroups.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading LineGroups: %v", err)
 	}
-	err = model.vehicleJourneys.Load(model.referential)
+	err = model.vehicleJourneys.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading VehicleJourneys: %v", err)
 	}
-	err = model.scheduledStopVisits.Load(model.referential)
+	err = model.scheduledStopVisits.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading StopVisits: %v", err)
 	}
-	err = model.operators.Load(model.referential)
+	err = model.operators.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Operators: %v", err)
 	}
-	err = model.facilities.Load(model.referential)
+	err = model.facilities.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Facilities: %v", err)
 	}
-	err = model.macros.Load(model.referential)
+	err = model.macros.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Macros: %v", err)
 	}
-	err = model.controls.Load(model.referential)
+	err = model.controls.Load(model.referentialSlug)
 	if err != nil {
 		logger.Log.Debugf("Error while loading Controls: %v", err)
 	}

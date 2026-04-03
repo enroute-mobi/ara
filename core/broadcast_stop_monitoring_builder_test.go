@@ -18,7 +18,7 @@ func Test_EstimatedTimetableBroadcaster_BuildDepartureSchedues(t *testing.T) {
 	// uuidGenerator := uuid.NewFakeUUIDGenerator()
 
 	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	referential := referentials.New("referential")
 	referential.SetClock(fakeClock)
 	referential.Save()
 
@@ -156,7 +156,7 @@ func Test_EstimatedTimetableBroadcaster_BuildArrivalSchedues(t *testing.T) {
 	// uuidGenerator := uuid.NewFakeUUIDGenerator()
 
 	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	referential := referentials.New("referential")
 	referential.SetClock(fakeClock)
 	referential.Save()
 

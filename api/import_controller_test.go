@@ -77,14 +77,8 @@ func Test_Serve(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
 
 	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	// Save a new referential
-	referential := referentials.New("test")
-	referential.Tokens = []string{"testToken"}
-	referentials.Save(referential)
+	server, referential := newTestServer(t, []string{"testToken"}...)
 
-	server := &Server{}
-	server.SetReferentials(referentials)
 	// Create a request
 	//prepare the reader instances to encode
 	values := map[string]io.Reader{

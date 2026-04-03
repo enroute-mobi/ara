@@ -14,8 +14,7 @@ import (
 )
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -117,8 +116,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 }
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{

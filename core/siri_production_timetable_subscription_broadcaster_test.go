@@ -15,8 +15,7 @@ func Test_PTT_checklines(t *testing.T) {
 	assert := assert.New(t)
 
 	// Test Setup
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{

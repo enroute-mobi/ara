@@ -23,12 +23,7 @@ func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *tes
 
 func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line *model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
-	referential.Tokens = []string{"testToken"}
-	referential.Save()
+	server, referential := newTestServer(t, []string{"testToken"}...)
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -166,7 +161,7 @@ func Test_LineController_Index(t *testing.T) {
 func Test_LineController_FindLine(t *testing.T) {
 	assert := assert.New(t)
 
-	ref := core.NewMemoryReferentials().New("test")
+	_, ref := newTestReferential(t)
 
 	line := ref.Model().Lines().New()
 	code := model.NewCode("codeSpace", "stif:value")

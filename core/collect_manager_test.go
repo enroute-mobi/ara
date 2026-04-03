@@ -8,13 +8,12 @@ import (
 )
 
 func Test_CollectManager_StopVisitUpdate(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
+	referential.Partners().Save(partner)
+
 	partner.ConnectorTypes = []string{TEST_STOP_MONITORING_REQUEST_COLLECTOR}
 	partner.RefreshConnectors()
-	referential.Partners().Save(partner)
-	referentials.Save(referential)
 
 	stopArea := referential.Model().StopAreas().New()
 	saCode := model.NewCode("codeSpace", "saValue")
@@ -48,9 +47,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 }
 
 func Test_CollectManager_StopAreaMonitored(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Origins.NewOrigin("partner")
@@ -80,9 +77,7 @@ func Test_CollectManager_StopAreaMonitored(t *testing.T) {
 }
 
 func Test_CollectManager_StopAreaMonitoredWithReferent(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Origins.NewOrigin("partner")

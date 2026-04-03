@@ -19,7 +19,7 @@ P is a model struct, and T its pointer
 		redisManager[LineId, Line, *Line]
 	}
 */
-type redisManager[Id ~string, P any, T RedisModelInstance[P]] struct {
+type redisManager[Id ~string, P any, T RedisModelInstance[Id, P]] struct {
 	uuid.UUIDConsumer
 
 	new       func(Model) T
@@ -39,13 +39,13 @@ func (m *redisManager[Id, P, T]) Find(id Id) (T, bool) {
 		return nil, false
 	}
 
-	t := m.new(m.model)
-	err = json.Unmarshal([]byte(val), t)
+	ts := []T{m.new(m.model)}
+	err = json.Unmarshal([]byte(val), &ts)
 	if err != nil {
 		logger.Log.Debugf("Error while finding %v %v: %v", m.modelName, id, err)
 		return nil, false
 	}
-	return t, true
+	return ts[0], true
 }
 
 func (m *redisManager[Id, P, T]) FindAttribute(id Id, attr string) (string, bool) {
@@ -164,12 +164,15 @@ func (m *redisManager[Id, P, T]) FindAllBy(indexName, identifier string) []T {
 }
 
 func (m *redisManager[Id, P, T]) Save(t T) bool {
-	err := m.client.Set(t)
+	if t.ModelId() == "" {
+		t.SetId(Id(m.NewUUID()))
+	}
+	err := m.client.Set(m.modelName, t)
 	return err == nil
 }
 
 func (m *redisManager[Id, P, T]) Delete(t T) bool {
-	err := m.client.Delete(t.ModelId())
+	err := m.client.Delete(m.modelName, t.ModelId())
 	return err == nil
 }
 
@@ -181,7 +184,7 @@ func (m *redisManager[Id, P, T]) SetModel(model Model) {
    For managers which handles code
    If we need to have more embedded structs like that, we should use another pattern:
 
-   type codeHandler[Id ~string, P any, T RedisModelInstance[P]] struct{
+   type codeHandler[Id ~string, P any, T RedisModelInstance[Id, P]] struct{
      rm *RedisManager[Id, P, T]
    }
 
@@ -194,7 +197,7 @@ func (m *redisManager[Id, P, T]) SetModel(model Model) {
 	manager.codeHandler.rm = &(manager.redisManager)
 */
 
-type redisCodeHandlerManager[Id ~string, P any, T RedisModelInstance[P]] struct {
+type redisCodeHandlerManager[Id ~string, P any, T RedisModelInstance[Id, P]] struct {
 	redisManager[Id, P, T]
 }
 

@@ -37,7 +37,7 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	}))
 	defer ts.Close()
 
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":        ts.URL,

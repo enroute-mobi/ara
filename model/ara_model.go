@@ -1,11 +1,11 @@
 package model
 
 import (
-	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-type RedisModelInstance[P any] interface {
+type RedisModelInstance[Id ~string, P any] interface {
+	SetId(Id)
 	ModelId() string
 	*P // Ensure the type implementing the interface is a pointer
 }
@@ -70,11 +70,4 @@ type Model interface {
 	SetBroadcastSXChan(chan SituationBroadcastEvent)
 	SetBroadcastVeChan(chan VehicleBroadcastEvent)
 	SetBroadcastFMChan(chan FacilityBroadcastEvent)
-}
-
-func NewTestModel(referential ...string) Model {
-	if config.Config.RedisAddr != "" {
-		return NewTestHybridModel(config.Config.CodeSpaces, referential...)
-	}
-	return NewTestMemoryModel(referential...)
 }

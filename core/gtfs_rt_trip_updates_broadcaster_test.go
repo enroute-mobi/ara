@@ -16,8 +16,7 @@ import (
 func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -224,8 +223,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *testing
 }
 
 func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdCodeSpace(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -271,8 +269,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongStopIdCodeSpace(t *testing.T) {
 }
 
 func Test_TripUpdatesBroadcaster_HandleGtfs_WrongLineIdCodeSpace(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -318,8 +315,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongLineIdCodeSpace(t *testing.T) {
 }
 
 func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVJIdCodeSpace(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -365,8 +361,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVJIdCodeSpace(t *testing.T) {
 }
 
 func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdCodeSpace(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -412,8 +407,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_WrongSVIdCodeSpace(t *testing.T) {
 }
 
 func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{

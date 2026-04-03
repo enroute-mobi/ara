@@ -15,8 +15,7 @@ import (
 )
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -139,8 +138,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -240,8 +238,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -320,8 +317,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaLineSelector(t *te
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -391,8 +387,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaTimeSelector(t *te
 }
 
 func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNotFound(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 

@@ -54,14 +54,10 @@ func NewHybridModel(referential string, client redisclient.Client) Model {
 	return model
 }
 
-func NewTestHybridModel(codespaces []string, referential ...string) Model {
+func NewTestHybridModel() Model {
 	model := &hybridModel{
 		date:   NewDate(clock.DefaultClock().Now()),
 		client: redisclient.TestClient,
-	}
-
-	if len(referential) != 0 {
-		model.referential = referential[0]
 	}
 
 	model.refresh()

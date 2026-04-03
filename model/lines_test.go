@@ -63,9 +63,9 @@ func Test_Line_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Line_Save(t *testing.T) {
-	model := NewTestModel()
+	model := newTestModel(t)
 	line := model.Lines().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	line.SetCode(code)
 
 	if line.model != model {
@@ -91,10 +91,10 @@ func Test_Line_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	line.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	line.SetCode(code)
 
-	foundCode, ok := line.Code("codeSpace")
+	foundCode, ok := line.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -178,7 +178,7 @@ func Test_MemoryLines_FindAll(t *testing.T) {
 func Test_MemoryLines_Delete(t *testing.T) {
 	lines := NewMemoryLines()
 	existingLine := lines.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingLine.SetCode(code)
 	lines.Save(existingLine)
 
@@ -216,13 +216,13 @@ func Test_MemoryLines_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
 	})
-	lines := model.Lines().(*memoryLines)
+	lines := model.Lines()
 	err = lines.Load("referential")
 	if err != nil {
 		t.Fatal(err)

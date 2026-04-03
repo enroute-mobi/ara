@@ -18,15 +18,13 @@ func Test_FacilityMonitoringBroadcaster_Create_Events(t *testing.T) {
 
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
 	referential.model.SetBroadcastFMChan(referential.broacasterManager.GetFacilityBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 	}
@@ -76,22 +74,22 @@ func Test_checkFacilities(t *testing.T) {
 
 	settings := map[string]string{
 		"local_url":         "http://ara",
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := newSIRIFacilityMonitoringSubscriptionBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
 	facility := referential.model.Facilities().New()
-	facility.SetCode(model.NewCode("codeSpace", "NINOXE:Facility:1"))
+	facility.SetCode(model.NewCode("internal", "NINOXE:Facility:1"))
 	facility.Save()
 
 	facility2 := referential.model.Facilities().New()
-	facility2.SetCode(model.NewCode("codeSpace", "NINOXE:Facility:2"))
+	facility2.SetCode(model.NewCode("internal", "NINOXE:Facility:2"))
 	facility2.Save()
 
 	facility3 := referential.model.Facilities().New()
-	facility3.SetCode(model.NewCode("AnotherCodeSpace", "NINOXE:Facility:3"))
+	facility3.SetCode(model.NewCode("external", "NINOXE:Facility:3"))
 	facility3.Save()
 
 	// test request for subscription to all Facilities having the same remote_code_space

@@ -19,7 +19,8 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	LoadFromCSVFile("testdata/import.csv", "referential", false)
 
 	// Fetch data from the db
-	model := NewTestModel("referential")
+	model := newTestModel(t)
+	model.SetReferential("referential")
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
@@ -63,7 +64,8 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.True(ok, "Can't find Facility: \"05cb9be3-e78b-4f76-b644-459e23ba5f1c\"")
 	assert.Equal(FacilityStatusUnknown, facility.Status)
 
-	model = NewTestModel("referential")
+	model = newTestModel(t)
+	model.SetReferential("referential")
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
@@ -99,7 +101,8 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	_, ok = model.Facilities().Find("05cb9be3-e78b-4f76-b644-459e23ba5f1c")
 	assert.True(ok, "Can't find Facility: \"05cb9be3-e78b-4f76-b644-459e23ba5f1c\"")
 
-	model = NewTestModel("referential")
+	model = newTestModel(t)
+	model.SetReferential("referential")
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

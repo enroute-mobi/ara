@@ -10,9 +10,9 @@ import (
 func Test_Macro_CreateCode_StopArea(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestModel()
+	model := newTestModel(t)
 	manager := model.Macros().(*macroManager)
-	attributes := `{"source_code_space": "sae", "target_code_space": "regional", "target_pattern": "prefix:%{value}:suffix"}`
+	attributes := `{"source_code_space": "internal", "target_code_space": "external", "target_pattern": "prefix:%{value}:suffix"}`
 
 	sm := &SelectMacro{
 		Id:              "id2",
@@ -42,21 +42,21 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 		t.Fatal("Macro should be created: ", err)
 	}
 
-	code1 := NewCode("sae", "test1")
+	code1 := NewCode("internal", "test1")
 
 	sa := model.StopAreas().New()
 	sa.SetCode(code1)
 	sa.Save()
 
-	code2 := NewCode("sae", "test2")
-	regionalCode := NewCode("regional", "test")
+	code2 := NewCode("internal", "test2")
+	regionalCode := NewCode("external", "test")
 
 	sa2 := model.StopAreas().New()
 	sa2.SetCode(code2)
 	sa2.SetCode(regionalCode)
 	sa2.Save()
 
-	code3 := NewCode("sae", "test3")
+	code3 := NewCode("internal", "test3")
 
 	updateManager := newUpdateManager(model)
 
@@ -79,26 +79,26 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 
 	updatedSA1, ok := model.StopAreas().FindByCode(code1)
 	assert.True(ok)
-	_, ok = updatedSA1.Code("regional")
+	_, ok = updatedSA1.Code("external")
 	assert.False(ok)
 
 	updatedSA2, ok := model.StopAreas().FindByCode(code2)
 	assert.True(ok)
-	foundRegionalCode, _ := updatedSA2.Code("regional")
+	foundRegionalCode, _ := updatedSA2.Code("external")
 	assert.Equal(regionalCode.Value(), foundRegionalCode.Value())
 
 	updatedSA3, ok := model.StopAreas().FindByCode(code3)
 	assert.True(ok)
-	foundRegionalCode, _ = updatedSA3.Code("regional")
+	foundRegionalCode, _ = updatedSA3.Code("external")
 	assert.Equal("prefix:test3:suffix", foundRegionalCode.Value())
 }
 
 func Test_Macro_CreateCode_Line(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestModel()
+	model := newTestModel(t)
 	manager := model.Macros().(*macroManager)
-	attributes := `{"source_code_space": "sae", "target_code_space": "regional", "target_pattern": "prefix:%{value}:suffix"}`
+	attributes := `{"source_code_space": "internal", "target_code_space": "external", "target_pattern": "prefix:%{value}:suffix"}`
 
 	sm := &SelectMacro{
 		Id:              "id2",
@@ -128,21 +128,21 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 		t.Fatal("Macro should be created: ", err)
 	}
 
-	code1 := NewCode("sae", "test1")
+	code1 := NewCode("internal", "test1")
 
 	sa := model.Lines().New()
 	sa.SetCode(code1)
 	sa.Save()
 
-	code2 := NewCode("sae", "test2")
-	regionalCode := NewCode("regional", "test")
+	code2 := NewCode("internal", "test2")
+	regionalCode := NewCode("external", "test")
 
 	sa2 := model.Lines().New()
 	sa2.SetCode(code2)
 	sa2.SetCode(regionalCode)
 	sa2.Save()
 
-	code3 := NewCode("sae", "test3")
+	code3 := NewCode("internal", "test3")
 
 	updateManager := newUpdateManager(model)
 
@@ -163,18 +163,24 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 	updateManager.Update(event2)
 	updateManager.Update(event3)
 
-	updatedSA1, ok := model.Lines().FindByCode(code1)
+	updatedLine, ok := model.Lines().FindByCode(code1)
 	assert.True(ok)
-	_, ok = updatedSA1.Code("regional")
-	assert.False(ok)
+	if ok {
+		_, ok = updatedLine.Code("external")
+		assert.False(ok)
+	}
 
-	updatedSA2, ok := model.Lines().FindByCode(code2)
+	updatedLine2, ok := model.Lines().FindByCode(code2)
 	assert.True(ok)
-	foundRegionalCode, _ := updatedSA2.Code("regional")
-	assert.Equal(regionalCode.Value(), foundRegionalCode.Value())
+	if ok {
+		foundRegionalCode, _ := updatedLine2.Code("external")
+		assert.Equal(regionalCode.Value(), foundRegionalCode.Value())
+	}
 
-	updatedSA3, ok := model.Lines().FindByCode(code3)
+	updatedLine3, ok := model.Lines().FindByCode(code3)
 	assert.True(ok)
-	foundRegionalCode, _ = updatedSA3.Code("regional")
-	assert.Equal("prefix:test3:suffix", foundRegionalCode.Value())
+	if ok {
+		foundRegionalCode, _ := updatedLine3.Code("external")
+		assert.Equal("prefix:test3:suffix", foundRegionalCode.Value())
+	}
 }

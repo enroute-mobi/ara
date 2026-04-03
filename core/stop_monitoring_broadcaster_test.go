@@ -18,15 +18,12 @@ import (
 func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestModel()
+	_, referential := newTestReferential(t)
 
-	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 	}
@@ -68,11 +65,10 @@ func Test_StopMonitoringBroadcaster_Create_Events(t *testing.T) {
 func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.Save()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 	}
@@ -121,11 +117,10 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilter(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.Save()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 	}
@@ -200,13 +195,12 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	defer ts.Close()
 
 	// Create a test referential
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.SetClock(fakeClock)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		s.BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS: "true",
 		"remote_code_space":                        "internal",
@@ -291,7 +285,10 @@ func Test_StopMonitoringBroadcaster_Receive_Notify(t *testing.T) {
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 
-	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(response)
+	notify, err := sxml.NewXMLNotifyStopMonitoringFromContent(response)
+	if err != nil {
+		t.Fatal(err)
+	}
 	delivery := notify.StopMonitoringDeliveries()
 
 	if len(delivery) != 2 {
@@ -349,16 +346,15 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
 	defer ts.Close()
 
 	// Create a test referential
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.SetClock(fakeClock)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
 	f := audit.NewFakeBigQuery()
-	audit.SetCurrentBigQuery("Un Referential Plutot Cool", f)
+	audit.SetCurrentBigQuery("referential", f)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"broadcast.siri.stop_monitoring.multiple_subscriptions": "true",
 		"remote_code_space": "internal",
@@ -440,7 +436,10 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications(t *testing.T) {
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 
-	notify, _ := sxml.NewXMLNotifyStopMonitoringFromContent(response)
+	notify, err := sxml.NewXMLNotifyStopMonitoringFromContent(response)
+	if err != nil {
+		t.Fatal(err)
+	}
 	delivery := notify.StopMonitoringDeliveries()
 
 	assert.Lenf(delivery, 2,
@@ -459,16 +458,15 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications_With_MaxPerDeliver
 	clock.SetDefaultClock(fakeClock)
 
 	// Create a test referential
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.SetClock(fakeClock)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
 	f := audit.NewFakeBigQuery()
-	audit.SetCurrentBigQuery("Un Referential Plutot Cool", f)
+	audit.SetCurrentBigQuery("referential", f)
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		s.BROADCAST_SIRI_SM_MULTIPLE_SUBSCRIPTIONS:         "false",
 		s.BROADCAST_SIRI_SM_MAXIMUM_RESOURCES_PER_DELIVERY: "1",

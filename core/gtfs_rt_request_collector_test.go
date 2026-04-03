@@ -27,10 +27,7 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]mo
 	defer ts.Close()
 
 	// Create a GtfsRequestCollector
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	// referential.collectManager = NewTestCollectManager()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 	partners := referential.partners
 	partner := partners.New("slug")
 	settings := map[string]string{
@@ -130,7 +127,7 @@ func Test_PartnerStatusDown(t *testing.T) {
 	defer ts.Close()
 
 	// Create a GtfsRequestCollector
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":        ts.URL,

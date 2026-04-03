@@ -25,6 +25,9 @@ populate:
 tests:
 	go test -coverprofile=coverage.out -p 1 -count 1  ./...
 
+redis_tests:
+	ARA_REDIS_ADDR=127.0.0.1:6379 go test -coverprofile=coverage.out -p 1 -count 1  ./...
+
 cucumber:
 	go build && bundle exec cucumber -t 'not @wip'
 

@@ -1,6 +1,8 @@
 package sxml
 
 import (
+	"fmt"
+
 	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/jbowtie/gokogiri"
 	"github.com/jbowtie/gokogiri/xml"
@@ -80,6 +82,9 @@ func NewXMLNotifyStopMonitoringFromContent(content []byte) (*XMLNotifyStopMonito
 	doc, err := gokogiri.ParseXml(content)
 	if err != nil {
 		return nil, err
+	}
+	if doc.Root() == nil {
+		return nil, fmt.Errorf("Doc Root is nil")
 	}
 	response := NewXMLNotifyStopMonitoring(doc.Root().XmlNode)
 	return response, nil

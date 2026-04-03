@@ -30,10 +30,7 @@ func Test_SIRISituationExchangeSubscriptionCollector(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 
@@ -41,24 +38,24 @@ func Test_SIRISituationExchangeSubscriptionCollector(t *testing.T) {
 	settings := map[string]string{
 		"local_url":         "http://example.com/test/siri",
 		"remote_url":        ts.URL,
-		"remote_code_space": "test_kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	code := model.NewCode("test_kind", "value")
+	code := model.NewCode("internal", "value")
 	situation := referential.Model().Situations().New()
 	situation.SetCode(code)
 	situation.Save()
 
 	line := partners.Model().Lines().New()
-	lineCode := model.NewCode("test_kind", "line value")
+	lineCode := model.NewCode("internal", "line value")
 	line.SetCode(lineCode)
 	partners.Model().Lines().Save(line)
 
 	line2 := partners.Model().Lines().New()
-	lineCode2 := model.NewCode("test_kind", "line value2")
+	lineCode2 := model.NewCode("internal", "line value2")
 	line2.SetCode(lineCode2)
 	partners.Model().Lines().Save(line2)
 

@@ -17,27 +17,23 @@ import (
 )
 
 func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t *testing.T) {
-	collectManager := NewTestCollectManager()
-	referential := &Referential{
-		collectManager: collectManager,
-		model:          model.NewTestModel(),
-	}
+	_, referential := newTestReferential(t, true)
 	referential.Model().StopAreas().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	stopArea := referential.Model().StopAreas().New()
-	code := model.NewCode("_internal", "coicogn2")
+	code := model.NewCode("internal", "coicogn2")
 	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	code2 := model.NewCode("_internal", "coicogn3")
+	code2 := model.NewCode("internal", "coicogn3")
 	stopArea2.SetCode(code2)
 	stopArea2.Save()
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space":                  "_internal",
+		"remote_code_space":                  "internal",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -68,8 +64,8 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 	connector.HandleNotifyStopMonitoring(deliveries)
 
 	// 2 StopAreas 1 Line 3 VehicleJourneys 3 StopVisits
-	if len(collectManager.(*TestCollectManager).UpdateEvents) != 9 {
-		t.Errorf("Wrong number of events in collectManager, expected 9 got %v", len(collectManager.(*TestCollectManager).UpdateEvents))
+	if len(referential.CollectManager().(*TestCollectManager).UpdateEvents) != 9 {
+		t.Errorf("Wrong number of events in collectManager, expected 9 got %v", len(referential.CollectManager().(*TestCollectManager).UpdateEvents))
 	}
 }
 
@@ -87,22 +83,19 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	defer ts.Close()
 
 	// Create a SIRIStopMonitoringRequestCollector
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":        ts.URL,
-		"remote_code_space": "test_kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	code := model.NewCode("test_kind", "value")
+	code := model.NewCode("internal", "value")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
@@ -120,7 +113,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_AddtoResource(t *testing.T) {
 	subscriptionResource := subscriptions[0].UniqueResource()
 	assert.NotNil(subscriptionResource)
 	assert.Equal(subscriptionResource.Reference.Type, "StopArea")
-	assert.Equal(subscriptionResource.Reference.Code.String(), "test_kind:value")
+	assert.Equal(subscriptionResource.Reference.Code.String(), "internal:value")
 
 	// Adding a new subscription
 	subscription := connector.partner.Subscriptions().FindOrCreateByKind(StopMonitoringCollect)
@@ -132,23 +125,20 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 	assert := assert.New(t)
 
 	// Create a SIRIStopMonitoringRequestCollector
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 	partners := NewPartnerManager(referential)
 
-	code := model.NewCode("test_kind", "value")
+	code := model.NewCode("internal", "value")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
 
-	code2 := model.NewCode("test_kind", "value2")
+	code2 := model.NewCode("internal", "value2")
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.SetCode(code2)
 	stopArea2.Save()
 
-	code3 := model.NewCode("test_kind", "value3")
+	code3 := model.NewCode("internal", "value3")
 	stopArea3 := referential.Model().StopAreas().New()
 	stopArea3.SetCode(code3)
 	stopArea3.Save()
@@ -164,7 +154,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 			testNumber: 1,
 			settings: map[string]string{
 				"local_url":                          "http://example.com/test/siri",
-				"remote_code_space":                  "test_kind",
+				"remote_code_space":                  "internal",
 				"generators.subscription_identifier": "Subscription::%{id}::LOC",
 			},
 			expectedNumberOfRequests:      1,
@@ -176,7 +166,7 @@ func Test_SIRIStopMonitoringSubscriptionCollector(t *testing.T) {
 			testNumber: 2,
 			settings: map[string]string{
 				"local_url":                          "http://example.com/test/siri",
-				"remote_code_space":                  "test_kind",
+				"remote_code_space":                  "internal",
 				"generators.subscription_identifier": "Subscription::%{id}::LOC",
 				"collect.siri.stop_monitoring.maximum_subscriptions_per_request": "1",
 			},
@@ -189,7 +179,7 @@ collect.siri.stop_monitoring.maximum_subscriptions_per_request = 3, should send 
 			testNumber: 3,
 			settings: map[string]string{
 				"local_url":                          "http://example.com/test/siri",
-				"remote_code_space":                  "test_kind",
+				"remote_code_space":                  "internal",
 				"generators.subscription_identifier": "Subscription::%{id}::LOC",
 				"collect.siri.stop_monitoring.maximum_subscriptions_per_request": "2",
 			},
@@ -204,7 +194,7 @@ collect.siri.stop_monitoring.maximum_subscriptions_per_request = 2, should send
 			testNumber: 4,
 			settings: map[string]string{
 				"local_url":                          "http://example.com/test/siri",
-				"remote_code_space":                  "test_kind",
+				"remote_code_space":                  "internal",
 				"generators.subscription_identifier": "Subscription::%{id}::LOC",
 				"collect.siri.stop_monitoring.maximum_subscriptions_per_request": "3",
 			},
@@ -271,10 +261,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 	partners := NewPartnerManager(referential)
 
 	partner := partners.New("slug")
@@ -282,7 +269,7 @@ func Test_SIRIStopMonitoringDeleteSubscriptionRequest(t *testing.T) {
 	settings := map[string]string{
 		"local_url":                          "http://example.com/test/siri",
 		"remote_url":                         ts.URL,
-		"remote_code_space":                  "test_kind",
+		"remote_code_space":                  "internal",
 		"generators.subscription_identifier": "Subscription::%{id}::LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)

@@ -47,8 +47,8 @@ func (b *Batch) Save(doc redis.JSONSetArgs) error {
 
 // --------------------------------- \\
 
-func (rc *client) Set(value model) error {
-	_, err := rc.c.JSONSet(rc.ctx, value.ModelId(), "$", value).Result()
+func (rc *client) Set(modelName string, value model) error {
+	_, err := rc.c.JSONSet(rc.ctx, rc.prefix(modelName, ":", value.ModelId()), "$", value).Result()
 	return err
 }
 
@@ -89,8 +89,8 @@ func (rc *client) findBy(modelName, query string) ([]redis.Document, error) {
 	return r.Docs, nil
 }
 
-func (rc *client) Delete(id string) error {
-	_, err := rc.c.JSONDel(rc.ctx, rc.prefix(id), "$").Result()
+func (rc *client) Delete(modelName, id string) error {
+	_, err := rc.c.JSONDel(rc.ctx, rc.prefix(modelName, ":", id), "$").Result()
 	return err
 }
 

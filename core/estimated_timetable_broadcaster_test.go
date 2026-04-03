@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
+func Test_EstimatedTimetableBroadcaster_Send_Notify(t *testing.T) {
 	assert := assert.New(t)
 
 	fakeClock := clock.NewFakeClock()
@@ -29,14 +29,12 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	// Create a test http server
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.SetClock(fakeClock)
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner swify")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 		"remote_credential": "external",
@@ -52,7 +50,6 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 
 	connector, _ := partner.Connector(SIRI_ESTIMATED_TIMETABLE_SUBSCRIPTION_BROADCASTER)
 
-	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).Partner().SetUUIDGenerator(uuidGenerator)
 	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).SetClock(fakeClock)
 	connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster).estimatedTimetableBroadcaster = NewFakeSIRIEstimatedTimetableBroadcaster(connector.(*SIRIEstimatedTimetableSubscriptionBroadcaster))
 
@@ -63,10 +60,9 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 	partner.Subscriptions().SetUUIDGenerator(uuidGenerator)
 
 	line := referential.Model().Lines().New()
-	line.Save()
-
-	code := model.NewCode("internal", string(line.Id()))
+	code := model.NewCode("internal", "code")
 	line.SetCode(code)
+	line.Save()
 
 	reference := model.Reference{
 		Code: &code,
@@ -136,14 +132,14 @@ func Test_EstimatedTimetableBroadcaster_Receive_Notify(t *testing.T) {
 			<siri:EstimatedJourneyVersionFrame>
 				<siri:RecordedAtTime>1984-04-04T00:00:00.000Z</siri:RecordedAtTime>
 				<siri:EstimatedVehicleJourney>
-					<siri:LineRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:LineRef>
+					<siri:LineRef>code</siri:LineRef>
 					<siri:DirectionRef>unknown</siri:DirectionRef>
-					<siri:DatedVehicleJourneyRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:DatedVehicleJourneyRef>
+					<siri:DatedVehicleJourneyRef>code</siri:DatedVehicleJourneyRef>
 					<siri:Cancellation>false</siri:Cancellation>
 					<siri:OperatorRef>123456789</siri:OperatorRef>
 					<siri:EstimatedCalls>
 						<siri:EstimatedCall>
-							<siri:StopPointRef>6ba7b814-9dad-11d1-0-00c04fd430c8</siri:StopPointRef>
+							<siri:StopPointRef>code</siri:StopPointRef>
 							<siri:Order>0</siri:Order>
 						</siri:EstimatedCall>
 					</siri:EstimatedCalls>

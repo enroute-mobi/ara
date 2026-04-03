@@ -22,15 +22,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential) {
+func siriHandler_PrepareServer(t *testing.T, envelopeType string) (*Server, *core.Referential) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// create a server with a fake clock and fake UUID generator
-	server := NewTestServer()
-
-	// Create the default referential with the appropriate connectors
-	referential := server.CurrentReferentials().New("default")
+	server, referential := newTestServer(t)
 
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -72,7 +69,7 @@ func siriHandler_Request(server *Server, buffer remote.Buffer, t *testing.T) *ht
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// Create a request
-	request, err := http.NewRequest("POST", "/default/siri", buffer)
+	request, err := http.NewRequest("POST", "/referential/siri", buffer)
 	require.NoError(err)
 
 	// Create a ResponseRecorder
@@ -103,7 +100,7 @@ func Test_SIRIHandler_SOAP(t *testing.T) {
 	}
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
@@ -124,7 +121,7 @@ func Test_SIRIHandler_SOAPResponse(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer(remote.SOAP_SIRI_ENVELOPE)
+	server, _ := siriHandler_PrepareServer(t, remote.SOAP_SIRI_ENVELOPE)
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
@@ -143,7 +140,7 @@ func Test_SIRIHandler_RawResponse(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer(remote.RAW_SIRI_ENVELOPE)
+	server, _ := siriHandler_PrepareServer(t, remote.RAW_SIRI_ENVELOPE)
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
@@ -166,7 +163,7 @@ func Test_SIRIHandler_Raw(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
@@ -187,7 +184,7 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
@@ -208,14 +205,14 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 
 	// Create a request
 	file, err := os.Open("testdata/checkstatus-soap-request.xml.gz")
 	require.NoError(err)
 	defer file.Close()
 
-	request, err := http.NewRequest("POST", "/default/siri", file)
+	request, err := http.NewRequest("POST", "/referential/siri", file)
 	require.NoError(err)
 
 	request.Header.Set("Content-Encoding", "gzip")
@@ -249,7 +246,7 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 	stopArea := referential.Model().StopAreas().New()
 	code := model.NewCode("codeSpace", "codeValue")
 	stopArea.SetCode(code)
@@ -322,7 +319,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	}
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -362,7 +359,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	}
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -391,7 +388,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
@@ -553,7 +550,7 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 
 	line := referential.Model().Lines().New()
 	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))

@@ -22,7 +22,7 @@ func Test_APIPartner_SetFactories(t *testing.T) {
 }
 
 func Test_APIPartner_Validate(t *testing.T) {
-	partners := createTestPartnerManager() // in core/partner_test.go
+	partners := newTestPartnerManager(t) // in core/partner_test.go
 	// Check empty Slug
 	apiPartner := &APIPartner{
 		manager: partners,

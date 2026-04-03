@@ -15,8 +15,7 @@ import (
 func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -96,8 +95,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs(t *testing.T) {
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -157,8 +155,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -218,8 +215,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -282,8 +278,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
@@ -348,8 +343,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 }
 
 func Test_VehiclePositionBroadcaster_HandleGtfs_Generators(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
