@@ -763,12 +763,12 @@ having a Referent should create StopId with the Refefent value`,
 		}
 
 		if tt.expectedRouteId != nil && tt.expectedStopId != nil {
-			assert.Equal(tt.expectedStopId, entitySelector[0].StopId)
-			assert.Equal(tt.expectedRouteId, entitySelector[0].RouteId)
+			assert.Equalf(tt.expectedStopId, entitySelector[0].StopId, tt.message)
+			assert.Equalf(tt.expectedRouteId, entitySelector[0].RouteId, tt.message)
 		}
 
-		assert.Equal(tt.expectedMonitoringRefs, GetReferencesSlice(broadcastedRefs.MonitoringRefs))
-		assert.Equal(tt.expectedLineRefs, GetReferencesSlice(broadcastedRefs.LineRefs))
+		assert.Equalf(tt.expectedMonitoringRefs, GetReferencesSlice(broadcastedRefs.MonitoringRefs), tt.message)
+		assert.Equalf(tt.expectedLineRefs, GetReferencesSlice(broadcastedRefs.LineRefs), tt.message)
 	}
 }
 

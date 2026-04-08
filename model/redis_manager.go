@@ -59,43 +59,47 @@ func (m *redisManager[Id, P, T]) FindAttribute(id Id, attr string) (string, bool
 		return "", false
 	}
 
-	t := make(map[string]string)
+	t := []string{}
 	err = json.Unmarshal([]byte(val), &t)
-	if err != nil {
+	if err != nil || len(t) != 1 {
 		logger.Log.Debugf("Error while finding %v %v attribute %v: %v", m.modelName, id, attr, err)
 		return "", false
 	}
-	return t[b.String()], true
+	return t[0], true
 }
 
-func (m *redisManager[Id, P, T]) FindAttributes(id Id, attrs ...string) (map[string]string, bool) {
+func (m *redisManager[Id, P, T]) FindAttributes(id Id, attrs ...string) (map[string]any, bool) {
 	if len(attrs) == 0 {
 		return nil, false
 	}
 
 	b := strings.Builder{}
 	for i := range attrs {
+		b.Reset()
 		b.WriteString("$.")
 		b.WriteString(attrs[i])
-		b.WriteString(" ")
+		attrs[i] = b.String()
 	}
 
-	val, err := m.client.GetPath(m.modelName, string(id), b.String())
+	val, err := m.client.GetPath(m.modelName, string(id), attrs...)
 	if err != nil {
 		logger.Log.Debugf("Error while finding %v %v attributes %v: %v", m.modelName, id, attrs, err)
 		return nil, false
 	}
 
-	t := make(map[string]string)
+	t := make(map[string][]any)
 	err = json.Unmarshal([]byte(val), &t)
 	if err != nil {
 		logger.Log.Debugf("Error while finding %v %v attributes %v: %v", m.modelName, id, attrs, err)
 		return nil, false
 	}
 
-	r := make(map[string]string)
+	r := make(map[string]any)
 	for k, v := range t {
-		r[k[2:]] = v // Remove first two characters of the key "$."
+		if len(v) != 1 {
+			continue
+		}
+		r[k[2:]] = v[0] // Remove first two characters of the key: "$."
 	}
 	return r, true
 }
@@ -203,13 +207,11 @@ type redisCodeHandlerManager[Id ~string, P any, T RedisModelInstance[Id, P]] str
 
 func (m *redisCodeHandlerManager[Id, P, T]) FindByCode(c Code) (T, bool) {
 	docs, err := m.client.FindByCode(m.modelName, c.CodeSpace(), c.Value())
-	if err != nil {
+	if err != nil || len(docs) == 0 {
 		logger.Log.Debugf("Error While finding %v by code: %v", m.modelName, err)
 		return nil, false
 	}
-	if len(docs) == 0 {
-		return nil, false
-	}
+
 	t := m.new(m.model)
 	err = json.Unmarshal([]byte(docs[0].Fields["$"]), t)
 	if err != nil {
@@ -233,9 +235,8 @@ func (m *redisCodeHandlerManager[Id, P, T]) CodeExists(c Code) bool {
 
 func (m *redisCodeHandlerManager[Id, P, T]) FindCode(id Id, codespace string) (Code, bool) {
 	b := strings.Builder{}
-	b.WriteString("$.codes.")
+	b.WriteString("$.Codes.")
 	b.WriteString(codespace)
-	b.WriteString(".value")
 
 	val, err := m.client.GetPath(m.modelName, string(id), b.String())
 	if err != nil {
@@ -243,11 +244,11 @@ func (m *redisCodeHandlerManager[Id, P, T]) FindCode(id Id, codespace string) (C
 		return Code{}, false
 	}
 
-	t := make(map[string]string)
+	t := []string{}
 	err = json.Unmarshal([]byte(val), &t)
-	if err != nil {
+	if err != nil || len(t) != 1 {
 		logger.Log.Debugf("Error while finding %v code %v attribute %v: %v", m.modelName, id, codespace, err)
 		return Code{}, false
 	}
-	return NewCode(codespace, t[b.String()]), true
+	return NewCode(codespace, t[0]), true
 }

@@ -25,10 +25,11 @@ var TestClient Client
 type Client interface {
 	Start(t time.Time) error
 	Stop()
+	Started() bool
 
 	Set(string, model) error
 	Get(string, string) (string, error)
-	GetPath(string, string, string) (string, error)
+	GetPath(string, string, ...string) (string, error)
 	FindAll(string) ([]redis.Document, error)
 	FindBy(string, string, string) ([]redis.Document, error)
 	FindByCode(string, string, string) ([]redis.Document, error)
@@ -44,6 +45,7 @@ type client struct {
 	slug       string
 	p          string
 	codespaces []string
+	started    bool
 }
 
 func New(slug string, codespaces []string, ctxs ...context.Context) (rc Client, err error) {
@@ -71,7 +73,7 @@ func (rc *client) Start(t time.Time) error {
 	if err != nil {
 		return err
 	}
-
+	rc.started = true
 	return rc.initIndexes()
 }
 
@@ -87,7 +89,7 @@ func newRedisclient(ctx context.Context) (*redis.Client, error) {
 
 	err := client.Ping(ctx).Err()
 	if err != nil {
-		logger.Log.Debugf("Can't Ping Redis database: %v", err)
+		logger.Log.Panicf("Can't Ping Redis database: %v", err)
 		return nil, err
 	}
 
@@ -97,9 +99,14 @@ func newRedisclient(ctx context.Context) (*redis.Client, error) {
 }
 
 func (rc *client) Stop() {
+	rc.started = false
 	if rc.c != nil {
 		rc.c.Close()
 	}
+}
+
+func (rc *client) Started() bool {
+	return rc.started
 }
 
 func (rc *client) FlushAll() {

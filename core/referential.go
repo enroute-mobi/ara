@@ -331,11 +331,11 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 	if config.Config.RedisAddr != "" {
 		c, err := redisclient.New(string(slug), config.Config.CodeSpaces)
 		if err != nil {
-			panic(err)
+			logger.Log.Panicf("%v", err)
 		}
 		err = c.Start(time.Now())
 		if err != nil {
-			panic(err)
+			logger.Log.Panicf("%v", err)
 		}
 		referential.redisClient = c
 		referential.model = model.NewHybridModel(string(slug), c)

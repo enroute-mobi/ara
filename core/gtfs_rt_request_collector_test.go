@@ -32,7 +32,7 @@ func collectGtfs(t *testing.T, feed *gtfs.FeedMessage, fakeBroadcast bool) ([]mo
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":        ts.URL,
-		"remote_code_space": "test_kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)

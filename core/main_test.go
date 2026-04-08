@@ -46,3 +46,8 @@ func newTestPartnerManager(t *testing.T) *PartnerManager {
 	_, r := newTestReferential(t)
 	return r.Partners().(*PartnerManager)
 }
+
+func newTestPartner(t *testing.T) (*Referential, *Partner) {
+	_, r := newTestReferential(t)
+	return r, r.Partners().New("partner")
+}

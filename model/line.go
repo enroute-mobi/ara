@@ -17,7 +17,7 @@ type Line struct {
 	ReferentId        LineId `json:",omitempty"`
 	Name              string `json:",omitempty"`
 	Number            string `json:",omitempty"`
-	origin            string
+	Origin            string `json:",omitempty"`
 	CollectSituations bool
 }
 
@@ -55,12 +55,8 @@ func (line *Line) SetId(id LineId) {
 	line.id = id
 }
 
-func (line *Line) Origin() string {
-	return line.origin
-}
-
 func (line *Line) SetOrigin(origin string) {
-	line.origin = origin
+	line.Origin = origin
 }
 
 func (line *Line) MarshalJSON() ([]byte, error) {
@@ -73,7 +69,6 @@ func (line *Line) MarshalJSON() ([]byte, error) {
 		RawAttributes RawAttributes        `json:",omitempty"`
 		References    map[string]Reference `json:",omitempty"`
 		Id            LineId
-		Origin        string `json:",omitempty"`
 	}{
 		Id:    line.id,
 		Alias: (*Alias)(line),
@@ -106,7 +101,6 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 		Codes      map[string]string
 		References map[string]Reference
 		Id         string
-		Origin     string
 		*Alias
 	}{
 		Alias: (*Alias)(line),
@@ -123,10 +117,6 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 
 	if aux.References != nil {
 		line.References.SetReferences(aux.References)
-	}
-
-	if aux.Origin != "" {
-		line.origin = aux.Origin
 	}
 
 	if aux.Id != "" && line.id == "" {

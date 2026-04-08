@@ -20,7 +20,7 @@ func (rc *client) initIndexes() (err error) {
 }
 
 func (rc *client) createIndex(modelName string, indexes []string, indexcodespaces bool) (err error) {
-	indexKey := rc.prefixIndex(modelName)
+	index := rc.prefixIndex(modelName)
 
 	schema := []*redis.FieldSchema{
 		{
@@ -51,7 +51,7 @@ func (rc *client) createIndex(modelName string, indexes []string, indexcodespace
 
 	_, err = rc.c.FTCreate(
 		rc.ctx,
-		indexKey,
+		index,
 		// Options:
 		&redis.FTCreateOptions{
 			OnJSON: true,
@@ -60,7 +60,7 @@ func (rc *client) createIndex(modelName string, indexes []string, indexcodespace
 		schema...,
 	).Result()
 	if err != nil {
-		logger.Log.Debugf("Error while creating %s indexes: %v", modelName, err)
+		logger.Log.Panicf("Error while creating %s indexes: %v", modelName, err)
 	} else {
 		logger.Log.Debugf("%v Indexes created", modelName)
 	}

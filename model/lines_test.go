@@ -5,6 +5,8 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Line_Id(t *testing.T) {
@@ -246,4 +248,70 @@ func Test_MemoryLines_Load(t *testing.T) {
 	if ref, ok := line.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
 		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
+}
+
+func Test_FindFamily(t *testing.T) {
+	model := newTestModel(t)
+
+	ref := model.Lines().New()
+	ref.SetCode(NewCode("internal", "ref"))
+	ref.Save()
+
+	ref2 := model.Lines().New()
+	ref2.ReferentId = ref.Id()
+	ref2.SetCode(NewCode("internal", "ref2"))
+	ref2.Save()
+
+	l := model.Lines().New()
+	l.ReferentId = ref2.Id()
+	l.SetCode(NewCode("internal", "l"))
+	l.Save()
+
+	l2 := model.Lines().New()
+	l2.ReferentId = ref2.Id()
+	l2.SetCode(NewCode("internal", "l2"))
+	l2.Save()
+
+	assert.Len(t, model.Lines().FindFamily(l.Id()), 3)
+	assert.Len(t, model.Lines().FindFamilyFromCode(NewCode("internal", "l")), 3)
+}
+
+func Test_ReferentOrSelfCode(t *testing.T) {
+	model := newTestModel(t)
+
+	ref := model.Lines().New()
+	ref.SetCode(NewCode("internal", "ref"))
+	ref.Save()
+
+	l := model.Lines().New()
+	l.ReferentId = ref.Id()
+	l.SetCode(NewCode("internal", "l"))
+	l.Save()
+
+	l2 := model.Lines().New()
+	l2.SetCode(NewCode("internal", "l2"))
+	l2.Save()
+
+	c, ok := l.ReferentOrSelfCode("internal")
+	assert.True(t, ok)
+	assert.Equal(t, "ref", c.Value())
+
+	c, ok = l2.ReferentOrSelfCode("internal")
+	assert.True(t, ok)
+	assert.Equal(t, "l2", c.Value())
+
+}
+
+func Test_FindAttributes(t *testing.T) {
+	model := newTestModel(t)
+
+	l := model.Lines().New()
+	l.Origin = "test"
+	l.CollectSituations = true
+	l.Save()
+
+	c, ok := model.Lines().(*redisLines).FindAttributes(l.Id(), "Origin", "CollectSituations", "Pouet")
+	assert.True(t, ok)
+	assert.Equal(t, "test", c["Origin"])
+	assert.Equal(t, true, c["CollectSituations"])
 }

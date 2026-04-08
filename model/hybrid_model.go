@@ -54,17 +54,6 @@ func NewHybridModel(referential string, client redisclient.Client) Model {
 	return model
 }
 
-func NewTestHybridModel() Model {
-	model := &hybridModel{
-		date:   NewDate(clock.DefaultClock().Now()),
-		client: redisclient.TestClient,
-	}
-
-	model.refresh()
-
-	return model
-}
-
 func (model *hybridModel) refresh() {
 	lines := NewRedisLines(model.client)
 	lines.SetModel(model)

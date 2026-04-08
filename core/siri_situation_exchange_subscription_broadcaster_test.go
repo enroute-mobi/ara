@@ -18,7 +18,6 @@ func Test_SituationExchangeBroadcaster_Create_Events(t *testing.T) {
 
 	_, referential := newTestReferential(t)
 
-	referential.model.SetBroadcastSXChan(referential.broacasterManager.GetSituationExchangeBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 

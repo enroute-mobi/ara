@@ -23,8 +23,8 @@ func (rc *client) Get(modelName, id string) (string, error) {
 	return rc.c.JSONGet(rc.ctx, rc.prefix(modelName, ":", id), "$").Result()
 }
 
-func (rc *client) GetPath(modelName, id, path string) (string, error) {
-	return rc.c.JSONGet(rc.ctx, rc.prefix(modelName, ":", id), path).Result()
+func (rc *client) GetPath(modelName, id string, path ...string) (string, error) {
+	return rc.c.JSONGet(rc.ctx, rc.prefix(modelName, ":", id), path...).Result()
 }
 
 func (rc *client) FindAll(modelName string) ([]redis.Document, error) {
@@ -86,31 +86,31 @@ func codeQuery(codespace, id string) string {
 
 // It isn't used for now, it was made during development but wasn't tested
 
-// type Batch struct {
-// 	rc   *client
-// 	docs []redis.JSONSetArgs
-// }
+type Batch struct {
+	rc   *client
+	docs []redis.JSONSetArgs
+}
 
-// func (rc *client) NewBatch() Batch {
-// 	return Batch{rc: rc}
-// }
+func (rc *client) NewBatch() Batch {
+	return Batch{rc: rc}
+}
 
-// func (b *Batch) Add(value model) {
-// 	b.docs = append(b.docs, redis.JSONSetArgs{Key: value.ModelId(), Path: "$", Value: value})
-// }
+func (b *Batch) Add(value model) {
+	b.docs = append(b.docs, redis.JSONSetArgs{Key: value.ModelId(), Path: "$", Value: value})
+}
 
-// func (b *Batch) Save(doc redis.JSONSetArgs) error {
-// 	for i := 0; i < len(b.docs); i += maxBatch {
-// 		j := i + maxBatch
-// 		if j > len(b.docs) {
-// 			j = len(b.docs)
-// 		}
+func (b *Batch) Save(doc redis.JSONSetArgs) error {
+	for i := 0; i < len(b.docs); i += maxBatch {
+		j := i + maxBatch
+		if j > len(b.docs) {
+			j = len(b.docs)
+		}
 
-// 		_, err := b.rc.c.JSONMSetArgs(b.rc.ctx, b.docs[i:j]).Result()
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// 	return nil
+		_, err := b.rc.c.JSONMSetArgs(b.rc.ctx, b.docs[i:j]).Result()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 
-// }
+}

@@ -130,17 +130,17 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 
 	code1 := NewCode("internal", "test1")
 
-	sa := model.Lines().New()
-	sa.SetCode(code1)
-	sa.Save()
+	line := model.Lines().New()
+	line.SetCode(code1)
+	line.Save()
 
 	code2 := NewCode("internal", "test2")
 	regionalCode := NewCode("external", "test")
 
-	sa2 := model.Lines().New()
-	sa2.SetCode(code2)
-	sa2.SetCode(regionalCode)
-	sa2.Save()
+	line2 := model.Lines().New()
+	line2.SetCode(code2)
+	line2.SetCode(regionalCode)
+	line2.Save()
 
 	code3 := NewCode("internal", "test3")
 
