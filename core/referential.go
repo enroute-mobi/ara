@@ -172,6 +172,12 @@ func (referential *Referential) DatabaseOrganisationId() sql.NullString {
 func (referential *Referential) Start() {
 	referential.startedAt = referential.Clock().Now()
 
+	referential.StartRedisClient()
+
+	referential.start()
+}
+
+func (referential *Referential) start() {
 	// Configure BigQuery
 	if config.Config.ValidBQConfig() {
 		dataset := fmt.Sprintf("%v_%v", config.Config.BigQueryDatasetPrefix, referential.slug)
@@ -278,11 +284,18 @@ func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model for referential %v", referential.slug)
 	referential.Stop()
 	referential.partners.DeleteAllFromTemplate()
+
+	// To reload and use the new model in the redis client, we need to define
+	// a new prefix. So we need to set the startedAt before loading the model
+	t := referential.Clock().Now()
+	referential.startedAt = t
+	referential.StartRedisClient()
+
 	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
 	referential.partners.Load()
 	referential.partnerTemplates.Load()
-	referential.Start()
+	referential.start()
 }
 
 func (referential *Referential) setNextReloadAt() {
@@ -303,6 +316,18 @@ func (referential *Referential) Load() {
 	referential.model.Load()
 	referential.Partners().Load()
 	referential.PartnerTemplates().Load()
+}
+func (referential *Referential) StartRedisClient() {
+	if referential.redisClient == nil {
+		return
+	}
+	referential.redisClient.SetSlug(string(referential.slug))
+	referential.redisClient.SetCodespaces(config.Config.CodeSpaces)
+
+	err := referential.redisClient.Start(referential.startedAt)
+	if err != nil {
+		logger.Log.Panicf("%v", err)
+	}
 }
 
 type MemoryReferentials struct {
@@ -330,10 +355,6 @@ func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
 
 	if config.Config.RedisAddr != "" {
 		c, err := redisclient.New(string(slug), config.Config.CodeSpaces)
-		if err != nil {
-			logger.Log.Panicf("%v", err)
-		}
-		err = c.Start(time.Now())
 		if err != nil {
 			logger.Log.Panicf("%v", err)
 		}

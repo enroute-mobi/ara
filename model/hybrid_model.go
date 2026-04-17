@@ -4,19 +4,10 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model/redisclient"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-type hybridManager struct {
-	uuid.UUIDConsumer
-
-	model Model
-}
-
-func (mm *hybridManager) SetModel(m Model) {
-	mm.model = m
-}
-
+// Hybrid model exists for the transition from memory to Redis.
+// When the transition is complete, we'll rename it redisModel
 type hybridModel struct {
 	client redisclient.Client
 
@@ -55,9 +46,14 @@ func NewHybridModel(referential string, client redisclient.Client) Model {
 }
 
 func (model *hybridModel) refresh() {
-	lines := NewRedisLines(model.client)
-	lines.SetModel(model)
-	model.lines = lines
+	// We initialize only once the RedisLines as we don't need to replace
+	// the redis client, we just need to change its prefix. This is
+	// handled in the Referential
+	if model.lines == nil {
+		lines := NewRedisLines(model.client)
+		lines.SetModel(model)
+		model.lines = lines
+	}
 
 	situations := NewMemorySituations()
 	situations.SetModel(model)

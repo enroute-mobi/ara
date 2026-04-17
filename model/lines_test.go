@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/config"
+	"bitbucket.org/enroute-mobi/ara/model/redisclient"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -272,8 +274,8 @@ func Test_FindFamily(t *testing.T) {
 	l2.SetCode(NewCode("internal", "l2"))
 	l2.Save()
 
-	assert.Len(t, model.Lines().FindFamily(l.Id()), 3)
-	assert.Len(t, model.Lines().FindFamilyFromCode(NewCode("internal", "l")), 3)
+	assert.Len(t, model.Lines().FindFamily(ref2.Id()), 3)
+	assert.Len(t, model.Lines().FindFamilyFromCode(NewCode("internal", "ref2")), 3)
 }
 
 func Test_ReferentOrSelfCode(t *testing.T) {
@@ -302,7 +304,37 @@ func Test_ReferentOrSelfCode(t *testing.T) {
 
 }
 
+func Test_FindAllAttributesBy(t *testing.T) {
+	if config.Config.RedisAddr == "" {
+		return
+	}
+	model := newTestModel(t)
+
+	ref := model.Lines().New()
+	ref.SetCode(NewCode("internal", "ref"))
+	ref.Save()
+
+	l := model.Lines().New()
+	l.ReferentId = ref.Id()
+	l.SetCode(NewCode("internal", "l"))
+	l.Save()
+
+	l2 := model.Lines().New()
+	l2.ReferentId = ref.Id()
+	l2.SetCode(NewCode("internal", "l2"))
+	l2.Save()
+
+	attrs := model.Lines().(*redisLines).FindAllAttributesBy(redisclient.ByReferentID, string(ref.Id()), "Id", "ReferentId")
+
+	assert.Len(t, attrs, 2)
+	assert.Contains(t, attrs, map[string]string{"Id": l.ModelId(), "ReferentId": ref.ModelId()})
+	assert.Contains(t, attrs, map[string]string{"Id": l2.ModelId(), "ReferentId": ref.ModelId()})
+}
+
 func Test_FindAttributes(t *testing.T) {
+	if config.Config.RedisAddr == "" {
+		return
+	}
 	model := newTestModel(t)
 
 	l := model.Lines().New()
@@ -310,8 +342,26 @@ func Test_FindAttributes(t *testing.T) {
 	l.CollectSituations = true
 	l.Save()
 
-	c, ok := model.Lines().(*redisLines).FindAttributes(l.Id(), "Origin", "CollectSituations", "Pouet")
+	c, ok := model.Lines().(*redisLines).FindAttributes(l.Id(), "Origin", "CollectSituations")
 	assert.True(t, ok)
 	assert.Equal(t, "test", c["Origin"])
 	assert.Equal(t, true, c["CollectSituations"])
+}
+
+func Test_FindAttributesBy(t *testing.T) {
+	if config.Config.RedisAddr == "" {
+		return
+	}
+	model := newTestModel(t)
+
+	l := model.Lines().New()
+	l.ReferentId = "referentId"
+	l.Origin = "test"
+	l.CollectSituations = true
+	l.Save()
+
+	c, ok := model.Lines().(*redisLines).FindAttributesBy(redisclient.ByReferentID, "referentId", "Origin", "CollectSituations")
+	assert.True(t, ok)
+	assert.Equal(t, "test", c["Origin"])
+	assert.Equal(t, "1", c["CollectSituations"])
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// initIndexes is meant to create Indexes for each model (Stops, Lines, Vehicles,...)
 func (rc *client) initIndexes() (err error) {
 	logger.Log.Debugf("Creating Line indexes")
 	err = rc.createIndex(Line, []string{ByReferentID}, true)
@@ -19,13 +20,15 @@ func (rc *client) initIndexes() (err error) {
 	return err
 }
 
-func (rc *client) createIndex(modelName string, indexes []string, indexcodespaces bool) (err error) {
-	index := rc.prefixIndex(modelName)
+// createIndex creates a default index on Id, an index for each of the given parameters in the indexes slice,
+// and an index for all the client code spaces if parameter indexCodespaces is true
+func (rc *client) createIndex(modelName string, indexes []string, indexCodespaces bool) (err error) {
+	indexName := rc.prefixIndex(modelName)
 
 	schema := []*redis.FieldSchema{
 		{
-			FieldName: "$.id",
-			As:        "id",
+			FieldName: "$.Id",
+			As:        "Id",
 			FieldType: redis.SearchFieldTypeTag,
 		},
 	}
@@ -38,7 +41,7 @@ func (rc *client) createIndex(modelName string, indexes []string, indexcodespace
 		})
 	}
 
-	if indexcodespaces {
+	if indexCodespaces {
 		for _, i := range rc.codespaces {
 			schema = append(schema, &redis.FieldSchema{
 				FieldName: fmt.Sprintf("$.Codes.%v", i),
@@ -51,7 +54,7 @@ func (rc *client) createIndex(modelName string, indexes []string, indexcodespace
 
 	_, err = rc.c.FTCreate(
 		rc.ctx,
-		index,
+		indexName,
 		// Options:
 		&redis.FTCreateOptions{
 			OnJSON: true,
@@ -60,6 +63,7 @@ func (rc *client) createIndex(modelName string, indexes []string, indexcodespace
 		schema...,
 	).Result()
 	if err != nil {
+		// For now we Panic as ara can't function at all without the indexes correctly set
 		logger.Log.Panicf("Error while creating %s indexes: %v", modelName, err)
 	} else {
 		logger.Log.Debugf("%v Indexes created", modelName)
@@ -68,6 +72,8 @@ func (rc *client) createIndex(modelName string, indexes []string, indexcodespace
 	return err
 }
 
+// prefixIndex is used to prefix all indexes with:
+// "[referential slug]:[referential startedTime]:indexes:[model name]"
 func (rc *client) prefixIndex(modelName string) string {
 	b := strings.Builder{}
 	b.Grow(60)

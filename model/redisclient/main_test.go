@@ -38,7 +38,6 @@ func TestMain(m *testing.M) {
 
 	if config.Config.RedisAddr != "" {
 		TestClient.FlushAll()
-		TestClient.Stop()
 	}
 
 	os.Exit(c)

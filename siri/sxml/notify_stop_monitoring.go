@@ -84,7 +84,7 @@ func NewXMLNotifyStopMonitoringFromContent(content []byte) (*XMLNotifyStopMonito
 		return nil, err
 	}
 	if doc.Root() == nil {
-		return nil, fmt.Errorf("Doc Root is nil")
+		return nil, fmt.Errorf("doc Root is nil")
 	}
 	response := NewXMLNotifyStopMonitoring(doc.Root().XmlNode)
 	return response, nil

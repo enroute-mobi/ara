@@ -31,6 +31,9 @@ redis_tests:
 cucumber:
 	go build && bundle exec cucumber -t 'not @wip'
 
+redis_cucumber:
+	go build && ARA_REDIS_ADDR=127.0.0.1:6379 bundle exec cucumber -t 'not @wip'
+
 gen_gtfsrt_bindings:
 	wget https://raw.githubusercontent.com/google/transit/refs/heads/master/gtfs-realtime/proto/gtfs-realtime.proto
 	protoc --go_out=. --go_opt=Mgtfs-realtime.proto=gtfs/ gtfs-realtime.proto

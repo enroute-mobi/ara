@@ -35,6 +35,7 @@ func newTestReferential(t *testing.T, tokens ...string) (*core.MemoryReferential
 	referential := referentials.New("referential")
 	referential.Tokens = tokens
 	referential.Save()
+	referential.StartRedisClient()
 
 	if config.Config.RedisAddr != "" {
 		t.Cleanup(referential.RedisClient().FlushAll)
@@ -43,16 +44,21 @@ func newTestReferential(t *testing.T, tokens ...string) (*core.MemoryReferential
 	return referentials, referential
 }
 
-func newTestServer(t *testing.T, tokens ...string) (*Server, *core.Referential) {
+func newTestServer(t *testing.T, g ...uuid.UUIDGenerator) (*Server, *core.Referential) {
 	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	if len(g) == 1 {
+		referentials.SetUUIDGenerator(g[0])
+	} else {
+		referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	}
+
 	server := &Server{}
 	server.SetReferentials(referentials)
 	server.startedTime = server.Clock().Now()
 
 	referential := server.CurrentReferentials().New("referential")
-	referential.Tokens = tokens
 	referential.Save()
+	referential.StartRedisClient()
 
 	if config.Config.RedisAddr != "" {
 		t.Cleanup(referential.RedisClient().FlushAll)

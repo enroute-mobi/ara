@@ -253,15 +253,8 @@ func Test_ReferentialController_Save(t *testing.T) {
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-	// Save a new referential
-	referential := referentials.New("referential")
-	referentials.Save(referential)
+	server, referential := newTestServer(t, uuid.NewRealUUIDGenerator())
 
-	server := &Server{}
-	server.SetReferentials(referentials)
 	// Create a request
 	request, err := http.NewRequest("POST", "/_referentials/save", nil)
 	if err != nil {
@@ -315,15 +308,8 @@ func Test_ReferentialController_Reload(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-	// Save a new referential
-	referential := referentials.New("referential")
-	referentials.Save(referential)
+	server, referential := newTestServer(t, uuid.NewRealUUIDGenerator())
 
-	server := &Server{}
-	server.SetReferentials(referentials)
 	// Create a request
 	request, err := http.NewRequest("POST", fmt.Sprintf("/_referentials/%v/reload", referential.Id()), nil)
 	if err != nil {
@@ -375,15 +361,7 @@ func Test_ReferentialController_Reload_Partner(t *testing.T) {
 	err := model.Database.Insert(&databasePartner)
 	require.NoError(err)
 
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGeneratorLegacy())
-	// Save a new referential
-	referential := referentials.New("referential")
-	referentials.Save(referential)
-
-	server := &Server{}
-	server.SetReferentials(referentials)
+	server, referential := newTestServer(t, uuid.NewFakeUUIDGeneratorLegacy())
 
 	// Ensure No partners exist
 	partners := referential.Partners().FindAll()

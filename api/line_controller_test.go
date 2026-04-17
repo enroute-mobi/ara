@@ -23,7 +23,8 @@ func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *tes
 
 func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line *model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
-	server, referential := newTestServer(t, []string{"testToken"}...)
+	server, referential := newTestServer(t)
+	referential.Tokens = []string{"testToken"}
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())

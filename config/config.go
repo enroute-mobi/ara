@@ -93,7 +93,7 @@ func LoadConfig(path string) error {
 		Config.RedisDB, _ = strconv.Atoi(redisDB)
 	}
 	redisCS := os.Getenv("ARA_REDIS_CODESPACES")
-	if redisDB != "" {
+	if redisCS != "" {
 		Config.CodeSpaces = strings.Split(redisCS, ",")
 	}
 

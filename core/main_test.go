@@ -34,6 +34,7 @@ func newTestReferential(t *testing.T, testCollectManager ...bool) (*MemoryRefere
 		referential.collectManager = NewTestCollectManager()
 	}
 	referential.Save()
+	referential.StartRedisClient()
 
 	if config.Config.RedisAddr != "" {
 		t.Cleanup(referential.RedisClient().FlushAll)
@@ -47,7 +48,7 @@ func newTestPartnerManager(t *testing.T) *PartnerManager {
 	return r.Partners().(*PartnerManager)
 }
 
-func newTestPartner(t *testing.T) (*Referential, *Partner) {
-	_, r := newTestReferential(t)
-	return r, r.Partners().New("partner")
-}
+// func newTestPartner(t *testing.T) (*Referential, *Partner) {
+// 	_, r := newTestReferential(t)
+// 	return r, r.Partners().New("partner")
+// }

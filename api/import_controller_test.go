@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
-	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/stretchr/testify/assert"
 )
@@ -49,7 +48,7 @@ func prepareMultipart(t *testing.T, values map[string]io.Reader) (request *http.
 	w.Close()
 
 	// Now that you have a form, you can submit it to your handler.
-	request, err := http.NewRequest("POST", "/test/import", &b)
+	request, err := http.NewRequest("POST", "/referential/import", &b)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,13 +71,13 @@ func Test_Serve(t *testing.T) {
 	assert := assert.New(t)
 
 	model.InitTestDb(t)
-	defer model.CleanTestDb(t)
+	t.Cleanup(func() { model.CleanTestDb(t) })
 
 	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
 
 	// Initialize referential manager
-	server, referential := newTestServer(t, []string{"testToken"}...)
-
+	server, referential := newTestServer(t)
+	referential.Tokens = []string{"testToken"}
 	// Create a request
 	//prepare the reader instances to encode
 	values := map[string]io.Reader{
@@ -178,13 +177,7 @@ func Test_Serve_With_NoToken(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
 
 	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	// Save a new referential
-	referential := referentials.New("test")
-	referentials.Save(referential)
-
-	server := &Server{}
-	server.SetReferentials(referentials)
+	server, referential := newTestServer(t)
 	// Create a request
 	//prepare the reader instances to encode
 	values := map[string]io.Reader{
@@ -214,14 +207,8 @@ func Test_Serve_With_ImportToken(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClockAt(time.Date(2017, time.January, 1, 0, 0, 0, 0, time.UTC)))
 
 	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	// Save a new referential
-	referential := referentials.New("test")
-	referential.ImportTokens = []string{"testToken"}
-	referentials.Save(referential)
-
-	server := &Server{}
-	server.SetReferentials(referentials)
+	server, referential := newTestServer(t)
+	referential.Tokens = []string{"testToken"}
 	// Create a request
 	//prepare the reader instances to encode
 	values := map[string]io.Reader{

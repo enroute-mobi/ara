@@ -30,10 +30,9 @@ func (manager *redisLines) FindByReferentId(id LineId) (lines []*Line) {
 func (manager *redisLines) FindFamily(lineId LineId) (lineIds []LineId) {
 	lineIds = []LineId{lineId}
 
-	rid, ok := manager.FindAttribute(lineId, redisclient.ReferentID)
-	if ok {
-		lineIds = append(lineIds, manager.FindFamily(LineId(rid))...)
-
+	ids := manager.FindAllAttributesBy(redisclient.ByReferentID, string(lineId), redisclient.ModelID)
+	for i := range ids {
+		lineIds = append(lineIds, manager.FindFamily(LineId(ids[i][redisclient.ModelID]))...)
 	}
 
 	return
