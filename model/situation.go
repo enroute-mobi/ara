@@ -708,13 +708,13 @@ func (situation *Situation) SetDefinition(apiSituation *APISituation) {
 }
 
 type memorySituations struct {
+	IndexHandler
 	memoryManager
 
 	mutex            *sync.RWMutex
 	GMbroadcastEvent func(event SituationBroadcastEvent)
 	SXbroadcastEvent func(event SituationBroadcastEvent)
 	byIdentifier     map[SituationId]*Situation
-	byCode           *CodeIndex
 }
 
 type Situations interface {
@@ -724,11 +724,12 @@ type Situations interface {
 }
 
 func NewMemorySituations() Situations {
-	return &memorySituations{
+	s := &memorySituations{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[SituationId]*Situation),
-		byCode:       NewCodeIndex(),
 	}
+	s.InitIndexes()
+	return s
 }
 
 func (manager *memorySituations) SetBroadcaster(f func(SituationBroadcastEvent), t ...string) {
@@ -772,7 +773,7 @@ func (manager *memorySituations) FindByCode(code Code) (*Situation, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
-	id, ok := manager.byCode.Find(code)
+	id, ok := manager.ByCode().Find(code)
 	if ok {
 		return manager.byIdentifier[SituationId(id)].copy(), true
 	}
@@ -782,7 +783,7 @@ func (manager *memorySituations) FindByCode(code Code) (*Situation, bool) {
 
 func (manager *memorySituations) CodeExists(code Code) bool {
 	manager.mutex.RLock()
-	_, ok := manager.byCode.Find(code)
+	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
 
 	return ok
@@ -797,7 +798,7 @@ func (manager *memorySituations) Save(situation *Situation) bool {
 	}
 	situation.model = manager.model
 	manager.byIdentifier[situation.Id()] = situation
-	manager.byCode.Index(situation)
+	manager.Index(situation)
 
 	event := SituationBroadcastEvent{
 		SituationId: situation.id,
@@ -818,7 +819,7 @@ func (manager *memorySituations) Delete(situation *Situation) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, situation.Id())
-	manager.byCode.Delete(ModelId(situation.id))
+	manager.Deindex(ModelId(situation.id))
 
 	return true
 }
