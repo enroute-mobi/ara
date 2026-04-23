@@ -434,3 +434,78 @@ func Test_StopAreaController_Index_SearchByName_Below_Three_Characters(t *testin
 
 	assert.Equal("length of search name must be at least 3 characters, got: XX\n", string(data))
 }
+
+func Test_StopAreaController_Index_SearchByCode(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	referentials := core.NewMemoryReferentials()
+	server := &Server{}
+	server.SetReferentials(referentials)
+	referential := referentials.New("default")
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	// Create and save 2 new stopAreas
+	stopArea := referential.Model().StopAreas().New()
+	code := model.NewCode("codeSpace", "value")
+	stopArea.SetCode(code)
+	stopArea.Name = "Alice"
+	referential.Model().StopAreas().Save(stopArea)
+
+	stopArea2 := referential.Model().StopAreas().New()
+	code = model.NewCode("codeSpace", "NotStartingWithvalue")
+	stopArea.SetCode(code)
+	stopArea2.Name = "Bob"
+	referential.Model().StopAreas().Save(stopArea2)
+
+	stopArea3 := referential.Model().StopAreas().New()
+	code = model.NewCode("wrongCodeSpace", "value")
+	stopArea.SetCode(code)
+	stopArea3.Name = "superBobStop"
+	referential.Model().StopAreas().Save(stopArea3)
+
+	stopArea4 := referential.Model().StopAreas().New()
+	code = model.NewCode("codeSpace", "value:with:semicolon")
+	stopArea.SetCode(code)
+	stopArea4.Name = "newBôbArret"
+	referential.Model().StopAreas().Save(stopArea4)
+
+	all := referential.Model().StopAreas().FindAll()
+	assert.Len(all, 4)
+
+	// Create a request
+	path := path.Join("default", "stop_areas")
+
+	params := url.Values{}
+	params.Add("code", "codeSpace:value")
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "stop_areas")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	var paginatedResource PaginatedResource[model.StopArea]
+	err = json.Unmarshal(data, &paginatedResource)
+	assert.NoError(err)
+
+	stopAreas := paginatedResource.Models
+	assert.Len(stopAreas, 1)
+
+	// StopAreas with name matching codeSpace:value should be found
+	assert.ElementsMatch([]string{"wrongCodeSpace:value", "codeSpace:value:with:semicolon"}, stopAreas[0].Codes().ToSlice())
+}

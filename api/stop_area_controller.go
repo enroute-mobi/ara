@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"sort"
+	"strings"
 	"unicode"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -78,6 +79,48 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 		for i := range allStopAreas {
 			normalizedSaName, _, _ := transform.String(t, allStopAreas[i].Name)
 			if searchPattern.MatchString(normalizedSaName) {
+				possibleStopAreas = append(possibleStopAreas, allStopAreas[i])
+			}
+		}
+		allStopAreas = possibleStopAreas
+	}
+
+	searchCode := params.Get("code")
+	possibleStopAreas = []*model.StopArea{}
+	if searchCode != "" {
+		params.Del("code")
+		searchCodeSpace, searchValue, found := strings.Cut(searchCode, ":")
+		if !found {
+			http.Error(response, fmt.Sprintf("invalid request: query parameter \"code\" : %s", searchCode), http.StatusUnprocessableEntity)
+			return
+		}
+		if searchCodeSpace == "" || searchValue == "" {
+			http.Error(response, "code space or value should not be empty", http.StatusUnprocessableEntity)
+			return
+		}
+		if len(searchValue) < 3 {
+			http.Error(response, fmt.Sprintf("length of search value must be at least 3 characters, got: %s", searchName), http.StatusUnprocessableEntity)
+			return
+		}
+
+		t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+		normalizedSearchValue, _, err := transform.String(t, searchValue)
+		if err != nil {
+			http.Error(response, fmt.Sprintf("invalid request: query parameter \"code\" %s: cannot normalize value:, %v", searchValue, err.Error()), http.StatusBadRequest)
+		}
+
+		searchPattern, err := regexp.Compile("(?i)" + normalizedSearchValue)
+		if err != nil {
+			http.Error(response, fmt.Sprintf("invalid request: cannot create search pattern: %v", err.Error()), http.StatusBadRequest)
+		}
+
+		for i := range allStopAreas {
+			code, ok := allStopAreas[i].Code(searchCodeSpace)
+			if !ok {
+				continue
+			}
+			normalisedCodeValue, _, _ := transform.String(t, code.Value())
+			if searchPattern.MatchString(normalisedCodeValue) {
 				possibleStopAreas = append(possibleStopAreas, allStopAreas[i])
 			}
 		}
