@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"slices"
 	"time"
 
@@ -437,8 +438,15 @@ func (ett *ETTBroadcaster) sendDelivery(delivery *siri.SIRINotifyEstimatedTimeta
 
 	t := ett.Clock().Now()
 
-	ett.connector.Partner().SIRIClient().NotifyEstimatedTimetable(delivery)
+	err := ett.connector.Partner().SIRIClient().NotifyEstimatedTimetable(delivery)
 	message.ProcessingTime = ett.Clock().Since(t).Seconds()
+	if err != nil {
+		e := fmt.Sprintf("Error during NotifyEstimatedTimetable: %v", err)
+		logger.Log.Debugf("%s", e)
+
+		message.Status = "Error"
+		message.ErrorDetails = e
+	}
 
 	audit.CurrentBigQuery(string(ett.connector.Partner().Referential().Slug())).WriteEvent(message)
 }

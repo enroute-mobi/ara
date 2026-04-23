@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -277,7 +278,11 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 	err := smb.connector.Partner().SIRIClient().NotifyStopMonitoring(notify)
 	message.ProcessingTime = smb.Clock().Since(t).Seconds()
 	if err != nil {
-		logger.Log.Debugf("Error in StopMonitoringBroadcaster while attempting to send a notification: %v", err)
+		e := fmt.Sprintf("Error during NotifyStopMonitoring: %v", err)
+		logger.Log.Debugf("%s", e)
+
+		message.Status = "Error"
+		message.ErrorDetails = e
 	}
 
 	notify.Deliveries = []*siri.SIRINotifyStopMonitoringDelivery{}
