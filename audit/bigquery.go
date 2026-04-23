@@ -208,6 +208,7 @@ type BigQueryClient struct {
 	longTermStopVisitEvents   chan *BigQueryLongTermStopVisitEvent
 	controlEvents             chan *BigQueryControlEvent
 	stop                      chan struct{}
+	lostMessagesCount         int
 }
 
 func NewBigQuery(dataset string) BigQuery {
@@ -268,8 +269,12 @@ func (bq *BigQueryClient) WriteEvent(e BigQueryEvent) error {
 func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
+		if bq.lostMessagesCount > 0 {
+			logger.Log.Printf("BigQuery queue was full: %d lost messages)", bq.lostMessagesCount)
+			bq.lostMessagesCount = 0
+		}
 	default:
-		logger.Log.Debugf("BigQuery queue is full")
+		bq.lostMessagesCount += 1
 	}
 	return nil
 }
