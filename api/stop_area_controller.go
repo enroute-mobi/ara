@@ -35,20 +35,6 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 	logger.Log.Debugf("StopAreas Index")
 
 	allStopAreas := controller.referential.Model().StopAreas().FindAll()
-	direction := params.Get("direction")
-	switch direction {
-	case "desc":
-		sort.Slice(allStopAreas, func(i, j int) bool {
-			return allStopAreas[i].Name > allStopAreas[j].Name
-		})
-	case "asc", "":
-		sort.Slice(allStopAreas, func(i, j int) bool {
-			return allStopAreas[i].Name < allStopAreas[j].Name
-		})
-	default:
-		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
-		return
-	}
 
 	// Search
 	filteredStopAreas, err := searchByName(allStopAreas, params)
@@ -63,6 +49,23 @@ func (controller *StopAreaController) Index(response http.ResponseWriter, params
 		return
 	}
 
+	// Sort
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(filteredStopAreas, func(i, j int) bool {
+			return filteredStopAreas[i].Name > filteredStopAreas[j].Name
+		})
+	case "asc", "":
+		sort.Slice(filteredStopAreas, func(i, j int) bool {
+			return filteredStopAreas[i].Name < filteredStopAreas[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	// Paginate
 	paginatedStopAreas, err := paginate(filteredStopAreas, params)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
