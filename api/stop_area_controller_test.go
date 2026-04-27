@@ -426,7 +426,7 @@ func Test_StopAreaController_Index_SearchByName_Below_Three_Characters(t *testin
 	server.handleReferentialModelIndex(responseRecorder, request)
 
 	res := responseRecorder.Result()
-	assert.Equal(res.StatusCode, 422)
+	assert.Equal(res.StatusCode, 400)
 
 	defer res.Body.Close()
 	data, err := io.ReadAll(res.Body)

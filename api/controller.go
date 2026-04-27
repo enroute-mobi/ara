@@ -109,6 +109,51 @@ type ModelForCode[S SearchableByCode] interface {
 	*S
 }
 
+type SearchableByName interface {
+	model.StopArea
+}
+
+type ModelForName[S SearchableByName] interface {
+	XName() string
+	*S
+}
+
+func searchByName[S SearchableByName, M ModelForName[S]](s []*S, params url.Values) ([]*S, error) {
+	searchName := params.Get("name")
+	if searchName == "" {
+		return s, nil
+	}
+	params.Del("name")
+
+	possibleModels := []*S{}
+
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	if len(searchName) < 3 {
+		return nil, fmt.Errorf("length of search name must be at least 3 characters, got: %s", searchName)
+	}
+
+	normalizedSearchPattern, _, err := transform.String(t, searchName)
+	if err != nil {
+		return nil, fmt.Errorf("query parameter \"name\" %s: cannot normalize:, %v", searchName, err.Error())
+	}
+
+	searchPattern, err := regexp.Compile("(?i)" + normalizedSearchPattern)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create search pattern: %v", err.Error())
+	}
+
+	for i := range s {
+		normalizedSaName, _, err := transform.String(t, M(s[i]).XName())
+		if err != nil {
+			return nil, fmt.Errorf("cannot normalize stopArea name: %v", err.Error())
+		}
+		if searchPattern.MatchString(normalizedSaName) {
+			possibleModels = append(possibleModels, s[i])
+		}
+	}
+	return possibleModels, nil
+}
+
 func searchByCode[S SearchableByCode, M ModelForCode[S]](s []*S, params url.Values) ([]*S, error) {
 	searchCode := params.Get("code")
 	if searchCode == "" {

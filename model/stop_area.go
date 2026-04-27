@@ -84,6 +84,10 @@ func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
 }
 
+func (stopArea *StopArea) XName() string {
+	return stopArea.Name
+}
+
 func (stopArea *StopArea) MarshalJSON() ([]byte, error) {
 	type Alias StopArea
 	aux := struct {

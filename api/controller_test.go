@@ -140,3 +140,25 @@ func Test_Paginate_With_empty_models(t *testing.T) {
 	assert.Equal(1, paginatedResource.TotalPages)
 	assert.Equal(0, paginatedResource.TotalCount)
 }
+
+func Test_SearchByName_Errors(t *testing.T) {
+	assert := assert.New(t)
+
+	s := &model.StopArea{}
+	slice := []*model.StopArea{s}
+
+	params := url.Values{}
+	values, err := searchByName(slice, params)
+	assert.NoError(err)
+	assert.ElementsMatch(values, slice, "should return the full list if there is no params \"code\"")
+
+	params.Set("name", "(*+")
+	_, err = searchByName(slice, params)
+	assert.Error(err)
+	assert.Equal("cannot create search pattern: error parsing regexp: missing argument to repetition operator: `*`", err.Error())
+
+	params.Set("name", "xx")
+	_, err = searchByName(slice, params)
+	assert.Error(err)
+	assert.Equal("length of search name must be at least 3 characters, got: xx", err.Error())
+}
