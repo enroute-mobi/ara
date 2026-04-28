@@ -74,6 +74,10 @@ func (vehicleJourney *VehicleJourney) Id() VehicleJourneyId {
 	return vehicleJourney.id
 }
 
+func (vehicleJourney *VehicleJourney) GetName() string {
+	return vehicleJourney.Name
+}
+
 func (vehicleJourney *VehicleJourney) Line() *Line {
 	if vehicleJourney.model == nil {
 		return nil
