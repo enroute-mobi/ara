@@ -114,7 +114,7 @@ type SearchableByName interface {
 }
 
 type ModelForName[S SearchableByName] interface {
-	XName() string
+	GetName() string
 	*S
 }
 
@@ -143,7 +143,7 @@ func searchByName[S SearchableByName, M ModelForName[S]](s []*S, params url.Valu
 	}
 
 	for i := range s {
-		normalizedSaName, _, err := transform.String(t, M(s[i]).XName())
+		normalizedSaName, _, err := transform.String(t, M(s[i]).GetName())
 		if err != nil {
 			return nil, fmt.Errorf("cannot normalize stopArea name: %v", err.Error())
 		}

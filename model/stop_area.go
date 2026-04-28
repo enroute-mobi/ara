@@ -84,7 +84,7 @@ func (stopArea *StopArea) Id() StopAreaId {
 	return stopArea.id
 }
 
-func (stopArea *StopArea) XName() string {
+func (stopArea *StopArea) GetName() string {
 	return stopArea.Name
 }
 
