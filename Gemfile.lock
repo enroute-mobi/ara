@@ -1,6 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: 8dcf72b189ec2cd894f3f21ceeba843ad9144c8c
+  revision: 68979a097b81e67fcf5e596b1d6c029e973abb34
   specs:
     ara (3.5.5)
       faraday
@@ -39,7 +39,7 @@ GEM
       tzinfo (~> 2.0, >= 2.0.5)
       uri (>= 0.13.1)
     base64 (0.3.0)
-    bigdecimal (4.1.1)
+    bigdecimal (4.1.2)
     builder (3.3.0)
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
@@ -84,12 +84,12 @@ GEM
       net-http (~> 0.5)
     ffi (1.17.4)
     http-accept (1.7.0)
-    http-cookie (1.1.4)
+    http-cookie (1.1.6)
       domain_name (~> 0.5)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     io-console (0.8.2)
-    json (2.19.3)
+    json (2.19.5)
     license_finder (7.2.1)
       bundler
       csv (~> 3.2)
@@ -108,17 +108,17 @@ GEM
     mime-types (3.7.0)
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
-    mime-types-data (3.2026.0407)
+    mime-types-data (3.2026.0414)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (6.0.3)
+    minitest (6.0.6)
       drb (~> 2.0)
       prism (~> 1.5)
     multi_test (1.1.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
     netrc (0.11.0)
-    nokogiri (1.19.2)
+    nokogiri (1.19.3)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
     pg (1.6.3)
@@ -128,7 +128,7 @@ GEM
       method_source (~> 1.0)
       reline (>= 0.6.0)
     racc (1.8.1)
-    rake (13.4.1)
+    rake (13.4.2)
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
