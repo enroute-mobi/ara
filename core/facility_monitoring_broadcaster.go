@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -158,9 +159,15 @@ func (fm *FMBroadcaster) sendDelivery(delivery *siri.SIRINotifyFacilityMonitorin
 
 	t := fm.Clock().Now()
 
-	fm.connector.Partner().SIRIClient().NotifyFacilityMonitoring(delivery)
+	err := fm.connector.Partner().SIRIClient().NotifyFacilityMonitoring(delivery)
 	message.ProcessingTime = fm.Clock().Since(t).Seconds()
+	if err != nil {
+		e := fmt.Sprintf("Error during NotifyFacilityMonitoring: %v", err)
+		logger.Log.Debugf("%s", e)
 
+		message.Status = "Error"
+		message.ErrorDetails = e
+	}
 	audit.CurrentBigQuery(string(fm.connector.Partner().Referential().Slug())).WriteEvent(message)
 }
 

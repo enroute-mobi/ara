@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -347,8 +348,15 @@ func (vm *VMBroadcaster) sendDelivery(delivery *siri.SIRINotifyVehicleMonitoring
 
 	t := vm.Clock().Now()
 
-	vm.connector.Partner().SIRIClient().NotifyVehicleMonitoring(delivery)
+	err := vm.connector.Partner().SIRIClient().NotifyVehicleMonitoring(delivery)
 	message.ProcessingTime = vm.Clock().Since(t).Seconds()
+	if err != nil {
+		e := fmt.Sprintf("Error during NotifyVehicleMonitoring: %v", err)
+		logger.Log.Debugf("%s", e)
+
+		message.Status = "Error"
+		message.ErrorDetails = e
+	}
 
 	audit.CurrentBigQuery(string(vm.connector.Partner().Referential().Slug())).WriteEvent(message)
 }

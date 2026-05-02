@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -152,8 +154,15 @@ func (gmb *GMBroadcaster) prepareSIRIGeneralMessageNotify() {
 			gmb.logSIRIGeneralMessageNotify(message, &notify)
 			t := gmb.Clock().Now()
 
-			gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
+			err := gmb.connector.Partner().SIRIClient().NotifyGeneralMessage(&notify)
 			message.ProcessingTime = gmb.Clock().Since(t).Seconds()
+			if err != nil {
+				e := fmt.Sprintf("Error during NotifyGeneralMessage: %v", err)
+				logger.Log.Debugf("%s", e)
+
+				message.Status = "Error"
+				message.ErrorDetails = e
+			}
 
 			audit.CurrentBigQuery(string(gmb.connector.Partner().Referential().Slug())).WriteEvent(message)
 		}

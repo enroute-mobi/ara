@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/audit"
@@ -151,9 +152,15 @@ func (sxb *SXBroadcaster) prepareSIRISituationExchangeNotify() {
 		sxb.logSIRISituationExchangeNotify(message, &notify)
 		t := sxb.Clock().Now()
 
-		sxb.connector.Partner().SIRIClient().NotifySituationExchange(&notify)
+		err := sxb.connector.Partner().SIRIClient().NotifySituationExchange(&notify)
 		message.ProcessingTime = sxb.Clock().Since(t).Seconds()
+		if err != nil {
+			e := fmt.Sprintf("Error during NotifySituationExchange: %v", err)
+			logger.Log.Debugf("%s", e)
 
+			message.Status = "Error"
+			message.ErrorDetails = e
+		}
 		audit.CurrentBigQuery(string(sxb.connector.Partner().Referential().Slug())).WriteEvent(message)
 	}
 }
