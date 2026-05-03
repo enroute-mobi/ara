@@ -8,6 +8,38 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_SearchByCode_Errors(t *testing.T) {
+	assert := assert.New(t)
+
+	s := &model.StopArea{}
+	slice := []*model.StopArea{s}
+
+	params := url.Values{}
+	values, err := searchByCode(slice, params)
+	assert.NoError(err)
+	assert.ElementsMatch(values, slice, "should return the full list if there is no params \"code\"")
+
+	params.Set("code", "fake")
+	_, err = searchByCode(slice, params)
+	assert.Error(err)
+	assert.Equal("invalid request: query parameter \"code\" : fake", err.Error())
+
+	params.Set("code", ":")
+	_, err = searchByCode(slice, params)
+	assert.Error(err)
+	assert.Equal("code space or value should not be empty", err.Error())
+
+	params.Set("code", "external:xx")
+	_, err = searchByCode(slice, params)
+	assert.Error(err)
+	assert.Equal("length of search value must be at least 3 characters, got: xx", err.Error())
+
+	params.Set("code", "external:*$#$&(&#@*@")
+	_, err = searchByCode(slice, params)
+	assert.Error(err)
+	assert.Equal("cannot create search pattern: error parsing regexp: missing argument to repetition operator: `*`", err.Error())
+}
+
 func Test_Paginate(t *testing.T) {
 	assert := assert.New(t)
 
@@ -107,4 +139,26 @@ func Test_Paginate_With_empty_models(t *testing.T) {
 	assert.Equal(0, paginatedResource.PerPage)
 	assert.Equal(1, paginatedResource.TotalPages)
 	assert.Equal(0, paginatedResource.TotalCount)
+}
+
+func Test_SearchByName_Errors(t *testing.T) {
+	assert := assert.New(t)
+
+	s := &model.StopArea{}
+	slice := []*model.StopArea{s}
+
+	params := url.Values{}
+	values, err := searchByName(slice, params)
+	assert.NoError(err)
+	assert.ElementsMatch(values, slice, "should return the full list if there is no params \"code\"")
+
+	params.Set("name", "(*+")
+	_, err = searchByName(slice, params)
+	assert.Error(err)
+	assert.Equal("cannot create search pattern: error parsing regexp: missing argument to repetition operator: `*`", err.Error())
+
+	params.Set("name", "xx")
+	_, err = searchByName(slice, params)
+	assert.Error(err)
+	assert.Equal("length of search name must be at least 3 characters, got: xx", err.Error())
 }
