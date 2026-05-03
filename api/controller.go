@@ -118,14 +118,14 @@ type ModelForName[S SearchableByName] interface {
 	*S
 }
 
-func searchByName[S SearchableByName, M ModelForName[S]](s []*S, params url.Values) ([]*S, error) {
+func searchByName[S SearchableByName, M ModelForName[S]](s []M, params url.Values) ([]M, error) {
 	searchName := params.Get("name")
 	if searchName == "" {
 		return s, nil
 	}
 	params.Del("name")
 
-	possibleModels := []*S{}
+	possibleModels := []M{}
 
 	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
 	if len(searchName) < 3 {
@@ -143,7 +143,7 @@ func searchByName[S SearchableByName, M ModelForName[S]](s []*S, params url.Valu
 	}
 
 	for i := range s {
-		normalizedSaName, _, err := transform.String(t, M(s[i]).GetName())
+		normalizedSaName, _, err := transform.String(t, s[i].GetName())
 		if err != nil {
 			return nil, fmt.Errorf("cannot normalize stopArea name: %v", err.Error())
 		}
@@ -154,14 +154,14 @@ func searchByName[S SearchableByName, M ModelForName[S]](s []*S, params url.Valu
 	return possibleModels, nil
 }
 
-func searchByCode[S SearchableByCode, M ModelForCode[S]](s []*S, params url.Values) ([]*S, error) {
+func searchByCode[S SearchableByCode, M ModelForCode[S]](s []M, params url.Values) ([]M, error) {
 	searchCode := params.Get("code")
 	if searchCode == "" {
 		return s, nil
 	}
 	params.Del("code")
 
-	possibleModels := []*S{}
+	possibleModels := []M{}
 
 	searchCodeSpace, searchValue, found := strings.Cut(searchCode, ":")
 	if !found {
@@ -186,8 +186,7 @@ func searchByCode[S SearchableByCode, M ModelForCode[S]](s []*S, params url.Valu
 	}
 
 	for i := range s {
-		m := M(s[i])
-		code, ok := m.Code(searchCodeSpace)
+		code, ok := s[i].Code(searchCodeSpace)
 		if !ok {
 			continue
 		}
