@@ -99,4 +99,5 @@ const (
 	AffectedSection             = "AffectedSection"
 	AffectedStopPoint           = "AffectedStopPoint"
 	Number                      = "number"
+	VehicleActivityNote         = "VehicleActivityNote"
 )

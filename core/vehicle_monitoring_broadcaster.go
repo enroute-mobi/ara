@@ -174,6 +174,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				ValidUntilTime:       vehicle.ValidUntilTime,
 				VehicleMonitoringRef: vehicleCode.Value(),
 				ProgressBetweenStops: vm.connector.handleProgressBetweenStops(vehicle),
+				VehicleActivityNote:  vehicle.RawAttributes[siri_attributes.VehicleActivityNote],
 			}
 
 			monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{

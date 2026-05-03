@@ -125,6 +125,7 @@ func (builder *VehicleMonitoringUpdateEventBuilder) buildUpdateEvents(xmlVehicle
 			RecordedAt:         xmlVehicleActivity.RecordedAtTime(),
 			Occupancy:          model.NormalizedOccupancyName(xmlVehicleActivity.Occupancy()),
 			NextStopPointOrder: xmlVehicleActivity.Order(),
+			SiriXML:            xmlVehicleActivity,
 		}
 
 		longitude, latitude, err := builder.handleCoordinates(xmlVehicleActivity)

@@ -70,7 +70,7 @@ func (manager *UpdateManager) updateFacility(event *FacilityUpdateEvent) {
 func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	situation, ok := manager.model.Situations().FindByCode(event.SituationCode)
 	if ok &&
-		situation.RecordedAt == event.RecordedAt &&
+		situation.RecordedAt.Equal(event.RecordedAt) &&
 		situation.Version == event.Version {
 		return
 	}
@@ -462,6 +462,10 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 		vehicle = manager.model.Vehicles().New()
 
 		vehicle.SetCode(event.Code)
+	}
+
+	if vehicle.RawAttributes.IsEmpty() {
+		vehicle.RawAttributes = event.RawAttributes()
 	}
 
 	if event.NextStopPointOrder != 0 {
