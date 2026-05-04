@@ -102,7 +102,8 @@ type Pagination struct {
 
 type SearchableByCode interface {
 	model.StopArea |
-		model.VehicleJourney
+		model.VehicleJourney |
+		model.Line
 }
 
 type ModelForCode[S SearchableByCode] interface {
@@ -112,7 +113,8 @@ type ModelForCode[S SearchableByCode] interface {
 
 type SearchableByName interface {
 	model.StopArea |
-		model.VehicleJourney
+		model.VehicleJourney |
+		model.Line
 }
 
 type ModelForName[S SearchableByName] interface {
