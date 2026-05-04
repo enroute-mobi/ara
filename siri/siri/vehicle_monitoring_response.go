@@ -37,6 +37,7 @@ type SIRIVehicleActivity struct {
 	RecordedAtTime       time.Time
 	ValidUntilTime       time.Time
 	VehicleMonitoringRef string                    `json:",omitempty"`
+	VehicleActivityNote  string                    `json:",omitempty"`
 	ProgressBetweenStops *SIRIProgressBetweenStops `json:",omitempty"`
 
 	MonitoredVehicleJourney *SIRIMonitoredVehicleJourney `json:",omitempty"`

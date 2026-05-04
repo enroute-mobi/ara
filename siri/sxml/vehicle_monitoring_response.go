@@ -27,6 +27,7 @@ type XMLVehicleActivity struct {
 	linkDistance         string
 	percentage           string
 	vehicleMonitoringRef string
+	vehicleActivityNote  string
 	recordedAtTime       time.Time
 	validUntilTime       time.Time
 }
@@ -108,6 +109,13 @@ func (va *XMLVehicleActivity) VehicleMonitoringRef() string {
 		va.vehicleMonitoringRef = va.findStringChildContent(siri_attributes.VehicleMonitoringRef)
 	}
 	return va.vehicleMonitoringRef
+}
+
+func (va *XMLVehicleActivity) VehicleActivityNote() string {
+	if va.vehicleActivityNote == "" {
+		va.vehicleActivityNote = va.findStringChildContent(siri_attributes.VehicleActivityNote)
+	}
+	return va.vehicleActivityNote
 }
 
 func (va *XMLVehicleActivity) RecordedAtTime() time.Time {

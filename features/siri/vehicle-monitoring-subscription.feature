@@ -131,13 +131,14 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | ExternalId        | subscription-1                      |
       | ReferenceArray[0] | Line, "internal": "Test:Line:3:LOC" |
     When the Vehicle "internal:Test:Vehicle:201123:LOC" is edited with the following attributes:
-      | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-      | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | Longitude        | 1.234                             |
-      | Latitude         | 5.678                             |
-      | Bearing          | 234                               |
-      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
-      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+      | LineId                             | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId                   | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Longitude                          | 1.234                             |
+      | Latitude                           | 5.678                             |
+      | Bearing                            | 234                               |
+      | RecordedAtTime                     | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime                     | 2017-01-01T14:00:00.000Z          |
+      | RawAttributes[VehicleActivityNote] | dummy                             |
     When the Vehicle "internal:Test:Vehicle:999:LOC" is edited with the following attributes:
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
@@ -184,6 +185,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                     <siri:Bearing>234</siri:Bearing>
                     <siri:Occupancy>seatsAvailable</siri:Occupancy>
                   </siri:MonitoredVehicleJourney>
+                  <siri:VehicleActivityNote>dummy</siri:VehicleActivityNote>
                 </siri:VehicleActivity>
                 <siri:VehicleActivity>
                   <siri:RecordedAtTime>2017-01-01T12:10:00.000Z</siri:RecordedAtTime>
@@ -768,6 +770,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                       <ns5:DepartureStatus>onTime</ns5:DepartureStatus>
                     </ns5:MonitoredCall>
                   </ns5:MonitoredVehicleJourney>
+                  <ns5:VehicleActivityNote>dummy</ns5:VehicleActivityNote>
                   <ns5:Extensions/>
                 </ns5:VehicleActivity>
               </ns5:VehicleMonitoringDelivery>
@@ -778,11 +781,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
       </soap:Envelope>
       """
       Then one Vehicle has the following attributes:
-        | Codes[internal] |        TRANSDEV:Vehicle::1501:LOC |
-        | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-        | Bearing         |                             171.0 |
-        | Latitude        |                 48.99927561424598 |
-        | Longitude       |                1.6770970859674874 |
+        | Codes[internal]                    |        TRANSDEV:Vehicle::1501:LOC |
+        | LineId                             | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+        | Bearing                            |                             171.0 |
+        | Latitude                           |                 48.99927561424598 |
+        | Longitude                          |                1.6770970859674874 |
+        | RawAttributes[VehicleActivityNote] |                             dummy |
       Then an audit event should exist with these attributes:
         | Type            | NotifyVehicleMonitoring                   |
         | Protocol        | siri                                      |

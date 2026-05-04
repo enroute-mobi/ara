@@ -176,6 +176,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 		ValidUntilTime:       vehicle.ValidUntilTime,
 		VehicleMonitoringRef: vehicleId.Value(),
 		ProgressBetweenStops: connector.handleProgressBetweenStops(vehicle),
+		VehicleActivityNote:  vehicle.RawAttributes[siri_attributes.VehicleActivityNote],
 	}
 
 	monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{

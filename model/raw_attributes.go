@@ -1,6 +1,8 @@
 package model
 
-import "golang.org/x/exp/maps"
+import (
+	"golang.org/x/exp/maps"
+)
 
 type RawAttributes map[string]string
 
@@ -21,6 +23,5 @@ func (attributes RawAttributes) IsEmpty() bool {
 
 func (attributes RawAttributes) Copy() (c RawAttributes) {
 	c = maps.Clone(attributes)
-
 	return
 }
