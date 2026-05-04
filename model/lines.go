@@ -40,6 +40,10 @@ func (line *Line) ModelId() ModelId {
 	return ModelId(line.id)
 }
 
+func (line *Line) GetName() string {
+	return line.Name
+}
+
 func (line *Line) copy() *Line {
 	l := *line
 	l.RawAttributes = line.RawAttributes.Copy()

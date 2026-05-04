@@ -35,22 +35,36 @@ func (controller *LineController) Index(response http.ResponseWriter, params url
 	logger.Log.Debugf("Lines Index")
 
 	allLines := controller.referential.Model().Lines().FindAll()
+
+	// Search
+	filteredLines, err := searchByName(allLines, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	filteredLines, err = searchByCode(filteredLines, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	direction := params.Get("direction")
 	switch direction {
 	case "desc":
-		sort.Slice(allLines, func(i, j int) bool {
-			return allLines[i].Name > allLines[j].Name
+		sort.Slice(filteredLines, func(i, j int) bool {
+			return filteredLines[i].Name > filteredLines[j].Name
 		})
 	case "asc", "":
-		sort.Slice(allLines, func(i, j int) bool {
-			return allLines[i].Name < allLines[j].Name
+		sort.Slice(filteredLines, func(i, j int) bool {
+			return filteredLines[i].Name < filteredLines[j].Name
 		})
 	default:
 		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
 		return
 	}
 
-	paginatedLines, err := paginate(allLines, params)
+	paginatedLines, err := paginate(filteredLines, params)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
