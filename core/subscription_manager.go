@@ -28,9 +28,9 @@ type Subscriptions interface {
 	Delete(*Subscription) bool
 	DeleteById(SubscriptionId)
 	CancelSubscriptions()
-	CancelSubscriptionsResourcesBefore(time.Time)
-	CancelBroadcastSubscriptions()
-	CancelCollectSubscriptions()
+	CancelSubscriptionsResourcesBefore(time.Time) (int, []SubscriptionId)
+	CancelBroadcastSubscriptions() []SubscriptionId
+	CancelCollectSubscriptions() []SubscriptionId
 	FindByResourceId(id, kind string) []*Subscription
 	FindByExternalId(string) (*Subscription, bool)
 }
@@ -304,7 +304,7 @@ func (manager *MemorySubscriptions) DeleteById(id SubscriptionId) {
 	delete(manager.byIdentifier, id)
 }
 
-func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time.Time) {
+func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time.Time) (cancelledRessources int, cancelledSubscriptions []SubscriptionId) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -313,6 +313,8 @@ func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time
 			if resource.SubscribedAt().After(time) || resource.SubscribedAt().IsZero() {
 				continue
 			}
+			cancelledRessources += 1
+			cancelledSubscriptions = append(cancelledSubscriptions, sub.Id())
 			sub.DeleteResource(key)
 			logger.Log.Debugf("Deleting ressource %v from subscription with id %v after partner reload", key, sub.Id())
 
@@ -321,6 +323,7 @@ func (manager *MemorySubscriptions) CancelSubscriptionsResourcesBefore(time time
 			delete(manager.byIdentifier, sub.Id())
 		}
 	}
+	return
 }
 
 func (manager *MemorySubscriptions) CancelSubscriptions() {
@@ -332,24 +335,28 @@ func (manager *MemorySubscriptions) CancelSubscriptions() {
 	}
 }
 
-func (manager *MemorySubscriptions) CancelBroadcastSubscriptions() {
+func (manager *MemorySubscriptions) CancelBroadcastSubscriptions() (cancelledSubscriptions []SubscriptionId) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
 	for id, subscription := range manager.byIdentifier {
 		if subscription.externalId != "" {
+			cancelledSubscriptions = append(cancelledSubscriptions, id)
 			delete(manager.byIdentifier, id)
 		}
 	}
+	return
 }
 
-func (manager *MemorySubscriptions) CancelCollectSubscriptions() {
+func (manager *MemorySubscriptions) CancelCollectSubscriptions() (cancelledSubscriptions []SubscriptionId) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
 	for id, subscription := range manager.byIdentifier {
 		if subscription.externalId == "" {
+			cancelledSubscriptions = append(cancelledSubscriptions, id)
 			delete(manager.byIdentifier, id)
 		}
 	}
+	return
 }
