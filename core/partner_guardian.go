@@ -107,7 +107,10 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 
 	if partnerStatus.OperationnalStatus == partners.OperationnalStatusUp && partnerStatus.ServiceStartedAt != partner.PartnerStatus.ServiceStartedAt {
 		partner.PartnerStatus = partnerStatus
-		partner.Subscriptions().CancelSubscriptionsResourcesBefore(partnerStatus.ServiceStartedAt)
+		cancelledRessources, cancelledSubscriptions := partner.Subscriptions().CancelSubscriptionsResourcesBefore(partnerStatus.ServiceStartedAt)
+		if cancelledRessources != 0 {
+			logger.Log.Printf("%v from %v: Partner reloaded, cancelled all ressources before ServiceStartedAt %v. Subscription affected: %v", partner.Slug(), partner.Referential().Slug(), partnerStatus.ServiceStartedAt, cancelledSubscriptions)
+		}
 		partner.lastDiscovery = time.Time{} // Reset discoveries if distant partner reloaded
 		return false
 	}
@@ -119,12 +122,18 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 
 		collectPersistent := partner.PersistentCollect()
 		if !collectPersistent {
-			partner.Subscriptions().CancelCollectSubscriptions()
+			cancelledSubscriptions := partner.Subscriptions().CancelCollectSubscriptions()
+			if len(cancelledSubscriptions) != 0 {
+				logger.Log.Printf("%v from %v: Partner Status Down, cancelled Collect subscriptions %v", partner.Slug(), partner.Referential().Slug(), cancelledSubscriptions)
+			}
 		}
 
 		broadcastPersistent := partner.PersistentBroadcastSubscriptions()
 		if !broadcastPersistent {
-			partner.Subscriptions().CancelBroadcastSubscriptions()
+			cancelledSubscriptions := partner.Subscriptions().CancelBroadcastSubscriptions()
+			if len(cancelledSubscriptions) != 0 {
+				logger.Log.Printf("%v from %v: Partner Status Down, cancelled Broadcast subscriptions %v", partner.Slug(), partner.Referential().Slug(), cancelledSubscriptions)
+			}
 		}
 
 		return (collectPersistent || broadcastPersistent)
@@ -145,7 +154,7 @@ func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Part
 				continue
 			}
 			sub.DeleteResource(key)
-			logger.Log.Printf("%v from %v: Deleting ressource %v from subscription with id %v. SubscribedUntil %v befor Clock.Now %v ", partner.Slug(), partner.Referential().Slug(), key, sub.Id(), value.SubscribedUntil, guardian.Clock().Now())
+			logger.Log.Printf("%v from %v: Deleting ressource %v from subscription with id %v. SubscribedUntil %v before Clock.Now %v ", partner.Slug(), partner.Referential().Slug(), key, sub.Id(), value.SubscribedUntil, guardian.Clock().Now())
 		}
 		if sub.ResourcesLen() == 0 {
 			sub.Delete()
