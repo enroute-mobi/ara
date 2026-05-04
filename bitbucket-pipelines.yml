@@ -9,6 +9,8 @@ definitions:
         POSTGRES_DB: ara
         POSTGRES_USER: ara
         POSTGRES_PASSWORD: ara
+    redis:
+      image: redis
   steps:
     - step: &go-mod
         name: Go Mod
@@ -62,12 +64,29 @@ definitions:
         services:
           - postgres
 
+    - step: &unit-tests-redis
+        name: Unit tests with Redis
+        image:
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-golang:dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
+        script:
+          - eval "$(build.sh bitbucket::env)"
+          - build.sh golang::dev::dependencies
+          - build.sh bitbucket::database
+          - make test_migrations
+          - make redis_tests
+          - build.sh codacy::report
+        services:
+          - postgres
+          - redis
+
     - step: &bundle-audit
         name: Bundle Audit
         image:
           name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-ruby:4.0-dev
           username: _json_key
-          password: '$GCLOUD_API_KEYFILE'
+          password: "$GCLOUD_API_KEYFILE"
         script:
           - build.sh bundle::audit
 
@@ -87,6 +106,23 @@ definitions:
         services:
           - postgres
 
+    - step: &cucumber-redis
+        name: Cucumber Tests with Redis
+        image:
+          name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-ruby:4.0-dev
+          username: _json_key
+          password: "$GCLOUD_API_KEYFILE"
+        script:
+          - eval "$(build.sh bitbucket::env)"
+          - build.sh cucumber::install
+          - export ARA_ROOT=build
+          - build.sh bitbucket::database
+          - cd build && ARA_ENV=test ARA_ROOT=${PWD} ARA_CONFIG=${PWD}/config ./ara migrate up && cd ..
+          - ARA_REDIS_ADDR=127.0.0.1:6379 TZ=Europe/Paris bundle exec cucumber --strict --tags "not @wip" --publish
+        services:
+          - postgres
+          - redis
+
 pipelines:
   default:
     - step: *go-mod
@@ -95,9 +131,13 @@ pipelines:
         steps:
           - step: *static-check
           - step: *unit-tests
+          - step: *unit-tests-redis
           - step: *build
           - step: *bundle-audit
-    - step: *cucumber
+    - parallel:
+        steps:
+          - step: *cucumber
+          - step: *cucumber-redis
 
   branches:
     master:
@@ -107,11 +147,13 @@ pipelines:
           steps:
             - step: *static-check
             - step: *unit-tests
+            - step: *unit-tests-redis
             - step: *build
             - step: *bundle-audit
       - parallel:
           steps:
             - step: *cucumber
+            - step: *cucumber-redis
             - step:
                 name: Build Docker
                 image:
@@ -129,9 +171,9 @@ pipelines:
       - step:
           name: Deploy to test
           image:
-              name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
-              username: _json_key
-              password: "$GCLOUD_API_KEYFILE"
+            name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
+            username: _json_key
+            password: "$GCLOUD_API_KEYFILE"
           deployment: test
           runs-on:
             - self.hosted
@@ -150,9 +192,9 @@ pipelines:
       - step:
           name: Deploy to staging
           image:
-              name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
-              username: _json_key
-              password: "$GCLOUD_API_KEYFILE"
+            name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
+            username: _json_key
+            password: "$GCLOUD_API_KEYFILE"
           deployment: staging
           trigger: manual
           runs-on:
@@ -172,9 +214,9 @@ pipelines:
       - step:
           name: Deploy to production
           image:
-              name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
-              username: _json_key
-              password: "$GCLOUD_API_KEYFILE"
+            name: europe-west1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-cloud-sdk:latest
+            username: _json_key
+            password: "$GCLOUD_API_KEYFILE"
           deployment: production
           trigger: manual
           runs-on:
