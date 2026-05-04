@@ -198,7 +198,7 @@ func Test_MemoryStopVisits_FindAll(t *testing.T) {
 }
 
 func Test_MemoryStopVisits_FindAllAfter(t *testing.T) {
-	stopVisits := NewMemoryStopVisits()
+	stopVisits := NewMemoryStopVisits().(*memoryStopVisits)
 
 	for i := range 5 {
 		sv := stopVisits.New()
@@ -286,12 +286,12 @@ func Test_MemoryStopVisits_Load(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	stopVisits := model.StopVisits().(*MemoryStopVisits)
+	})
+	stopVisits := model.StopVisits().(*memoryStopVisits)
 	err = stopVisits.Load("referential")
 	if err != nil {
 		t.Fatal(err)

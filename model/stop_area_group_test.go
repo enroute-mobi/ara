@@ -179,12 +179,12 @@ func Test_MemoryStopAreaGroups_Load(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	stopAreaGroups := model.StopAreaGroups().(*MemoryStopAreaGroups)
+	})
+	stopAreaGroups := model.StopAreaGroups().(*memoryStopAreaGroups)
 	err = stopAreaGroups.Load("referential")
 	require.NoError(err)
 

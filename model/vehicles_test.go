@@ -292,7 +292,7 @@ func Test_Save_BiqQuery(t *testing.T) {
 
 	m := NewTestMemoryModel("ref")
 	vehicles := NewMemoryVehicles()
-	vehicles.model = m
+	vehicles.SetModel(m)
 	v := vehicles.New()
 	code := NewCode("codeSpace", "value")
 	v.SetCode(code)

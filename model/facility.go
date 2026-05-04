@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type FacilityId ModelId
@@ -35,7 +34,7 @@ func NewFacility(model Model) *Facility {
 	facility := &Facility{
 		model: model,
 	}
-	facility.codes = make(Codes)
+	facility.InitCodes()
 	facility.Status = FacilityStatusUnknown
 	return facility
 }
@@ -62,9 +61,8 @@ func (facility *Facility) Id() FacilityId {
 }
 
 type MemoryFacilities struct {
-	uuid.UUIDConsumer
+	memoryManager
 
-	model        *MemoryModel
 	mutex        *sync.RWMutex
 	byIdentifier map[FacilityId]*Facility
 	byCode       *codeIndex
@@ -73,26 +71,26 @@ type MemoryFacilities struct {
 }
 
 type Facilities interface {
-	uuid.UUIDInterface
-
-	New() *Facility
-	FindAll() []*Facility
-	Find(FacilityId) (*Facility, bool)
-	FindByCode(Code) (*Facility, bool)
-	Save(*Facility) bool
-	Delete(*Facility) bool
+	ModelManager[FacilityId, *Facility]
+	CodeHandler[*Facility]
+	Broadcaster[FacilityBroadcastEvent]
+	Loadable
 }
 
 func (facility *Facility) Save() bool {
 	return facility.model.Facilities().Save(facility)
 }
 
-func NewMemoryFacilities() *MemoryFacilities {
+func NewMemoryFacilities() Facilities {
 	return &MemoryFacilities{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[FacilityId]*Facility),
 		byCode:       NewCodeIndex(),
 	}
+}
+
+func (manager *MemoryFacilities) SetBroadcaster(f func(FacilityBroadcastEvent), _ ...string) {
+	manager.broadcastEvent = f
 }
 
 func (manager *MemoryFacilities) New() *Facility {
@@ -120,6 +118,14 @@ func (manager *MemoryFacilities) FindByCode(code Code) (*Facility, bool) {
 	}
 
 	return &Facility{}, false
+}
+
+func (manager *MemoryFacilities) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
 }
 
 func (manager *MemoryFacilities) FindAll() (facilitys []*Facility) {
@@ -216,7 +222,7 @@ func (facility *Facility) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		facility.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		facility.SetCodesFromMap(aux.Codes)
 	}
 
 	return nil
@@ -243,7 +249,7 @@ func (manager *MemoryFacilities) Load(referentialSlug string) error {
 				return err
 			}
 
-			facility.codes = NewCodesFromMap(codeMap)
+			facility.SetCodesFromMap(codeMap)
 		}
 		manager.Save(facility)
 	}

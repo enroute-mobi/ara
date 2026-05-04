@@ -200,11 +200,11 @@ func Test_MemoryOperators_Load(t *testing.T) {
 		t.Fatal(err)
 	}
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
+	})
 
 	operators := model.Operators().(*MemoryOperators)
 

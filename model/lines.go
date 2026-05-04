@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"sync"
 	"time"
-
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type LineId ModelId
@@ -34,7 +32,7 @@ func NewLine(model Model) *Line {
 		References:    NewReferences(),
 	}
 
-	line.codes = make(Codes)
+	line.InitCodes()
 	return line
 }
 
@@ -113,7 +111,7 @@ func (line *Line) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		line.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		line.SetCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -176,45 +174,39 @@ func (line *Line) Save() bool {
 	return line.model.Lines().Save(line)
 }
 
-type MemoryLines struct {
-	uuid.UUIDConsumer
+type memoryLines struct {
 	IndexHandler
-
-	model Model
+	memoryManager
 
 	mutex        *sync.RWMutex
 	byIdentifier map[LineId]*Line
 }
 
 type Lines interface {
-	uuid.UUIDInterface
+	ModelManager[LineId, *Line]
+	CodeHandler[*Line]
+	Loadable
 
-	New() *Line
-	Find(LineId) (*Line, bool)
-	FindByCode(Code) (*Line, bool)
-	FindAll() []*Line
 	FindFamily(LineId) []LineId
 	FindFamilyFromCode(Code) []LineId
-	Save(*Line) bool
-	Delete(*Line) bool
 }
 
-func NewMemoryLines() (m *MemoryLines) {
-	m = &MemoryLines{
+func NewMemoryLines() Lines {
+	m := &memoryLines{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[LineId]*Line),
 	}
 	m.InitIndexes()
 	m.AddIndex(ByReferent, OneToMany, lineReferentExtractor)
 
-	return
+	return m
 }
 
-func (manager *MemoryLines) New() *Line {
+func (manager *memoryLines) New() *Line {
 	return NewLine(manager.model)
 }
 
-func (manager *MemoryLines) Find(id LineId) (*Line, bool) {
+func (manager *memoryLines) Find(id LineId) (*Line, bool) {
 	manager.mutex.RLock()
 	line, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -225,7 +217,7 @@ func (manager *MemoryLines) Find(id LineId) (*Line, bool) {
 	return &Line{}, false
 }
 
-func (manager *MemoryLines) FindByReferentId(id LineId) (lines []*Line) {
+func (manager *memoryLines) FindByReferentId(id LineId) (lines []*Line) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.FindBy(ByReferent, ModelId(id))
@@ -239,7 +231,7 @@ func (manager *MemoryLines) FindByReferentId(id LineId) (lines []*Line) {
 	return
 }
 
-func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
+func (manager *memoryLines) FindByCode(code Code) (*Line, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -251,7 +243,7 @@ func (manager *MemoryLines) FindByCode(code Code) (*Line, bool) {
 	return &Line{}, false
 }
 
-func (manager *MemoryLines) CodeExists(code Code) bool {
+func (manager *memoryLines) CodeExists(code Code) bool {
 	manager.mutex.RLock()
 	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
@@ -259,7 +251,7 @@ func (manager *MemoryLines) CodeExists(code Code) bool {
 	return ok
 }
 
-func (manager *MemoryLines) FindAll() (lines []*Line) {
+func (manager *memoryLines) FindAll() (lines []*Line) {
 	manager.mutex.RLock()
 
 	for _, line := range manager.byIdentifier {
@@ -270,7 +262,7 @@ func (manager *MemoryLines) FindAll() (lines []*Line) {
 	return
 }
 
-func (manager *MemoryLines) FindFamily(lineId LineId) (lineIds []LineId) {
+func (manager *memoryLines) FindFamily(lineId LineId) (lineIds []LineId) {
 	manager.mutex.RLock()
 
 	lineIds = manager.findFamily(lineId)
@@ -280,7 +272,7 @@ func (manager *MemoryLines) FindFamily(lineId LineId) (lineIds []LineId) {
 	return
 }
 
-func (manager *MemoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
+func (manager *memoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -294,7 +286,7 @@ func (manager *MemoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
 	return
 }
 
-func (manager *MemoryLines) findFamily(lineId LineId) (lineIds []LineId) {
+func (manager *memoryLines) findFamily(lineId LineId) (lineIds []LineId) {
 	lineIds = []LineId{lineId}
 
 	ids, _ := manager.FindBy(ByReferent, ModelId(lineId))
@@ -305,7 +297,7 @@ func (manager *MemoryLines) findFamily(lineId LineId) (lineIds []LineId) {
 	return
 }
 
-func (manager *MemoryLines) Save(line *Line) bool {
+func (manager *memoryLines) Save(line *Line) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -320,7 +312,7 @@ func (manager *MemoryLines) Save(line *Line) bool {
 	return true
 }
 
-func (manager *MemoryLines) Delete(line *Line) bool {
+func (manager *memoryLines) Delete(line *Line) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -330,7 +322,7 @@ func (manager *MemoryLines) Delete(line *Line) bool {
 	return true
 }
 
-func (manager *MemoryLines) Load(referentialSlug string) error {
+func (manager *memoryLines) Load(referentialSlug string) error {
 	var selectLines []SelectLine
 	modelDate := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from lines where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())
@@ -374,7 +366,7 @@ func (manager *MemoryLines) Load(referentialSlug string) error {
 			if err = json.Unmarshal([]byte(sl.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			line.codes = NewCodesFromMap(codeMap)
+			line.SetCodesFromMap(codeMap)
 		}
 
 		manager.Save(line)

@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
-
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopAreaGroupId ModelId
@@ -38,10 +36,9 @@ func (stopAreaGroup *StopAreaGroup) Save() bool {
 	return stopAreaGroup.model.StopAreaGroups().Save(stopAreaGroup)
 }
 
-type MemoryStopAreaGroups struct {
-	uuid.UUIDConsumer
+type memoryStopAreaGroups struct {
+	memoryManager
 
-	model *MemoryModel
 	mutex *sync.RWMutex
 
 	byIdentifier map[StopAreaGroupId]*StopAreaGroup
@@ -49,26 +46,21 @@ type MemoryStopAreaGroups struct {
 }
 
 type StopAreaGroups interface {
-	uuid.UUIDInterface
+	ModelManager[StopAreaGroupId, *StopAreaGroup]
+	Loadable
 
-	New() *StopAreaGroup
-
-	Find(StopAreaGroupId) (*StopAreaGroup, bool)
 	FindByShortName(string) (*StopAreaGroup, bool)
-	FindAll() []*StopAreaGroup
-	Save(*StopAreaGroup) bool
-	Delete(*StopAreaGroup) bool
 }
 
-func NewMemoryStopAreaGroups() *MemoryStopAreaGroups {
-	return &MemoryStopAreaGroups{
+func NewMemoryStopAreaGroups() StopAreaGroups {
+	return &memoryStopAreaGroups{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaGroupId]*StopAreaGroup),
 		byShortName:  make(map[string]*StopAreaGroup),
 	}
 }
 
-func (manager *MemoryStopAreaGroups) Find(id StopAreaGroupId) (*StopAreaGroup, bool) {
+func (manager *memoryStopAreaGroups) Find(id StopAreaGroupId) (*StopAreaGroup, bool) {
 	manager.mutex.RLock()
 	stopAreaGroup, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -79,7 +71,7 @@ func (manager *MemoryStopAreaGroups) Find(id StopAreaGroupId) (*StopAreaGroup, b
 	return &StopAreaGroup{}, false
 }
 
-func (manager *MemoryStopAreaGroups) FindByShortName(shortName string) (*StopAreaGroup, bool) {
+func (manager *memoryStopAreaGroups) FindByShortName(shortName string) (*StopAreaGroup, bool) {
 	manager.mutex.RLock()
 	stopAreaGroup, ok := manager.byShortName[shortName]
 	manager.mutex.RUnlock()
@@ -90,11 +82,11 @@ func (manager *MemoryStopAreaGroups) FindByShortName(shortName string) (*StopAre
 	return &StopAreaGroup{}, false
 }
 
-func (manager *MemoryStopAreaGroups) New() *StopAreaGroup {
+func (manager *memoryStopAreaGroups) New() *StopAreaGroup {
 	return NewStopAreaGroup(manager.model)
 }
 
-func (manager *MemoryStopAreaGroups) FindAll() (stopAreaGroups []*StopAreaGroup) {
+func (manager *memoryStopAreaGroups) FindAll() (stopAreaGroups []*StopAreaGroup) {
 	manager.mutex.RLock()
 
 	for _, stopAreaGroup := range manager.byIdentifier {
@@ -105,7 +97,7 @@ func (manager *MemoryStopAreaGroups) FindAll() (stopAreaGroups []*StopAreaGroup)
 	return
 }
 
-func (manager *MemoryStopAreaGroups) Save(stopAreaGroup *StopAreaGroup) bool {
+func (manager *memoryStopAreaGroups) Save(stopAreaGroup *StopAreaGroup) bool {
 	manager.mutex.Lock()
 
 	if stopAreaGroup.Id() == "" {
@@ -119,7 +111,7 @@ func (manager *MemoryStopAreaGroups) Save(stopAreaGroup *StopAreaGroup) bool {
 	return true
 }
 
-func (manager *MemoryStopAreaGroups) Delete(stopAreaGroup *StopAreaGroup) bool {
+func (manager *memoryStopAreaGroups) Delete(stopAreaGroup *StopAreaGroup) bool {
 	manager.mutex.Lock()
 
 	delete(manager.byIdentifier, stopAreaGroup.Id())
@@ -143,7 +135,7 @@ func (stopAreaGroup *StopAreaGroup) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&aux)
 }
 
-func (manager *MemoryStopAreaGroups) Load(referentialSlug string) error {
+func (manager *memoryStopAreaGroups) Load(referentialSlug string) error {
 	var selectStopAreaGroups []SelectStopAreaGroup
 	modelDate := manager.model.Date()
 	sqlQuery := fmt.Sprintf("select * from stop_area_groups where referential_slug = '%s' and model_date = '%s'", referentialSlug, modelDate.String())

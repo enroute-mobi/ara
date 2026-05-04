@@ -22,7 +22,7 @@ func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t 
 		collectManager: collectManager,
 		model:          model.NewTestMemoryModel(),
 	}
-	referential.Model().StopAreas().(*model.MemoryStopAreas).SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	referential.Model().StopAreas().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	stopArea := referential.Model().StopAreas().New()
 	code := model.NewCode("_internal", "coicogn2")

@@ -408,12 +408,12 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel()
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
-	stopAreas := model.StopAreas().(*MemoryStopAreas)
+	})
+	stopAreas := model.StopAreas().(*memoryStopAreas)
 	err = stopAreas.Load("referential")
 	if err != nil {
 		t.Fatal(err)

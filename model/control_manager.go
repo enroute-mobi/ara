@@ -12,6 +12,8 @@ import (
 type controls [][][]Control
 
 type Controls interface {
+	Loadable
+
 	GetControls(hooks.Type, model_types.Model) []Control
 }
 
@@ -21,7 +23,7 @@ type ControlManager struct {
 	controls controls
 }
 
-func NewControlManager() *ControlManager {
+func NewControlManager() Controls {
 	m := &ControlManager{
 		mutex: &sync.RWMutex{},
 	}

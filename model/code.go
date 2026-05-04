@@ -124,6 +124,8 @@ func (code *Code) UnmarshalJSON(data []byte) error {
 }
 
 type CodeConsumerInterface interface {
+	InitCodes()
+	SetCodesFromMap(codeMap map[string]string)
 	Code(string) (Code, bool)
 	CodeWithFallback([]string) (Code, bool)
 	Codes() Codes
@@ -134,6 +136,17 @@ type CodeConsumerInterface interface {
 
 type CodeConsumer struct {
 	codes Codes
+}
+
+func (consumer *CodeConsumer) InitCodes() {
+	consumer.codes = make(Codes)
+}
+
+func (consumer *CodeConsumer) SetCodesFromMap(codeMap map[string]string) {
+	consumer.codes = make(Codes)
+	for key, value := range codeMap {
+		consumer.codes[key] = NewCode(key, value)
+	}
 }
 
 func (consumer *CodeConsumer) Copy() (c CodeConsumer) {

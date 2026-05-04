@@ -20,11 +20,11 @@ func Test_LoadFromCSVFile(t *testing.T) {
 
 	// Fetch data from the db
 	model := NewTestMemoryModel("referential")
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
-	}
+	})
 	model.Load()
 
 	sag, ok := model.StopAreaGroups().Find("cf3e1970-7a7e-4379-ae67-a67abe1c7c1b")
@@ -64,11 +64,11 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.Equal(FacilityStatusUnknown, facility.Status)
 
 	model = NewTestMemoryModel("referential")
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   2,
-	}
+	})
 	model.Load()
 
 	_, ok = model.StopAreaGroups().Find("cf3e1970-7a7e-4379-ae67-a67abe1c7c1b")
@@ -81,7 +81,7 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.True(ok, "Can't find Line: \"f0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11\"")
 	assert.Zero(li.Number)
 
-	_, ok = model.lineGroups.Find("59208069-3cad-4108-968f-349c5d50a351")
+	_, ok = model.LineGroups().Find("59208069-3cad-4108-968f-349c5d50a351")
 	assert.True(ok, "Can't find LineGroup : \"59208069-3cad-4108-968f-349c5d50a351\"")
 
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")
@@ -100,11 +100,11 @@ func Test_LoadFromCSVFile(t *testing.T) {
 	assert.True(ok, "Can't find Facility: \"05cb9be3-e78b-4f76-b644-459e23ba5f1c\"")
 
 	model = NewTestMemoryModel("referential")
-	model.date = Date{
+	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   3,
-	}
+	})
 	model.Load()
 
 	vj, ok = model.VehicleJourneys().Find("01eebc99-9c0b-4ef8-bb6d-6bb9bd380a11")

@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
-
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type OperatorId string
@@ -24,7 +22,7 @@ func NewOperator(model Model) *Operator {
 		model: model,
 	}
 
-	operator.codes = make(Codes)
+	operator.InitCodes()
 	return operator
 }
 
@@ -78,16 +76,15 @@ func (operator *Operator) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		operator.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		operator.SetCodesFromMap(aux.Codes)
 	}
 
 	return nil
 }
 
 type MemoryOperators struct {
-	uuid.UUIDConsumer
+	memoryManager
 
-	model *MemoryModel
 	mutex *sync.RWMutex
 
 	byIdentifier map[OperatorId]*Operator
@@ -95,17 +92,12 @@ type MemoryOperators struct {
 }
 
 type Operators interface {
-	uuid.UUIDInterface
-
-	New() *Operator
-	Find(OperatorId) (*Operator, bool)
-	FindByCode(Code) (*Operator, bool)
-	FindAll() []*Operator
-	Save(*Operator) bool
-	Delete(*Operator) bool
+	ModelManager[OperatorId, *Operator]
+	CodeHandler[*Operator]
+	Loadable
 }
 
-func NewMemoryOperators() *MemoryOperators {
+func NewMemoryOperators() Operators {
 	return &MemoryOperators{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[OperatorId]*Operator),
@@ -149,6 +141,14 @@ func (manager *MemoryOperators) FindByCode(code Code) (*Operator, bool) {
 	}
 
 	return &Operator{}, false
+}
+
+func (manager *MemoryOperators) CodeExists(code Code) bool {
+	manager.mutex.RLock()
+	_, ok := manager.byCode.Find(code)
+	manager.mutex.RUnlock()
+
+	return ok
 }
 
 func (manager *MemoryOperators) Save(operator *Operator) bool {
@@ -199,7 +199,7 @@ func (manager *MemoryOperators) Load(referentialSlug string) error {
 				return err
 			}
 
-			operator.codes = NewCodesFromMap(codeMap)
+			operator.SetCodesFromMap(codeMap)
 		}
 		manager.Save(operator)
 	}

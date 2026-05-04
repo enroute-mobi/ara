@@ -8,7 +8,6 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 	"cloud.google.com/go/civil"
 )
 
@@ -42,7 +41,7 @@ func NewVehicle(model Model) *Vehicle {
 		model:         model,
 		RawAttributes: NewRawAttributes(),
 	}
-	vehicle.codes = make(Codes)
+	vehicle.InitCodes()
 	return vehicle
 }
 
@@ -124,18 +123,16 @@ func (vehicle *Vehicle) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		vehicle.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		vehicle.SetCodesFromMap(aux.Codes)
 	}
 
 	return nil
 }
 
-type MemoryVehicles struct {
-	uuid.UUIDConsumer
+type memoryVehicles struct {
+	memoryManager
 	clock.ClockConsumer
 	IndexHandler
-
-	model *MemoryModel
 
 	mutex             *sync.RWMutex
 	byIdentifier      map[VehicleId]*Vehicle
@@ -145,22 +142,17 @@ type MemoryVehicles struct {
 }
 
 type Vehicles interface {
-	uuid.UUIDInterface
+	ModelManager[VehicleId, *Vehicle]
+	CodeHandler[*Vehicle]
+	Broadcaster[VehicleBroadcastEvent]
 
-	New() *Vehicle
-	Find(VehicleId) (*Vehicle, bool)
-	FindByCode(Code) (*Vehicle, bool)
 	FindByLineId(LineId) []*Vehicle
 	FindByVehicleJourneyId(VehicleJourneyId) (*Vehicle, bool)
 	FindByNextStopVisitId(StopVisitId) (*Vehicle, bool)
-	FindAll() []*Vehicle
-	Save(*Vehicle) bool
-	Delete(*Vehicle) bool
 }
 
-func NewMemoryVehicles() (v *MemoryVehicles) {
-
-	v = &MemoryVehicles{
+func NewMemoryVehicles() Vehicles {
+	v := &memoryVehicles{
 		mutex:             &sync.RWMutex{},
 		byIdentifier:      make(map[VehicleId]*Vehicle),
 		byNextStopVisitId: make(map[StopVisitId]VehicleId),
@@ -169,14 +161,18 @@ func NewMemoryVehicles() (v *MemoryVehicles) {
 	v.AddIndex(ByLine, OneToMany, vehicleLineExtractor)
 	v.AddIndex(ByVehicleJourney, OneToOne, vehicleVjExtractor)
 
-	return
+	return v
 }
 
-func (manager *MemoryVehicles) New() *Vehicle {
+func (manager *memoryVehicles) SetBroadcaster(f func(VehicleBroadcastEvent), _ ...string) {
+	manager.broadcastEvent = f
+}
+
+func (manager *memoryVehicles) New() *Vehicle {
 	return NewVehicle(manager.model)
 }
 
-func (manager *MemoryVehicles) Find(id VehicleId) (*Vehicle, bool) {
+func (manager *memoryVehicles) Find(id VehicleId) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	vehicle, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -187,7 +183,7 @@ func (manager *MemoryVehicles) Find(id VehicleId) (*Vehicle, bool) {
 	return &Vehicle{}, false
 }
 
-func (manager *MemoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
+func (manager *memoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -198,7 +194,7 @@ func (manager *MemoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 	return &Vehicle{}, false
 }
 
-func (manager *MemoryVehicles) CodeExists(code Code) bool {
+func (manager *memoryVehicles) CodeExists(code Code) bool {
 	manager.mutex.RLock()
 	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
@@ -206,7 +202,7 @@ func (manager *MemoryVehicles) CodeExists(code Code) bool {
 	return ok
 }
 
-func (manager *MemoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
+func (manager *memoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.FindBy(ByLine, ModelId(id))
@@ -220,7 +216,7 @@ func (manager *MemoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	return
 }
 
-func (manager *MemoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*Vehicle, bool) {
+func (manager *memoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -231,7 +227,7 @@ func (manager *MemoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*V
 	return &Vehicle{}, false
 }
 
-func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
+func (manager *memoryVehicles) FindAll() (vehicles []*Vehicle) {
 	manager.mutex.RLock()
 
 	for _, vehicle := range manager.byIdentifier {
@@ -242,7 +238,7 @@ func (manager *MemoryVehicles) FindAll() (vehicles []*Vehicle) {
 	return
 }
 
-func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
+func (manager *memoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 	vehicleId, ok := manager.byNextStopVisitId[stopVisitId]
@@ -263,7 +259,7 @@ func (manager *MemoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*
 	return &Vehicle{}, false
 }
 
-func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
+func (manager *memoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -299,7 +295,7 @@ func (manager *MemoryVehicles) Save(vehicle *Vehicle) bool {
 	return true
 }
 
-func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
+func (manager *memoryVehicles) sendBQMessage(v *Vehicle) {
 	if manager.model == nil {
 		return
 	}
@@ -317,7 +313,7 @@ func (manager *MemoryVehicles) sendBQMessage(v *Vehicle) {
 	audit.CurrentBigQuery(manager.model.Referential()).WriteEvent(vehicleEvent)
 }
 
-func (manager *MemoryVehicles) Delete(vehicle *Vehicle) bool {
+func (manager *memoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())

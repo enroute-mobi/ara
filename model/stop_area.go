@@ -9,7 +9,6 @@ import (
 
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
-	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
 type StopAreaId ModelId
@@ -46,7 +45,7 @@ func NewStopArea(model Model) *StopArea {
 		References:      NewReferences(),
 		CollectedAlways: true,
 	}
-	stopArea.codes = make(Codes)
+	stopArea.InitCodes()
 	return stopArea
 }
 
@@ -142,7 +141,7 @@ func (stopArea *StopArea) UnmarshalJSON(data []byte) error {
 	}
 
 	if aux.Codes != nil {
-		stopArea.CodeConsumer.codes = NewCodesFromMap(aux.Codes)
+		stopArea.SetCodesFromMap(aux.Codes)
 	}
 
 	if aux.References != nil {
@@ -224,11 +223,9 @@ func (stopArea *StopArea) Save() bool {
 	return stopArea.model.StopAreas().Save(stopArea)
 }
 
-type MemoryStopAreas struct {
-	uuid.UUIDConsumer
+type memoryStopAreas struct {
 	IndexHandler
-
-	model *MemoryModel
+	memoryManager
 
 	mutex        *sync.RWMutex
 	byIdentifier map[StopAreaId]*StopArea
@@ -237,25 +234,22 @@ type MemoryStopAreas struct {
 }
 
 type StopAreas interface {
-	uuid.UUIDInterface
+	ModelManager[StopAreaId, *StopArea]
+	CodeHandler[*StopArea]
+	Broadcaster[StopMonitoringBroadcastEvent]
+	Loadable
 
-	New() *StopArea
-	Find(StopAreaId) (*StopArea, bool)
-	FindByCode(Code) (*StopArea, bool)
 	FindByLineId(LineId) []*StopArea
 	FindByOrigin(string) []StopAreaId
-	FindAll() []*StopArea
 	FindAllValues() []StopArea
 	FindFamily(StopAreaId) []StopAreaId
 	FindByReferentId(StopAreaId) []*StopArea
 	FindAscendants(StopAreaId) []*StopArea
 	FindAscendantsWithCodeSpace(StopAreaId, string) []Code
-	Save(*StopArea) bool
-	Delete(*StopArea) bool
 }
 
-func NewMemoryStopAreas() (m *MemoryStopAreas) {
-	m = &MemoryStopAreas{
+func NewMemoryStopAreas() StopAreas {
+	m := &memoryStopAreas{
 		mutex:        &sync.RWMutex{},
 		byIdentifier: make(map[StopAreaId]*StopArea),
 	}
@@ -263,14 +257,18 @@ func NewMemoryStopAreas() (m *MemoryStopAreas) {
 	m.AddIndex(ByParent, OneToMany, saParentExtractor)
 	m.AddIndex(ByReferent, OneToMany, saReferentExtractor)
 
-	return
+	return m
 }
 
-func (manager *MemoryStopAreas) New() *StopArea {
+func (manager *memoryStopAreas) SetBroadcaster(f func(StopMonitoringBroadcastEvent), _ ...string) {
+	manager.broadcastEvent = f
+}
+
+func (manager *memoryStopAreas) New() *StopArea {
 	return NewStopArea(manager.model)
 }
 
-func (manager *MemoryStopAreas) Find(id StopAreaId) (*StopArea, bool) {
+func (manager *memoryStopAreas) Find(id StopAreaId) (*StopArea, bool) {
 	manager.mutex.RLock()
 	stopArea, ok := manager.byIdentifier[id]
 	manager.mutex.RUnlock()
@@ -281,7 +279,7 @@ func (manager *MemoryStopAreas) Find(id StopAreaId) (*StopArea, bool) {
 	return &StopArea{}, false
 }
 
-func (manager *MemoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
+func (manager *memoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
 
@@ -293,7 +291,7 @@ func (manager *MemoryStopAreas) FindByCode(code Code) (*StopArea, bool) {
 	return &StopArea{}, false
 }
 
-func (manager *MemoryStopAreas) CodeExists(code Code) bool {
+func (manager *memoryStopAreas) CodeExists(code Code) bool {
 	manager.mutex.RLock()
 	_, ok := manager.ByCode().Find(code)
 	manager.mutex.RUnlock()
@@ -301,7 +299,7 @@ func (manager *MemoryStopAreas) CodeExists(code Code) bool {
 	return ok
 }
 
-func (manager *MemoryStopAreas) FindByLineId(id LineId) (stopAreas []*StopArea) {
+func (manager *memoryStopAreas) FindByLineId(id LineId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
 	for _, stopArea := range manager.byIdentifier {
@@ -314,7 +312,7 @@ func (manager *MemoryStopAreas) FindByLineId(id LineId) (stopAreas []*StopArea) 
 	return
 }
 
-func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAreaId) {
+func (manager *memoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAreaId) {
 	manager.mutex.RLock()
 
 	for _, stopArea := range manager.byIdentifier {
@@ -327,7 +325,7 @@ func (manager *MemoryStopAreas) FindByOrigin(origin string) (stopAreas []StopAre
 	return
 }
 
-func (manager *MemoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*StopArea) {
+func (manager *memoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.FindBy(ByReferent, ModelId(id))
@@ -341,7 +339,7 @@ func (manager *MemoryStopAreas) FindByReferentId(id StopAreaId) (stopAreas []*St
 	return
 }
 
-func (manager *MemoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*StopArea) {
+func (manager *memoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
 	ids, _ := manager.FindBy(ByParent, ModelId(id))
@@ -355,7 +353,7 @@ func (manager *MemoryStopAreas) FindByParentId(id StopAreaId) (stopAreas []*Stop
 	return
 }
 
-func (manager *MemoryStopAreas) FindAllValues() (stopAreas []StopArea) {
+func (manager *memoryStopAreas) FindAllValues() (stopAreas []StopArea) {
 	manager.mutex.RLock()
 
 	for _, stopArea := range manager.byIdentifier {
@@ -366,7 +364,7 @@ func (manager *MemoryStopAreas) FindAllValues() (stopAreas []StopArea) {
 	return
 }
 
-func (manager *MemoryStopAreas) FindAll() (stopAreas []*StopArea) {
+func (manager *memoryStopAreas) FindAll() (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
 	for _, stopArea := range manager.byIdentifier {
@@ -377,7 +375,7 @@ func (manager *MemoryStopAreas) FindAll() (stopAreas []*StopArea) {
 	return
 }
 
-func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
+func (manager *memoryStopAreas) Save(stopArea *StopArea) bool {
 	if stopArea.Id() == "" {
 		stopArea.id = StopAreaId(manager.NewUUID())
 	}
@@ -402,7 +400,7 @@ func (manager *MemoryStopAreas) Save(stopArea *StopArea) bool {
 	return true
 }
 
-func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
+func (manager *memoryStopAreas) Delete(stopArea *StopArea) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
@@ -412,7 +410,7 @@ func (manager *MemoryStopAreas) Delete(stopArea *StopArea) bool {
 	return true
 }
 
-func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+func (manager *memoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	manager.mutex.RLock()
 
 	stopAreaIds = manager.findFamily(stopAreaId)
@@ -422,7 +420,7 @@ func (manager *MemoryStopAreas) FindFamily(stopAreaId StopAreaId) (stopAreaIds [
 	return
 }
 
-func (manager *MemoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
+func (manager *memoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds []StopAreaId) {
 	stopAreaIds = []StopAreaId{stopAreaId}
 
 	ids, _ := manager.FindBy(ByParent, ModelId(stopAreaId))
@@ -437,7 +435,7 @@ func (manager *MemoryStopAreas) findFamily(stopAreaId StopAreaId) (stopAreaIds [
 	return
 }
 
-func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas []*StopArea) {
+func (manager *memoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas []*StopArea) {
 	manager.mutex.RLock()
 
 	var count uint8
@@ -449,7 +447,7 @@ func (manager *MemoryStopAreas) FindAscendants(stopAreaId StopAreaId) (stopAreas
 	return
 }
 
-func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId, count uint8) (stopAreas []*StopArea) {
+func (manager *memoryStopAreas) findAscendants(stopAreaId StopAreaId, count uint8) (stopAreas []*StopArea) {
 	if count >= 20 {
 		logger.Log.Printf("Loop in StopAreas when finding Ascendants: %v", stopAreaId)
 		return
@@ -471,7 +469,7 @@ func (manager *MemoryStopAreas) findAscendants(stopAreaId StopAreaId, count uint
 	return
 }
 
-func (manager *MemoryStopAreas) FindAscendantsWithCodeSpace(stopAreaId StopAreaId, kind string) (stopAreaCodes []Code) {
+func (manager *memoryStopAreas) FindAscendantsWithCodeSpace(stopAreaId StopAreaId, kind string) (stopAreaCodes []Code) {
 	manager.mutex.RLock()
 
 	stopAreaCodes = manager.findAscendantsWithCodeSpace(stopAreaId, kind)
@@ -481,7 +479,7 @@ func (manager *MemoryStopAreas) FindAscendantsWithCodeSpace(stopAreaId StopAreaI
 	return
 }
 
-func (manager *MemoryStopAreas) findAscendantsWithCodeSpace(stopAreaId StopAreaId, kind string) (stopAreaCodes []Code) {
+func (manager *memoryStopAreas) findAscendantsWithCodeSpace(stopAreaId StopAreaId, kind string) (stopAreaCodes []Code) {
 	sa, ok := manager.byIdentifier[stopAreaId]
 	if !ok {
 		return
@@ -502,7 +500,7 @@ func (manager *MemoryStopAreas) findAscendantsWithCodeSpace(stopAreaId StopAreaI
 	return
 }
 
-func (manager *MemoryStopAreas) Load(referentialSlug string) error {
+func (manager *memoryStopAreas) Load(referentialSlug string) error {
 	var selectStopAreas []SelectStopArea
 	modelDate := manager.model.Date()
 
@@ -567,7 +565,7 @@ func (manager *MemoryStopAreas) Load(referentialSlug string) error {
 			if err = json.Unmarshal([]byte(sa.Codes.String), &codeMap); err != nil {
 				return err
 			}
-			stopArea.codes = NewCodesFromMap(codeMap)
+			stopArea.SetCodesFromMap(codeMap)
 		}
 
 		manager.Save(stopArea)
