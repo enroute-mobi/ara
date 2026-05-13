@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"slices"
 	"sort"
 
 	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
-	"github.com/google/uuid"
 )
 
 type VehicleController struct {
@@ -47,7 +45,7 @@ func (controller *VehicleController) Index(response http.ResponseWriter, params 
 		return
 	}
 
-	filteredVehicles, err = controller.searchByLineIds(filteredVehicles, params)
+	filteredVehicles, err = searchByLineIds(filteredVehicles, params)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
@@ -160,26 +158,4 @@ func (controller *VehicleController) Create(response http.ResponseWriter, body [
 	controller.referential.Model().Vehicles().Save(vehicle)
 	jsonBytes, _ := vehicle.MarshalJSON()
 	response.Write(jsonBytes)
-}
-
-func (controller *VehicleController) searchByLineIds(vehicles []*model.Vehicle, params url.Values) ([]*model.Vehicle, error) {
-	lineIds := params["line_ids[]"]
-	if len(lineIds) == 0 {
-		return vehicles, nil
-	}
-
-	for i := range lineIds {
-		err := uuid.Validate(lineIds[i])
-		if err != nil {
-			return nil, fmt.Errorf("line id is not a valid UUID: %s", lineIds[i])
-		}
-	}
-
-	possibleVehicles := []*model.Vehicle{}
-	for i := range vehicles {
-		if slices.Contains(lineIds, string(vehicles[i].LineId)) {
-			possibleVehicles = append(possibleVehicles, vehicles[i])
-		}
-	}
-	return possibleVehicles, nil
 }
