@@ -136,6 +136,8 @@ func searchByLineIds[S SearchableByLineId, M ModelForLineIds[S]](s []M, params u
 		return s, nil
 	}
 
+	params.Del("line_ids[]")
+
 	for i := range lineIds {
 		err := uuid.Validate(lineIds[i])
 		if err != nil {
