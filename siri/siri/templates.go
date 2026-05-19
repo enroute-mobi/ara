@@ -19,6 +19,9 @@ var (
 	stringGt  = []byte("&gt;")
 	stringAmp = []byte("&amp;")
 
+	cdataPrefix = "<![CDATA["
+	cdataSuffix = "]]>"
+
 	// Regexp could be simplified in `{{ ?((?:\.(?!Build)[^. }]+)+) ?}}`
 	// but Golang doesn't support lookahead
 	re        = regexp.MustCompile(`{{ ?((?:\.(?:(?:[^. }]{0,5})|(?:Buil[^d][^. }]*)|(?:Bui[^l][^. }]*)|(?:Bu[^i][^. }]*)|(?:B[^u][^. }]*)|(?:[^B][^. }]*)))+) ?}}`)
@@ -36,7 +39,10 @@ func init() {
 		logger.Log.Panicf("Error while loading templates: %v", err)
 	}
 
-	t := template.New("").Funcs(template.FuncMap{"stringEscape": StringEscape})
+	t := template.New("").Funcs(template.FuncMap{
+		"stringEscape": StringEscape,
+		"escapeCData":  escapeCData,
+	})
 	templates = template.Must(parseGlob(t, filepath.Join(templatePath, "*.template")))
 }
 
@@ -122,6 +128,18 @@ func stringEscape(w io.Writer, b []byte) {
 		last = i + 1
 	}
 	w.Write(b[last:])
+}
+
+func escapeCData(s string) string {
+	if !strings.Contains(s, "<") {
+		return s
+	}
+
+	b := strings.Builder{}
+	b.WriteString(cdataPrefix)
+	b.WriteString(s)
+	b.WriteString(cdataSuffix)
+	return b.String()
 }
 
 func evalArg(arg any) (s string) {

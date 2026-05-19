@@ -81,7 +81,7 @@ Feature: Support SIRI GeneralMessage for Situation
                    </Message>
                    <Message>
                      <MessageType>textOnly</MessageType>
-                     <MessageText>La nouvelle &lt;b&gt;carte d'abonnement&lt;/b&gt; est disponible</MessageText>
+                     <MessageText><![CDATA[La nouvelle <b>carte d'abonnement</b> est disponible]]></MessageText>
                      <MessageText xml:lang='EN'>The new pass is available</MessageText>
                    </Message>
                  </siri:Content>
@@ -245,7 +245,7 @@ Feature: Support SIRI GeneralMessage for Situation
                                 </Message>
                                 <Message>
                                     <MessageType>textOnly</MessageType>
-                                    <MessageText>La nouvelle carte d'abonnement est disponible</MessageText>
+                                    <MessageText><![CDATA[La nouvelle <b>carte d'abonnement<b> est disponible]]></MessageText>
                                     <MessageText xml:lang='EN'>The new pass is available</MessageText>
                                 </Message>
                             </siri:Content>
@@ -312,7 +312,7 @@ Feature: Support SIRI GeneralMessage for Situation
       | ProducerRef                                                                        | NINOXE:default                                |
       | ValidityPeriods[0]#StartTime                                                       | 2017-03-29T03:30:06+02:00                     |
       | ValidityPeriods[0]#EndTime                                                         | 2017-03-29T20:50:06+02:00                     |
-      | Description[DefaultValue]                                                          | La nouvelle carte d'abonnement est disponible |
+      | Description[DefaultValue]                                                          | La nouvelle <b>carte d'abonnement<b> est disponible |
       | Description[Translations]#EN                                                       | The new pass is available                     |
       | Summary[Translations]#FR                                                           | Nouveau pass Navigo                           |
       | Summary[Translations]#EN                                                           | New pass Navigo                               |
