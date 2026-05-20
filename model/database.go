@@ -67,7 +67,7 @@ func InitTestDb(t *testing.T) {
 	// Initialize Database
 	Database = InitDB(config.Config.DB)
 
-	_, err = Database.Exec("TRUNCATE referentials, partners, lines, line_groups, operators, stop_areas, stop_area_groups, stop_visits, vehicle_journeys, facilities, controls, macros;")
+	_, err = Database.Exec("TRUNCATE referentials, partners, lines, line_groups, operators, stop_areas, stop_area_groups, stop_visits, vehicle_journeys, facilities, controls, macros, code_spaces;")
 	if err != nil {
 		t.Fatal(err)
 	}
