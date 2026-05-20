@@ -101,9 +101,10 @@ type Pagination struct {
 }
 
 type SearchableByCode interface {
-	model.StopArea |
+	model.Line |
+		model.Vehicle |
 		model.VehicleJourney |
-		model.Line
+		model.StopArea
 }
 
 type ModelForCode[S SearchableByCode] interface {

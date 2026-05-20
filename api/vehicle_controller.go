@@ -38,22 +38,29 @@ func (controller *VehicleController) Index(response http.ResponseWriter, params 
 	allVehicles := controller.referential.Model().Vehicles().FindAll()
 	logger.Log.Debugf("VehicleController FindAll time : %v", controller.referential.Clock().Since(stime))
 
+	// Search
+	filteredVehicles, err := searchByCode(allVehicles, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	direction := params.Get("direction")
 	switch direction {
 	case "desc":
-		sort.Slice(allVehicles, func(i, j int) bool {
-			return allVehicles[i].Id() > allVehicles[j].Id()
+		sort.Slice(filteredVehicles, func(i, j int) bool {
+			return filteredVehicles[i].Id() > filteredVehicles[j].Id()
 		})
 	case "asc", "":
-		sort.Slice(allVehicles, func(i, j int) bool {
-			return allVehicles[i].Id() < allVehicles[j].Id()
+		sort.Slice(filteredVehicles, func(i, j int) bool {
+			return filteredVehicles[i].Id() < filteredVehicles[j].Id()
 		})
 	default:
 		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
 		return
 	}
 
-	paginatedVehicles, err := paginate(allVehicles, params)
+	paginatedVehicles, err := paginate(filteredVehicles, params)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
