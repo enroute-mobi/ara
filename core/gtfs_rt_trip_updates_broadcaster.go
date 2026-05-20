@@ -57,152 +57,125 @@ func (connector *TripUpdatesBroadcaster) HandleGtfs(feed *gtfs.FeedMessage) {
 }
 
 func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEntity, err error) {
-	stopVisits := connector.partner.Model().StopVisits().FindAllAfter(connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME))
-	linesCode := make(map[model.VehicleJourneyId]model.Code)
-	feedEntities := make(map[model.VehicleJourneyId]*gtfs.FeedEntity)
 	gtfsStopSequenceOffset := uint32(0)
 	if connector.partner.GtfsEnforceStopSequence() {
 		gtfsStopSequenceOffset += uint32(1)
 	}
 
-	for i := range stopVisits {
-		sa, ok := connector.partner.Model().StopAreas().Find(stopVisits[i].StopAreaId)
-		if !ok { // Should never happen
-			logger.Log.Debugf("Can't find StopArea %v of StopVisit %v", stopVisits[i].StopAreaId, stopVisits[i].Id())
-			continue
-		}
-		saId, ok := sa.Code(connector.remoteCodeSpace)
+	referenceTime := connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME)
+
+	vehicleJourneys := connector.partner.Model().VehicleJourneys().FindAll()
+	for i := range vehicleJourneys {
+		vjId, ok := vehicleJourneys[i].CodeWithFallback(connector.vjRemoteCodeSpaces)
 		if !ok {
 			continue
 		}
 
-		feedEntity, ok := feedEntities[stopVisits[i].VehicleJourneyId]
-		// If we don't already have a tripUpdate with the VehicleJourney we create one
+		var routeId string
+		l, ok := connector.partner.Model().Lines().Find(vehicleJourneys[i].LineId)
 		if !ok {
-			// Fetch all needed models and codes
-			vj, ok := connector.partner.Model().VehicleJourneys().Find(stopVisits[i].VehicleJourneyId)
+			continue
+		}
+		lineCode, ok := l.Code(connector.remoteCodeSpace)
+		if !ok {
+			continue
+		}
+
+		routeId = lineCode.Value()
+		tripId := vjId.Value()
+
+		// Fill the tripDescriptor
+		tripDescriptor := &gtfs.TripDescriptor{
+			TripId:  &tripId,
+			RouteId: &routeId,
+		}
+
+		if directionId := vehicleJourneys[i].GtfsDirectionId(); directionId != nil {
+			tripDescriptor.DirectionId = directionId
+		}
+
+		if vehicleJourneys[i].IsCancelled() {
+			cancelled := gtfs.TripDescriptor_CANCELED
+			tripDescriptor.ScheduleRelationship = &cancelled
+		}
+
+		tu := &gtfs.TripUpdate{Trip: tripDescriptor}
+
+		// Fetch the Vehicle Informations
+		v := vehicleJourneys[i].Vehicle()
+		if v != nil {
+			vd := &gtfs.VehicleDescriptor{}
+
+			vehicleId, ok := v.CodeWithFallback(connector.vehicleRemoteCodeSpaces)
+			if ok {
+				vehicleId := vehicleId.Value()
+				vd.Id = &vehicleId
+			}
+
+			// The other GTFS fields are a label, the licence plate,
+			// and wheelchair accessible, but we don't have anything to fill these
+
+			tu.Vehicle = vd
+		}
+
+		// Fill the FeedEntity
+		newId := fmt.Sprintf("trip:%v", vjId.Value())
+		feedEntity := &gtfs.FeedEntity{
+			Id:         &newId,
+			TripUpdate: tu,
+		}
+
+		stopVisits := connector.partner.Model().StopVisits().FindByVehicleJourneyIdAfterUnsorted(vehicleJourneys[i].Id(), referenceTime)
+		sort.Slice(stopVisits, func(i, j int) bool {
+			return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder
+		})
+
+		for i := range stopVisits {
+			sa, ok := connector.partner.Model().StopAreas().Find(stopVisits[i].StopAreaId)
+			if !ok { // Should never happen
+				logger.Log.Debugf("Can't find StopArea %v of StopVisit %v", stopVisits[i].StopAreaId, stopVisits[i].Id())
+				continue
+			}
+			saId, ok := sa.Code(connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
-			vjId, ok := vj.CodeWithFallback(connector.vjRemoteCodeSpaces)
-			if !ok {
-				continue
+
+			stopId := saId.Value()
+
+			// rewrite stopSequence
+			stopSequence := uint32(i) + gtfsStopSequenceOffset
+
+			stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
+				StopSequence: &stopSequence,
+				StopId:       &stopId,
 			}
 
-			var routeId string
-			lineCode, ok := linesCode[vj.Id()]
-			if !ok {
-				l, ok := connector.partner.Model().Lines().Find(vj.LineId)
-				if !ok {
-					continue
-				}
-				lineCode, ok = l.Code(connector.remoteCodeSpace)
-				if !ok {
-					continue
-				}
-				linesCode[stopVisits[i].VehicleJourneyId] = lineCode
+			arrival := &gtfs.TripUpdate_StopTimeEvent{}
+			departure := &gtfs.TripUpdate_StopTimeEvent{}
+
+			if a := stopVisits[i].ReferenceArrivalTime(); !a.IsZero() {
+				arrivalTime := int64(a.Unix())
+				arrival.Time = &arrivalTime
+				stopTimeUpdate.Arrival = arrival
+
 			}
-			routeId = lineCode.Value()
-			tripId := vjId.Value()
-			// Fill the tripDescriptor
-			tripDescriptor := &gtfs.TripDescriptor{
-				TripId:  &tripId,
-				RouteId: &routeId,
+			if d := stopVisits[i].ReferenceDepartureTime(); !d.IsZero() {
+				departureTime := int64(d.Unix())
+				departure.Time = &departureTime
+				stopTimeUpdate.Departure = departure
 			}
 
-			if directionId := vj.GtfsDirectionId(); directionId != nil {
-				tripDescriptor.DirectionId = directionId
+			if stopVisits[i].DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED {
+				skipped := gtfs.TripUpdate_StopTimeUpdate_SKIPPED
+				stopTimeUpdate.ScheduleRelationship = &skipped
 			}
-
-			if vj.IsCancelled() {
-				cancelled := gtfs.TripDescriptor_CANCELED
-				tripDescriptor.ScheduleRelationship = &cancelled
-			}
-
-			tu := &gtfs.TripUpdate{Trip: tripDescriptor}
-
-			// Fetch the Vehicle Informations
-			v := vj.Vehicle()
-			if v != nil {
-				vd := &gtfs.VehicleDescriptor{}
-
-				vehicleId, ok := v.CodeWithFallback(connector.vehicleRemoteCodeSpaces)
-				if ok {
-					vehicleId := vehicleId.Value()
-					vd.Id = &vehicleId
-				}
-
-				// The other GTFS fields are a label, the licence plate,
-				// and wheelchair accessible, but we don't have anything to fill these
-
-				tu.Vehicle = vd
-			}
-
-			// Fill the FeedEntity
-			newId := fmt.Sprintf("trip:%v", vjId.Value())
-			feedEntity = &gtfs.FeedEntity{
-				Id:         &newId,
-				TripUpdate: tu,
-			}
-
-			feedEntities[stopVisits[i].VehicleJourneyId] = feedEntity
+			feedEntity.TripUpdate.StopTimeUpdate = append(feedEntity.TripUpdate.StopTimeUpdate, stopTimeUpdate)
 		}
 
-		stopId := saId.Value()
-		stopSequence := uint32(stopVisits[i].PassageOrder)
-
-		stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
-			StopSequence: &stopSequence,
-			StopId:       &stopId,
+		if len(feedEntity.TripUpdate.StopTimeUpdate) != 0 {
+			entities = append(entities, feedEntity)
 		}
-
-		arrival := &gtfs.TripUpdate_StopTimeEvent{}
-		departure := &gtfs.TripUpdate_StopTimeEvent{}
-
-		if a := stopVisits[i].ReferenceArrivalTime(); !a.IsZero() {
-			arrivalTime := int64(a.Unix())
-			arrival.Time = &arrivalTime
-			stopTimeUpdate.Arrival = arrival
-
-		}
-		if d := stopVisits[i].ReferenceDepartureTime(); !d.IsZero() {
-			departureTime := int64(d.Unix())
-			departure.Time = &departureTime
-			stopTimeUpdate.Departure = departure
-		}
-
-		if stopVisits[i].DepartureStatus == model.STOP_VISIT_DEPARTURE_CANCELLED {
-			skipped := gtfs.TripUpdate_StopTimeUpdate_SKIPPED
-			stopTimeUpdate.ScheduleRelationship = &skipped
-		}
-
-		feedEntity.TripUpdate.StopTimeUpdate = append(feedEntity.TripUpdate.StopTimeUpdate, stopTimeUpdate)
 	}
-
-	for _, entity := range feedEntities {
-		connector.rewriteStopSequence(entity, gtfsStopSequenceOffset)
-		entities = append(entities, entity)
-	}
-
 	return
-}
-
-func (connector *TripUpdatesBroadcaster) rewriteStopSequence(entity *gtfs.FeedEntity, gtfsStopSequenceOffset uint32) {
-	if len(entity.TripUpdate.StopTimeUpdate) == 0 {
-		return
-	}
-
-	sort.Slice(entity.TripUpdate.StopTimeUpdate, func(i, j int) bool {
-		return *entity.TripUpdate.StopTimeUpdate[i].StopSequence < *entity.TripUpdate.StopTimeUpdate[j].StopSequence
-	})
-
-	for i := range entity.TripUpdate.StopTimeUpdate {
-		*entity.TripUpdate.StopTimeUpdate[i].StopSequence = uint32(i) + gtfsStopSequenceOffset
-	}
-
-	// ARA-829
-	// if entity.TripUpdate.StopTimeUpdate[0].Departure.Time != nil {
-	// 	startTime := time.Unix(*entity.TripUpdate.StopTimeUpdate[0].Departure.Time, 0).Format("15:04:05")
-	// 	entity.TripUpdate.Trip.StartTime = &startTime
-	// }
 }
