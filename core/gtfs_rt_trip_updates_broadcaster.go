@@ -130,6 +130,11 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			return stopVisits[i].PassageOrder < stopVisits[j].PassageOrder
 		})
 
+		var passageOrderOffset int
+		if vehicleJourneys[i].AimedStopVisitCount != 0 && vehicleJourneys[i].AimedStopVisitCount > len(stopVisits) {
+			passageOrderOffset = vehicleJourneys[i].AimedStopVisitCount - len(stopVisits)
+		}
+
 		for i := range stopVisits {
 			sa, ok := connector.partner.Model().StopAreas().Find(stopVisits[i].StopAreaId)
 			if !ok { // Should never happen
@@ -144,7 +149,7 @@ func (connector *TripUpdatesBroadcaster) handleGtfs() (entities []*gtfs.FeedEnti
 			stopId := saId.Value()
 
 			// rewrite stopSequence
-			stopSequence := uint32(i) + gtfsStopSequenceOffset
+			stopSequence := uint32(i) + uint32(passageOrderOffset) + gtfsStopSequenceOffset
 
 			stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
 				StopSequence: &stopSequence,
