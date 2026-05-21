@@ -35,26 +35,29 @@ func benchmarkHandleGtfs(pc int, seed bool, b *testing.B) {
 	if seed {
 		for i := 0; i != 500; i++ {
 			vehicleJourney := referential.model.VehicleJourneys().New()
-			vjId := model.NewCode("codeSpace", fmt.Sprintf("vj%d", i))
+			vjId := model.NewCode("codeSpace", fmt.Sprintf("vehicle_jourey%d", i))
 			vehicleJourney.SetCode(vjId)
 			vehicleJourney.LineId = line.Id()
 			vehicleJourney.Save()
 
 			// stopAreas & stopVisits
 			for j := 0; j < 30; j++ {
-				saId := model.NewCode("codeSpace", fmt.Sprintf("saId%d", j))
+				saId := model.NewCode("codeSpace", fmt.Sprintf("stop_area%d", j))
 				stopArea := referential.Model().StopAreas().New()
 				stopArea.SetCode(saId)
 				stopArea.Save()
 
 				stopVisit := referential.model.StopVisits().New()
-				svId1 := model.NewCode("codeSpace", fmt.Sprintf("svId%d", j))
+				svId1 := model.NewCode("codeSpace", fmt.Sprintf("stop_visit%d", j))
 				stopVisit.SetCode(svId1)
 				stopVisit.StopAreaId = stopArea.Id()
 				stopVisit.VehicleJourneyId = vehicleJourney.Id()
 
-				stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(time.Duration(float64(j*1e9))-10*time.Minute))
+				delta := time.Duration(float64(j) * float64(time.Minute))
+				base := connector.Clock().Now().Add(-4 * time.Minute)
+				stopVisit.Schedules.SetDepartureTime("actual", base.Add(delta))
 				stopVisit.PassageOrder = j
+
 				stopVisit.Save()
 			}
 		}
@@ -81,8 +84,12 @@ func benchmarkHandleGtfs(pc int, seed bool, b *testing.B) {
 			stopVisit.StopAreaId = stopArea.Id()
 			stopVisit.VehicleJourneyId = vehicleJourney.Id()
 
-			stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(time.Duration(float64(j*1e9))-10*time.Minute))
+			delta := time.Duration(float64(j) * float64(time.Minute))
+			base := connector.Clock().Now().Add(-10 * time.Minute)
+			stopVisit.Schedules.SetDepartureTime("actual", base.Add(delta))
+
 			stopVisit.PassageOrder = j
+
 			stopVisit.Save()
 
 		}
