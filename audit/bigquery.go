@@ -25,6 +25,7 @@ const (
 	VEHICLE_TABLE              = "vehicles"
 	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
 	CONTROL_TABLE              = "control_messages"
+	maxMessageBatchSize        = 200
 )
 
 var tablesSchemas = map[string]bigquery.Schema{
@@ -270,7 +271,7 @@ func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
 		if bq.lostMessagesCount > 0 {
-			logger.Log.Printf("BigQuery queue was full: %d lost messages)", bq.lostMessagesCount)
+			logger.Log.Printf("BigQuery queue was full: %d lost messages", bq.lostMessagesCount)
 			bq.lostMessagesCount = 0
 		}
 	default:
@@ -317,14 +318,22 @@ func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) 
 
 func (bq *BigQueryClient) run() {
 	bq.connect()
-
+	var messageBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
 	for {
 		select {
 		case <-bq.stop:
+			if len(messageBatch) > 0 { // flushing remaining messages
+				bq.sendMultiple(messageBatch, bq.inserter)
+			}
 			bq.client.Close()
 			return
 		case message := <-bq.messages:
-			bq.send(message, bq.inserter)
+			ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
+			messageBatch = append(messageBatch, ss)
+			if len(messageBatch) == maxMessageBatchSize {
+				bq.sendMultiple(messageBatch, bq.inserter)
+				messageBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+			}
 		case partnerMessage := <-bq.partnerEvents:
 			bq.send(partnerMessage, bq.partnerInserter)
 		case vehicleMessage := <-bq.vehicleEvents:
@@ -339,6 +348,17 @@ func (bq *BigQueryClient) run() {
 	}
 }
 
+func (bq *BigQueryClient) sendMultiple(ss []*bigquery.StructSaver, inserter *bigquery.Inserter) {
+	if inserter == nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
+	defer cancel()
+	if err := inserter.Put(ctx, ss); err != nil {
+		logger.Log.Printf("BigQuery Multi Inserter error: %v", err)
+	}
+}
+
 func (bq *BigQueryClient) send(message any, inserter *bigquery.Inserter) {
 	if inserter == nil {
 		return
@@ -347,7 +367,7 @@ func (bq *BigQueryClient) send(message any, inserter *bigquery.Inserter) {
 	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
 	defer cancel()
 	if err := inserter.Put(ctx, &ss); err != nil {
-		logger.Log.Debugf("BigQuery inserter error: %v", err)
+		logger.Log.Printf("BigQuery inserter error: %v", err)
 	}
 }
 
