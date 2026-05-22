@@ -338,6 +338,9 @@ func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) 
 func (bq *BigQueryClient) run() {
 	bq.connect()
 	var messageBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var vehicleBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var longTermSvBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var controlBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
 	for {
 		select {
 		case <-bq.stop:
@@ -356,13 +359,28 @@ func (bq *BigQueryClient) run() {
 		case partnerMessage := <-bq.partnerEvents:
 			bq.send(partnerMessage, bq.partnerInserter)
 		case vehicleMessage := <-bq.vehicleEvents:
-			bq.send(vehicleMessage, bq.vehicleInserter)
+			ss := &bigquery.StructSaver{Struct: vehicleMessage, InsertID: bq.NewUUID()}
+			vehicleBatch = append(vehicleBatch, ss)
+			if len(vehicleBatch) == maxMessageBatchSize {
+				bq.sendMultiple(vehicleBatch, bq.inserter)
+				vehicleBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+			}
 		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
 			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
-				bq.send(longTermStopVisitMessage, bq.longTermStopVisitInserter)
+				ss := &bigquery.StructSaver{Struct: longTermStopVisitMessage, InsertID: bq.NewUUID()}
+				longTermSvBatch = append(longTermSvBatch, ss)
+				if len(longTermSvBatch) == maxMessageBatchSize {
+					bq.sendMultiple(longTermSvBatch, bq.inserter)
+					longTermSvBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+				}
 			}
 		case controlMessage := <-bq.controlEvents:
-			bq.send(controlMessage, bq.controlInserter)
+			ss := &bigquery.StructSaver{Struct: controlMessage, InsertID: bq.NewUUID()}
+			controlBatch = append(controlBatch, ss)
+			if len(controlBatch) == maxMessageBatchSize {
+				bq.sendMultiple(controlBatch, bq.inserter)
+				controlBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+			}
 		}
 	}
 }
