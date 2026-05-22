@@ -194,22 +194,26 @@ type BigQueryClient struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
 
-	projectID                 string
-	dataset                   string
-	ctx                       context.Context
-	client                    *bigquery.Client
-	inserter                  *bigquery.Inserter
-	vehicleInserter           *bigquery.Inserter
-	partnerInserter           *bigquery.Inserter
-	longTermStopVisitInserter *bigquery.Inserter
-	controlInserter           *bigquery.Inserter
-	messages                  chan *BigQueryMessage
-	partnerEvents             chan *BigQueryPartnerEvent
-	vehicleEvents             chan *BigQueryVehicleEvent
-	longTermStopVisitEvents   chan *BigQueryLongTermStopVisitEvent
-	controlEvents             chan *BigQueryControlEvent
-	stop                      chan struct{}
-	lostMessagesCount         int
+	projectID                         string
+	dataset                           string
+	ctx                               context.Context
+	client                            *bigquery.Client
+	inserter                          *bigquery.Inserter
+	vehicleInserter                   *bigquery.Inserter
+	partnerInserter                   *bigquery.Inserter
+	longTermStopVisitInserter         *bigquery.Inserter
+	controlInserter                   *bigquery.Inserter
+	messages                          chan *BigQueryMessage
+	partnerEvents                     chan *BigQueryPartnerEvent
+	vehicleEvents                     chan *BigQueryVehicleEvent
+	longTermStopVisitEvents           chan *BigQueryLongTermStopVisitEvent
+	controlEvents                     chan *BigQueryControlEvent
+	stop                              chan struct{}
+	lostMessagesCount                 int
+	lostPartnerEventsCount            int
+	lostVehicleEventsCount            int
+	lostLongTermStopVisitsEventsCount int
+	lostControlEventsCount            int
 }
 
 func NewBigQuery(dataset string) BigQuery {
@@ -271,7 +275,7 @@ func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
 		if bq.lostMessagesCount > 0 {
-			logger.Log.Printf("BigQuery queue was full: %d lost messages", bq.lostMessagesCount)
+			logger.Log.Printf("BigQuery message queue was full: %d lost messages", bq.lostMessagesCount)
 			bq.lostMessagesCount = 0
 		}
 	default:
@@ -283,8 +287,13 @@ func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) error {
 	select {
 	case bq.partnerEvents <- partnerEvent:
+		if bq.lostPartnerEventsCount > 0 {
+			logger.Log.Printf("BigQuery partnerEvent queue was full: %d lost messages", bq.lostPartnerEventsCount)
+			bq.lostPartnerEventsCount = 0
+		}
+
 	default:
-		logger.Log.Debugf("BigQuery partner queue is full")
+		bq.lostPartnerEventsCount += 1
 	}
 	return nil
 }
@@ -292,8 +301,12 @@ func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) 
 func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error {
 	select {
 	case bq.vehicleEvents <- vehicleEvent:
+		if bq.lostVehicleEventsCount > 0 {
+			logger.Log.Printf("BigQuery vehicleEvent queue was full: %d lost messages", bq.lostVehicleEventsCount)
+			bq.lostVehicleEventsCount = 0
+		}
 	default:
-		logger.Log.Debugf("BigQuery vehicle queue is full")
+		bq.lostVehicleEventsCount += 1
 	}
 	return nil
 }
@@ -301,8 +314,12 @@ func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) 
 func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *BigQueryLongTermStopVisitEvent) error {
 	select {
 	case bq.longTermStopVisitEvents <- longTermStopVisitEvent:
+		if bq.lostLongTermStopVisitsEventsCount > 0 {
+			logger.Log.Printf("BigQuery longTermStopVisitEvent queue was full: %d lost messages", bq.lostLongTermStopVisitsEventsCount)
+			bq.lostLongTermStopVisitsEventsCount = 0
+		}
 	default:
-		logger.Log.Debugf("BigQuery longTermStopVisit queue is full")
+		bq.lostLongTermStopVisitsEventsCount += 1
 	}
 	return nil
 }
@@ -310,8 +327,10 @@ func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *Bi
 func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) error {
 	select {
 	case bq.controlEvents <- controlEvent:
+		logger.Log.Printf("BigQuery controleEvent queue was full: %d lost messages", bq.lostControlEventsCount)
+		bq.lostControlEventsCount = 0
 	default:
-		logger.Log.Debugf("BigQuery control queue is full")
+		bq.lostControlEventsCount += 1
 	}
 	return nil
 }
