@@ -344,45 +344,45 @@ func (bq *BigQueryClient) run() {
 	for {
 		select {
 		case <-bq.stop:
-			if len(messageBatch) > 0 { // flushing remaining messages
+			// flushing remaining messages
+			if len(messageBatch) > 0 {
 				bq.sendMultiple(messageBatch, bq.inserter)
+			}
+			if len(vehicleBatch) > 0 {
+				bq.sendMultiple(vehicleBatch, bq.vehicleInserter)
+			}
+			if len(longTermSvBatch) > 0 {
+				bq.sendMultiple(longTermSvBatch, bq.longTermStopVisitInserter)
+			}
+			if len(controlBatch) > 0 {
+				bq.sendMultiple(controlBatch, bq.controlInserter)
 			}
 			bq.client.Close()
 			return
 		case message := <-bq.messages:
-			ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
-			messageBatch = append(messageBatch, ss)
-			if len(messageBatch) == maxMessageBatchSize {
-				bq.sendMultiple(messageBatch, bq.inserter)
-				messageBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-			}
+			messageBatch = bq.processMessage(message, messageBatch, bq.inserter)
 		case partnerMessage := <-bq.partnerEvents:
 			bq.send(partnerMessage, bq.partnerInserter)
 		case vehicleMessage := <-bq.vehicleEvents:
-			ss := &bigquery.StructSaver{Struct: vehicleMessage, InsertID: bq.NewUUID()}
-			vehicleBatch = append(vehicleBatch, ss)
-			if len(vehicleBatch) == maxMessageBatchSize {
-				bq.sendMultiple(vehicleBatch, bq.inserter)
-				vehicleBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-			}
+			vehicleBatch = bq.processMessage(vehicleMessage, vehicleBatch, bq.vehicleInserter)
 		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
 			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
-				ss := &bigquery.StructSaver{Struct: longTermStopVisitMessage, InsertID: bq.NewUUID()}
-				longTermSvBatch = append(longTermSvBatch, ss)
-				if len(longTermSvBatch) == maxMessageBatchSize {
-					bq.sendMultiple(longTermSvBatch, bq.inserter)
-					longTermSvBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-				}
+				longTermSvBatch = bq.processMessage(longTermStopVisitMessage, longTermSvBatch, bq.longTermStopVisitInserter)
 			}
 		case controlMessage := <-bq.controlEvents:
-			ss := &bigquery.StructSaver{Struct: controlMessage, InsertID: bq.NewUUID()}
-			controlBatch = append(controlBatch, ss)
-			if len(controlBatch) == maxMessageBatchSize {
-				bq.sendMultiple(controlBatch, bq.inserter)
-				controlBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-			}
+			controlBatch = bq.processMessage(controlMessage, controlBatch, bq.controlInserter)
 		}
 	}
+}
+
+func (bq *BigQueryClient) processMessage(message BigQueryEvent, batch []*bigquery.StructSaver, inserter *bigquery.Inserter) []*bigquery.StructSaver {
+	ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
+	batch = append(batch, ss)
+	if len(batch) == maxMessageBatchSize {
+		bq.sendMultiple(batch, inserter)
+		batch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	}
+	return batch
 }
 
 func (bq *BigQueryClient) sendMultiple(ss []*bigquery.StructSaver, inserter *bigquery.Inserter) {
