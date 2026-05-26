@@ -25,6 +25,7 @@ const (
 	VEHICLE_TABLE              = "vehicles"
 	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
 	CONTROL_TABLE              = "control_messages"
+	maxMessageBatchSize        = 200
 )
 
 var tablesSchemas = map[string]bigquery.Schema{
@@ -193,22 +194,26 @@ type BigQueryClient struct {
 	uuid.UUIDConsumer
 	clock.ClockConsumer
 
-	projectID                 string
-	dataset                   string
-	ctx                       context.Context
-	client                    *bigquery.Client
-	inserter                  *bigquery.Inserter
-	vehicleInserter           *bigquery.Inserter
-	partnerInserter           *bigquery.Inserter
-	longTermStopVisitInserter *bigquery.Inserter
-	controlInserter           *bigquery.Inserter
-	messages                  chan *BigQueryMessage
-	partnerEvents             chan *BigQueryPartnerEvent
-	vehicleEvents             chan *BigQueryVehicleEvent
-	longTermStopVisitEvents   chan *BigQueryLongTermStopVisitEvent
-	controlEvents             chan *BigQueryControlEvent
-	stop                      chan struct{}
-	lostMessagesCount         int
+	projectID                         string
+	dataset                           string
+	ctx                               context.Context
+	client                            *bigquery.Client
+	inserter                          *bigquery.Inserter
+	vehicleInserter                   *bigquery.Inserter
+	partnerInserter                   *bigquery.Inserter
+	longTermStopVisitInserter         *bigquery.Inserter
+	controlInserter                   *bigquery.Inserter
+	messages                          chan *BigQueryMessage
+	partnerEvents                     chan *BigQueryPartnerEvent
+	vehicleEvents                     chan *BigQueryVehicleEvent
+	longTermStopVisitEvents           chan *BigQueryLongTermStopVisitEvent
+	controlEvents                     chan *BigQueryControlEvent
+	stop                              chan struct{}
+	lostMessagesCount                 int
+	lostPartnerEventsCount            int
+	lostVehicleEventsCount            int
+	lostLongTermStopVisitsEventsCount int
+	lostControlEventsCount            int
 }
 
 func NewBigQuery(dataset string) BigQuery {
@@ -270,7 +275,7 @@ func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
 		if bq.lostMessagesCount > 0 {
-			logger.Log.Printf("BigQuery queue was full: %d lost messages)", bq.lostMessagesCount)
+			logger.Log.Printf("BigQuery message queue was full: %d lost messages", bq.lostMessagesCount)
 			bq.lostMessagesCount = 0
 		}
 	default:
@@ -282,8 +287,13 @@ func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) error {
 	select {
 	case bq.partnerEvents <- partnerEvent:
+		if bq.lostPartnerEventsCount > 0 {
+			logger.Log.Printf("BigQuery partnerEvent queue was full: %d lost messages", bq.lostPartnerEventsCount)
+			bq.lostPartnerEventsCount = 0
+		}
+
 	default:
-		logger.Log.Debugf("BigQuery partner queue is full")
+		bq.lostPartnerEventsCount += 1
 	}
 	return nil
 }
@@ -291,8 +301,12 @@ func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) 
 func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error {
 	select {
 	case bq.vehicleEvents <- vehicleEvent:
+		if bq.lostVehicleEventsCount > 0 {
+			logger.Log.Printf("BigQuery vehicleEvent queue was full: %d lost messages", bq.lostVehicleEventsCount)
+			bq.lostVehicleEventsCount = 0
+		}
 	default:
-		logger.Log.Debugf("BigQuery vehicle queue is full")
+		bq.lostVehicleEventsCount += 1
 	}
 	return nil
 }
@@ -300,8 +314,12 @@ func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) 
 func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *BigQueryLongTermStopVisitEvent) error {
 	select {
 	case bq.longTermStopVisitEvents <- longTermStopVisitEvent:
+		if bq.lostLongTermStopVisitsEventsCount > 0 {
+			logger.Log.Printf("BigQuery longTermStopVisitEvent queue was full: %d lost messages", bq.lostLongTermStopVisitsEventsCount)
+			bq.lostLongTermStopVisitsEventsCount = 0
+		}
 	default:
-		logger.Log.Debugf("BigQuery longTermStopVisit queue is full")
+		bq.lostLongTermStopVisitsEventsCount += 1
 	}
 	return nil
 }
@@ -309,33 +327,72 @@ func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *Bi
 func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) error {
 	select {
 	case bq.controlEvents <- controlEvent:
+		logger.Log.Printf("BigQuery controleEvent queue was full: %d lost messages", bq.lostControlEventsCount)
+		bq.lostControlEventsCount = 0
 	default:
-		logger.Log.Debugf("BigQuery control queue is full")
+		bq.lostControlEventsCount += 1
 	}
 	return nil
 }
 
 func (bq *BigQueryClient) run() {
 	bq.connect()
-
+	var messageBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var vehicleBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var longTermSvBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var controlBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
 	for {
 		select {
 		case <-bq.stop:
+			// flushing remaining messages
+			if len(messageBatch) > 0 {
+				bq.sendMultiple(messageBatch, bq.inserter)
+			}
+			if len(vehicleBatch) > 0 {
+				bq.sendMultiple(vehicleBatch, bq.vehicleInserter)
+			}
+			if len(longTermSvBatch) > 0 {
+				bq.sendMultiple(longTermSvBatch, bq.longTermStopVisitInserter)
+			}
+			if len(controlBatch) > 0 {
+				bq.sendMultiple(controlBatch, bq.controlInserter)
+			}
 			bq.client.Close()
 			return
 		case message := <-bq.messages:
-			bq.send(message, bq.inserter)
+			messageBatch = bq.processMessage(message, messageBatch, bq.inserter)
 		case partnerMessage := <-bq.partnerEvents:
 			bq.send(partnerMessage, bq.partnerInserter)
 		case vehicleMessage := <-bq.vehicleEvents:
-			bq.send(vehicleMessage, bq.vehicleInserter)
+			vehicleBatch = bq.processMessage(vehicleMessage, vehicleBatch, bq.vehicleInserter)
 		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
 			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
-				bq.send(longTermStopVisitMessage, bq.longTermStopVisitInserter)
+				longTermSvBatch = bq.processMessage(longTermStopVisitMessage, longTermSvBatch, bq.longTermStopVisitInserter)
 			}
 		case controlMessage := <-bq.controlEvents:
-			bq.send(controlMessage, bq.controlInserter)
+			controlBatch = bq.processMessage(controlMessage, controlBatch, bq.controlInserter)
 		}
+	}
+}
+
+func (bq *BigQueryClient) processMessage(message BigQueryEvent, batch []*bigquery.StructSaver, inserter *bigquery.Inserter) []*bigquery.StructSaver {
+	ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
+	batch = append(batch, ss)
+	if len(batch) == maxMessageBatchSize {
+		bq.sendMultiple(batch, inserter)
+		batch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	}
+	return batch
+}
+
+func (bq *BigQueryClient) sendMultiple(ss []*bigquery.StructSaver, inserter *bigquery.Inserter) {
+	if inserter == nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
+	defer cancel()
+	if err := inserter.Put(ctx, ss); err != nil {
+		logger.Log.Printf("BigQuery Multi Inserter error: %v", err)
 	}
 }
 
@@ -347,7 +404,7 @@ func (bq *BigQueryClient) send(message any, inserter *bigquery.Inserter) {
 	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
 	defer cancel()
 	if err := inserter.Put(ctx, &ss); err != nil {
-		logger.Log.Debugf("BigQuery inserter error: %v", err)
+		logger.Log.Printf("BigQuery inserter error: %v", err)
 	}
 }
 
