@@ -573,7 +573,7 @@ func Test_RewriteStopSequenceWithPassedStopVisits(t *testing.T) {
 		delta := time.Duration(float64(j) * float64(time.Minute))
 		base := connector.Clock().Now().Add(-4 * time.Minute)
 		stopVisit.Schedules.SetDepartureTime("actual", base.Add(delta))
-		stopVisit.PassageOrder = j + j*2
+		stopVisit.PassageOrder = j * 3
 		stopVisit.Save()
 	}
 
