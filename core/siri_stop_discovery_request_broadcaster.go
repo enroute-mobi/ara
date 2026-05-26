@@ -7,9 +7,10 @@ import (
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/state"
 
-	"golang.org/x/exp/maps"
 	"slices"
 	"sort"
+
+	"golang.org/x/exp/maps"
 )
 
 type SIRIStopPointsDiscoveryRequestBroadcaster struct {
@@ -81,7 +82,7 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		lines := sas[i].Lines()
 		stopAreaLines := make(map[string]struct{})
 		for i := range lines {
-			if lines[i].Origin() == string(connector.partner.Slug()) {
+			if lines[i].Origin == string(connector.partner.Slug()) {
 				continue
 			}
 			code := model.Code{}

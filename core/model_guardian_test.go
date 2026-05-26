@@ -80,12 +80,7 @@ func Test_ModelGuardian_RefreshStopAreas_CollectedUntil(t *testing.T) {
 	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
 	defer testSpan.Finish()
 
-	referential := &Referential{
-		model:          model.NewTestMemoryModel(),
-		collectManager: NewTestCollectManager(),
-	}
-	referential.modelGuardian = NewModelGuardian(referential)
-
+	_, referential := newTestReferential(t, true)
 	fakeClock := clock.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)
 

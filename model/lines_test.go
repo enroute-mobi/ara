@@ -5,6 +5,10 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"bitbucket.org/enroute-mobi/ara/config"
+	"bitbucket.org/enroute-mobi/ara/model/redisclient"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_Line_Id(t *testing.T) {
@@ -63,9 +67,9 @@ func Test_Line_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Line_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	line := model.Lines().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	line.SetCode(code)
 
 	if line.model != model {
@@ -91,10 +95,10 @@ func Test_Line_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	line.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	line.SetCode(code)
 
-	foundCode, ok := line.Code("codeSpace")
+	foundCode, ok := line.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -178,7 +182,7 @@ func Test_MemoryLines_FindAll(t *testing.T) {
 func Test_MemoryLines_Delete(t *testing.T) {
 	lines := NewMemoryLines()
 	existingLine := lines.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingLine.SetCode(code)
 	lines.Save(existingLine)
 
@@ -216,13 +220,13 @@ func Test_MemoryLines_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
 		Day:   1,
 	})
-	lines := model.Lines().(*memoryLines)
+	lines := model.Lines()
 	err = lines.Load("referential")
 	if err != nil {
 		t.Fatal(err)
@@ -244,6 +248,120 @@ func Test_MemoryLines_Load(t *testing.T) {
 		t.Errorf("Wrong Code:\n got: %v:%v\n expected: \"internal\":\"value\"", code.CodeSpace(), code.Value())
 	}
 	if ref, ok := line.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
+}
+
+func Test_FindFamily(t *testing.T) {
+	model := newTestModel(t)
+
+	ref := model.Lines().New()
+	ref.SetCode(NewCode("internal", "ref"))
+	ref.Save()
+
+	ref2 := model.Lines().New()
+	ref2.ReferentId = ref.Id()
+	ref2.SetCode(NewCode("internal", "ref2"))
+	ref2.Save()
+
+	l := model.Lines().New()
+	l.ReferentId = ref2.Id()
+	l.SetCode(NewCode("internal", "l"))
+	l.Save()
+
+	l2 := model.Lines().New()
+	l2.ReferentId = ref2.Id()
+	l2.SetCode(NewCode("internal", "l2"))
+	l2.Save()
+
+	assert.Len(t, model.Lines().FindFamily(ref2.Id()), 3)
+	assert.Len(t, model.Lines().FindFamilyFromCode(NewCode("internal", "ref2")), 3)
+}
+
+func Test_ReferentOrSelfCode(t *testing.T) {
+	model := newTestModel(t)
+
+	ref := model.Lines().New()
+	ref.SetCode(NewCode("internal", "ref"))
+	ref.Save()
+
+	l := model.Lines().New()
+	l.ReferentId = ref.Id()
+	l.SetCode(NewCode("internal", "l"))
+	l.Save()
+
+	l2 := model.Lines().New()
+	l2.SetCode(NewCode("internal", "l2"))
+	l2.Save()
+
+	c, ok := l.ReferentOrSelfCode("internal")
+	assert.True(t, ok)
+	assert.Equal(t, "ref", c.Value())
+
+	c, ok = l2.ReferentOrSelfCode("internal")
+	assert.True(t, ok)
+	assert.Equal(t, "l2", c.Value())
+
+}
+
+func Test_FindAllAttributesBy(t *testing.T) {
+	if config.Config.RedisAddr == "" {
+		return
+	}
+	model := newTestModel(t)
+
+	ref := model.Lines().New()
+	ref.SetCode(NewCode("internal", "ref"))
+	ref.Save()
+
+	l := model.Lines().New()
+	l.ReferentId = ref.Id()
+	l.SetCode(NewCode("internal", "l"))
+	l.Save()
+
+	l2 := model.Lines().New()
+	l2.ReferentId = ref.Id()
+	l2.SetCode(NewCode("internal", "l2"))
+	l2.Save()
+
+	attrs := model.Lines().(*redisLines).FindAllAttributesBy(redisclient.ByReferentID, string(ref.Id()), "Id", "ReferentId")
+
+	assert.Len(t, attrs, 2)
+	assert.Contains(t, attrs, map[string]string{"Id": l.ModelId(), "ReferentId": ref.ModelId()})
+	assert.Contains(t, attrs, map[string]string{"Id": l2.ModelId(), "ReferentId": ref.ModelId()})
+}
+
+func Test_FindAttributes(t *testing.T) {
+	if config.Config.RedisAddr == "" {
+		return
+	}
+	model := newTestModel(t)
+
+	l := model.Lines().New()
+	l.Origin = "test"
+	l.CollectSituations = true
+	l.Save()
+
+	c, ok := model.Lines().(*redisLines).FindAttributes(l.Id(), "Origin", "CollectSituations")
+	assert.True(t, ok)
+	assert.Equal(t, "test", c["Origin"])
+	assert.Equal(t, true, c["CollectSituations"])
+}
+
+func Test_FindAttributesBy(t *testing.T) {
+	if config.Config.RedisAddr == "" {
+		return
+	}
+	model := newTestModel(t)
+
+	l := model.Lines().New()
+	l.ReferentId = "referentId"
+	l.Origin = "test"
+	l.CollectSituations = true
+	l.Save()
+
+	c, ok := model.Lines().(*redisLines).FindAttributesBy(redisclient.ByReferentID, "referentId", "Origin", "CollectSituations")
+	assert.True(t, ok)
+	assert.Equal(t, "test", c["Origin"])
+	assert.Equal(t, "1", c["CollectSituations"])
 }

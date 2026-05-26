@@ -14,26 +14,27 @@ import (
 )
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space":             "test",
+		"remote_code_space":             "internal",
 		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partner.Save()
+
 	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 	connector.Start()
 
 	line := referential.Model().Lines().New()
-	lineCode := model.NewCode("test", "1234")
+	lineCode := model.NewCode("internal", "1234")
 	line.SetCode(lineCode)
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
-	lineCode2 := model.NewCode("test", "5678")
+	lineCode2 := model.NewCode("internal", "5678")
 	line2.SetCode(lineCode2)
 	line2.Save()
 
@@ -43,20 +44,20 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 	line3.Save()
 
 	line4 := referential.Model().Lines().New()
-	lineCode4 := model.NewCode("test", "91011")
+	lineCode4 := model.NewCode("internal", "91011")
 	line4.SetCode(lineCode4)
 	line4.SetOrigin("partner")
 	line4.Save()
 
 	firstStopArea := referential.Model().StopAreas().New()
-	firstCode := model.NewCode("test", "NINOXE:StopPoint:SP:1:LOC")
+	firstCode := model.NewCode("internal", "NINOXE:StopPoint:SP:1:LOC")
 	firstStopArea.SetCode(firstCode)
 	firstStopArea.Name = "First"
 	firstStopArea.LineIds = []model.LineId{line.Id(), line3.Id(), line4.Id()}
 	firstStopArea.Save()
 
 	secondStopArea := referential.Model().StopAreas().New()
-	secondCode := model.NewCode("test", "NINOXE:StopPoint:SP:2:LOC")
+	secondCode := model.NewCode("internal", "NINOXE:StopPoint:SP:2:LOC")
 	secondStopArea.SetCode(secondCode)
 	secondStopArea.Name = "Second"
 	secondStopArea.LineIds = []model.LineId{line2.Id()}
@@ -117,12 +118,11 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
 }
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space":             "test",
+		"remote_code_space":             "internal",
 		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -131,7 +131,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	connector.Start()
 
 	line := referential.Model().Lines().New()
-	lineCode := model.NewCode("test", "1234")
+	lineCode := model.NewCode("internal", "1234")
 	line.SetCode(lineCode)
 	line.Save()
 
@@ -143,14 +143,14 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	firstStopArea.Save()
 
 	secondStopArea := referential.Model().StopAreas().New()
-	secondCode := model.NewCode("test", "NINOXE:StopPoint:SP:2:LOC")
+	secondCode := model.NewCode("internal", "NINOXE:StopPoint:SP:2:LOC")
 	secondStopArea.SetCode(secondCode)
 	secondStopArea.Name = "Second"
 	secondStopArea.LineIds = []model.LineId{line.Id()}
 	secondStopArea.Save()
 
 	thirdStopArea := referential.Model().StopAreas().New()
-	thirdCode := model.NewCode("test", "NINOXE:StopPoint:SP:3:LOC")
+	thirdCode := model.NewCode("internal", "NINOXE:StopPoint:SP:3:LOC")
 	thirdStopArea.SetCode(thirdCode)
 	thirdStopArea.ReferentId = secondStopArea.Id()
 	thirdStopArea.Name = "Third"
@@ -158,7 +158,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	thirdStopArea.Save()
 
 	fourthStopArea := referential.Model().StopAreas().New()
-	fourthCode := model.NewCode("test", "NINOXE:StopPoint:SP:4:LOC")
+	fourthCode := model.NewCode("internal", "NINOXE:StopPoint:SP:4:LOC")
 	fourthStopArea.SetCode(fourthCode)
 	fourthStopArea.ReferentId = firstStopArea.Id()
 	fourthStopArea.Name = "Fourth"

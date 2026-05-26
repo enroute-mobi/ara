@@ -132,6 +132,10 @@ GEM
     rb-fsevent (0.11.2)
     rb-inotify (0.11.1)
       ffi (~> 1.0)
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
+    redis-client (0.28.0)
+      connection_pool
     reline (0.6.3)
       io-console (~> 0.5)
     rest-client (2.1.0)
@@ -176,6 +180,7 @@ DEPENDENCIES
   pg
   pry
   rake
+  redis
   rest-client
   rspec-expectations
   siri-xsd!

@@ -629,18 +629,18 @@ Feature: Support SIRI VehicleMonitoring
    Given a SIRI Partner "test" exists with connectors [siri-lite-vehicle-monitoring-request-broadcaster] and the following settings:
       | local_credential                                                   | test     |
       | remote_code_space                                                  | internal |
-      | siri-lite-vehicle-monitoring-request-broadcaster.remote_code_space | other    |
+      | siri-lite-vehicle-monitoring-request-broadcaster.remote_code_space | external |
     Given a Line exists with the following attributes:
-      | Codes[other] | Test:Line:3:LOC |
-      | Name         | Ligne 3 Metro   |
+      | Codes[external] | Test:Line:3:LOC |
+      | Name            | Ligne 3 Metro   |
     And a VehicleJourney exists with the following attributes:
       | Name                         | Passage 32                        |
-      | Codes[other]                 | Test:VehicleJourney:201:LOC       |
+      | Codes[external]              | Test:VehicleJourney:201:LOC       |
       | LineId                       | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | Monitored                    | true                              |
       | RawAttributes[DirectionName] | Direction Name                    |
     And a Vehicle exists with the following attributes:
-      | Codes[other]     | Test:Vehicle:201123:LOC           |
+      | Codes[external]  | Test:Vehicle:201123:LOC           |
       | LineId           | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
       | VehicleJourneyId | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
       | Longitude        | 1.234                             |

@@ -15,6 +15,7 @@ group :test do
   gem 'activesupport'
   gem 'webrick'
   gem 'ara', en_route: 'ara-ruby'
+  gem 'redis'
 end
 
 group :development do

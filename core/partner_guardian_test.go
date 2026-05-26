@@ -11,7 +11,7 @@ import (
 )
 
 func Test_PartnerGuardian_Run(t *testing.T) {
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 	partner.ConnectorTypes = []string{"test-check-status-client"}
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
@@ -55,7 +55,7 @@ func Test_PartnerGuardian_Run(t *testing.T) {
 }
 
 func Test_PartnerGuardian_Run_WithRetry(t *testing.T) {
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 	settings := map[string]string{
 		s.PARTNER_MAX_RETRY: "1",

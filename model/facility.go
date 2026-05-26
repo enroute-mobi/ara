@@ -9,7 +9,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/logger"
 )
 
-type FacilityId ModelId
+type FacilityId string
 
 type FacilityStatus string
 
@@ -39,8 +39,8 @@ func NewFacility(model Model) *Facility {
 	return facility
 }
 
-func (facility *Facility) ModelId() ModelId {
-	return ModelId(facility.id)
+func (facility *Facility) ModelId() string {
+	return string(facility.id)
 }
 
 func (facility *Facility) copy() *Facility {
@@ -168,7 +168,7 @@ func (manager *MemoryFacilities) Delete(facility *Facility) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, facility.Id())
-	manager.byCode.Delete(ModelId(facility.id))
+	manager.byCode.Delete(string(facility.id))
 
 	return true
 }

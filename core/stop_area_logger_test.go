@@ -10,13 +10,12 @@ import (
 func Test_NewStopAreaLogger(t *testing.T) {
 	assert := assert.New(t)
 
-	referential := referentials.New("default")
-	referential.SetSetting("logger.verbose.stop_areas", "codeSpace:value")
+	_, referential := newTestReferential(t)
+	referential.SetSetting("logger.verbose.stop_areas", "internal:value")
 
-	memoryModel := model.NewTestMemoryModel()
-	stopArea := memoryModel.StopAreas().New()
+	stopArea := referential.Model().StopAreas().New()
 
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	stopArea.SetCode(code)
 
 	logger := NewStopAreaLogger(referential, stopArea)
@@ -26,16 +25,15 @@ func Test_NewStopAreaLogger(t *testing.T) {
 func Test_NewStopAreaLogger_WithMultipleCodes(t *testing.T) {
 	assert := assert.New(t)
 
-	referential := referentials.New("default")
-	referential.SetSetting("logger.verbose.stop_areas", "codeSpace:value")
+	_, referential := newTestReferential(t)
+	referential.SetSetting("logger.verbose.stop_areas", "internal:value")
 
-	memoryModel := model.NewTestMemoryModel()
-	stopArea := memoryModel.StopAreas().New()
+	stopArea := referential.Model().StopAreas().New()
 
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	stopArea.SetCode(code)
 
-	stopArea.SetCode(model.NewCode("second", "value"))
+	stopArea.SetCode(model.NewCode("external", "value"))
 
 	logger := NewStopAreaLogger(referential, stopArea)
 	assert.True(logger.IsVerbose(), "StopAreaLogger should be in verbose")
@@ -44,13 +42,12 @@ func Test_NewStopAreaLogger_WithMultipleCodes(t *testing.T) {
 func Test_NewStopAreaLogger_NoMatch(t *testing.T) {
 	assert := assert.New(t)
 
-	referential := referentials.New("default")
-	referential.SetSetting("logger.debug.stop_areas", "codeSpace:value")
+	_, referential := newTestReferential(t)
+	referential.SetSetting("logger.debug.stop_areas", "internal:value")
 
-	memoryModel := model.NewTestMemoryModel()
-	stopArea := memoryModel.StopAreas().New()
+	stopArea := referential.Model().StopAreas().New()
 
-	code := model.NewCode("no", "match")
+	code := model.NewCode("external", "value")
 	stopArea.SetCode(code)
 
 	logger := NewStopAreaLogger(referential, stopArea)

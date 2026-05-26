@@ -71,14 +71,14 @@ func Test_Equal_Unexported(t *testing.T) {
 
 // Commented for now, SA have a field Origins which is a sync.RWMutex. It would need a tag to ignore but Equal isn't used for now
 // func Test_Equal_StopAreas(t *testing.T) {
-// 	model := NewTestMemoryModel()
+// 	model := newTestModel(t)
 // 	testTime := time.Date(1984, time.April, 4, 0, 0, 0, 0, time.UTC)
 
 // 	attributes := NewRawAttributes()
 // 	attributes.Set("key", "value")
 
 // 	references := NewReferences()
-// 	obj := NewCode("codeSpace", "value")
+// 	obj := NewCode("internal", "value")
 
 // 	reference := Reference{Code: &obj}
 // 	references.Set("key", reference)

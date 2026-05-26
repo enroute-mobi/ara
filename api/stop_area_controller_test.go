@@ -180,7 +180,7 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 	ref := core.NewMemoryReferentials().New("test")
 
 	stopArea := ref.Model().StopAreas().New()
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	stopArea.SetCode(code)
 	ref.Model().StopAreas().Save(stopArea)
 
@@ -188,7 +188,7 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 		referential: ref,
 	}
 
-	_, ok := controller.findStopArea("codeSpace:value")
+	_, ok := controller.findStopArea("internal:value")
 	assert.True(ok, "Can't find StopArea by Code")
 
 	_, ok = controller.findStopArea(string(stopArea.Id()))

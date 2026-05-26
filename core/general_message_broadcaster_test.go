@@ -17,12 +17,11 @@ import (
 func Test_GeneralMessageBroadcaster_Create_Events(t *testing.T) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.Start()
 	defer referential.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 	}
@@ -68,13 +67,11 @@ func Test_GeneralMessageBroadcaster_Receive_Notify(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	// Create a test http server
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
+	_, referential := newTestReferential(t)
 	referential.Start()
 	defer referential.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 	settings := map[string]string{
 		"remote_code_space": "internal",
 		"local_credential":  "external",

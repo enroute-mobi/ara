@@ -16,7 +16,7 @@ import (
 func Test_GetSubscriptionRequest(t *testing.T) {
 	assert := assert.New(t)
 
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 
 	settings := map[string]string{
@@ -103,7 +103,7 @@ having 1 RetryCount > 10`)
 func Test_HandleResponse_BadResponse(t *testing.T) {
 	assert := assert.New(t)
 
-	subscriber, subscription, responseTemplate := testSetup()
+	subscriber, subscription, responseTemplate := testSetup(t)
 
 	// Create and add Resource to Subscription
 	obj := model.NewCode("internal", "Value")
@@ -162,7 +162,7 @@ func Test_HandleResponse_BadResponse(t *testing.T) {
 func Test_HandleResponse_GoodResponse(t *testing.T) {
 	assert := assert.New(t)
 
-	subscriber, subscription, responseTemplate := testSetup()
+	subscriber, subscription, responseTemplate := testSetup(t)
 
 	// Create and add Resource to Subscription
 	obj := model.NewCode("internal", "Value")
@@ -199,7 +199,7 @@ and Status is true, the resource should be subscribed and the subscriptionReques
 func Test_HandleResponse_GoodResponse_With_GeneralMessageCollect_all(t *testing.T) {
 	assert := assert.New(t)
 
-	subscriber, subscription, responseTemplate := testSetup()
+	subscriber, subscription, responseTemplate := testSetup(t)
 
 	// Create and add Resource to Subscription
 	obj := model.NewCode(GeneralMessageCollect, "all")
@@ -236,7 +236,7 @@ and Status is true, the resource should be subscribed and the subscriptionReques
 func Test_HandleResponse_GoodResponse_With_SituationExchangeCollect_all(t *testing.T) {
 	assert := assert.New(t)
 
-	subscriber, subscription, responseTemplate := testSetup()
+	subscriber, subscription, responseTemplate := testSetup(t)
 
 	// Create and add Resource to Subscription
 	obj := model.NewCode(SituationExchangeCollect, "all")
@@ -273,7 +273,7 @@ and Status is true, the resource should be subscribed and the subscriptionReques
 func Test_HandleResponse_GoodResponse_With_MultipleResources(t *testing.T) {
 	assert := assert.New(t)
 
-	subscriber, subscription, responseTemplate := testSetup()
+	subscriber, subscription, responseTemplate := testSetup(t)
 
 	// Create and add Resources to Subscription
 	obj := model.NewCode("internal", "Value")
@@ -324,7 +324,7 @@ and the subscriptionRequests must be emtpy`
 func Test_HandleResponse_StatusFalse(t *testing.T) {
 	assert := assert.New(t)
 
-	subscriber, subscription, responseTemplate := testSetup()
+	subscriber, subscription, responseTemplate := testSetup(t)
 
 	// Create and add Resource to Subscription
 	obj := model.NewCode("internal", "Value")
@@ -358,7 +358,7 @@ and Status is false, the resource should not subscribed and the subscriptionRequ
 	assert.Empty(subscriptionRequests, testMessage)
 }
 
-func testSetup() (subscriber *CollectSubscriber, subscription *Subscription, response []byte) {
+func testSetup(t *testing.T) (subscriber *CollectSubscriber, subscription *Subscription, response []byte) {
 	response = []byte(`<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
     <SOAP-ENV:Header xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"/>
     <soap:Body>
@@ -385,7 +385,7 @@ func testSetup() (subscriber *CollectSubscriber, subscription *Subscription, res
     </soap:Body>
 </soap:Envelope>`)
 
-	partners := createTestPartnerManager()
+	partners := newTestPartnerManager(t)
 	partner := partners.New("slug")
 
 	settings := map[string]string{

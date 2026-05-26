@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-type StopAreaGroupId ModelId
+type StopAreaGroupId string
 
 type StopAreaGroup struct {
 	model       Model

@@ -57,17 +57,10 @@ func CloseDB(database *gorp.DbMap) {
 }
 
 func InitTestDb(t *testing.T) {
-	config.SetEnvironment("test")
-	// Load configuration
-	err := config.LoadConfig("")
-	if err != nil {
-		t.Fatal(err)
-	}
-	config.Config.ApiKey = ""
 	// Initialize Database
 	Database = InitDB(config.Config.DB)
 
-	_, err = Database.Exec("TRUNCATE referentials, partners, lines, line_groups, operators, stop_areas, stop_area_groups, stop_visits, vehicle_journeys, facilities, controls, macros, code_spaces;")
+	_, err := Database.Exec("TRUNCATE referentials, partners, lines, line_groups, operators, stop_areas, stop_area_groups, stop_visits, vehicle_journeys, facilities, controls, macros, code_spaces;")
 	if err != nil {
 		t.Fatal(err)
 	}

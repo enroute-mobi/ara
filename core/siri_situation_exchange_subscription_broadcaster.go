@@ -199,14 +199,14 @@ func (connector *SIRISituationExchangeSubscriptionBroadcaster) addfilteredSituat
 	// Filtered subscription
 	for _, affect := range situation.Affects {
 		if affect.GetType() == model.SituationTypeLine {
-			if lineRef, ok := connector.lineRef(sub); ok && model.ModelId(lineRef) == affect.GetId() {
+			if lineRef, ok := connector.lineRef(sub); ok && string(lineRef) == affect.GetId() {
 				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(situation, sub))
 				connector.addSituation(sub.Id(), situation.Id())
 				continue
 			}
 		}
 		if affect.GetType() == model.SituationTypeStopArea {
-			if stopPointRef, ok := connector.stopPointRef(sub); ok && model.ModelId(stopPointRef) == affect.GetId() {
+			if stopPointRef, ok := connector.stopPointRef(sub); ok && string(stopPointRef) == affect.GetId() {
 				r.SetLastState(string(situation.Id()), ls.NewSituationLastChange(situation, sub))
 				connector.addSituation(sub.Id(), situation.Id())
 				continue

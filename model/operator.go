@@ -26,8 +26,8 @@ func NewOperator(model Model) *Operator {
 	return operator
 }
 
-func (operator *Operator) ModelId() ModelId {
-	return ModelId(operator.id)
+func (operator *Operator) ModelId() string {
+	return string(operator.id)
 }
 
 func (operator *Operator) copy() *Operator {
@@ -169,7 +169,7 @@ func (manager *MemoryOperators) Delete(operator *Operator) bool {
 	manager.mutex.Lock()
 
 	delete(manager.byIdentifier, operator.Id())
-	manager.byCode.Delete(ModelId(operator.id))
+	manager.byCode.Delete(string(operator.id))
 
 	manager.mutex.Unlock()
 	return true

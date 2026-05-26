@@ -3,7 +3,7 @@ package model
 func NewDefineSituationAffectsUpdater(sm *SelectMacro) (updater, error) {
 	return func(mi ModelInstance) error {
 		s := mi.(*Situation)
-		affects := make(map[ModelId]Affect)
+		affects := make(map[string]Affect)
 		for _, a := range s.Affects {
 			affects[a.GetId()] = a
 		}

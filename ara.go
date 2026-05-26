@@ -36,6 +36,9 @@ func main() {
 	clockPtr := flag.String("testclock", "", "Use a fake clock at time given. Format 20060102-1504")
 	pidPtr := flag.String("pidfile", "", "Write processus pid in given file")
 	configPtr := flag.String("config", "", "Config directory")
+	redisAddrPtr := flag.String("redisaddr", "", "Redis address")
+	redisPasswordPtr := flag.String("redispwd", "", "Redis password")
+	redisDBPtr := flag.Int("redisdb", 0, "Redis database")
 	flag.BoolVar(&config.Config.Debug, "debug", false, "Enable debug messages")
 	flag.BoolVar(&config.Config.Syslog, "syslog", false, "Redirect messages to syslog")
 	flag.BoolVar(&config.Config.ColorizeLog, "colorizelog", false, "Colorize messages in log")
@@ -85,6 +88,15 @@ func main() {
 
 	if *uuidPtr {
 		uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	}
+	if *redisAddrPtr != "" {
+		config.Config.RedisAddr = *redisAddrPtr
+	}
+	if *redisPasswordPtr != "" {
+		config.Config.RedisAddr = *redisPasswordPtr
+	}
+	if *redisDBPtr != 0 {
+		config.Config.RedisDB = *redisDBPtr
 	}
 	if *clockPtr != "" {
 		testTime, err := time.Parse("20060102-1504", *clockPtr)

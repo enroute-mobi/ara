@@ -14,9 +14,9 @@ const (
 	VEHICLE_DIRECTION_OUTBOUND = "outbound"
 )
 
-type VehicleJourneyId ModelId
+type VehicleJourneyId string
 
-var VjLineExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*VehicleJourney)).LineId) }
+var VjLineExtractor = func(instance ModelInstance) string { return string((instance.(*VehicleJourney)).LineId) }
 
 type VehicleJourney struct {
 	References    References
@@ -58,8 +58,8 @@ func NewVehicleJourney(model Model) *VehicleJourney {
 	return vehicleJourney
 }
 
-func (vehicleJourney *VehicleJourney) ModelId() ModelId {
-	return ModelId(vehicleJourney.id)
+func (vehicleJourney *VehicleJourney) ModelId() string {
+	return string(vehicleJourney.id)
 }
 
 func (vehicleJourney *VehicleJourney) copy() *VehicleJourney {
@@ -301,7 +301,7 @@ func (manager *memoryVehicleJourneys) CodeExists(code Code) bool {
 func (manager *memoryVehicleJourneys) FindByLineId(id LineId) (vehicleJourneys []*VehicleJourney) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByLine, ModelId(id))
+	ids, _ := manager.FindBy(ByLine, string(id))
 
 	for _, id := range ids {
 		vj := manager.byIdentifier[VehicleJourneyId(id)]
@@ -347,7 +347,7 @@ func (manager *memoryVehicleJourneys) DeleteById(id VehicleJourneyId) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, id)
-	manager.Deindex(ModelId(id))
+	manager.Deindex(string(id))
 
 	for subscriptionId, vehicleJourneyIds := range manager.byBroadcastedFull {
 		delete(vehicleJourneyIds, id)

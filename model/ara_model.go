@@ -4,12 +4,16 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
-type ModelId string
+type RedisModelInstance[Id ~string, P any] interface {
+	SetId(Id)
+	ModelId() string
+	*P // Ensure the type implementing the interface is a pointer
+}
 
 type ModelInstance interface {
 	CodeConsumerInterface
 
-	ModelId() ModelId
+	ModelId() string
 }
 
 type ModelManager[Id, O any] interface {

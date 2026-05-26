@@ -25,8 +25,14 @@ populate:
 tests:
 	go test -coverprofile=coverage.out -p 1 -count 1  ./...
 
+redis_tests:
+	ARA_REDIS_ADDR=127.0.0.1:6379 go test -coverprofile=coverage.out -p 1 -count 1  ./...
+
 cucumber:
 	go build && bundle exec cucumber -t 'not @wip'
+
+redis_cucumber:
+	go build && ARA_REDIS_ADDR=127.0.0.1:6379 bundle exec cucumber -t 'not @wip'
 
 gen_gtfsrt_bindings:
 	wget https://raw.githubusercontent.com/google/transit/refs/heads/master/gtfs-realtime/proto/gtfs-realtime.proto

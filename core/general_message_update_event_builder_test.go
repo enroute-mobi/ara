@@ -25,77 +25,74 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 
 	response, _ := sxml.NewXMLGeneralMessageResponseFromContent(content)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("slug")
-	referential.model = model.NewTestMemoryModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	// StopPointRef
-	code := model.NewCode("remote_code_space", "stopPointRef1")
+	code := model.NewCode("internal", "stopPointRef1")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
 	stopAreaId := stopArea.Id()
 
-	code2 := model.NewCode("remote_code_space", "stopPointRef2")
+	code2 := model.NewCode("internal", "stopPointRef2")
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.SetCode(code2)
 	stopArea2.Save()
 	stopArea2Id := stopArea2.Id()
 
 	// LineRef
-	code3 := model.NewCode("remote_code_space", "lineRef1")
+	code3 := model.NewCode("internal", "lineRef1")
 	line := referential.Model().Lines().New()
 	line.SetCode(code3)
 	line.Save()
 	lineId := line.Id()
 
 	// Destinations
-	code4 := model.NewCode("remote_code_space", "destinationRef1")
+	code4 := model.NewCode("internal", "destinationRef1")
 	destinationRef1 := referential.Model().StopAreas().New()
 	destinationRef1.SetCode(code4)
 	destinationRef1.Save()
 
-	code5 := model.NewCode("remote_code_space", "destinationRef2")
+	code5 := model.NewCode("internal", "destinationRef2")
 	destinationRef2 := referential.Model().StopAreas().New()
 	destinationRef2.SetCode(code5)
 	destinationRef2.Save()
 
 	// LineSections
-	code6 := model.NewCode("remote_code_space", "lineSectionRef1")
+	code6 := model.NewCode("internal", "lineSectionRef1")
 	lineSectionRef1 := referential.Model().Lines().New()
 	lineSectionRef1.SetCode(code6)
 	lineSectionRef1.Save()
 
-	code7 := model.NewCode("remote_code_space", "firstStop1")
+	code7 := model.NewCode("internal", "firstStop1")
 	firstStop1 := referential.Model().StopAreas().New()
 	firstStop1.SetCode(code7)
 	firstStop1.Save()
 
-	code8 := model.NewCode("remote_code_space", "lastStop1")
+	code8 := model.NewCode("internal", "lastStop1")
 	lastStop1 := referential.Model().StopAreas().New()
 	lastStop1.SetCode(code8)
 	lastStop1.Save()
 
-	code9 := model.NewCode("remote_code_space", "lineSectionRef2")
+	code9 := model.NewCode("internal", "lineSectionRef2")
 	lineSectionRef2 := referential.Model().Lines().New()
 	lineSectionRef2.SetCode(code9)
 	lineSectionRef2.Save()
 
-	code10 := model.NewCode("remote_code_space", "firstStop2")
+	code10 := model.NewCode("internal", "firstStop2")
 	firstStop2 := referential.Model().StopAreas().New()
 	firstStop2.SetCode(code10)
 	firstStop2.Save()
 
-	code11 := model.NewCode("remote_code_space", "lastStop2")
+	code11 := model.NewCode("internal", "lastStop2")
 	lastStop2 := referential.Model().StopAreas().New()
 	lastStop2.SetCode(code11)
 	lastStop2.Save()
@@ -119,7 +116,9 @@ func Test_GeneralMessageUpdateEventBuilder_BuildGeneralMessageUpdateEvent(t *tes
 
 	// Affected Lines
 	ok, affectedLine1 := event.TestFindAffectByLineId(lineId)
-	assert.True(ok)
+	if !ok {
+		t.Fatal("should return affected line")
+	}
 
 	// AffectedDestinations for LineRef1
 	assert.Equal(destinationRef1.Id(), affectedLine1.AffectedDestinations[0].StopAreaId)
@@ -286,20 +285,17 @@ and summary is already defined, should keep existing summary and create descript
 func Test_setAffectedStopArea(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("slug")
-	referential.model = model.NewTestMemoryModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	code := model.NewCode("remote_code_space", "stopPointRef1")
+	code := model.NewCode("internal", "stopPointRef1")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
@@ -335,20 +331,17 @@ func Test_setAffectedStopArea(t *testing.T) {
 func Test_setAffectedLine(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("slug")
-	referential.model = model.NewTestMemoryModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	code := model.NewCode("remote_code_space", "lineRef1")
+	code := model.NewCode("internal", "lineRef1")
 	line := referential.Model().Lines().New()
 	line.SetCode(code)
 	line.Save()
@@ -383,25 +376,22 @@ func Test_setAffectedLine(t *testing.T) {
 func Test_setAffectedDestination(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("slug")
-	referential.model = model.NewTestMemoryModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	code := model.NewCode("remote_code_space", "destinationRef")
+	code := model.NewCode("internal", "destinationRef")
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.SetCode(code)
 	stopArea.Save()
 
-	code2 := model.NewCode("remote_code_space", "lineRef")
+	code2 := model.NewCode("internal", "lineRef")
 	line := referential.Model().Lines().New()
 	line.SetCode(code2)
 	line.Save()
@@ -444,30 +434,27 @@ func Test_setAffectedDestination(t *testing.T) {
 func Test_setAffectedSection(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("slug")
-	referential.model = model.NewTestMemoryModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 	partner := partners.New("slug")
 	settings := map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
-	code := model.NewCode("remote_code_space", "firstStop")
+	code := model.NewCode("internal", "firstStop")
 	firstStop := referential.Model().StopAreas().New()
 	firstStop.SetCode(code)
 	firstStop.Save()
 
-	code1 := model.NewCode("remote_code_space", "lastStop")
+	code1 := model.NewCode("internal", "lastStop")
 	lastStop := referential.Model().StopAreas().New()
 	lastStop.SetCode(code1)
 	lastStop.Save()
 
-	code2 := model.NewCode("remote_code_space", "lineRef")
+	code2 := model.NewCode("internal", "lineRef")
 	line := referential.Model().Lines().New()
 	line.SetCode(code2)
 	line.Save()

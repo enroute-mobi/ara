@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-type LineGroupId ModelId
+type LineGroupId string
 
 type LineGroup struct {
 	model     Model

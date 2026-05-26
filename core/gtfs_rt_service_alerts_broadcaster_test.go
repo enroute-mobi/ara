@@ -19,14 +19,14 @@ func Test_ServiceAlertsBroadcaster_HandleGtfs_WithEmptyAffectsSituations(t *test
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewServiceAlertsBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 	connector.Start()
 
-	code := model.NewCode("codeSpace", "saId")
+	code := model.NewCode("internal", "saId")
 	situation := referential.Model().Situations().New()
 	situation.SetCode(code)
 	situation.Save()

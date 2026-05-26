@@ -178,7 +178,7 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 
 	ref := core.NewMemoryReferentials().New("test")
 	stopVisit := ref.Model().StopVisits().New()
-	code := model.NewCode("codeSpace", "stif:value")
+	code := model.NewCode("internal", "stif:value")
 	stopVisit.SetCode(code)
 	ref.Model().StopVisits().Save(stopVisit)
 
@@ -186,7 +186,7 @@ func Test_StopVisitController_FindStopVisit(t *testing.T) {
 		svs: ref.Model().StopVisits(),
 	}
 
-	_, ok := controller.findStopVisit("codeSpace:stif:value")
+	_, ok := controller.findStopVisit("internal:stif:value")
 	assert.True(ok, "Can't find StopVisit by Code")
 
 	_, ok = controller.findStopVisit(string(stopVisit.Id()))

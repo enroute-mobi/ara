@@ -27,10 +27,10 @@ func Test_Vehicle_MarshalJSON(t *testing.T) {
 		Bearing:          5.6,
 	}
 	vehicle.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicle.SetCode(code)
 
-	expected := `{"Codes":{"codeSpace":"value"},"RecordedAtTime":"0001-01-01T00:00:00Z","ValidUntilTime":"0001-01-01T00:00:00Z","VehicleJourneyId":"Id","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
+	expected := `{"Codes":{"internal":"value"},"RecordedAtTime":"0001-01-01T00:00:00Z","ValidUntilTime":"0001-01-01T00:00:00Z","VehicleJourneyId":"Id","Longitude":1.2,"Latitude":3.4,"Bearing":5.6,"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8"}`
 	jsonBytes, err := vehicle.MarshalJSON()
 	if err != nil {
 		t.Fatal(err)
@@ -72,9 +72,9 @@ func Test_Vehicle_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_Vehicle_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	vehicle := model.Vehicles().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicle.SetCode(code)
 
 	if vehicle.model != model {
@@ -99,12 +99,12 @@ func Test_Vehicle_Save(t *testing.T) {
 func Test_Vehicle_Save_WithNextStopVisitId(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	vehicle := model.Vehicles().New()
 	stopVisit := model.StopVisits().New()
 	stopVisit.Save()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicle.SetCode(code)
 	vehicle.NextStopVisitId = stopVisit.Id()
 	ok := vehicle.Save()
@@ -119,13 +119,13 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 
 	var ok bool
 
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	vehicleA := model.Vehicles().New()
 	vehicleB := model.Vehicles().New()
 	stopVisit1 := model.StopVisits().New()
 	stopVisit1.Save()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicleA.SetCode(code)
 	vehicleB.SetCode(code)
 
@@ -159,10 +159,10 @@ func Test_Vehicle_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	vehicle.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicle.SetCode(code)
 
-	foundCode, ok := vehicle.Code("codeSpace")
+	foundCode, ok := vehicle.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -246,7 +246,7 @@ func Test_MemoryVehicles_FindAll(t *testing.T) {
 func Test_MemoryVehicles_Delete(t *testing.T) {
 	vehicles := NewMemoryVehicles()
 	existingVehicle := vehicles.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingVehicle.SetCode(code)
 	vehicles.Save(existingVehicle)
 
@@ -264,14 +264,14 @@ func Test_MemoryVehicles_Delete(t *testing.T) {
 
 func Test_MemoryVehicles_Delete_WithNextStopVisitId(t *testing.T) {
 	assert := assert.New(t)
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 
 	vehicle := model.Vehicles().New()
 
 	stopVisit := model.StopVisits().New()
 	stopVisit.Save()
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	vehicle.SetCode(code)
 	vehicle.NextStopVisitId = stopVisit.Id()
 
@@ -290,11 +290,12 @@ func Test_Save_BiqQuery(t *testing.T) {
 	f := audit.NewFakeBigQuery()
 	audit.SetCurrentBigQuery("ref", f)
 
-	m := NewTestMemoryModel("ref")
+	m := newTestModel(t)
+	m.SetReferential("ref")
 	vehicles := NewMemoryVehicles()
 	vehicles.SetModel(m)
 	v := vehicles.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	v.SetCode(code)
 	v.Latitude = 1.0
 	vehicles.Save(v)

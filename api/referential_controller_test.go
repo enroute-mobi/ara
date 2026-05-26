@@ -28,15 +28,15 @@ func TestTokens(t *testing.T) {
 	server.SetReferentials(referentials)
 
 	// Save a new referential
-	referential := referentials.New("first_referential")
+	referential := referentials.New("referential")
 	referentials.Save(referential)
 
 	// Create a request
-	request, err := http.NewRequest("GET", "/first_referential/partners", nil)
+	request, err := http.NewRequest("GET", "/referential/partners", nil)
 	require.NoError(err)
 
 	responseRecorder := httptest.NewRecorder()
-	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("referential_slug", "referential")
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
@@ -47,7 +47,7 @@ func TestTokens(t *testing.T) {
 	referential.Save()
 
 	responseRecorder = httptest.NewRecorder()
-	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("referential_slug", "referential")
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
@@ -56,7 +56,7 @@ func TestTokens(t *testing.T) {
 	request.Header.Set("Authorization", "Token token=12345")
 
 	responseRecorder = httptest.NewRecorder()
-	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("referential_slug", "referential")
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
@@ -65,7 +65,7 @@ func TestTokens(t *testing.T) {
 	request.Header.Set("Authorization", "Token token=23456")
 
 	responseRecorder = httptest.NewRecorder()
-	request.SetPathValue("referential_slug", "first_referential")
+	request.SetPathValue("referential_slug", "referential")
 	request.SetPathValue("model", "partners")
 	server.handleReferentialModelIndex(responseRecorder, request)
 
@@ -85,15 +85,9 @@ func referentialCheckResponseStatus(responseRecorder *httptest.ResponseRecorder,
 }
 
 func referentialPrepareRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (referential *core.Referential, responseRecorder *httptest.ResponseRecorder, server *Server, request *http.Request) {
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
-	// Save a new referential
-	referential = referentials.New("first_referential")
-	referentials.Save(referential)
+	server, referential = newTestServer(t)
+	// referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
-	server = &Server{}
-	server.SetReferentials(referentials)
 	// Create a request
 	address := []byte("/_referentials")
 	if sendIdentifier {
@@ -227,7 +221,7 @@ func Test_ReferentialController_Create_Invalid(t *testing.T) {
 
 func Test_ReferentialController_Create_ExistingSlug(t *testing.T) {
 	// Prepare and send request
-	body := []byte(`{"Slug":"first_referential"}`)
+	body := []byte(`{"Slug":"referential"}`)
 	_, responseRecorder, server, request := referentialPrepareRequest("POST", false, body, t)
 	server.handleReferentialCreate(responseRecorder, request)
 
@@ -259,15 +253,8 @@ func Test_ReferentialController_Save(t *testing.T) {
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-	// Save a new referential
-	referential := referentials.New("first_referential")
-	referentials.Save(referential)
+	server, referential := newTestServer(t, uuid.NewRealUUIDGenerator())
 
-	server := &Server{}
-	server.SetReferentials(referentials)
 	// Create a request
 	request, err := http.NewRequest("POST", "/_referentials/save", nil)
 	if err != nil {
@@ -321,15 +308,8 @@ func Test_ReferentialController_Reload(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-	// Save a new referential
-	referential := referentials.New("referential")
-	referentials.Save(referential)
+	server, referential := newTestServer(t, uuid.NewRealUUIDGenerator())
 
-	server := &Server{}
-	server.SetReferentials(referentials)
 	// Create a request
 	request, err := http.NewRequest("POST", fmt.Sprintf("/_referentials/%v/reload", referential.Id()), nil)
 	if err != nil {
@@ -381,15 +361,7 @@ func Test_ReferentialController_Reload_Partner(t *testing.T) {
 	err := model.Database.Insert(&databasePartner)
 	require.NoError(err)
 
-	// Initialize referential manager
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGeneratorLegacy())
-	// Save a new referential
-	referential := referentials.New("referential")
-	referentials.Save(referential)
-
-	server := &Server{}
-	server.SetReferentials(referentials)
+	server, referential := newTestServer(t, uuid.NewFakeUUIDGeneratorLegacy())
 
 	// Ensure No partners exist
 	partners := referential.Partners().FindAll()

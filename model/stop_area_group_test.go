@@ -58,7 +58,7 @@ func Test_StopAreaGroup_UnmarshalJSON(t *testing.T) {
 func Test_StopAreaGroup_Save(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	stopAreaGroup := model.StopAreaGroups().New()
 	assert.Equal(model, stopAreaGroup.model, "New stopAreaGroup model should be MemoryStopAreaGroup model")
 
@@ -178,7 +178,7 @@ func Test_MemoryStopAreaGroups_Load(t *testing.T) {
 	require.NoError(err)
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,

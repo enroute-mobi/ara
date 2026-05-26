@@ -16,15 +16,12 @@ func Test_SituationExchangeBroadcaster_Create_Events(t *testing.T) {
 	fakeClock := clock.NewFakeClock()
 	clock.SetDefaultClock(fakeClock)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestMemoryModel()
+	_, referential := newTestReferential(t)
 
-	referential.model.SetBroadcastSXChan(referential.broacasterManager.GetSituationExchangeBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 
 	settings := map[string]string{
 		"remote_code_space": "internal",

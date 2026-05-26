@@ -30,10 +30,7 @@ func Test_SIRIFacilityMonitoringSubscriptionCollector(t *testing.T) {
 	}))
 	defer ts.Close()
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.model = model.NewTestMemoryModel()
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partners := NewPartnerManager(referential)
 
@@ -41,13 +38,13 @@ func Test_SIRIFacilityMonitoringSubscriptionCollector(t *testing.T) {
 	settings := map[string]string{
 		"local_url":         "http://example.com/test/siri",
 		"remote_url":        ts.URL,
-		"remote_code_space": "test_kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.subscriptionManager = NewMemorySubscriptions(partner)
 	partners.Save(partner)
 
-	code := model.NewCode("test_kind", "value")
+	code := model.NewCode("internal", "value")
 	facility := referential.Model().Facilities().New()
 	facility.SetCode(code)
 	facility.Save()

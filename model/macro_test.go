@@ -73,8 +73,8 @@ func Test_MacroBuilder_NOk(t *testing.T) {
 func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel().(*memoryModel)
-	manager := NewMacroManager().(*macroManager)
+	model := newTestModel(t)
+	manager := model.Macros().(*macroManager)
 
 	smc := &SelectMacro{
 		Id:              "id",
@@ -114,9 +114,8 @@ func Test_Macro_UpdateVehicleJourney(t *testing.T) {
 	if len(err) != 0 {
 		t.Fatal("Macro should be created: ", err)
 	}
-	model.macros = manager
 
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	sa := model.StopAreas().New()
 	sa.SetCode(code)
 	sa.Save()

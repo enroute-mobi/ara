@@ -15,20 +15,19 @@ import (
 )
 
 func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
-	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
@@ -79,21 +78,20 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituation(t *testing.T) {
 }
 
 func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 
-	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	situation.Origin = "partner"
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
@@ -131,14 +129,13 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithSameOrigin(t 
 }
 
 func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	settings := map[string]string{
 		"local_url":                              "http://ara",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"generators.response_message_identifier": "Ara:ResponseMessage::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -146,10 +143,10 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	connector.SetClock(clock.NewFakeClock())
 
 	line := referential.Model().Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "LineRef"))
+	line.SetCode(model.NewCode("internal", "LineRef"))
 	line.Save()
 
-	code := model.NewCode("codeSpace", "NINOXE:StopPoint:SP:24:LOC")
+	code := model.NewCode("internal", "NINOXE:StopPoint:SP:24:LOC")
 	situation := referential.Model().Situations().New()
 	period := &model.TimeRange{EndTime: referential.Clock().Now().Add(5 * time.Minute)}
 	situation.ValidityPeriods = []*model.TimeRange{period}
@@ -165,14 +162,14 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RequestSituationWithFilter(t *tes
 	situation.Affects = append(situation.Affects, affectedStopArea)
 	situation.Save()
 
-	code2 := model.NewCode("codeSpace", "2")
+	code2 := model.NewCode("internal", "2")
 	situation2 := referential.Model().Situations().New()
 	situation2.ValidityPeriods = []*model.TimeRange{period}
 	situation2.Keywords = []string{"Perturbation"}
 	situation2.SetCode(code2)
 
 	stopArea1 := referential.Model().StopAreas().New()
-	code3 := model.NewCode("codeSpace", "DepartureStopArea")
+	code3 := model.NewCode("internal", "DepartureStopArea")
 	stopArea1.SetCode(code3)
 	stopArea1.Save()
 

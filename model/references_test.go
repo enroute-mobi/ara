@@ -14,7 +14,7 @@ func Test_NewReferences(t *testing.T) {
 
 func Test_References_Set(t *testing.T) {
 	references := NewReferences()
-	obj := NewCode("codeSpace", "value")
+	obj := NewCode("internal", "value")
 
 	reference := Reference{Code: &obj}
 	references.Set("key", reference)

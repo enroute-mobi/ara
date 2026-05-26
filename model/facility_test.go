@@ -28,10 +28,10 @@ func Test_Facility_MarshalJSON(t *testing.T) {
 	}
 
 	facility.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	facility.SetCode(code)
 
-	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Codes":{"codeSpace":"value"},"Status":"available","Origin":"partner1"}`
+	expected := `{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Codes":{"internal":"value"},"Status":"available","Origin":"partner1"}`
 
 	jsonBytes, err := facility.MarshalJSON()
 
@@ -95,9 +95,9 @@ func Test_Facility_UnmarshalJSON_WithoutStatus(t *testing.T) {
 func Test_Facility_Save(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	facility := model.Facilities().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	facility.SetCode(code)
 
 	assert.Equal(model, facility.model)
@@ -117,10 +117,10 @@ func Test_Facility_Code(t *testing.T) {
 
 	facility := Facility{id: "6ba7b814-9dad-11d1-0-00c04fd430c8"}
 	facility.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	facility.SetCode(code)
 
-	foundCode, ok := facility.Code("codeSpace")
+	foundCode, ok := facility.Code("internal")
 	assert.True(ok)
 	assert.Equal("value", foundCode.Value())
 
@@ -191,7 +191,7 @@ func Test_MemoryFacilities_Delete(t *testing.T) {
 
 	facilities := NewMemoryFacilities()
 	existingFacility := facilities.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingFacility.SetCode(code)
 	ok := facilities.Save(existingFacility)
 	assert.True(ok)

@@ -245,7 +245,7 @@ Feature: Support SIRI ProductionTimetable by subscription
 <S:Body>
   <sw:Subscribe xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
     <SubscriptionRequestInfo>
-      <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>      
+      <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>test</siri:RequestorRef>
       <siri:MessageIdentifier>1</siri:MessageIdentifier>
     </SubscriptionRequestInfo>
@@ -393,7 +393,7 @@ Feature: Support SIRI ProductionTimetable by subscription
 <S:Body>
   <sw:Subscribe xmlns:sw='http://wsdl.siri.org.uk' xmlns:siri='http://www.siri.org.uk/siri' xmlns:sws='http://wsdl.siri.org.uk/siri'>
     <SubscriptionRequestInfo>
-      <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>      
+      <siri:RequestTimestamp>2017-01-01T12:01:05.000Z</siri:RequestTimestamp>
       <siri:RequestorRef>test</siri:RequestorRef>
       <siri:MessageIdentifier>1</siri:MessageIdentifier>
     </SubscriptionRequestInfo>
@@ -750,7 +750,7 @@ Feature: Support SIRI ProductionTimetable by subscription
   </ServiceDelivery>
 </Siri>
       """
-  
+
   @ARA-1366
   Scenario: Handle a raw SIRI ProductionTimetable subscription to all lines with a ScheduledStopVisit having a VehicleJourneyId not existing should not broadcast the associated DatedCall
     Given a raw SIRI server on "http://localhost:8090"
@@ -971,12 +971,12 @@ Feature: Support SIRI ProductionTimetable by subscription
        | remote_url        | http://localhost:8090 |
        | remote_credential | ara                   |
        | local_credential  | test                  |
-       | remote_code_space | didok                 |
+       | remote_code_space | external              |
        | siri.envelope     | raw                   |
     And a StopArea exists with the following attributes:
     # "6ba7b814-9dad-11d1-2-00c04fd430c8"
-      | Name         | Parent                                  |
-      | Codes[didok] | fr:1:StopPlace:OURA2:StopArea:log351672 |
+      | Name            | Parent                                  |
+      | Codes[external] | fr:1:StopPlace:OURA2:StopArea:log351672 |
     And a StopArea exists with the following attributes:
     # "6ba7b814-9dad-11d1-3-00c04fd430c8"
       | Name            | Child                                 |
@@ -985,36 +985,36 @@ Feature: Support SIRI ProductionTimetable by subscription
       | ParentId        | 6ba7b814-9dad-11d1-2-00c04fd430c8     |
     And a Line exists with the following attributes:
     # "6ba7b814-9dad-11d1-4-00c04fd430c8"
-      | Codes[didok] | NINOXE:Line:3:LOC |
-      | Name         | Ligne 3 Metro     |
+      | Codes[external] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
     And a VehicleJourney exists with the following attributes:
     # "6ba7b814-9dad-11d1-5-00c04fd430c8"
       | Name                           | Passage 32                        |
-      | Codes[didok]                   | NINOXE:VehicleJourney:201         |
+      | Codes[external]                | NINOXE:VehicleJourney:201         |
       | LineId                         | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
       | DirectionType                  | outbound                          |
       | Reference[DestinationRef]#Code | "internal": "ThisIsTheEnd"        |
     And a ScheduledStopVisit exists with the following attributes:
     # "6ba7b814-9dad-11d1-6-00c04fd430c8"
-      | PassageOrder                | 4                                 |
-      | StopAreaId                  | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | VehicleJourneyId            | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | VehicleAtStop               | false                             |
-      | Reference[OperatorRef]#Code | "didok": "CdF:Company::410:LOC"   |
-      | Schedule[aimed]#Arrival     | 2017-01-01T15:00:00.000Z          |
+      | PassageOrder                | 4                                  |
+      | StopAreaId                  | 6ba7b814-9dad-11d1-3-00c04fd430c8  |
+      | VehicleJourneyId            | 6ba7b814-9dad-11d1-5-00c04fd430c8  |
+      | VehicleAtStop               | false                              |
+      | Reference[OperatorRef]#Code | "external": "CdF:Company::410:LOC" |
+      | Schedule[aimed]#Arrival     | 2017-01-01T15:00:00.000Z           |
     And a StopArea exists with the following attributes:
     # "6ba7b814-9dad-11d1-7-00c04fd430c8"
-      | Name         | Other                                   |
-      | Codes[didok] | fr:1:StopPlace:OTHER:StopArea:log351672 |
-      | Lines        | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
+      | Name            | Other                                   |
+      | Codes[external] | fr:1:StopPlace:OTHER:StopArea:log351672 |
+      | Lines           | ["6ba7b814-9dad-11d1-4-00c04fd430c8"]   |
     And a ScheduledStopVisit exists with the following attributes:
     # "6ba7b814-9dad-11d1-8-00c04fd430c8"
-      | PassageOrder                | 5                                 |
-      | StopAreaId                  | 6ba7b814-9dad-11d1-7-00c04fd430c8 |
-      | VehicleJourneyId            | 6ba7b814-9dad-11d1-5-00c04fd430c8 |
-      | VehicleAtStop               | false                             |
-      | Reference[OperatorRef]#Code | "didok": "CdF:Company::410:LOC"   |
-      | Schedule[aimed]#Arrival     | 2017-01-01T16:00:00.000Z          |
+      | PassageOrder                | 5                                  |
+      | StopAreaId                  | 6ba7b814-9dad-11d1-7-00c04fd430c8  |
+      | VehicleJourneyId            | 6ba7b814-9dad-11d1-5-00c04fd430c8  |
+      | VehicleAtStop               | false                              |
+      | Reference[OperatorRef]#Code | "external": "CdF:Company::410:LOC" |
+      | Schedule[aimed]#Arrival     | 2017-01-01T16:00:00.000Z           |
     And a minute has passed
     And I send this SIRI request
       """

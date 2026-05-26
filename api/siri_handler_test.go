@@ -22,22 +22,19 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func siriHandler_PrepareServer(envelopeType string) (*Server, *core.Referential) {
+func siriHandler_PrepareServer(t *testing.T, envelopeType string) (*Server, *core.Referential) {
 	clock.SetDefaultClock(clock.NewFakeClock())
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// create a server with a fake clock and fake UUID generator
-	server := NewTestServer()
-
-	// Create the default referential with the appropriate connectors
-	referential := server.CurrentReferentials().New("default")
+	server, referential := newTestServer(t)
 
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
 		"remote_url":                             "",
 		"remote_credential":                      "",
-		"remote_code_space":                      "codeSpace",
+		"remote_code_space":                      "internal",
 		"local_credential":                       "Ara",
 		"local_url":                              "http://ara",
 		"generators.message_identifier":          "Ara:Message::%{uuid}:LOC",
@@ -72,7 +69,7 @@ func siriHandler_Request(server *Server, buffer remote.Buffer, t *testing.T) *ht
 	defer clock.SetDefaultClock(clock.NewRealClock())
 
 	// Create a request
-	request, err := http.NewRequest("POST", "/default/siri", buffer)
+	request, err := http.NewRequest("POST", "/referential/siri", buffer)
 	require.NoError(err)
 
 	// Create a ResponseRecorder
@@ -103,7 +100,7 @@ func Test_SIRIHandler_SOAP(t *testing.T) {
 	}
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
@@ -124,7 +121,7 @@ func Test_SIRIHandler_SOAPResponse(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer(remote.SOAP_SIRI_ENVELOPE)
+	server, _ := siriHandler_PrepareServer(t, remote.SOAP_SIRI_ENVELOPE)
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
@@ -143,7 +140,7 @@ func Test_SIRIHandler_RawResponse(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer(remote.RAW_SIRI_ENVELOPE)
+	server, _ := siriHandler_PrepareServer(t, remote.RAW_SIRI_ENVELOPE)
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	_, err = remote.NewSIRIEnvelope(responseRecorder.Body, remote.SOAP_SIRI_ENVELOPE)
@@ -166,7 +163,7 @@ func Test_SIRIHandler_Raw(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
@@ -187,7 +184,7 @@ func Test_SIRIHandler_CheckStatus(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 	responseRecorder := siriHandler_Request(server, buffer, t)
 
 	// Check the response body is what we expect.
@@ -208,14 +205,14 @@ func Test_SIRIHandler_CheckStatus_Gzip(t *testing.T) {
 	assert := assert.New(t)
 	require := require.New(t)
 
-	server, _ := siriHandler_PrepareServer("")
+	server, _ := siriHandler_PrepareServer(t, "")
 
 	// Create a request
 	file, err := os.Open("testdata/checkstatus-soap-request.xml.gz")
 	require.NoError(err)
 	defer file.Close()
 
-	request, err := http.NewRequest("POST", "/default/siri", file)
+	request, err := http.NewRequest("POST", "/referential/siri", file)
 	require.NoError(err)
 
 	request.Header.Set("Content-Encoding", "gzip")
@@ -249,9 +246,9 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 
 	buffer.WriteXML(request)
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 	stopArea := referential.Model().StopAreas().New()
-	code := model.NewCode("codeSpace", "codeValue")
+	code := model.NewCode("internal", "codeValue")
 	stopArea.SetCode(code)
 	stopArea.Monitored = true
 	stopArea.Save()
@@ -269,21 +266,21 @@ func Test_SIRIHandler_StopMonitoring(t *testing.T) {
 	stopVisit := referential.Model().StopVisits().New()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(2*time.Hour))
-	stopVisit.SetCode(model.NewCode("codeSpace", "second"))
+	stopVisit.SetCode(model.NewCode("internal", "second"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
 	stopVisit2.StopAreaId = stopArea.Id()
 	stopVisit2.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(1*time.Hour))
-	stopVisit2.SetCode(model.NewCode("codeSpace", "first"))
+	stopVisit2.SetCode(model.NewCode("internal", "first"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
 	pastStopVisit.StopAreaId = stopArea.Id()
 	pastStopVisit.Schedules.SetArrivalTime(schedules.Actual, referential.Clock().Now().Add(-1*time.Hour))
-	pastStopVisit.SetCode(model.NewCode("codeSpace", "past"))
+	pastStopVisit.SetCode(model.NewCode("internal", "past"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.Save()
 
@@ -322,7 +319,7 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	}
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -330,12 +327,12 @@ func Test_SIRIHandler_NotifyStopMonitoring(t *testing.T) {
 	subscription.Save()
 
 	stopArea := referential.Model().StopAreas().New()
-	code := model.NewCode("codeSpace", "stopArea1")
+	code := model.NewCode("internal", "stopArea1")
 	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	code2 := model.NewCode("codeSpace", "stopArea2")
+	code2 := model.NewCode("internal", "stopArea2")
 	stopArea2.SetCode(code2)
 	stopArea2.Save()
 
@@ -362,7 +359,7 @@ func Test_SIRIHandler_NotifyGeneralMessage(t *testing.T) {
 	}
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 	partner := referential.Partners().FindAll()[0]
 
 	partner.Subscriptions().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -391,40 +388,40 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 
 	stopArea := referential.Model().StopAreas().New()
-	stopArea.SetCode(model.NewCode("codeSpace", "stopArea1"))
+	stopArea.SetCode(model.NewCode("internal", "stopArea1"))
 	stopArea.Monitored = true
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetCode(model.NewCode("codeSpace", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("internal", "stopArea2"))
 	stopArea2.Monitored = true
 	stopArea2.Save()
 
 	line := referential.Model().Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("internal", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
-	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("internal", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	vehicleJourney := referential.Model().VehicleJourneys().New()
-	vehicleJourney.SetCode(model.NewCode("codeSpace", "vehicleJourney"))
+	vehicleJourney.SetCode(model.NewCode("internal", "vehicleJourney"))
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	vehicleJourney2 := referential.Model().VehicleJourneys().New()
-	vehicleJourney2.SetCode(model.NewCode("codeSpace", "vehicleJourney2"))
+	vehicleJourney2.SetCode(model.NewCode("internal", "vehicleJourney2"))
 	vehicleJourney2.LineId = line2.Id()
 	vehicleJourney2.Save()
 
 	pastStopVisit := referential.Model().StopVisits().New()
-	pastStopVisit.SetCode(model.NewCode("codeSpace", "pastStopVisit"))
+	pastStopVisit.SetCode(model.NewCode("internal", "pastStopVisit"))
 	pastStopVisit.VehicleJourneyId = vehicleJourney.Id()
 	pastStopVisit.StopAreaId = stopArea.Id()
 	pastStopVisit.PassageOrder = 0
@@ -434,7 +431,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	pastStopVisit.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	stopVisit.SetCode(model.NewCode("codeSpace", "stopVisit"))
+	stopVisit.SetCode(model.NewCode("internal", "stopVisit"))
 	stopVisit.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.PassageOrder = 1
@@ -444,7 +441,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit.Save()
 
 	stopVisit2 := referential.Model().StopVisits().New()
-	stopVisit2.SetCode(model.NewCode("codeSpace", "stopVisit2"))
+	stopVisit2.SetCode(model.NewCode("internal", "stopVisit2"))
 	stopVisit2.VehicleJourneyId = vehicleJourney.Id()
 	stopVisit2.StopAreaId = stopArea2.Id()
 	stopVisit2.PassageOrder = 2
@@ -454,7 +451,7 @@ func Test_SIRIHandler_EstimatedTimetable(t *testing.T) {
 	stopVisit2.Save()
 
 	stopVisit3 := referential.Model().StopVisits().New()
-	stopVisit3.SetCode(model.NewCode("codeSpace", "stopVisit3"))
+	stopVisit3.SetCode(model.NewCode("internal", "stopVisit3"))
 	stopVisit3.VehicleJourneyId = vehicleJourney2.Id()
 	stopVisit3.StopAreaId = stopArea.Id()
 	stopVisit3.PassageOrder = 1
@@ -553,20 +550,20 @@ func Test_SIRIHandler_LinesDiscovery(t *testing.T) {
 
 	buffer.WriteXML(string(content))
 
-	server, referential := siriHandler_PrepareServer("")
+	server, referential := siriHandler_PrepareServer(t, "")
 
 	line := referential.Model().Lines().New()
-	line.SetCode(model.NewCode("codeSpace", "NINOXE:Line:2:LOC"))
+	line.SetCode(model.NewCode("internal", "NINOXE:Line:2:LOC"))
 	line.Name = "lineName"
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
-	line2.SetCode(model.NewCode("codeSpace", "NINOXE:Line:3:LOC"))
+	line2.SetCode(model.NewCode("internal", "NINOXE:Line:3:LOC"))
 	line2.Name = "lineName2"
 	line2.Save()
 
 	line3 := referential.Model().Lines().New()
-	line3.SetCode(model.NewCode("codeSpace2", "NINOXE:Line:4:LOC"))
+	line3.SetCode(model.NewCode("external", "NINOXE:Line:4:LOC"))
 	line3.Name = "lineName3"
 	line3.Save()
 

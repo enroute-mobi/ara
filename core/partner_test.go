@@ -14,14 +14,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createTestPartnerManager() *PartnerManager {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.collectManager = NewTestCollectManager()
-	referentials.Save(referential)
-	return (referential.partners).(*PartnerManager)
-}
-
 func Test_Partner_Id(t *testing.T) {
 	partner := &Partner{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
@@ -51,7 +43,7 @@ func Test_Partner_OperationnalStatus(t *testing.T) {
 }
 
 func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.New("slug")
 	settings := map[string]string{
 		"local_credential":  "loc",
@@ -91,7 +83,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 }
 
 func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.New("slug")
 
 	settings := map[string]string{
@@ -133,7 +125,7 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 }
 
 func Test_Partner_SubcriptionCancel(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.New("slug")
 
 	settings := map[string]string{
@@ -215,7 +207,7 @@ func Test_Partner_MarshalJSON(t *testing.T) {
 }
 
 func Test_Partner_Save(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.New("partner")
 
 	if partner.manager != partnerManager {
@@ -676,7 +668,7 @@ func Test_CanCollectFacility(t *testing.T) {
 }
 
 func Test_Partners_FindAllByCollectPriority(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner1 := &Partner{
 		slug: "First",
 	}
@@ -711,7 +703,7 @@ func Test_Partner_Subcription(t *testing.T) {
 }
 
 func Test_NewPartnerManager(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 
 	if partnerManager.guardian == nil {
 		t.Errorf("New PartnerManager should have a PartnersGuardian")
@@ -719,7 +711,7 @@ func Test_NewPartnerManager(t *testing.T) {
 }
 
 func Test_PartnerManager_New(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.New("partner")
 
 	if partner.Id() != "" {
@@ -728,7 +720,7 @@ func Test_PartnerManager_New(t *testing.T) {
 }
 
 func Test_PartnerManager_Save(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.New("partner")
 
 	if success := partnerManager.Save(partner); !success {
@@ -741,7 +733,7 @@ func Test_PartnerManager_Save(t *testing.T) {
 }
 
 func Test_PartnerManager_Find_NotFound(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 	partner := partnerManager.Find("6ba7b814-9dad-11d1-0-00c04fd430c8")
 	if partner != nil {
 		t.Errorf("Find should return false when Partner isn't found")
@@ -749,7 +741,7 @@ func Test_PartnerManager_Find_NotFound(t *testing.T) {
 }
 
 func Test_PartnerManager_Find(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 
 	existingPartner := partnerManager.New("partner")
 	partnerManager.Save(existingPartner)
@@ -765,7 +757,7 @@ func Test_PartnerManager_Find(t *testing.T) {
 }
 
 func Test_PartnerManager_FindByCredentials(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 
 	existingPartner := partnerManager.New("partner")
 	settings := map[string]string{
@@ -801,7 +793,7 @@ func Test_PartnerManager_FindByCredentials(t *testing.T) {
 }
 
 func Test_PartnerManager_FindBySlug(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 
 	existingPartner := partnerManager.New("partner")
 	partnerManager.Save(existingPartner)
@@ -816,7 +808,7 @@ func Test_PartnerManager_FindBySlug(t *testing.T) {
 }
 
 func Test_PartnerManager_FindAll(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 
 	for i := range 5 {
 		existingPartner := partnerManager.New(p.Slug(strconv.Itoa(i)))
@@ -831,7 +823,7 @@ func Test_PartnerManager_FindAll(t *testing.T) {
 }
 
 func Test_PartnerManager_Delete(t *testing.T) {
-	partnerManager := createTestPartnerManager()
+	partnerManager := newTestPartnerManager(t)
 
 	existingPartner := partnerManager.New("partner")
 	partnerManager.Save(existingPartner)

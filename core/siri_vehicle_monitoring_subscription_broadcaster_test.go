@@ -14,15 +14,13 @@ func Test_VehicleMonitoringBroadcaster_Create_Events(t *testing.T) {
 	assert := assert.New(t)
 	clock.SetDefaultClock(clock.NewFakeClock())
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("Un Referential Plutot Cool")
-	referential.model = model.NewTestMemoryModel()
+	_, referential := newTestReferential(t)
 
 	referential.model.SetBroadcastVeChan(referential.broacasterManager.GetVehicleBroadcastEventChan())
 	referential.broacasterManager.Start()
 	defer referential.broacasterManager.Stop()
 
-	partner := referential.Partners().New("Un Partner tout autant cool")
+	partner := referential.Partners().New("partner")
 
 	settings := map[string]string{
 		"remote_code_space": "internal",

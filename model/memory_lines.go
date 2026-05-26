@@ -4,179 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
-	"time"
 )
 
-type LineId ModelId
-
-var lineReferentExtractor = func(instance ModelInstance) ModelId { return ModelId((instance.(*Line)).ReferentId) }
-
-type Line struct {
-	Collectable
-	model      Model
-	References References
-	CodeConsumer
-	RawAttributes     RawAttributes
-	id                LineId
-	ReferentId        LineId `json:",omitempty"`
-	Name              string `json:",omitempty"`
-	Number            string `json:",omitempty"`
-	origin            string
-	CollectSituations bool
-}
-
-func NewLine(model Model) *Line {
-	line := &Line{
-		model:         model,
-		RawAttributes: NewRawAttributes(),
-		References:    NewReferences(),
-	}
-
-	line.InitCodes()
-	return line
-}
-
-func (line *Line) ModelId() ModelId {
-	return ModelId(line.id)
-}
-
-func (line *Line) GetName() string {
-	return line.Name
-}
-
-func (line *Line) copy() *Line {
-	l := *line
-	l.RawAttributes = line.RawAttributes.Copy()
-	l.References = line.References.Copy()
-	return &l
-}
-
-func (line *Line) Id() LineId {
-	return line.id
-}
-
-func (line *Line) Origin() string {
-	return line.origin
-}
-
-func (line *Line) SetOrigin(origin string) {
-	line.origin = origin
-}
-
-func (line *Line) MarshalJSON() ([]byte, error) {
-	type Alias Line
-	aux := struct {
-		*Alias
-		Codes         Codes                `json:",omitempty"`
-		NextCollectAt *time.Time           `json:",omitempty"`
-		CollectedAt   *time.Time           `json:",omitempty"`
-		RawAttributes RawAttributes        `json:",omitempty"`
-		References    map[string]Reference `json:",omitempty"`
-		Id            LineId
-	}{
-		Id:    line.id,
-		Alias: (*Alias)(line),
-	}
-
-	if !line.Codes().Empty() {
-		aux.Codes = line.Codes()
-	}
-	if !line.nextCollectAt.IsZero() {
-		aux.NextCollectAt = &line.nextCollectAt
-	}
-	if !line.collectedAt.IsZero() {
-		aux.CollectedAt = &line.collectedAt
-	}
-	if !line.RawAttributes.IsEmpty() {
-		aux.RawAttributes = line.RawAttributes
-	}
-
-	if !line.References.IsEmpty() {
-		aux.References = line.References.GetReferences()
-	}
-
-	return json.Marshal(&aux)
-}
-
-func (line *Line) UnmarshalJSON(data []byte) error {
-	type Alias Line
-
-	aux := &struct {
-		Codes      map[string]string
-		References map[string]Reference
-		*Alias
-	}{
-		Alias: (*Alias)(line),
-	}
-
-	err := json.Unmarshal(data, aux)
-	if err != nil {
-		return err
-	}
-
-	if aux.Codes != nil {
-		line.SetCodesFromMap(aux.Codes)
-	}
-
-	if aux.References != nil {
-		line.References.SetReferences(aux.References)
-	}
-	return nil
-}
-
-func (line *Line) Referent() (*Line, bool) {
-	return line.model.Lines().Find(line.ReferentId)
-}
-
-func (line *Line) ReferentOrSelfCode(codeSpace string) (Code, bool) {
-	ref, ok := line.Referent()
-	if ok {
-		code, ok := ref.Code(codeSpace)
-		if ok {
-			return code, true
-		}
-	}
-	code, ok := line.Code(codeSpace)
-	if ok {
-		return code, true
-	}
-	return Code{}, false
-}
-
-/*
-Returns true if we need to send the Line in a Discovery
-
-We only send the Line if it has no referent with a correct codeSpace.
-If that's the case, we'll send the Referent instead
-*/
-func (line *Line) DiscoveryCode(codeSpace string) (Code, bool) {
-	ref, ok := line.Referent()
-	if ok {
-		_, ok := ref.Code(codeSpace)
-		if ok {
-			return Code{}, false
-		}
-	}
-	code, ok := line.Code(codeSpace)
-	if ok {
-		return code, true
-	}
-	return Code{}, false
-}
-
-func (line *Line) Attribute(key string) (string, bool) {
-	value, present := line.RawAttributes[key]
-	return value, present
-}
-
-func (line *Line) Reference(key string) (Reference, bool) {
-	value, present := line.References.Get(key)
-	return value, present
-}
-
-func (line *Line) Save() bool {
-	return line.model.Lines().Save(line)
-}
+var lineReferentExtractor = func(instance ModelInstance) string { return string((instance.(*Line)).ReferentId) }
 
 type memoryLines struct {
 	IndexHandler
@@ -193,6 +23,7 @@ type Lines interface {
 
 	FindFamily(LineId) []LineId
 	FindFamilyFromCode(Code) []LineId
+	FindCode(LineId, string) (Code, bool)
 }
 
 func NewMemoryLines() Lines {
@@ -224,7 +55,7 @@ func (manager *memoryLines) Find(id LineId) (*Line, bool) {
 func (manager *memoryLines) FindByReferentId(id LineId) (lines []*Line) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByReferent, ModelId(id))
+	ids, _ := manager.FindBy(ByReferent, string(id))
 
 	for _, id := range ids {
 		l := manager.byIdentifier[LineId(id)]
@@ -253,6 +84,17 @@ func (manager *memoryLines) CodeExists(code Code) bool {
 	manager.mutex.RUnlock()
 
 	return ok
+}
+
+func (manager *memoryLines) FindCode(id LineId, codespace string) (Code, bool) {
+	manager.mutex.RLock()
+	line, ok := manager.byIdentifier[id]
+	manager.mutex.RUnlock()
+
+	if ok {
+		return line.Code(codespace)
+	}
+	return Code{}, false
 }
 
 func (manager *memoryLines) FindAll() (lines []*Line) {
@@ -293,7 +135,7 @@ func (manager *memoryLines) FindFamilyFromCode(code Code) (lineIds []LineId) {
 func (manager *memoryLines) findFamily(lineId LineId) (lineIds []LineId) {
 	lineIds = []LineId{lineId}
 
-	ids, _ := manager.FindBy(ByReferent, ModelId(lineId))
+	ids, _ := manager.FindBy(ByReferent, string(lineId))
 	for _, id := range ids {
 		lineIds = append(lineIds, manager.findFamily(LineId(id))...)
 	}
@@ -321,7 +163,7 @@ func (manager *memoryLines) Delete(line *Line) bool {
 	defer manager.mutex.Unlock()
 
 	delete(manager.byIdentifier, line.Id())
-	manager.Deindex(ModelId(line.id))
+	manager.Deindex(string(line.id))
 
 	return true
 }

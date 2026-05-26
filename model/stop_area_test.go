@@ -26,7 +26,7 @@ func Test_StopArea_Id(t *testing.T) {
 func Test_StopArea_Lines(t *testing.T) {
 	assert := assert.New(t)
 
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	line := model.Lines().New()
 	line.Save()
 
@@ -177,9 +177,9 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 }
 
 func Test_StopArea_Save(t *testing.T) {
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	stopArea := model.StopAreas().New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopArea.SetCode(code)
 
 	if stopArea.model != model {
@@ -206,10 +206,10 @@ func Test_StopArea_Code(t *testing.T) {
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",
 	}
 	stopArea.codes = make(Codes)
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	stopArea.SetCode(code)
 
-	foundCode, ok := stopArea.Code("codeSpace")
+	foundCode, ok := stopArea.Code("internal")
 	if !ok {
 		t.Errorf("Code should return true if Code exists")
 	}
@@ -293,7 +293,7 @@ func Test_MemoryStopAreas_FindAll(t *testing.T) {
 func Test_MemoryStopAreas_Delete(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 	existingStopArea := stopAreas.New()
-	code := NewCode("codeSpace", "value")
+	code := NewCode("internal", "value")
 	existingStopArea.SetCode(code)
 	stopAreas.Save(existingStopArea)
 
@@ -407,7 +407,7 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 	}
 
 	// Fetch data from the db
-	model := NewTestMemoryModel()
+	model := newTestModel(t)
 	model.SetDate(Date{
 		Year:  2017,
 		Month: time.January,
@@ -457,6 +457,6 @@ func Test_MemoryStopAreas_Load(t *testing.T) {
 		t.Errorf("Wrong LineIds:\n got: %v\n expected: [d0eebc99-9c0b,e0eebc99-9c0b]", stopArea.LineIds)
 	}
 	if ref, ok := stopArea.Reference("Ref"); !ok || ref.Type != "Ref" || ref.Code.CodeSpace() != "kind" || ref.Code.Value() != "value" {
-		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"codeSpace:value\"", ref)
+		t.Errorf("Wrong References:\n got: %v\n expected Type: \"Ref\" and Code: \"internal:value\"", ref)
 	}
 }

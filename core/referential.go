@@ -15,6 +15,7 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/redisclient"
 	"bitbucket.org/enroute-mobi/ara/state"
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
@@ -37,6 +38,7 @@ type Referential struct {
 
 	collectManager    CollectManagerInterface
 	broacasterManager BroadcastManagerInterface
+	redisClient       redisclient.Client
 	manager           Referentials
 	model             model.Model
 	modelGuardian     *ModelGuardian
@@ -141,6 +143,10 @@ func (referential *Referential) Model() model.Model {
 	return referential.model
 }
 
+func (referential *Referential) RedisClient() redisclient.Client {
+	return referential.redisClient
+}
+
 func (referential *Referential) ModelGuardian() *ModelGuardian {
 	return referential.modelGuardian
 }
@@ -166,6 +172,12 @@ func (referential *Referential) DatabaseOrganisationId() sql.NullString {
 func (referential *Referential) Start() {
 	referential.startedAt = referential.Clock().Now()
 
+	referential.StartRedisClient()
+
+	referential.start()
+}
+
+func (referential *Referential) start() {
 	// Configure BigQuery
 	if config.Config.ValidBQConfig() {
 		dataset := fmt.Sprintf("%v_%v", config.Config.BigQueryDatasetPrefix, referential.slug)
@@ -261,16 +273,29 @@ func (referential *Referential) SetDefinition(apiReferential *APIReferential) {
 func (referential *Referential) NextReloadAt() time.Time {
 	return referential.nextReloadAt
 }
+func (referential *Referential) SetModel(m model.Model) {
+	referential.model = m
+	referential.model.SetBroadcastSMChan(referential.broacasterManager.GetStopMonitoringBroadcastEventChan())
+	referential.model.SetBroadcastGMChan(referential.broacasterManager.GetGeneralMessageBroadcastEventChan())
+
+}
 
 func (referential *Referential) ReloadModel() {
 	logger.Log.Printf("Reset Model for referential %v", referential.slug)
 	referential.Stop()
 	referential.partners.DeleteAllFromTemplate()
+
+	// To reload and use the new model in the redis client, we need to define
+	// a new prefix. So we need to set the startedAt before loading the model
+	t := referential.Clock().Now()
+	referential.startedAt = t
+	referential.StartRedisClient()
+
 	referential.model = referential.model.Reload()
 	referential.setNextReloadAt()
 	referential.partners.Load()
 	referential.partnerTemplates.Load()
-	referential.Start()
+	referential.start()
 }
 
 func (referential *Referential) setNextReloadAt() {
@@ -292,6 +317,18 @@ func (referential *Referential) Load() {
 	referential.Partners().Load()
 	referential.PartnerTemplates().Load()
 }
+func (referential *Referential) StartRedisClient() {
+	if referential.redisClient == nil {
+		return
+	}
+	referential.redisClient.SetSlug(string(referential.slug))
+	referential.redisClient.SetCodespaces(config.Config.CodeSpaces)
+
+	err := referential.redisClient.Start(referential.startedAt)
+	if err != nil {
+		logger.Log.Panicf("%v", err)
+	}
+}
 
 type MemoryReferentials struct {
 	uuid.UUIDConsumer
@@ -310,13 +347,21 @@ func CurrentReferentials() Referentials {
 }
 
 func (manager *MemoryReferentials) New(slug ReferentialSlug) *Referential {
-	model := model.NewMemoryModel(string(slug))
-
 	referential := &Referential{
 		ReferentialSettings: s.NewReferentialSettings(),
 		manager:             manager,
-		model:               model,
 		slug:                slug,
+	}
+
+	if config.Config.RedisAddr != "" {
+		c, err := redisclient.New(string(slug), config.Config.CodeSpaces)
+		if err != nil {
+			logger.Log.Panicf("%v", err)
+		}
+		referential.redisClient = c
+		referential.model = model.NewHybridModel(string(slug), c)
+	} else {
+		referential.model = model.NewMemoryModel(string(slug))
 	}
 
 	referential.partners = NewPartnerManager(referential)

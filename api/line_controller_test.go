@@ -23,12 +23,8 @@ func checkLineResponseStatus(responseRecorder *httptest.ResponseRecorder, t *tes
 
 func prepareLineRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (line *model.Line, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
 	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -96,7 +92,7 @@ func Test_LineController_Update(t *testing.T) {
 	assert := assert.New(t)
 
 	// Prepare and send request
-	body := []byte(`{ "Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	body := []byte(`{ "Codes": { "internal": "FR:77491:ZDE:34004:STIF" } }`)
 	line, responseRecorder, referential := prepareLineRequest("PUT", true, body, t)
 
 	// Check response
@@ -131,7 +127,7 @@ func Test_LineController_Create(t *testing.T) {
 	body := []byte(`{ 	"References" : {
 		"JourneyPattern":{"Code":{"lol":"lel"}, "Id":"42"}
 	},
-	"Codes": { "reflex": "FR:77491:ZDE:34004:STIF" } }`)
+	"Codes": { "internal": "FR:77491:ZDE:34004:STIF" } }`)
 	_, responseRecorder, referential := prepareLineRequest("POST", false, body, t)
 
 	// Check response
@@ -142,7 +138,7 @@ func Test_LineController_Create(t *testing.T) {
 	_, ok := referential.Model().Lines().Find("6ba7b814-9dad-11d1-1-00c04fd430c8")
 	assert.True(ok, "Line should be found after POST request")
 
-	expected := `{"CollectSituations":false,"Codes":{"reflex":"FR:77491:ZDE:34004:STIF"},"References":{"JourneyPattern":{"Code":{"lol":"lel"}}},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
+	expected := `{"CollectSituations":false,"Codes":{"internal":"FR:77491:ZDE:34004:STIF"},"References":{"JourneyPattern":{"Code":{"lol":"lel"}}},"Id":"6ba7b814-9dad-11d1-1-00c04fd430c8"}`
 	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
@@ -166,10 +162,10 @@ func Test_LineController_Index(t *testing.T) {
 func Test_LineController_FindLine(t *testing.T) {
 	assert := assert.New(t)
 
-	ref := core.NewMemoryReferentials().New("test")
+	_, ref := newTestReferential(t)
 
 	line := ref.Model().Lines().New()
-	code := model.NewCode("codeSpace", "stif:value")
+	code := model.NewCode("internal", "stif:value")
 	line.SetCode(code)
 	ref.Model().Lines().Save(line)
 
@@ -177,7 +173,7 @@ func Test_LineController_FindLine(t *testing.T) {
 		referential: ref,
 	}
 
-	_, ok := controller.findLine("codeSpace:stif:value")
+	_, ok := controller.findLine("internal:stif:value")
 	assert.True(ok, "Can't find Line by Code")
 
 	_, ok = controller.findLine(string(line.Id()))
