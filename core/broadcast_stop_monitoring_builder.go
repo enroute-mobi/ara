@@ -27,6 +27,7 @@ type BroadcastStopMonitoringBuilder struct {
 	noDestinationRefRewritingFrom []string
 	noDataFrameRefRewritingFrom   []string
 	rewriteJourneyPatternRef      bool
+	ignoreNotes                   bool
 }
 
 func NewBroadcastStopMonitoringBuilder(partner *Partner, connectorName string) *BroadcastStopMonitoringBuilder {
@@ -37,6 +38,7 @@ func NewBroadcastStopMonitoringBuilder(partner *Partner, connectorName string) *
 		noDestinationRefRewritingFrom: partner.NoDestinationRefRewritingFrom(),
 		noDataFrameRefRewritingFrom:   partner.NoDataFrameRefRewritingFrom(),
 		rewriteJourneyPatternRef:      partner.RewriteJourneyPatternRef(),
+		ignoreNotes:                   partner.IgnoreNotes(connectorName),
 	}
 }
 
@@ -173,6 +175,9 @@ func (builder *BroadcastStopMonitoringBuilder) BuildMonitoredStopVisit(stopVisit
 		monitoredStopVisit.Bearing = vehicle.Bearing
 	}
 
+	if builder.ignoreNotes {
+		delete(vehicleJourney.RawAttributes, siri_attributes.JourneyNote)
+	}
 	monitoredStopVisit.Attributes["VehicleJourneyAttributes"] = vehicleJourney.RawAttributes
 	monitoredStopVisit.References["VehicleJourney"] = vehicleJourneyRefCopy.GetSiriReferences()
 

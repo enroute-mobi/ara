@@ -157,6 +157,52 @@ func Test_GtfsTTL_Above_30_Seconds(t *testing.T) {
 	assert.Equal(time.Duration(31000000000), partnerSettings.GtfsTTL())
 }
 
+func Test_IgnoreNotes_Default(t *testing.T) {
+	assert := assert.New(t)
+
+	partnerSettings := NewEmptyPartnerSettings(uuid.DefaultUUIDGenerator)
+
+	assert.False(partnerSettings.IgnoreNotes())
+}
+
+func Test_IgnoreNotes_Global(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		IGNORE_NOTES: "true",
+	}
+
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+	assert.True(partnerSettings.IgnoreNotes())
+	assert.True(partnerSettings.IgnoreNotes("any_connector"))
+}
+
+func Test_IgnoreNotes_With_Connector(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		"connector_name.ignore_notes": "true",
+	}
+
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+	assert.True(partnerSettings.IgnoreNotes("connector_name"))
+	assert.False(partnerSettings.IgnoreNotes("other_connector"))
+	assert.False(partnerSettings.IgnoreNotes())
+}
+
+func Test_IgnoreNotes_Connector_Overrides_Global(t *testing.T) {
+	assert := assert.New(t)
+
+	settings := map[string]string{
+		IGNORE_NOTES:                "true",
+		"connector_name.ignore_notes": "false",
+	}
+
+	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
+	assert.False(partnerSettings.IgnoreNotes("connector_name"))
+	assert.True(partnerSettings.IgnoreNotes())
+}
+
 func Test_RecordedCallsDurations(t *testing.T) {
 	assert := assert.New(t)
 

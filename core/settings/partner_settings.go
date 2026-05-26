@@ -14,6 +14,20 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 )
 
+/* To add a new setting:
+*   - Add a constant with the setting name
+*   - Add a private field in the PartnerSettings struct
+*   - Create a private setter method
+*   - Add this method to PartnerSettings#parseSettings
+*   - Add a public getter method
+ */
+
+var remoteCodeSpaceRegexp = regexp.MustCompile(`(.+)\.remote_code_space`)
+var vjRemoteCodeSpaceRegexp = regexp.MustCompile(`(.+)\.vehicle_journey_remote_code_space`)
+var vehicleRemoteCodeSpaceRegexp = regexp.MustCompile(`(.+)\.vehicle_remote_code_space`)
+var ignoreNotesRegexp = regexp.MustCompile(`(.+)\.ignore_notes`)
+var cacheTimeoutRegexp = regexp.MustCompile(`(.+)\.cache_timeout`)
+
 const (
 	LOCAL_CREDENTIAL  = "local_credential"
 	LOCAL_CREDENTIALS = "local_credentials"
@@ -69,6 +83,10 @@ const (
 	BROADCAST_SITUATIONS_INTERNAL_TAGS                    = "broadcast.situations.internal_tags"
 	BROADCAST_SITUATIONS_TTL                              = "broadcast.situations.time_to_live"
 	BROADCAST_SUBSCRIPTIONS_PERSISTENT                    = "broadcast.subscriptions.persistent"
+	BROADCAST_SIRI_IGNORE_NOTES                           = "broadcast.siri.ignore_notes"
+	BROADCAST_SIRI_STOP_MONITORING_IGNORE_NOTES           = "broadcast.siri.stop_monitoring.ignore_notes"
+	BROADCAST_SIRI_VEHICLE_MONITORING_IGNORE_NOTES        = "broadcast.siri.vehicle_monitoring.ignore_notes"
+	IGNORE_NOTES                                          = "broadcast.siri.ignore_notes"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
 	GENERAL_MESSAGE_REQUEST_2_2     = "generalMessageRequest.version2.2"
@@ -140,6 +158,9 @@ type PartnerSettings struct {
 	cacheTimeouts                                           sync.Map
 	siriDirectionTypeInbound                                string
 	siriDirectionTypeOutbound                               string
+
+	ignoreNotes    bool
+	ignoreNotesMap sync.Map
 
 	maximumCheckstatusRetry          int
 	subscriptionMaximumResources     int
@@ -227,6 +248,7 @@ func (s *PartnerSettings) parseSettings(settings map[string]string, resolvers []
 	s.setSortPayloadForTest(settings)
 	s.setSmMultipleDeliveriesPerNotify(settings)
 	s.setMaxStopVisitPerDelivery(settings)
+	s.setIgnoreNotes(settings)
 
 	s.setVehicleRemoteCodeSpaceWithFallback(settings)
 	s.setVehicleJourneyRemoteCodeSpaceWithFallback(settings)
@@ -275,15 +297,13 @@ func (s *PartnerSettings) RateLimit() float64 {
 }
 
 func (s *PartnerSettings) setRemoteCodeSpaces(settings map[string]string) {
-	r, _ := regexp.Compile(`(.+)\.remote_code_space`)
-
 	// xxxx.remote_code_space = dummy -> xxxx = dummy
 	for key, value := range settings {
 		if len(value) == 0 {
 			continue
 		}
 
-		matches := r.FindStringSubmatch(key)
+		matches := remoteCodeSpaceRegexp.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
 		}
@@ -308,10 +328,41 @@ func (s *PartnerSettings) RemoteCodeSpace(optionalConnectorName ...string) strin
 	return s.remoteCodeSpace
 }
 
+func (s *PartnerSettings) setIgnoreNotes(settings map[string]string) {
+	for key, value := range settings {
+		if len(value) == 0 {
+			continue
+		}
+
+		matches := ignoreNotesRegexp.FindStringSubmatch(key)
+		if len(matches) == 0 {
+			continue
+		}
+
+		connectorName := matches[1]
+		i, _ := strconv.ParseBool(value)
+		s.ignoreNotesMap.Store(connectorName, i)
+	}
+
+	i, _ := strconv.ParseBool(settings[IGNORE_NOTES])
+	s.ignoreNotes = i
+}
+
+func (s *PartnerSettings) IgnoreNotes(optionalConnectorName ...string) bool {
+	if len(optionalConnectorName) == 1 {
+		connectorName := optionalConnectorName[0]
+
+		value, ok := s.ignoreNotesMap.Load(connectorName)
+		if ok {
+			return value.(bool)
+		}
+	}
+
+	return s.ignoreNotes
+}
+
 func (s *PartnerSettings) setVehicleJourneyRemoteCodeSpaceWithFallback(settings map[string]string) {
 	// xxxx.vehicle_journey_remote_code_space
-	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_JOURNEY_REMOTE_CODE_SPACE))
-
 	s.vehicleJourneyRemoteCodeSpaces = trimedSlice(settings[VEHICLE_JOURNEY_REMOTE_CODE_SPACE])
 
 	// xxxx.vehicle_journey_remote_code_space = dummy -> xxxx = dummy
@@ -320,7 +371,7 @@ func (s *PartnerSettings) setVehicleJourneyRemoteCodeSpaceWithFallback(settings 
 			continue
 		}
 
-		matches := r.FindStringSubmatch(key)
+		matches := vjRemoteCodeSpaceRegexp.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
 		}
@@ -350,9 +401,6 @@ func (s *PartnerSettings) VehicleJourneyRemoteCodeSpaceWithFallback(connectorNam
 }
 
 func (s *PartnerSettings) setVehicleRemoteCodeSpaceWithFallback(settings map[string]string) {
-	// xxxx.vehicle_journey_remote_code_space
-	r, _ := regexp.Compile(fmt.Sprintf("(.+)\\.%s", VEHICLE_REMOTE_CODE_SPACE))
-
 	s.vehicleRemoteCodeSpaces = trimedSlice(settings[VEHICLE_REMOTE_CODE_SPACE])
 
 	// xxxx.vehicle_journey_remote_code_space = dummy -> xxxx = dummy
@@ -361,7 +409,7 @@ func (s *PartnerSettings) setVehicleRemoteCodeSpaceWithFallback(settings map[str
 			continue
 		}
 
-		matches := r.FindStringSubmatch(key)
+		matches := vehicleRemoteCodeSpaceRegexp.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
 		}
@@ -435,15 +483,13 @@ func (s *PartnerSettings) GtfsCacheTimeout() (t time.Duration) {
 }
 
 func (s *PartnerSettings) setCacheTimeouts(settings map[string]string) {
-	r, _ := regexp.Compile(`(.+)\.cache_timeout`)
-
 	// xxxx.cache_timeout = dummy -> xxxx = dummy
 	for key, value := range settings {
 		if len(value) == 0 {
 			continue
 		}
 
-		matches := r.FindStringSubmatch(key)
+		matches := cacheTimeoutRegexp.FindStringSubmatch(key)
 		if len(matches) == 0 {
 			continue
 		}

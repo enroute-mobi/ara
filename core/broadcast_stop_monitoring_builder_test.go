@@ -5,8 +5,11 @@ import (
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
+	s "bitbucket.org/enroute-mobi/ara/core/settings"
+	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/siri"
+	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -279,4 +282,74 @@ and AimedArrivalTime if Expected and Aimed time are provided`,
 		assert.Equal(siriStopVisit.AimedArrivalTime, tt.aimedArrivalTime, tt.message)
 		assert.Equal(siriStopVisit.ActualArrivalTime, tt.actualArrivalTime, tt.message)
 	}
+}
+
+func setupStopMonitoringModel(referential *Referential) (stopArea *model.StopArea, line *model.Line, vj *model.VehicleJourney, sv *model.StopVisit) {
+	stopAreaCode := model.NewCode("internal", "stop-area-ref")
+	stopArea = referential.Model().StopAreas().New()
+	stopArea.SetCode(stopAreaCode)
+	stopArea.Save()
+
+	lineCode := model.NewCode("internal", "line-ref")
+	line = referential.Model().Lines().New()
+	line.SetCode(lineCode)
+	line.Save()
+
+	vjCode := model.NewCode("internal", "vj-ref")
+	vj = referential.Model().VehicleJourneys().New()
+	vj.SetCode(vjCode)
+	vj.LineId = line.Id()
+	vj.RawAttributes[siri_attributes.JourneyNote] = "A journey note"
+	vj.Save()
+
+	svCode := model.NewCode("internal", "sv-ref")
+	sv = referential.Model().StopVisits().New()
+	sv.SetCode(svCode)
+	sv.StopAreaId = stopArea.Id()
+	sv.VehicleJourneyId = vj.Id()
+	sv.Save()
+
+	return
+}
+
+func Test_BroadcastStopMonitoringBuilder_BuildMonitoredStopVisit_IgnoreNotes(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("test")
+
+	partner := referential.Partners().New("partner")
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{
+		"remote_code_space": "internal",
+		s.IGNORE_NOTES:      "true",
+	})
+
+	_, _, _, sv := setupStopMonitoringModel(referential)
+
+	builder := NewBroadcastStopMonitoringBuilder(partner, "")
+	result := builder.BuildMonitoredStopVisit(sv)
+
+	assert.NotNil(result)
+	_, hasJourneyNote := result.Attributes["VehicleJourneyAttributes"][siri_attributes.JourneyNote]
+	assert.False(hasJourneyNote, "JourneyNote should be removed when ignore_notes is true")
+}
+
+func Test_BroadcastStopMonitoringBuilder_BuildMonitoredStopVisit_DoNotIgnoreNotes(t *testing.T) {
+	assert := assert.New(t)
+
+	referentials := NewMemoryReferentials()
+	referential := referentials.New("test")
+
+	partner := referential.Partners().New("partner")
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{
+		"remote_code_space": "internal",
+	})
+
+	_, _, _, sv := setupStopMonitoringModel(referential)
+
+	builder := NewBroadcastStopMonitoringBuilder(partner, "")
+	result := builder.BuildMonitoredStopVisit(sv)
+
+	assert.NotNil(result)
+	assert.Equal("A journey note", result.Attributes["VehicleJourneyAttributes"][siri_attributes.JourneyNote])
 }

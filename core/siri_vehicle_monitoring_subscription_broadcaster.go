@@ -18,6 +18,7 @@ type SIRIVehicleMonitoringSubscriptionBroadcaster struct {
 
 	vjRemoteCodeSpaces           []string
 	vehicleRemoteCodeSpaces      []string
+	ignoreNotes                  bool
 	vehicleMonitoringBroadcaster VehicleMonitoringBroadcaster
 	toBroadcast                  map[SubscriptionId][]model.VehicleId
 
@@ -41,9 +42,6 @@ func (factory *SIRIVehicleMonitoringSubscriptionBroadcasterFactory) Validate(api
 
 func newSIRIVehicleMonitoringSubscriptionBroadcaster(partner *Partner) *SIRIVehicleMonitoringSubscriptionBroadcaster {
 	connector := &SIRIVehicleMonitoringSubscriptionBroadcaster{}
-	connector.remoteCodeSpace = partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
-	connector.vehicleRemoteCodeSpaces = partner.VehicleRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
-	connector.vjRemoteCodeSpaces = partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
 	connector.partner = partner
 	connector.mutex = &sync.Mutex{}
 	connector.toBroadcast = make(map[SubscriptionId][]model.VehicleId)
@@ -188,6 +186,11 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) Stop() {
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) Start() {
+	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.vehicleRemoteCodeSpaces = connector.partner.VehicleRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+	connector.ignoreNotes = connector.partner.IgnoreNotes(SIRI_VEHICLE_MONITORING_SUBSCRIPTION_BROADCASTER)
+
 	connector.vehicleMonitoringBroadcaster.Start()
 }
 
