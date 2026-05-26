@@ -474,7 +474,7 @@ func Test_RewriteStopSequence(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
@@ -482,25 +482,25 @@ func Test_RewriteStopSequence(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewCode("codeSpace", "lId")
+	lId := model.NewCode("internal", "lId")
 	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewCode("codeSpace", "value")
+	vjId := model.NewCode("internal", "value")
 	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
 
 	// stopAreas & stopVisits
 	for j := 0; j < 5; j++ {
-		saId := model.NewCode("codeSpace", fmt.Sprintf("saId%d", j))
+		saId := model.NewCode("internal", fmt.Sprintf("saId%d", j))
 		stopArea := referential.Model().StopAreas().New()
 		stopArea.SetCode(saId)
 		stopArea.Save()
 
 		stopVisit := referential.model.StopVisits().New()
-		svId1 := model.NewCode("codeSpace", fmt.Sprintf("svId%d", j))
+		svId1 := model.NewCode("internal", fmt.Sprintf("svId%d", j))
 		stopVisit.SetCode(svId1)
 		stopVisit.StopAreaId = stopArea.Id()
 		stopVisit.VehicleJourneyId = vehicleJourney.Id()
@@ -534,12 +534,11 @@ func Test_RewriteStopSequenceWithPassedStopVisits(t *testing.T) {
 	assert := assert.New(t)
 
 	// Setup
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
@@ -547,12 +546,12 @@ func Test_RewriteStopSequenceWithPassedStopVisits(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewCode("codeSpace", "lId")
+	lId := model.NewCode("internal", "lId")
 	line.SetCode(lId)
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewCode("codeSpace", "value")
+	vjId := model.NewCode("internal", "value")
 	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.AimedStopVisitCount = 20
@@ -560,13 +559,13 @@ func Test_RewriteStopSequenceWithPassedStopVisits(t *testing.T) {
 
 	// stopAreas & stopVisits
 	for j := 0; j < 5; j++ {
-		saId := model.NewCode("codeSpace", fmt.Sprintf("saId%d", j))
+		saId := model.NewCode("internal", fmt.Sprintf("saId%d", j))
 		stopArea := referential.Model().StopAreas().New()
 		stopArea.SetCode(saId)
 		stopArea.Save()
 
 		stopVisit := referential.model.StopVisits().New()
-		svId1 := model.NewCode("codeSpace", fmt.Sprintf("svId%d", j))
+		svId1 := model.NewCode("internal", fmt.Sprintf("svId%d", j))
 		stopVisit.SetCode(svId1)
 		stopVisit.StopAreaId = stopArea.Id()
 		stopVisit.VehicleJourneyId = vehicleJourney.Id()

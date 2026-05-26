@@ -14,12 +14,11 @@ import (
 
 func benchmarkHandleGtfs(pc int, seed bool, b *testing.B) {
 	// Setup
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space": "codeSpace",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
@@ -27,7 +26,7 @@ func benchmarkHandleGtfs(pc int, seed bool, b *testing.B) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewCode("codeSpace", "lId")
+	lId := model.NewCode("internal", "lId")
 	line.SetCode(lId)
 	line.Save()
 
@@ -35,20 +34,20 @@ func benchmarkHandleGtfs(pc int, seed bool, b *testing.B) {
 	if seed {
 		for i := 0; i != 500; i++ {
 			vehicleJourney := referential.model.VehicleJourneys().New()
-			vjId := model.NewCode("codeSpace", fmt.Sprintf("vehicle_jourey%d", i))
+			vjId := model.NewCode("internal", fmt.Sprintf("vehicle_jourey%d", i))
 			vehicleJourney.SetCode(vjId)
 			vehicleJourney.LineId = line.Id()
 			vehicleJourney.Save()
 
 			// stopAreas & stopVisits
 			for j := 0; j < 30; j++ {
-				saId := model.NewCode("codeSpace", fmt.Sprintf("stop_area%d", j))
+				saId := model.NewCode("internal", fmt.Sprintf("stop_area%d", j))
 				stopArea := referential.Model().StopAreas().New()
 				stopArea.SetCode(saId)
 				stopArea.Save()
 
 				stopVisit := referential.model.StopVisits().New()
-				svId1 := model.NewCode("codeSpace", fmt.Sprintf("stop_visit%d", j))
+				svId1 := model.NewCode("internal", fmt.Sprintf("stop_visit%d", j))
 				stopVisit.SetCode(svId1)
 				stopVisit.StopAreaId = stopArea.Id()
 				stopVisit.VehicleJourneyId = vehicleJourney.Id()
@@ -66,20 +65,20 @@ func benchmarkHandleGtfs(pc int, seed bool, b *testing.B) {
 	// models for benchmark
 	for i := 0; i != pc; i++ {
 		vehicleJourney := referential.model.VehicleJourneys().New()
-		vjId := model.NewCode("codeSpace", fmt.Sprintf("vj%d", i))
+		vjId := model.NewCode("internal", fmt.Sprintf("vj%d", i))
 		vehicleJourney.SetCode(vjId)
 		vehicleJourney.LineId = line.Id()
 		vehicleJourney.Save()
 
 		// stopAreas & stopVisits
 		for j := 0; j < 30; j++ {
-			saId := model.NewCode("codeSpace", fmt.Sprintf("saId%d", j))
+			saId := model.NewCode("internal", fmt.Sprintf("saId%d", j))
 			stopArea := referential.Model().StopAreas().New()
 			stopArea.SetCode(saId)
 			stopArea.Save()
 
 			stopVisit := referential.model.StopVisits().New()
-			svId1 := model.NewCode("codeSpace", fmt.Sprintf("svId%d", j))
+			svId1 := model.NewCode("internal", fmt.Sprintf("svId%d", j))
 			stopVisit.SetCode(svId1)
 			stopVisit.StopAreaId = stopArea.Id()
 			stopVisit.VehicleJourneyId = vehicleJourney.Id()
