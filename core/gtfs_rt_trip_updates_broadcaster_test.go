@@ -505,7 +505,7 @@ func Test_RewriteStopSequence(t *testing.T) {
 		stopVisit.StopAreaId = stopArea.Id()
 		stopVisit.VehicleJourneyId = vehicleJourney.Id()
 		stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(time.Duration(float64(j*1e9))+10*time.Minute))
-		stopVisit.PassageOrder = j + j*2
+		stopVisit.PassageOrder = j * 3
 		stopVisit.Save()
 	}
 
