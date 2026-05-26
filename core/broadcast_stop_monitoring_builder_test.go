@@ -315,8 +315,7 @@ func setupStopMonitoringModel(referential *Referential) (stopArea *model.StopAre
 func Test_BroadcastStopMonitoringBuilder_BuildMonitoredStopVisit_IgnoreNotes(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("test")
+	_, referential := newTestReferential(t)
 
 	partner := referential.Partners().New("partner")
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{
@@ -337,8 +336,7 @@ func Test_BroadcastStopMonitoringBuilder_BuildMonitoredStopVisit_IgnoreNotes(t *
 func Test_BroadcastStopMonitoringBuilder_BuildMonitoredStopVisit_DoNotIgnoreNotes(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("test")
+	_, referential := newTestReferential(t)
 
 	partner := referential.Partners().New("partner")
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{

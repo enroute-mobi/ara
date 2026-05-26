@@ -59,8 +59,7 @@ func readVehicleMonitoringRequest(t *testing.T) *sxml.XMLGetVehicleMonitoring {
 func Test_SIRIVehicleMonitoringRequestBroadcaster_RequestVehicles_IgnoreNotes(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{
@@ -87,8 +86,7 @@ func Test_SIRIVehicleMonitoringRequestBroadcaster_RequestVehicles_IgnoreNotes(t 
 func Test_SIRIVehicleMonitoringRequestBroadcaster_RequestVehicles_DoNotIgnoreNotes(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{
