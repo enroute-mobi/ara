@@ -1,5 +1,8 @@
+---
 definitions:
   services:
+    docker:
+      memory: 2048
     postgres:
       image:
         name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-postgresql:dev
