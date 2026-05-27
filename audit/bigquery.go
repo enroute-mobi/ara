@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -25,7 +26,7 @@ const (
 	VEHICLE_TABLE              = "vehicles"
 	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
 	CONTROL_TABLE              = "control_messages"
-	maxMessageBatchSize        = 200
+	DEFAULT_BATCH_SIZE         = 100
 )
 
 var tablesSchemas = map[string]bigquery.Schema{
@@ -214,6 +215,7 @@ type BigQueryClient struct {
 	lostVehicleEventsCount            int
 	lostLongTermStopVisitsEventsCount int
 	lostControlEventsCount            int
+	messagesBatchSize                 int
 }
 
 func NewBigQuery(dataset string) BigQuery {
@@ -226,7 +228,7 @@ func NewBigQuery(dataset string) BigQuery {
 }
 
 func NewBigQueryClient(dataset string) *BigQueryClient {
-	return &BigQueryClient{
+	client := &BigQueryClient{
 		dataset:                 dataset,
 		projectID:               config.Config.BigQueryProjectID,
 		messages:                make(chan *BigQueryMessage, 500),
@@ -234,7 +236,15 @@ func NewBigQueryClient(dataset string) *BigQueryClient {
 		vehicleEvents:           make(chan *BigQueryVehicleEvent, 500),
 		longTermStopVisitEvents: make(chan *BigQueryLongTermStopVisitEvent, 500),
 		controlEvents:           make(chan *BigQueryControlEvent, 500),
+		messagesBatchSize:       DEFAULT_BATCH_SIZE,
 	}
+
+	batchSize, err := strconv.Atoi(os.Getenv("BIGQUERY_MESSAGES_BATCH_SIZE"))
+	if err != nil && batchSize != 0 {
+		client.messagesBatchSize = batchSize
+	}
+
+	return client
 }
 
 func formatDatasetName(dataset string) string {
@@ -337,10 +347,10 @@ func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) 
 
 func (bq *BigQueryClient) run() {
 	bq.connect()
-	var messageBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-	var vehicleBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-	var longTermSvBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
-	var controlBatch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+	var messageBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
+	var vehicleBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
+	var longTermSvBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
+	var controlBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
 	for {
 		select {
 		case <-bq.stop:
@@ -378,9 +388,9 @@ func (bq *BigQueryClient) run() {
 func (bq *BigQueryClient) processMessage(message BigQueryEvent, batch []*bigquery.StructSaver, inserter *bigquery.Inserter) []*bigquery.StructSaver {
 	ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
 	batch = append(batch, ss)
-	if len(batch) == maxMessageBatchSize {
+	if len(batch) == bq.messagesBatchSize {
 		bq.sendMultiple(batch, inserter)
-		batch = make([]*bigquery.StructSaver, 0, maxMessageBatchSize)
+		batch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
 	}
 	return batch
 }
