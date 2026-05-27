@@ -195,10 +195,7 @@ func Test_VehicleController_Index_SearchByLineIds(t *testing.T) {
 	assert := assert.New(t)
 
 	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
 	referential.Save()
 
@@ -207,36 +204,36 @@ func Test_VehicleController_Index_SearchByLineIds(t *testing.T) {
 
 	// Create and save 2 new line
 	line1 := referential.Model().Lines().New()
-	code := model.NewCode("codeSpace", "value1")
+	code := model.NewCode("internal", "value1")
 	line1.SetCode(code)
 	referential.Model().Lines().Save(line1)
 
 	line2 := referential.Model().Lines().New()
-	code = model.NewCode("codeSpace", "value2")
+	code = model.NewCode("internal", "value2")
 	line2.SetCode(code)
 	referential.Model().Lines().Save(line2)
 
 	// Create and save 2 new vehicles
 	vehicle := referential.Model().Vehicles().New()
-	code = model.NewCode("codeSpace", "GOODLineId")
+	code = model.NewCode("internal", "GOODLineId")
 	vehicle.SetCode(code)
 	vehicle.LineId = line1.Id()
 	referential.Model().Vehicles().Save(vehicle)
 
 	vehicle2 := referential.Model().Vehicles().New()
-	code = model.NewCode("codeSpace", "GOODLineId1")
+	code = model.NewCode("internal", "GOODLineId1")
 	vehicle2.SetCode(code)
 	vehicle2.LineId = line1.Id()
 	referential.Model().Vehicles().Save(vehicle2)
 
 	vehicle3 := referential.Model().Vehicles().New()
-	code = model.NewCode("codeSpace", "value5")
+	code = model.NewCode("internal", "value5")
 	vehicle3.SetCode(code)
 	vehicle3.LineId = line2.Id()
 	referential.Model().Vehicles().Save(vehicle3)
 
 	vehicle4 := referential.Model().Vehicles().New()
-	code = model.NewCode("codeSpace", "value6")
+	code = model.NewCode("internal", "value6")
 	vehicle4.SetCode(code)
 	vehicle4.LineId = model.LineId("09fc2149-1182-4bcc-a0d4-382516c193a1")
 	referential.Model().Vehicles().Save(vehicle4)
@@ -281,5 +278,5 @@ func Test_VehicleController_Index_SearchByLineIds(t *testing.T) {
 		}
 	}
 
-	assert.ElementsMatch([]string{"codeSpace:GOODLineId", "codeSpace:GOODLineId1"}, vehicleCodesFromApi)
+	assert.ElementsMatch([]string{"internal:GOODLineId", "internal:GOODLineId1"}, vehicleCodesFromApi)
 }
