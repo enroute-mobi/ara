@@ -88,7 +88,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopAreaNoSelector(t *test
 	stopVisit2.VehicleJourneyId = vehicleJourney2.Id()
 
 	line2 := referential.model.Lines().New()
-	obj = model.NewCode("WrongCodeSpace", "NINOXE:StopPoint:SP:30:LOC")
+	obj = model.NewCode("external", "NINOXE:StopPoint:SP:30:LOC")
 	line2.SetCode(obj)
 	line2.Save()
 
@@ -156,7 +156,7 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RequestStopWithReferent(t *testin
 	stopArea.SetCode(code)
 	stopArea.Save()
 
-	code2 := model.NewCode("wrongCodeSpace", "NINOXE:StopPoint:SP:20:LOC")
+	code2 := model.NewCode("external", "NINOXE:StopPoint:SP:20:LOC")
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.SetCode(code2)
 	stopArea2.ReferentId = stopArea.Id()
@@ -453,7 +453,7 @@ func Test_SIRIStopMonitoringRequestBroadcasterFactory_Validate(t *testing.T) {
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 		"local_credential":  "local_credential",
 	}
 	apiPartner.Validate()
@@ -466,15 +466,15 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RemoteCodeSpacePresent(t *testing
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-stop-monitoring-request-broadcaster.remote_code_space": "CodeSpace1",
-		"remote_code_space": "CodeSpace2",
+		"siri-stop-monitoring-request-broadcaster.remote_code_space": "internal",
+		"remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 
-	if connector.partner.RemoteCodeSpace(SIRI_STOP_MONITORING_REQUEST_BROADCASTER) != "CodeSpace1" {
-		t.Errorf("RemoteCodeSpace should be equal to CodeSpace1")
+	if connector.partner.RemoteCodeSpace(SIRI_STOP_MONITORING_REQUEST_BROADCASTER) != "internal" {
+		t.Errorf("RemoteCodeSpace should be equal to internal")
 	}
 }
 
@@ -483,12 +483,12 @@ func Test_SIRIStopMonitoringRequestBroadcaster_RemoteCodeSpaceAbsent(t *testing.
 
 	settings := map[string]string{
 		"siri-stop-monitoring-request-broadcaster.remote_code_space": "",
-		"remote_code_space": "CodeSpace2",
+		"remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIStopMonitoringRequestBroadcaster(partner)
 
-	if connector.partner.RemoteCodeSpace(SIRI_STOP_MONITORING_REQUEST_BROADCASTER) != "CodeSpace2" {
-		t.Errorf("RemoteCodeSpace should be equal to CodeSpace2")
+	if connector.partner.RemoteCodeSpace(SIRI_STOP_MONITORING_REQUEST_BROADCASTER) != "external" {
+		t.Errorf("RemoteCodeSpace should be equal to external")
 	}
 }

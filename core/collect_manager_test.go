@@ -52,7 +52,7 @@ func Test_CollectManager_StopAreaMonitored(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Origins.NewOrigin("partner")
 	stopArea.Monitored = true
-	stopArea.SetCode(model.NewCode("test", "value"))
+	stopArea.SetCode(model.NewCode("internal", "value"))
 	stopArea.Save()
 
 	referential.CollectManager().HandlePartnerStatusChange("partner", false)
@@ -82,14 +82,14 @@ func Test_CollectManager_StopAreaMonitoredWithReferent(t *testing.T) {
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.Origins.NewOrigin("partner")
 	stopArea.Monitored = true
-	stopArea.SetCode(model.NewCode("test", "value"))
+	stopArea.SetCode(model.NewCode("internal", "value"))
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
 	stopArea2.Origins.NewOrigin("partner2")
 	stopArea2.ReferentId = stopArea.Id()
 	stopArea2.Monitored = true
-	stopArea2.SetCode(model.NewCode("test", "value"))
+	stopArea2.SetCode(model.NewCode("internal", "value"))
 	stopArea2.Save()
 
 	referential.CollectManager().HandlePartnerStatusChange("partner2", false)

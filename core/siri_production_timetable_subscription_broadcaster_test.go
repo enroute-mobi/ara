@@ -37,7 +37,7 @@ func Test_PTT_checklines(t *testing.T) {
 	line2.Save()
 
 	line3 := referential.model.Lines().New()
-	line3.SetCode(model.NewCode("AnotherCodeSpace", "NINOXE:Line:A:BUS"))
+	line3.SetCode(model.NewCode("external", "NINOXE:Line:A:BUS"))
 	line3.Name = "lineName3"
 	line3.Save()
 

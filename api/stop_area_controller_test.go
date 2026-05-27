@@ -439,7 +439,7 @@ func Test_StopAreaController_Index_SearchByCode(t *testing.T) {
 	referential.Model().StopAreas().Save(stopArea2)
 
 	stopArea3 := referential.Model().StopAreas().New()
-	code = model.NewCode("wrongCodeSpace", "value")
+	code = model.NewCode("external", "value")
 	stopArea.SetCode(code)
 	stopArea3.Name = "superBobStop"
 	referential.Model().StopAreas().Save(stopArea3)
@@ -483,5 +483,5 @@ func Test_StopAreaController_Index_SearchByCode(t *testing.T) {
 	assert.Len(stopAreas, 1)
 
 	// StopAreas with name matching internal:value should be found
-	assert.ElementsMatch([]string{"wrongCodeSpace:value", "internal:value:with:semicolon"}, stopAreas[0].Codes().ToSlice())
+	assert.ElementsMatch([]string{"external:value", "internal:value:with:semicolon"}, stopAreas[0].Codes().ToSlice())
 }

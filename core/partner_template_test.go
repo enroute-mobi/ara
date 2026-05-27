@@ -151,7 +151,7 @@ func TestValidate(t *testing.T) {
 			pt: &PartnerTemplate{
 				manager: m,
 				Settings: map[string]string{
-					"remote_code_space": "test",
+					"remote_code_space": "internal",
 					"remote_url":        "test",
 				},
 				ConnectorTypes: []string{

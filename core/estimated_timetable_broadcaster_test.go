@@ -80,7 +80,7 @@ func Test_EstimatedTimetableBroadcaster_Send_Notify(t *testing.T) {
 	stopArea.SetCode(code)
 	stopArea.Save()
 
-	operatorCode := model.NewCode("test", "1234")
+	operatorCode := model.NewCode("external", "1234")
 	operatorRef := model.Reference{
 		Code: &operatorCode,
 		Type: "OperatorRef",

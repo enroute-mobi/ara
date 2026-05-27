@@ -18,7 +18,7 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
-		"remote_code_space":             "test",
+		"remote_code_space":             "internal",
 		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -28,13 +28,13 @@ func Test_SIRILinesDiscoveryRequestBroadcaster_Lines(t *testing.T) {
 
 	line := referential.Model().Lines().New()
 	line.Name = "line1"
-	lineCode := model.NewCode("test", "1234")
+	lineCode := model.NewCode("internal", "1234")
 	line.SetCode(lineCode)
 	line.Save()
 
 	line2 := referential.Model().Lines().New()
 	line2.Name = "line2"
-	line2Code := model.NewCode("test2", "1234")
+	line2Code := model.NewCode("external", "1234")
 	line2.SetCode(line2Code)
 	line2.Save()
 
