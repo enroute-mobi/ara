@@ -26,13 +26,9 @@ func checkVehicleJourneyResponseStatus(responseRecorder *httptest.ResponseRecord
 }
 
 func prepareVehicleJourneyRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicleJourney *model.VehicleJourney, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -133,13 +129,8 @@ func Test_VehicleJourneyController_Show(t *testing.T) {
 func Test_VehicleJourneyController_Show_With_Detailed_Stop_visits(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -266,7 +257,7 @@ func Test_VehicleJourneyController_Index(t *testing.T) {
 func Test_VehicleJourneyController_FindVehicleJourney(t *testing.T) {
 	assert := assert.New(t)
 
-	ref := core.NewMemoryReferentials().New("test")
+	_, ref := newTestReferential(t)
 
 	vehicleJourney := ref.Model().VehicleJourneys().New()
 	code := model.NewCode("internal", "value")

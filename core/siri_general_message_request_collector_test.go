@@ -41,18 +41,18 @@ func prepare_SIRIGeneralMessageRequestCollector(t *testing.T, responseFilePath s
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":        ts.URL,
-		"remote_code_space": "test kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	situation := partners.Model().Situations().New()
-	code := model.NewCode("test kind", "test value")
+	code := model.NewCode("internal", "test value")
 	situation.SetCode(code)
 	partners.Model().Situations().Save(situation)
 
 	line := partners.Model().Lines().New()
-	lineCode := model.NewCode("test kind", "line value")
+	lineCode := model.NewCode("internal", "line value")
 	line.SetCode(lineCode)
 	partners.Model().Lines().Save(line)
 
@@ -82,7 +82,7 @@ func Test_SIRIGeneralMessageCollectorFactory_Validate(t *testing.T) {
 
 	apiPartner.Settings = map[string]string{
 		"remote_url":        "remote_url",
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 		"remote_credential": "remote_credential",
 	}
 	apiPartner.Validate()

@@ -41,7 +41,7 @@ func Test_Line_MarshalJSON(t *testing.T) {
 
 func Test_Line_UnmarshalJSON(t *testing.T) {
 	text := `{
-    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+    "Codes": { "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" }
   }`
 
 	line := Line{}
@@ -51,8 +51,8 @@ func Test_Line_UnmarshalJSON(t *testing.T) {
 	}
 
 	expectedCodes := []Code{
-		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewCode("hastus", "sqypis"),
+		NewCode("internal", "FR:77491:ZDE:34004:STIF"),
+		NewCode("external", "sqypis"),
 	}
 
 	for _, expectedCode := range expectedCodes {

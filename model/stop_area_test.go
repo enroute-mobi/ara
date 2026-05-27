@@ -142,7 +142,7 @@ func Test_StopArea_MarshalJSON(t *testing.T) {
 func Test_StopArea_UnmarshalJSON(t *testing.T) {
 	text := `{
     "Name":"Test",
-    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Codes": { "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" },
     "Lines": ["1234","5678"]
   }`
 
@@ -157,8 +157,8 @@ func Test_StopArea_UnmarshalJSON(t *testing.T) {
 	}
 
 	expectedCodes := []Code{
-		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewCode("hastus", "sqypis"),
+		NewCode("internal", "FR:77491:ZDE:34004:STIF"),
+		NewCode("external", "sqypis"),
 	}
 
 	for _, expectedCode := range expectedCodes {

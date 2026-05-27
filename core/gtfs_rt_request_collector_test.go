@@ -131,7 +131,7 @@ func Test_PartnerStatusDown(t *testing.T) {
 	partner := partners.New("slug")
 	settings := map[string]string{
 		"remote_url":        ts.URL,
-		"remote_code_space": "test_kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)

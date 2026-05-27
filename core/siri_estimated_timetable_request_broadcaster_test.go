@@ -200,7 +200,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetCode(model.NewCode("wrongCodeSpace", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("external", "stopArea2"))
 	stopArea2.ReferentId = stopArea.Id()
 	stopArea2.Monitored = true
 	stopArea2.Save()
@@ -319,7 +319,7 @@ func Test_SIRIEstimatedTimetableBroadcasterFactory_Validate(t *testing.T) {
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 		"local_credential":  "local_credential",
 	}
 	apiPartner.Validate()
@@ -332,15 +332,15 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteCodeSpacePresent(t *testing.T)
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-estimated-timetable-request-broadcaster.remote_code_space": "CodeSpace1",
-		"remote_code_space": "CodeSpace2",
+		"siri-estimated-timetable-request-broadcaster.remote_code_space": "internal",
+		"remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 
-	if connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "CodeSpace1" {
-		t.Errorf("RemoteCodeSpace should be egals to CodeSpace1")
+	if connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "internal" {
+		t.Errorf("RemoteCodeSpace should be egals to internal")
 	}
 }
 
@@ -349,14 +349,14 @@ func Test_SIRIEstimatedTimetableBroadcaster_RemoteCodeSpaceAbsent(t *testing.T) 
 
 	settings := map[string]string{
 		"siri-estimated-timetable-request-broadcaster.remote_code_space": "",
-		"remote_code_space": "CodeSpace2",
+		"remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIEstimatedTimetableRequestBroadcaster(partner)
 	connector.Start()
 
-	if connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "CodeSpace2" {
-		t.Errorf("RemoteCodeSpace should be egals to CodeSpace2")
+	if connector.partner.RemoteCodeSpace(SIRI_ESTIMATED_TIMETABLE_REQUEST_BROADCASTER) != "external" {
+		t.Errorf("RemoteCodeSpace should be egals to external")
 	}
 }

@@ -47,7 +47,7 @@ func Test_Partner_OperationnalStatus_PushCollector(t *testing.T) {
 	partner := partnerManager.New("slug")
 	settings := map[string]string{
 		"local_credential":  "loc",
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{"push-collector"}
@@ -88,7 +88,7 @@ func Test_Partner_OperationnalStatus_GtfsCollector(t *testing.T) {
 
 	settings := map[string]string{
 		"local_credential":  "loc",
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partner.ConnectorTypes = []string{GTFS_RT_REQUEST_COLLECTOR}
@@ -130,7 +130,7 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 
 	settings := map[string]string{
 		"remote_url":        "une url",
-		"remote_code_space": "_internal",
+		"remote_code_space": "internal",
 		s.PARTNER_MAX_RETRY: "1",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
@@ -144,18 +144,18 @@ func Test_Partner_SubcriptionCancel(t *testing.T) {
 
 	stopArea := referential.Model().StopAreas().New()
 	stopArea.CollectedAlways = false
-	code := model.NewCode("_internal", "coicogn2")
+	code := model.NewCode("internal", "coicogn2")
 	stopArea.SetCode(code)
 	stopArea.Save()
 
 	stopVisit := referential.Model().StopVisits().New()
-	code = model.NewCode("_internal", "stopvisit1")
+	code = model.NewCode("internal", "stopvisit1")
 	stopVisit.SetCode(code)
 	stopVisit.StopAreaId = stopArea.Id()
 	stopVisit.Collected(time.Now())
 	stopVisit.Save()
 
-	objId := model.NewCode("_internal", "coicogn2")
+	objId := model.NewCode("internal", "coicogn2")
 	ref := model.Reference{
 		Code: &objId,
 
@@ -880,9 +880,7 @@ func Test_MemoryPartners_Load(t *testing.T) {
 // func Test_MemoryPartners_SaveToDatabase(t *testing.T) {}
 
 func Test_Partners_StartStop(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 
 	partner.ConnectorTypes = []string{TEST_STARTABLE_CONNECTOR}

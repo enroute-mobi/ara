@@ -26,13 +26,9 @@ func checkStopAreaResponseStatus(responseRecorder *httptest.ResponseRecorder, t 
 }
 
 func prepareStopAreaRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopArea *model.StopArea, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -177,7 +173,7 @@ func Test_StopAreaController_Index(t *testing.T) {
 func Test_StopAreaController_FindStopArea(t *testing.T) {
 	assert := assert.New(t)
 
-	ref := core.NewMemoryReferentials().New("test")
+	_, ref := newTestReferential(t)
 
 	stopArea := ref.Model().StopAreas().New()
 	code := model.NewCode("internal", "value")
@@ -198,13 +194,8 @@ func Test_StopAreaController_FindStopArea(t *testing.T) {
 func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -291,13 +282,8 @@ func Test_StopAreaController_Index_Paginated_With_Name_Order(t *testing.T) {
 func Test_StopAreaController_Index_SearchByName(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -392,13 +378,8 @@ func Test_StopAreaController_Index_SearchByName(t *testing.T) {
 func Test_StopAreaController_Index_SearchByName_Below_Three_Characters(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -438,38 +419,33 @@ func Test_StopAreaController_Index_SearchByName_Below_Three_Characters(t *testin
 func Test_StopAreaController_Index_SearchByCode(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
 
 	// Create and save 2 new stopAreas
 	stopArea := referential.Model().StopAreas().New()
-	code := model.NewCode("codeSpace", "value")
+	code := model.NewCode("internal", "value")
 	stopArea.SetCode(code)
 	stopArea.Name = "Alice"
 	referential.Model().StopAreas().Save(stopArea)
 
 	stopArea2 := referential.Model().StopAreas().New()
-	code = model.NewCode("codeSpace", "NotStartingWithvalue")
+	code = model.NewCode("internal", "NotStartingWithvalue")
 	stopArea.SetCode(code)
 	stopArea2.Name = "Bob"
 	referential.Model().StopAreas().Save(stopArea2)
 
 	stopArea3 := referential.Model().StopAreas().New()
-	code = model.NewCode("wrongCodeSpace", "value")
+	code = model.NewCode("external", "value")
 	stopArea.SetCode(code)
 	stopArea3.Name = "superBobStop"
 	referential.Model().StopAreas().Save(stopArea3)
 
 	stopArea4 := referential.Model().StopAreas().New()
-	code = model.NewCode("codeSpace", "value:with:semicolon")
+	code = model.NewCode("internal", "value:with:semicolon")
 	stopArea.SetCode(code)
 	stopArea4.Name = "newBôbArret"
 	referential.Model().StopAreas().Save(stopArea4)
@@ -481,7 +457,7 @@ func Test_StopAreaController_Index_SearchByCode(t *testing.T) {
 	path := path.Join("default", "stop_areas")
 
 	params := url.Values{}
-	params.Add("code", "codeSpace:value")
+	params.Add("code", "internal:value")
 
 	u, _ := URI("", path, params)
 
@@ -506,6 +482,6 @@ func Test_StopAreaController_Index_SearchByCode(t *testing.T) {
 	stopAreas := paginatedResource.Models
 	assert.Len(stopAreas, 1)
 
-	// StopAreas with name matching codeSpace:value should be found
-	assert.ElementsMatch([]string{"wrongCodeSpace:value", "codeSpace:value:with:semicolon"}, stopAreas[0].Codes().ToSlice())
+	// StopAreas with name matching internal:value should be found
+	assert.ElementsMatch([]string{"external:value", "internal:value:with:semicolon"}, stopAreas[0].Codes().ToSlice())
 }

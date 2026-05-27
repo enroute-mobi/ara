@@ -38,14 +38,14 @@ func Test_Code_String(t *testing.T) {
 
 func Test_NewCodesFromMap(t *testing.T) {
 	idmap := map[string]string{
-		"reflex": "FR:77491:ZDE:34004:STIF",
-		"hastus": "sqypis",
+		"internal": "FR:77491:ZDE:34004:STIF",
+		"external": "sqypis",
 	}
 	identifiers := NewCodesFromMap(idmap)
 
 	expectedIdentifiers := make(Codes)
-	expectedIdentifiers["reflex"] = NewCode("reflex", "FR:77491:ZDE:34004:STIF")
-	expectedIdentifiers["hastus"] = NewCode("hastus", "sqypis")
+	expectedIdentifiers["internal"] = NewCode("internal", "FR:77491:ZDE:34004:STIF")
+	expectedIdentifiers["external"] = NewCode("external", "sqypis")
 
 	if !reflect.DeepEqual(expectedIdentifiers, identifiers) {
 		t.Errorf("Wrong unmarshalled identifers from %s\n want: %#v\n got: %#v", idmap, expectedIdentifiers, identifiers)
@@ -53,7 +53,7 @@ func Test_NewCodesFromMap(t *testing.T) {
 }
 
 func Test_Codes_UnmarshalJSON(t *testing.T) {
-	text := `{ "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }`
+	text := `{ "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" }`
 	identifiers := make(Codes)
 	err := json.Unmarshal([]byte(text), &identifiers)
 	if err != nil {
@@ -61,8 +61,8 @@ func Test_Codes_UnmarshalJSON(t *testing.T) {
 	}
 
 	expectedIdentifiers := make(Codes)
-	expectedIdentifiers["reflex"] = NewCode("reflex", "FR:77491:ZDE:34004:STIF")
-	expectedIdentifiers["hastus"] = NewCode("hastus", "sqypis")
+	expectedIdentifiers["internal"] = NewCode("internal", "FR:77491:ZDE:34004:STIF")
+	expectedIdentifiers["external"] = NewCode("external", "sqypis")
 
 	if !reflect.DeepEqual(expectedIdentifiers, identifiers) {
 		t.Errorf("Wrong unmarshalled identifers from %s\n want: %#v\n got: %#v", text, expectedIdentifiers, identifiers)

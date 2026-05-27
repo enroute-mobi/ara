@@ -27,13 +27,9 @@ func checkSituationResponseStatus(responseRecorder *httptest.ResponseRecorder, t
 }
 
 func prepareSituationRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (situation *model.Situation, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -174,13 +170,8 @@ func Test_SituationController_Index(t *testing.T) {
 func Test_SituationController_Index_Paginated(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -251,13 +242,8 @@ func Test_SituationController_Index_Paginated(t *testing.T) {
 func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -355,13 +341,8 @@ func Test_SituationController_Index_Paginated_With_ValidityPerioStart_Order(t *t
 func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_Not_Provided(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -406,13 +387,8 @@ func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_Not_Pr
 func Test_SituationController_Index_Paginated_UseDefaultPerPage_IfPerPage_AboveDefaultPerPage(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())

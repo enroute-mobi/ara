@@ -31,13 +31,9 @@ func checkPartnerResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 }
 
 func preparePartnerRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (partner *core.Partner, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -87,13 +83,8 @@ func preparePartnerRequest(method string, sendIdentifier bool, body []byte, t *t
 func Test_PartnerController_SubscriptionsCreate(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -132,13 +123,8 @@ func Test_PartnerController_SubscriptionsCreate(t *testing.T) {
 func Test_PartnerController_SubscriptionsIndex(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -178,13 +164,8 @@ func Test_PartnerController_SubscriptionsIndex(t *testing.T) {
 func Test_PartnerController_SubscriptionsDelete(t *testing.T) {
 	assert := assert.New(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -357,15 +338,9 @@ func Test_PartnerController_Save(t *testing.T) {
 	model.InitTestDb(t)
 	defer model.CleanTestDb(t)
 
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	referentials.SetUUIDGenerator(uuid.NewRealUUIDGenerator())
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential := referentials.New("default")
+	server, referential := newTestServer(t, uuid.NewRealUUIDGenerator())
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
-	status, refErr := referentials.SaveToDatabase()
+	status, refErr := referential.Manager().SaveToDatabase()
 	require.NoError(refErr)
 	require.Equal(200, status, "Cannot save referentials to Database")
 
@@ -404,9 +379,7 @@ func Test_PartnerController_FindPartner(t *testing.T) {
 	assert := assert.New(t)
 
 	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	referential := referentials.New("default")
-	referential.Save()
+	_, referential := newTestReferential(t)
 
 	// Save a new partner
 	partner := referential.Partners().New("First Partner")

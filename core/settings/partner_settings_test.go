@@ -698,7 +698,7 @@ func Test_CollectSettings_With_Included_StopAreaGroups(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"remote_code_space":                "dummy",
+		"remote_code_space":                "internal",
 		"collect.include_stop_areas":       "A,B",
 		"collect.include_stop_area_groups": "GROUP",
 	}
@@ -760,7 +760,7 @@ func Test_CollectSettings_With_Excluded_StopAreaGroups(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"remote_code_space":                "dummy",
+		"remote_code_space":                "internal",
 		"collect.exclude_stop_areas":       "A,B",
 		"collect.exclude_stop_area_groups": "GROUP",
 	}
@@ -822,7 +822,7 @@ func Test_CollectSettings_With_Included_LineGroups(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"remote_code_space":           "dummy",
+		"remote_code_space":           "internal",
 		"collect.include_lines":       "A,B",
 		"collect.include_line_groups": "GROUP",
 	}
@@ -886,7 +886,7 @@ func Test_CollectSettings_With_Excluded_LineGroups(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		"remote_code_space":           "dummy",
+		"remote_code_space":           "internal",
 		"collect.exclude_lines":       "A,B",
 		"collect.exclude_line_groups": "GROUP",
 	}

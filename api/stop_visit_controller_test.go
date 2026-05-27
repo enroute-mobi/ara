@@ -23,13 +23,9 @@ func checkStopVisitResponseStatus(responseRecorder *httptest.ResponseRecorder, t
 }
 
 func prepareStopVisitRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopVisit *model.StopVisit, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -176,7 +172,7 @@ func Test_StopVisitController_Index(t *testing.T) {
 func Test_StopVisitController_FindStopVisit(t *testing.T) {
 	assert := assert.New(t)
 
-	ref := core.NewMemoryReferentials().New("test")
+	_, ref := newTestReferential(t)
 	stopVisit := ref.Model().StopVisits().New()
 	code := model.NewCode("internal", "stif:value")
 	stopVisit.SetCode(code)

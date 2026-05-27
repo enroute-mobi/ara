@@ -43,14 +43,14 @@ func prepare_SIRIStopMonitoringRequestCollector(t *testing.T, responseFilePath s
 
 	settings := map[string]string{
 		"remote_url":        ts.URL,
-		"remote_code_space": "test kind",
+		"remote_code_space": "internal",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	partners.Save(partner)
 
 	// Create StopArea with Code
 	stopArea := partners.Model().StopAreas().New()
-	code := model.NewCode("test kind", "test value")
+	code := model.NewCode("internal", "test value")
 	stopArea.SetCode(code)
 	partners.Model().StopAreas().Save(stopArea)
 
@@ -155,7 +155,7 @@ func Test_SIRIStopMonitoringRequestCollectorFactory_Validate(t *testing.T) {
 
 	apiPartner.Settings = map[string]string{
 		"remote_url":        "remote_url",
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 		"remote_credential": "remote_credential",
 	}
 	apiPartner.Validate()

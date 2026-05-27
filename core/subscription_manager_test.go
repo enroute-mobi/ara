@@ -10,11 +10,11 @@ import (
 
 func Test_FindOrCreateByKind_StopMonitoringAndVehicleMonitoringCollect(t *testing.T) {
 	assert := assert.New(t)
-
+	// Doesn't use the main_test.go helper because we don't need to
 	referentials := NewMemoryReferentials()
 
 	for _, kind := range []string{"StopMonitoringCollect", "VehicleMonitoringCollect"} {
-		referential := referentials.New(ReferentialSlug("referential"))
+		referential := referentials.New("test")
 		partner := referential.partners.New("test")
 		partner.Subscriptions().FindOrCreateByKind(kind)
 
@@ -28,8 +28,7 @@ func Test_FindOrCreateByKind_StopMonitoringAndVehicleMonitoringCollect(t *testin
 func Test_FindOrCreateByKind_WithMaximumResources(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
+	_, referential := newTestReferential(t)
 	partner := referential.partners.New("test")
 
 	settings := map[string]string{
@@ -49,8 +48,7 @@ func Test_FindOrCreateByKind_WithMaximumResources(t *testing.T) {
 func Test_FindOrCreateByKind_WithExistingSubscription(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
+	_, referential := newTestReferential(t)
 	partner := referential.partners.New("test")
 	referential.partners.Save(partner)
 
@@ -70,8 +68,7 @@ func Test_FindOrCreateByKind_WithExistingSubscription(t *testing.T) {
 func Test_FindOrCreateByKind_WithExistingSubscription_AlreadySubscribed(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
+	_, referential := newTestReferential(t)
 	partner := referential.partners.New("test")
 	referential.partners.Save(partner)
 
@@ -94,8 +91,7 @@ func Test_FindOrCreateByKind_WithExistingSubscription_AlreadySubscribed(t *testi
 func Test_FindOrCreateByKind_WithExistingSubscription_WithResourceBelowMaximumResource(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
+	_, referential := newTestReferential(t)
 	partner := referential.partners.New("test")
 	settings := map[string]string{
 		"subscriptions.maximum_resources": "3",
@@ -128,8 +124,7 @@ func Test_FindOrCreateByKind_WithExistingSubscription_WithResourceBelowMaximumRe
 func Test_FindOrCreateByKind_WithExistingSubscription_WithResourceEqualToMaximumResource(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
+	_, referential := newTestReferential(t)
 	partner := referential.partners.New("test")
 	settings := map[string]string{
 		"subscriptions.maximum_resources": "2",

@@ -67,8 +67,7 @@ func Test_checkFacilities(t *testing.T) {
 	require := require.New(t)
 
 	// Test Setup
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 

@@ -44,7 +44,7 @@ func Test_Facility_UnmarshalJSON(t *testing.T) {
 	require := require.New(t)
 
 	text := `{
-    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Codes": { "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" },
     "Status": "available"
   }`
 
@@ -53,8 +53,8 @@ func Test_Facility_UnmarshalJSON(t *testing.T) {
 	require.NoError(err)
 
 	expectedCodes := []Code{
-		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewCode("hastus", "sqypis"),
+		NewCode("internal", "FR:77491:ZDE:34004:STIF"),
+		NewCode("external", "sqypis"),
 	}
 
 	for _, expectedCode := range expectedCodes {
@@ -71,7 +71,7 @@ func Test_Facility_UnmarshalJSON_WithoutStatus(t *testing.T) {
 	require := require.New(t)
 
 	text := `{
-    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" }
+    "Codes": { "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" }
   }`
 
 	facility := Facility{}
@@ -79,8 +79,8 @@ func Test_Facility_UnmarshalJSON_WithoutStatus(t *testing.T) {
 	require.NoError(err)
 
 	expectedCodes := []Code{
-		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewCode("hastus", "sqypis"),
+		NewCode("internal", "FR:77491:ZDE:34004:STIF"),
+		NewCode("external", "sqypis"),
 	}
 
 	for _, expectedCode := range expectedCodes {

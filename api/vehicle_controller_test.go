@@ -22,13 +22,9 @@ func checkVehicleResponseStatus(responseRecorder *httptest.ResponseRecorder, t *
 }
 
 func prepareVehicleRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (vehicle *model.Vehicle, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
@@ -173,7 +169,7 @@ func Test_VehicleController_Index(t *testing.T) {
 func Test_VehicleController_FindVehicle(t *testing.T) {
 	assert := assert.New(t)
 
-	ref := core.NewMemoryReferentials().New("test")
+	_, ref := newTestReferential(t)
 
 	vehicle := ref.Model().Vehicles().New()
 	code := model.NewCode("internal", "value")

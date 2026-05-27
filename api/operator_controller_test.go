@@ -22,13 +22,9 @@ func checkOperatorResponseStatus(responseRecorder *httptest.ResponseRecorder, t 
 }
 
 func prepareOperatorRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (operator *model.Operator, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())

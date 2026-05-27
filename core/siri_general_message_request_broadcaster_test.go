@@ -229,7 +229,7 @@ func Test_SIRIGeneralMessageRequestBroadcasterFactory_Validate(t *testing.T) {
 	}
 
 	apiPartner.Settings = map[string]string{
-		"remote_code_space": "remote_code_space",
+		"remote_code_space": "internal",
 		"local_credential":  "local_credential",
 	}
 	apiPartner.Validate()
@@ -243,14 +243,14 @@ func Test_SIRIGeneralMessageRequestBroadcaster_RemoteCodeSpaceAbsent(t *testing.
 
 	settings := map[string]string{
 		"siri-general-message-request-broadcaster.remote_code_space": "",
-		"remote_code_space": "CodeSpace2",
+		"remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
-	if connector.partner.RemoteCodeSpace(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "CodeSpace2" {
-		t.Errorf("RemoteCodeSpace should be egals to CodeSpace2")
+	if connector.partner.RemoteCodeSpace(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "external" {
+		t.Errorf("RemoteCodeSpace should be egals to external")
 	}
 }
 
@@ -258,13 +258,13 @@ func Test_SIRIGeneralMessageBroadcaster_RemoteCodeSpacePresent(t *testing.T) {
 	partner := NewPartner()
 
 	settings := map[string]string{
-		"siri-general-message-request-broadcaster.remote_code_space": "CodeSpace1",
-		"remote_code_space": "CodeSpace2",
+		"siri-general-message-request-broadcaster.remote_code_space": "internal",
+		"remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewSIRIGeneralMessageRequestBroadcaster(partner)
 
-	if connector.partner.RemoteCodeSpace(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "CodeSpace1" {
-		t.Errorf("RemoteCodeSpace should be egals to CodeSpace1")
+	if connector.partner.RemoteCodeSpace(SIRI_GENERAL_MESSAGE_REQUEST_BROADCASTER) != "internal" {
+		t.Errorf("RemoteCodeSpace should be egals to internal")
 	}
 }

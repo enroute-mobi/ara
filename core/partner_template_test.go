@@ -7,19 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func createTestPartnerTemplateManager() *PartnerTemplateManager {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referential.collectManager = NewTestCollectManager()
-	referentials.Save(referential)
-
+func createTestPartnerTemplateManager(t *testing.T) *PartnerTemplateManager {
+	_, referential := newTestReferential(t, true)
 	return NewPartnerTemplateManager(referential)
 }
 
 func TestFindByCredential(t *testing.T) {
 	assert := assert.New(t)
 
-	m := createTestPartnerTemplateManager()
+	m := createTestPartnerTemplateManager(t)
 	pt := m.New("test")
 	pt.CredentialType = FormatMatching
 
@@ -57,7 +53,7 @@ func TestFindByCredential(t *testing.T) {
 func TestValidate(t *testing.T) {
 	assert := assert.New(t)
 
-	m := createTestPartnerTemplateManager()
+	m := createTestPartnerTemplateManager(t)
 	pt := m.New("test")
 	pt.CredentialType = FormatMatching
 	pt.LocalCredential = "%{value}"
@@ -155,7 +151,7 @@ func TestValidate(t *testing.T) {
 			pt: &PartnerTemplate{
 				manager: m,
 				Settings: map[string]string{
-					"remote_code_space": "test",
+					"remote_code_space": "internal",
 					"remote_url":        "test",
 				},
 				ConnectorTypes: []string{
