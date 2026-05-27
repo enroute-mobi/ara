@@ -179,11 +179,8 @@ func Test_ModelGuardian_Run_cleanOrUpdateStopVisits_Clean(t *testing.T) {
 	testSpan, spanCtx := tracer.StartSpanFromContext(ctx, "test.span")
 	defer testSpan.Finish()
 
-	referentials := NewMemoryReferentials()
-
-	referential := referentials.New(ReferentialSlug("referential"))
+	_, referential := newTestReferential(t)
 	referential.SetSetting(s.MODEL_PERSISTENCE, "30M")
-	referentials.Save(referential)
 
 	fakeClock := clock.NewFakeClock()
 	referential.ModelGuardian().SetClock(fakeClock)

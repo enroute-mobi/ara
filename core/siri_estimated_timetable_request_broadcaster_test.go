@@ -200,7 +200,7 @@ func Test_SIRIEstimatedTimetableBroadcaster_RequestStopAreaWithReferent(t *testi
 	stopArea.Save()
 
 	stopArea2 := referential.Model().StopAreas().New()
-	stopArea2.SetCode(model.NewCode("wrongCodeSpace", "stopArea2"))
+	stopArea2.SetCode(model.NewCode("external", "stopArea2"))
 	stopArea2.ReferentId = stopArea.Id()
 	stopArea2.Monitored = true
 	stopArea2.Save()

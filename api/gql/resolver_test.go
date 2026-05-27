@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"testing"
 
-	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
 	graphql "github.com/graph-gophers/graphql-go"
@@ -35,9 +34,7 @@ type v struct {
 func TestResolverQuery(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := core.NewMemoryReferentials()
-	referential := referentials.New(core.ReferentialSlug("referential"))
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partner := referential.Partners().New("slug")
 	s := map[string]string{
@@ -146,9 +143,7 @@ func TestResolverQuery(t *testing.T) {
 func TestResolverMutation(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := core.NewMemoryReferentials()
-	referential := referentials.New(core.ReferentialSlug("referential"))
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partner := referential.Partners().New("slug")
 	s := map[string]string{
@@ -237,9 +232,7 @@ func TestResolverMutation(t *testing.T) {
 func TestResolverMutationWithoutAuthorization(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := core.NewMemoryReferentials()
-	referential := referentials.New(core.ReferentialSlug("referential"))
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 
 	partner := referential.Partners().New("slug")
 	s := map[string]string{

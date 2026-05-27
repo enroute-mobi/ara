@@ -39,7 +39,7 @@ func Test_StopVisit_MarshalJSON(t *testing.T) {
 
 func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 	text := `{
-    "Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+    "Codes": { "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" },
     "StopAreaId": "6ba7b814-9dad-11d1-1-00c04fd430c8",
     "VehicleJourneyId": "6ba7b814-9dad-11d1-2-00c04fd430c8",
     "PassageOrder": 10
@@ -52,8 +52,8 @@ func Test_StopVisit_UnmarshalJSON(t *testing.T) {
 	}
 
 	expectedCodes := []Code{
-		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewCode("hastus", "sqypis"),
+		NewCode("internal", "FR:77491:ZDE:34004:STIF"),
+		NewCode("external", "sqypis"),
 	}
 
 	for _, expectedCode := range expectedCodes {

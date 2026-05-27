@@ -152,7 +152,7 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 	text := `{
 "Origin":"test",
-"Codes": { "reflex": "FR:77491:ZDE:34004:STIF", "hastus": "sqypis" },
+"Codes": { "internal": "FR:77491:ZDE:34004:STIF", "external": "sqypis" },
 "InternalTags":["tag1"],
 "Affects":[
 {"Type":"StopArea","StopAreaId":"259344234"},
@@ -174,8 +174,8 @@ func Test_Situation_UnmarshalJSON(t *testing.T) {
 	assert.Nil(err)
 
 	expectedCodes := []Code{
-		NewCode("reflex", "FR:77491:ZDE:34004:STIF"),
-		NewCode("hastus", "sqypis"),
+		NewCode("internal", "FR:77491:ZDE:34004:STIF"),
+		NewCode("external", "sqypis"),
 	}
 
 	expectedAffectedStopArea := NewAffectedStopArea()

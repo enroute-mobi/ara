@@ -124,8 +124,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 func Test_TripUpdatesBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	settings := map[string]string{
@@ -471,8 +470,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 func Test_rewriteStopSequence(t *testing.T) {
 	assert := assert.New(t)
 
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("referential")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	connector := NewTripUpdatesBroadcaster(partner)

@@ -880,9 +880,7 @@ func Test_MemoryPartners_Load(t *testing.T) {
 // func Test_MemoryPartners_SaveToDatabase(t *testing.T) {}
 
 func Test_Partners_StartStop(t *testing.T) {
-	referentials := NewMemoryReferentials()
-	referential := referentials.New(ReferentialSlug("referential"))
-	referentials.Save(referential)
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 
 	partner.ConnectorTypes = []string{TEST_STARTABLE_CONNECTOR}

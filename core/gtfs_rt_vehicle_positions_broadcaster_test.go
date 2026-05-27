@@ -107,7 +107,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongLineId(t *testing.T) {
 	connector.Start()
 
 	line := referential.model.Lines().New()
-	lId := model.NewCode("WRONG_KIND", "lId")
+	lId := model.NewCode("external", "lId")
 	line.SetCode(lId)
 	line.Save()
 
@@ -172,7 +172,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVJId(t *testing.T) {
 	line.Save()
 
 	vehicleJourney := referential.model.VehicleJourneys().New()
-	vjId := model.NewCode("WRONG_ID", "vjId")
+	vjId := model.NewCode("external", "vjId")
 	vehicleJourney.SetCode(vjId)
 	vehicleJourney.LineId = line.Id()
 	vehicleJourney.Save()
@@ -246,7 +246,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleId(t *testing.T) {
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewCode("WRONG_ID", "vId")
+	vId := model.NewCode("external", "vId")
 	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()
@@ -284,7 +284,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 
 	settings := map[string]string{
 		"remote_code_space": "internal",
-		"gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space": "WRONG_ID",
+		"gtfs-rt-vehicle-positions-broadcaster.vehicle_remote_code_space": "external",
 	}
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewVehiclePositionBroadcaster(partner)
@@ -311,7 +311,7 @@ func Test_VehiclePositionBroadcaster_HandleGtfs_WrongVehicleIdWithSetting(t *tes
 	stopVisit.Save()
 
 	vehicle := referential.model.Vehicles().New()
-	vId := model.NewCode("WRONG_ID", "vId")
+	vId := model.NewCode("external", "vId")
 	vehicle.SetCode(vId)
 	vehicle.VehicleJourneyId = vehicleJourney.Id()
 	vehicle.LineId = line.Id()

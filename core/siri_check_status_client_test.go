@@ -28,8 +28,7 @@ func prepareSiriCheckStatusClient(t *testing.T, responseFilePath string) (partne
 	defer ts.Close()
 
 	// Create a CheckStatusClient
-	referentials := NewMemoryReferentials()
-	referential := referentials.New("slug")
+	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("slug")
 
 	settings := map[string]string{s.REMOTE_URL: ts.URL}

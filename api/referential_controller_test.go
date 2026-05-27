@@ -129,7 +129,7 @@ func Test_ReferentialController_Update(t *testing.T) {
 "Slug": "another_test",
 "OrganisationId": "test",
 "Name": "test name",
-"Settings": {"model.refresh_time": "4h", "logger.verbose.stop_areas": "stif:STIF:StopPoint:Q:473947:"}
+"Settings": {"model.refresh_time": "4h", "logger.verbose.stop_areas": "internal:STIF:StopPoint:Q:473947:"}
 }`)
 
 	referential, responseRecorder, server, request := referentialPrepareRequest("PUT", true, body, t)
@@ -152,7 +152,7 @@ func Test_ReferentialController_Update(t *testing.T) {
 
 	// Settings must be set
 	assert.Equal(4*time.Hour, updatedReferential.ModelRefreshTime())
-	expectedLoggerStopAreas := []model.Code{model.NewCode("stif", "STIF:StopPoint:Q:473947:")}
+	expectedLoggerStopAreas := []model.Code{model.NewCode("internal", "STIF:StopPoint:Q:473947:")}
 	assert.Equal(expectedLoggerStopAreas, updatedReferential.LoggerVerboseStopAreas())
 }
 

@@ -136,7 +136,7 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	line.Save()
 
 	firstStopArea := referential.Model().StopAreas().New()
-	firstCode := model.NewCode("test_incorrect", "NINOXE:StopPoint:SP:1:LOC")
+	firstCode := model.NewCode("external", "NINOXE:StopPoint:SP:1:LOC")
 	firstStopArea.SetCode(firstCode)
 	firstStopArea.Name = "First"
 	firstStopArea.LineIds = []model.LineId{line.Id()}

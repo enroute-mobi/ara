@@ -22,13 +22,9 @@ func checkStopAreaGroupResponseStatus(responseRecorder *httptest.ResponseRecorde
 }
 
 func prepareStopAreaGroupRequest(method string, sendIdentifier bool, body []byte, t *testing.T) (stopAreaGroup *model.StopAreaGroup, responseRecorder *httptest.ResponseRecorder, referential *core.Referential) {
-	// Create a referential
-	referentials := core.NewMemoryReferentials()
-	server := &Server{}
-	server.SetReferentials(referentials)
-	referential = referentials.New("default")
+	var server *Server
+	server, referential = newTestServer(t)
 	referential.Tokens = []string{"testToken"}
-	referential.Save()
 
 	// Set the fake UUID generator
 	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())

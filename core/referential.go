@@ -134,7 +134,10 @@ func (referential *Referential) StartedAt() time.Time {
 	return referential.startedAt
 }
 
-// WIP: Interface ?
+func (referential *Referential) Manager() Referentials {
+	return referential.manager
+}
+
 func (referential *Referential) CollectManager() CollectManagerInterface {
 	return referential.collectManager
 }
