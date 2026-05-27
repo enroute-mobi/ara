@@ -2,9 +2,13 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
+	"path"
 	"testing"
 
 	"bitbucket.org/enroute-mobi/ara/core"
@@ -185,4 +189,94 @@ func Test_VehicleController_FindVehicle(t *testing.T) {
 
 	_, ok = controller.findVehicle(string(vehicle.Id()))
 	assert.True(ok, "Can't find Vehicle by Id")
+}
+
+func Test_VehicleController_Index_SearchByLineIds(t *testing.T) {
+	assert := assert.New(t)
+
+	// Create a referential
+	server, referential := newTestServer(t)
+	referential.Tokens = []string{"testToken"}
+	referential.Save()
+
+	// Set the fake UUID generator
+	uuid.SetDefaultUUIDGenerator(uuid.NewRealUUIDGenerator())
+
+	// Create and save 2 new line
+	line1 := referential.Model().Lines().New()
+	code := model.NewCode("internal", "value1")
+	line1.SetCode(code)
+	referential.Model().Lines().Save(line1)
+
+	line2 := referential.Model().Lines().New()
+	code = model.NewCode("internal", "value2")
+	line2.SetCode(code)
+	referential.Model().Lines().Save(line2)
+
+	// Create and save 2 new vehicles
+	vehicle := referential.Model().Vehicles().New()
+	code = model.NewCode("internal", "GOODLineId")
+	vehicle.SetCode(code)
+	vehicle.LineId = line1.Id()
+	referential.Model().Vehicles().Save(vehicle)
+
+	vehicle2 := referential.Model().Vehicles().New()
+	code = model.NewCode("internal", "GOODLineId1")
+	vehicle2.SetCode(code)
+	vehicle2.LineId = line1.Id()
+	referential.Model().Vehicles().Save(vehicle2)
+
+	vehicle3 := referential.Model().Vehicles().New()
+	code = model.NewCode("internal", "value5")
+	vehicle3.SetCode(code)
+	vehicle3.LineId = line2.Id()
+	referential.Model().Vehicles().Save(vehicle3)
+
+	vehicle4 := referential.Model().Vehicles().New()
+	code = model.NewCode("internal", "value6")
+	vehicle4.SetCode(code)
+	vehicle4.LineId = model.LineId("09fc2149-1182-4bcc-a0d4-382516c193a1")
+	referential.Model().Vehicles().Save(vehicle4)
+
+	all := referential.Model().Vehicles().FindAll()
+	assert.Len(all, 4)
+
+	// Create a request
+	path := path.Join("default", "vehicles")
+
+	params := url.Values{}
+	params.Add("line_ids[]", string(line1.Id()))
+
+	u, _ := URI("", path, params)
+
+	request, _ := http.NewRequest("GET", u.String(), nil)
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "vehicles")
+
+	// Create a ResponseRecorder and send request
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	res := responseRecorder.Result()
+	defer res.Body.Close()
+	data, err := io.ReadAll(res.Body)
+	assert.NoError(err)
+
+	var paginatedResource PaginatedResource[model.Vehicle]
+	err = json.Unmarshal(data, &paginatedResource)
+	assert.NoError(err)
+
+	vehicles := paginatedResource.Models
+	assert.Len(vehicles, 2)
+
+	// Vehicles with matching LineId
+	vehicleCodesFromApi := []string{}
+	for i := range vehicles {
+		for j := range vehicles[i].CodeSlice() {
+			vehicleCodesFromApi = append(vehicleCodesFromApi, vehicles[i].CodeSlice()[j])
+		}
+	}
+
+	assert.ElementsMatch([]string{"internal:GOODLineId", "internal:GOODLineId1"}, vehicleCodesFromApi)
 }

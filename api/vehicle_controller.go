@@ -45,6 +45,12 @@ func (controller *VehicleController) Index(response http.ResponseWriter, params 
 		return
 	}
 
+	filteredVehicles, err = searchByLineIds(filteredVehicles, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	direction := params.Get("direction")
 	switch direction {
 	case "desc":

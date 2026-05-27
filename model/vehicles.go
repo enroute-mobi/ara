@@ -75,6 +75,10 @@ func (vehicle *Vehicle) Id() VehicleId {
 	return vehicle.id
 }
 
+func (vehicle *Vehicle) GetLineId() LineId {
+	return vehicle.LineId
+}
+
 func (vehicle *Vehicle) Save() bool {
 	return vehicle.model.Vehicles().Save(vehicle)
 }
