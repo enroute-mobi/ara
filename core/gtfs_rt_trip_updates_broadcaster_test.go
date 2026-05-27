@@ -1,7 +1,7 @@
 package core
 
 import (
-	"strconv"
+	"fmt"
 	"testing"
 	"time"
 
@@ -117,7 +117,7 @@ func Test_TripUpdatesBroadcaster_HandleGtfs(t *testing.T) {
 	stopTimeUpdate := tripUpdate.StopTimeUpdate[0]
 	assert.Equal(uint32(0), stopTimeUpdate.GetStopSequence())
 	assert.Equal("saId", stopTimeUpdate.GetStopId())
-	assert.Equal(referential.Clock().Now().Add(10*time.Minute).Unix(), stopTimeUpdate.Departure.GetTime())
+	assert.Equal(connector.Clock().Now().Add(10*time.Minute).Unix(), stopTimeUpdate.Departure.GetTime())
 	assert.Equal(int64(0), stopTimeUpdate.Arrival.GetTime())
 }
 
@@ -467,55 +467,153 @@ func Test_TripUpdatesBroadcaster_HandleGtfs_Generators(t *testing.T) {
 	}
 }
 
-func Test_rewriteStopSequence(t *testing.T) {
+func Test_RewriteStopSequence(t *testing.T) {
 	assert := assert.New(t)
 
 	_, referential := newTestReferential(t)
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_code_space": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
 	connector := NewTripUpdatesBroadcaster(partner)
 	connector.SetClock(clock.NewFakeClock())
 	connector.Start()
 
-	number := 1
+	line := referential.model.Lines().New()
+	lId := model.NewCode("internal", "lId")
+	line.SetCode(lId)
+	line.Save()
 
-	tripId := "tripId"
-	routeId := "routeId"
-	tripDescriptor := &gtfs.TripDescriptor{
-		TripId:  &tripId,
-		RouteId: &routeId,
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vjId := model.NewCode("internal", "value")
+	vehicleJourney.SetCode(vjId)
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.Save()
+
+	// stopAreas & stopVisits
+	for j := 0; j < 5; j++ {
+		saId := model.NewCode("internal", fmt.Sprintf("saId%d", j))
+		stopArea := referential.Model().StopAreas().New()
+		stopArea.SetCode(saId)
+		stopArea.Save()
+
+		stopVisit := referential.model.StopVisits().New()
+		svId1 := model.NewCode("internal", fmt.Sprintf("svId%d", j))
+		stopVisit.SetCode(svId1)
+		stopVisit.StopAreaId = stopArea.Id()
+		stopVisit.VehicleJourneyId = vehicleJourney.Id()
+		stopVisit.Schedules.SetDepartureTime("actual", connector.Clock().Now().Add(time.Duration(float64(j*1e9))+10*time.Minute))
+		stopVisit.PassageOrder = j * 3
+		stopVisit.Save()
 	}
 
-	id := strconv.Itoa(number)
-	entity := &gtfs.FeedEntity{
-		Id:         &id,
-		TripUpdate: &gtfs.TripUpdate{Trip: tripDescriptor},
+	stopVisits := connector.partner.Model().StopVisits().FindAll()
+	var stopVisitPassageOrders []int
+	for i := range stopVisits {
+		stopVisitPassageOrders = append(stopVisitPassageOrders, stopVisits[i].PassageOrder)
 	}
+	assert.ElementsMatch([]int{0, 3, 6, 9, 12}, stopVisitPassageOrders)
 
-	for number <= 5 {
-		stopId := "stopId"
-		stopSequence := uint32(number + number*2)
-		stopTimeUpdate := &gtfs.TripUpdate_StopTimeUpdate{
-			StopSequence: &stopSequence,
-			StopId:       &stopId,
-		}
+	gtfsFeed := &gtfs.FeedMessage{}
 
-		entity.TripUpdate.StopTimeUpdate = append(entity.TripUpdate.StopTimeUpdate, stopTimeUpdate)
-		number++
-	}
+	connector.HandleGtfs(gtfsFeed)
+	assert.Len(gtfsFeed.Entity, 1)
 
-	var actualStopSequences []int
+	entity := gtfsFeed.Entity[0]
+
+	var gtfsStopSequences []int
 	for i := range entity.TripUpdate.StopTimeUpdate {
-		actualStopSequences = append(actualStopSequences, int(*entity.TripUpdate.StopTimeUpdate[i].StopSequence))
+		gtfsStopSequences = append(gtfsStopSequences, int(entity.TripUpdate.StopTimeUpdate[i].GetStopSequence()))
 	}
-	assert.Equal([]int{3, 6, 9, 12, 15}, actualStopSequences)
+	assert.ElementsMatch([]int{0, 1, 2, 3, 4}, gtfsStopSequences)
+}
 
-	// Rewrite and order from zero
-	connector.rewriteStopSequence(entity, uint32(0))
+func Test_RewriteStopSequenceWithPassedStopVisits(t *testing.T) {
+	assert := assert.New(t)
 
-	var newStopSequences []int
+	// Setup
+	_, referential := newTestReferential(t)
+	partner := referential.Partners().New("partner")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_code_space": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	connector := NewTripUpdatesBroadcaster(partner)
+	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
+
+	line := referential.model.Lines().New()
+	lId := model.NewCode("internal", "lId")
+	line.SetCode(lId)
+	line.Save()
+
+	vehicleJourney := referential.model.VehicleJourneys().New()
+	vjId := model.NewCode("internal", "value")
+	vehicleJourney.SetCode(vjId)
+	vehicleJourney.LineId = line.Id()
+	vehicleJourney.AimedStopVisitCount = 20
+	vehicleJourney.Save()
+
+	// stopAreas & stopVisits
+	for j := 0; j < 5; j++ {
+		saId := model.NewCode("internal", fmt.Sprintf("saId%d", j))
+		stopArea := referential.Model().StopAreas().New()
+		stopArea.SetCode(saId)
+		stopArea.Save()
+
+		stopVisit := referential.model.StopVisits().New()
+		svId1 := model.NewCode("internal", fmt.Sprintf("svId%d", j))
+		stopVisit.SetCode(svId1)
+		stopVisit.StopAreaId = stopArea.Id()
+		stopVisit.VehicleJourneyId = vehicleJourney.Id()
+		delta := time.Duration(float64(j) * float64(time.Minute))
+		base := connector.Clock().Now().Add(-4 * time.Minute)
+		stopVisit.Schedules.SetDepartureTime("actual", base.Add(delta))
+		stopVisit.PassageOrder = j * 3
+		stopVisit.Save()
+	}
+
+	// verify Setup
+	stopVisits := connector.partner.Model().StopVisits().FindAll()
+	var stopVisitPassageOrders []int
+	for i := range stopVisits {
+		stopVisitPassageOrders = append(stopVisitPassageOrders, stopVisits[i].PassageOrder)
+	}
+	assert.ElementsMatch([]int{0, 3, 6, 9, 12}, stopVisitPassageOrders)
+
+	// verify Broadcastble stopVisits
+	referenceTime := connector.Clock().Now().Add(PAST_STOP_VISITS_MAX_TIME)
+	broadcastableStopVisits := connector.partner.Model().StopVisits().FindByVehicleJourneyIdAfterUnsorted(vehicleJourney.Id(), referenceTime)
+	assert.Len(broadcastableStopVisits, 2)
+
+	var broadcastableStopVisitsPassageOrder []int
+	for i := range broadcastableStopVisits {
+		broadcastableStopVisitsPassageOrder = append(broadcastableStopVisitsPassageOrder, broadcastableStopVisits[i].PassageOrder)
+	}
+	assert.ElementsMatch([]int{9, 12}, broadcastableStopVisitsPassageOrder)
+
+	// GTFS feed
+	gtfsFeed := &gtfs.FeedMessage{}
+
+	connector.HandleGtfs(gtfsFeed)
+	assert.Len(gtfsFeed.Entity, 1)
+
+	entity := gtfsFeed.Entity[0]
+
+	var gtfsStopSequences []int
 	for i := range entity.TripUpdate.StopTimeUpdate {
-		newStopSequences = append(newStopSequences, int(*entity.TripUpdate.StopTimeUpdate[i].StopSequence))
+		gtfsStopSequences = append(gtfsStopSequences, int(entity.TripUpdate.StopTimeUpdate[i].GetStopSequence()))
 	}
-	assert.Equal([]int{0, 1, 2, 3, 4}, newStopSequences)
+	// vehicleJourney has 20 AimedStopVisits
+	// vehicleJourney has 5 stopVisits in memory
+	//
+	// Only 2 can be broadcasted because of their reference time
+	// PassageOrder are 9 and 12
+	//
+	// The passageOrder offset should be 20 - 2 = 18
+	// the broadcast should start at passageOrder 18
+	assert.ElementsMatch([]int{18, 19}, gtfsStopSequences)
 }

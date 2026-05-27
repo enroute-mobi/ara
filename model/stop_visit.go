@@ -290,6 +290,7 @@ type StopVisits interface {
 	FindByVehicleJourneyIdAndStopVisitOrder(VehicleJourneyId, int) *StopVisit
 	VehicleJourneyHasStopVisits(VehicleJourneyId) bool
 	FindByVehicleJourneyIdAfter(VehicleJourneyId, time.Time) []*StopVisit
+	FindByVehicleJourneyIdAfterUnsorted(VehicleJourneyId, time.Time) []*StopVisit
 	FindFollowingByVehicleJourneyId(VehicleJourneyId) []*StopVisit
 	StopVisitsLenByVehicleJourney(VehicleJourneyId) int
 	FindByStopAreaId(StopAreaId) []*StopVisit
@@ -428,6 +429,22 @@ func (manager *memoryStopVisits) FindByVehicleJourneyIdAfter(id VehicleJourneyId
 
 	manager.mutex.RUnlock()
 	sort.Sort(ByTime(stopVisits))
+	return
+}
+
+func (manager *memoryStopVisits) FindByVehicleJourneyIdAfterUnsorted(id VehicleJourneyId, t time.Time) (stopVisits []*StopVisit) {
+	manager.mutex.RLock()
+
+	ids, _ := manager.FindBy(ByVehicleJourney, string(id))
+
+	for _, id := range ids {
+		sv := manager.byIdentifier[StopVisitId(id)]
+		if sv.ReferenceTime().After(t) {
+			stopVisits = append(stopVisits, sv.copy())
+		}
+	}
+
+	manager.mutex.RUnlock()
 	return
 }
 
