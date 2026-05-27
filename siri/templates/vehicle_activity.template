@@ -7,5 +7,5 @@
 					<siri:Percentage>{{ .ProgressBetweenStops.Percentage }}</siri:Percentage>{{ end }}
 				</siri:ProgressBetweenStops>{{ end }}
 				{{.MonitoredVehicleJourney.BuildMonitoredVehicleJourneyXML }}{{ if .VehicleActivityNote }}
-				<siri:VehicleActivityNote>{{ .VehicleActivityNote }}</siri:VehicleActivityNote>{{ end }}
+				<siri:VehicleActivityNote>{{ escapeCData .VehicleActivityNote }}</siri:VehicleActivityNote>{{ end }}
 			</siri:VehicleActivity>

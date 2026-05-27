@@ -1,6 +1,6 @@
 {{ $tag := .Tag }}
 {{ $prefix := .Prefix }}
-{{ if .DefaultValue }}<{{ $prefix }}{{ $tag }}>{{ .DefaultValue }}</{{ $prefix }}{{ $tag }}>{{ end }}
+{{ if .DefaultValue }}<{{ $prefix }}{{ $tag }}>{{ escapeCData .DefaultValue }}</{{ $prefix }}{{ $tag }}>{{ end }}
 {{ range $key, $value := .Translations }}
-                   <{{ $prefix }}{{ $tag }} xml:lang="{{ $key }}">{{ $value }}</{{ $prefix }}{{ $tag }}>
+                   <{{ $prefix }}{{ $tag }} xml:lang="{{ $key }}">{{ escapeCData $value }}</{{ $prefix }}{{ $tag }}>
                 {{ end }}

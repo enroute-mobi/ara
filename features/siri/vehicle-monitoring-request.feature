@@ -76,7 +76,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | Bearing                            |                               123 |
       | RecordedAtTime                     |          2017-01-01T13:00:00.000Z |
       | ValidUntilTime                     |          2017-01-01T14:00:00.000Z |
-      | RawAttributes[VehicleActivityNote] | dummy                             |
+      | RawAttributes[VehicleActivityNote] | <dummy/>                          |
    When I send this SIRI request
      """
      <?xml version='1.0' encoding='UTF-8'?>
@@ -134,7 +134,7 @@ Feature: Support SIRI VehicleMonitoring by request
                     </siri:VehicleLocation>
                     <siri:Bearing>123</siri:Bearing>
                   </siri:MonitoredVehicleJourney>
-                  <siri:VehicleActivityNote>dummy</siri:VehicleActivityNote>
+                  <siri:VehicleActivityNote><![CDATA[<dummy/>]]></siri:VehicleActivityNote>
                 </siri:VehicleActivity>
               </siri:VehicleMonitoringDelivery>
             </Answer>
@@ -1207,7 +1207,7 @@ Feature: Support SIRI VehicleMonitoring by request
                 <ns5:DepartureStatus>delayed</ns5:DepartureStatus>
               </ns5:MonitoredCall>
             </ns5:MonitoredVehicleJourney>
-            <ns5:VehicleActivityNote>dummy</ns5:VehicleActivityNote>
+            <ns5:VehicleActivityNote><![CDATA[<bad/>]]></ns5:VehicleActivityNote>
             <ns5:Extensions/>
           </ns5:VehicleActivity>
         </ns5:VehicleMonitoringDelivery>
@@ -1248,7 +1248,7 @@ Feature: Support SIRI VehicleMonitoring by request
       | LinkDistance                       |                         349.0 |
       | Percentage                         |                          70.0 |
       | ValidUntilTime                     | 2021-08-02T08:50:27.733+02:00 |
-      | RawAttributes[VehicleActivityNote] |                         dummy |
+      | RawAttributes[VehicleActivityNote] |                        <bad/> |
     And an audit event should exist with these attributes:
       | Protocol        | siri                                    |
       | Direction       | sent                                    |

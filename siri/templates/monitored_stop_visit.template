@@ -28,7 +28,7 @@
 					<siri:DestinationRef>{{ .References.VehicleJourney.DestinationRef }}</siri:DestinationRef>{{end}}{{ if .DestinationName}}
 					<siri:DestinationName>{{ .DestinationName }}</siri:DestinationName>{{end}}{{ if .VehicleJourneyName }}
 					<siri:VehicleJourneyName>{{ .VehicleJourneyName }}</siri:VehicleJourneyName>{{end}}{{ if .Attributes.VehicleJourneyAttributes.JourneyNote}}
-					<siri:JourneyNote>{{.Attributes.VehicleJourneyAttributes.JourneyNote}}</siri:JourneyNote>{{end}}{{ if .Attributes.VehicleJourneyAttributes.HeadwayService}}
+					<siri:JourneyNote>{{escapeCData .Attributes.VehicleJourneyAttributes.JourneyNote}}</siri:JourneyNote>{{end}}{{ if .Attributes.VehicleJourneyAttributes.HeadwayService}}
 					<siri:HeadwayService>{{.Attributes.VehicleJourneyAttributes.HeadwayService}}</siri:HeadwayService>{{end}}{{ if .Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}
 					<siri:OriginAimedDepartureTime>{{.Attributes.VehicleJourneyAttributes.OriginAimedDepartureTime}}</siri:OriginAimedDepartureTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}
 					<siri:DestinationAimedArrivalTime>{{.Attributes.VehicleJourneyAttributes.DestinationAimedArrivalTime}}</siri:DestinationAimedArrivalTime>{{end}}{{ if .Attributes.VehicleJourneyAttributes.FirstOrLastJourney}}

@@ -262,7 +262,7 @@ Feature: Support SIRI StopMonitoring by request
     Then one StopVisit has the following attributes:
       | Codes[internal] | SNCF_ACCES_CLOUD:VehicleJourney::2e484a6e-2359-4cb2-95e1-4483d547aa5a:LOC-6 |
 
- 
+
   Scenario: 2461 - Performs a SIRI StopMonitoring request to a Partner
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
@@ -725,7 +725,7 @@ Feature: Support SIRI StopMonitoring by request
       | RawAttributes[HeadwayService]              | false                                           |
       | RawAttributes[InCongestion]                | false                                           |
       | RawAttributes[InPanic]                     | false                                           |
-      | RawAttributes[JourneyNote]                 | Note de test                                    |
+      | RawAttributes[JourneyNote]                 | <dummy/>                                        |
       | RawAttributes[JourneyPatternName]          | TEST                                            |
       | RawAttributes[MonitoringError]             | false                                           |
       | RawAttributes[OriginAimedDepartureTime]    | 2016-09-22T07:54:52.977Z                        |
@@ -797,7 +797,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationRef                                               | NINOXE:StopPoint:SP:62:LOC                                  | VehicleJourney#Reference[DestinationRef]#Code             |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationName                                              | Cimetière des Sauvages                                      | VehicleJourney#DestinationName                            |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:VehicleJourneyName                                           | Magicien Noir - Cimetière (OMNI)                            | VehicleJourney#Name                                       |
-      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | Note de test                                                | VehicleJourney#RawAttributes[JourneyNote]                 |
+      | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:JourneyNote                                                  | <dummy/>                                                    | VehicleJourney#RawAttributes[JourneyNote]                 |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:HeadwayService                                               | false                                                       | VehicleJourney#RawAttributes[HeadwayService]              |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:OriginAimedDepartureTime                                     | 2016-09-22T07:54:52.977Z                                    | VehicleJourney#RawAttributes[OriginAimedDepartureTime]    |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:DestinationAimedArrivalTime                                  | 2016-09-22T09:54:52.977Z                                    | VehicleJourney#RawAttributes[DestinationAimedArrivalTime] |
@@ -978,7 +978,7 @@ Feature: Support SIRI StopMonitoring by request
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:DistanceFromStop                          | 800                                                                  | StopVisit#RawAttributes[DistanceFromStop]                 |   |
       | //siri:MonitoredStopVisit[1]/siri:MonitoredVehicleJourney/siri:MonitoredCall/siri:NumberOfStopsAway                         | 1                                                                    | StopVisit#RawAttributes[NumberOfStopsAway]                |   |
 
- 
+
   Scenario: 2466 - Don't perform StopMonitoring request for an unmonitored StopArea
     Given a SIRI server waits GetStopMonitoring request on "http://localhost:8090" to respond with
       """
