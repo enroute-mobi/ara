@@ -435,7 +435,7 @@ func (manager *memoryStopVisits) FindByVehicleJourneyIdAfter(id VehicleJourneyId
 func (manager *memoryStopVisits) FindByVehicleJourneyIdAfterUnsorted(id VehicleJourneyId, t time.Time) (stopVisits []*StopVisit) {
 	manager.mutex.RLock()
 
-	ids, _ := manager.FindBy(ByVehicleJourney, ModelId(id))
+	ids, _ := manager.FindBy(ByVehicleJourney, string(id))
 
 	for _, id := range ids {
 		sv := manager.byIdentifier[StopVisitId(id)]
