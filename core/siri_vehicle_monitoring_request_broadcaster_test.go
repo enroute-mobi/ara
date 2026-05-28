@@ -63,8 +63,8 @@ func Test_SIRIVehicleMonitoringRequestBroadcaster_RequestVehicles_IgnoreNotes(t 
 	partner := referential.Partners().New("partner")
 	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, map[string]string{
-		"remote_code_space": "internal",
-		s.IGNORE_NOTES:      "true",
+		"remote_code_space":           "internal",
+		s.BROADCAST_SIRI_IGNORE_NOTES: "true",
 	})
 
 	connector := NewSIRIVehicleMonitoringRequestBroadcaster(partner)

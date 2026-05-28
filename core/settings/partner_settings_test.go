@@ -169,7 +169,7 @@ func Test_IgnoreNotes_Global(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		IGNORE_NOTES: "true",
+		BROADCAST_SIRI_IGNORE_NOTES: "true",
 	}
 
 	partnerSettings := NewPartnerSettings(uuid.DefaultUUIDGenerator, settings)
@@ -194,7 +194,7 @@ func Test_IgnoreNotes_Connector_Overrides_Global(t *testing.T) {
 	assert := assert.New(t)
 
 	settings := map[string]string{
-		IGNORE_NOTES:                "true",
+		BROADCAST_SIRI_IGNORE_NOTES:   "true",
 		"connector_name.ignore_notes": "false",
 	}
 

@@ -343,7 +343,7 @@ func (s *PartnerSettings) setIgnoreNotes(settings map[string]string) {
 		s.ignoreNotesMap.Store(connectorName, i)
 	}
 
-	i, _ := strconv.ParseBool(settings[IGNORE_NOTES])
+	i, _ := strconv.ParseBool(settings[BROADCAST_SIRI_IGNORE_NOTES])
 	s.ignoreNotes = i
 }
 
