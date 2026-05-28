@@ -86,7 +86,6 @@ const (
 	BROADCAST_SIRI_IGNORE_NOTES                           = "broadcast.siri.ignore_notes"
 	BROADCAST_SIRI_STOP_MONITORING_IGNORE_NOTES           = "broadcast.siri.stop_monitoring.ignore_notes"
 	BROADCAST_SIRI_VEHICLE_MONITORING_IGNORE_NOTES        = "broadcast.siri.vehicle_monitoring.ignore_notes"
-	IGNORE_NOTES                                          = "broadcast.siri.ignore_notes"
 
 	IGNORE_STOP_WITHOUT_LINE        = "ignore_stop_without_line"
 	GENERAL_MESSAGE_REQUEST_2_2     = "generalMessageRequest.version2.2"
