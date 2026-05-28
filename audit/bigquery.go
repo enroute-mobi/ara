@@ -337,8 +337,10 @@ func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *Bi
 func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) error {
 	select {
 	case bq.controlEvents <- controlEvent:
-		logger.Log.Printf("BigQuery controleEvent queue was full: %d lost messages", bq.lostControlEventsCount)
-		bq.lostControlEventsCount = 0
+		if bq.lostControlEventsCount > 0 {
+			logger.Log.Printf("BigQuery controleEvent queue was full: %d lost messages", bq.lostControlEventsCount)
+			bq.lostControlEventsCount = 0
+		}
 	default:
 		bq.lostControlEventsCount += 1
 	}
