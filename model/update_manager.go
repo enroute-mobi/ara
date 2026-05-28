@@ -16,7 +16,7 @@ type UpdateManager struct {
 	uuid.UUIDConsumer
 
 	model     Model
-	toControl map[model_types.Model]map[ModelId]map[string]Control
+	toControl map[model_types.Model]map[string]map[string]Control
 }
 
 func NewUpdateManager(model Model) func([]UpdateEvent) {
@@ -31,13 +31,13 @@ func newUpdateManager(model Model) *UpdateManager {
 }
 
 func (manager *UpdateManager) resetToControl() {
-	manager.toControl = make(map[model_types.Model]map[ModelId]map[string]Control)
+	manager.toControl = make(map[model_types.Model]map[string]map[string]Control)
 }
 
-func (manager *UpdateManager) addToControl(t model_types.Model, id ModelId, c Control) {
+func (manager *UpdateManager) addToControl(t model_types.Model, id string, c Control) {
 	_, found := manager.toControl[t]
 	if !found {
-		manager.toControl[t] = map[ModelId]map[string]Control{id: {c.InternalCode: c}}
+		manager.toControl[t] = map[string]map[string]Control{id: {c.InternalCode: c}}
 		return
 	}
 
