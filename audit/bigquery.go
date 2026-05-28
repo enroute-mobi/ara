@@ -356,53 +356,53 @@ func (bq *BigQueryClient) run() {
 		case <-bq.stop:
 			// flushing remaining messages
 			if len(messageBatch) > 0 {
-				bq.sendMultiple(messageBatch, bq.inserter)
+				bq.sendMultiple(EXCHANGE_TABLE, messageBatch, bq.inserter)
 			}
 			if len(vehicleBatch) > 0 {
-				bq.sendMultiple(vehicleBatch, bq.vehicleInserter)
+				bq.sendMultiple(VEHICLE_TABLE, vehicleBatch, bq.vehicleInserter)
 			}
 			if len(longTermSvBatch) > 0 {
-				bq.sendMultiple(longTermSvBatch, bq.longTermStopVisitInserter)
+				bq.sendMultiple(LONG_TERM_STOP_VISIT_TABLE, longTermSvBatch, bq.longTermStopVisitInserter)
 			}
 			if len(controlBatch) > 0 {
-				bq.sendMultiple(controlBatch, bq.controlInserter)
+				bq.sendMultiple(CONTROL_TABLE, controlBatch, bq.controlInserter)
 			}
 			bq.client.Close()
 			return
 		case message := <-bq.messages:
-			messageBatch = bq.processMessage(message, messageBatch, bq.inserter)
+			messageBatch = bq.processMessage(EXCHANGE_TABLE, message, messageBatch, bq.inserter)
 		case partnerMessage := <-bq.partnerEvents:
 			bq.send(partnerMessage, bq.partnerInserter)
 		case vehicleMessage := <-bq.vehicleEvents:
-			vehicleBatch = bq.processMessage(vehicleMessage, vehicleBatch, bq.vehicleInserter)
+			vehicleBatch = bq.processMessage(VEHICLE_TABLE, vehicleMessage, vehicleBatch, bq.vehicleInserter)
 		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
 			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
-				longTermSvBatch = bq.processMessage(longTermStopVisitMessage, longTermSvBatch, bq.longTermStopVisitInserter)
+				longTermSvBatch = bq.processMessage(LONG_TERM_STOP_VISIT_TABLE, longTermStopVisitMessage, longTermSvBatch, bq.longTermStopVisitInserter)
 			}
 		case controlMessage := <-bq.controlEvents:
-			controlBatch = bq.processMessage(controlMessage, controlBatch, bq.controlInserter)
+			controlBatch = bq.processMessage(CONTROL_TABLE, controlMessage, controlBatch, bq.controlInserter)
 		}
 	}
 }
 
-func (bq *BigQueryClient) processMessage(message BigQueryEvent, batch []*bigquery.StructSaver, inserter *bigquery.Inserter) []*bigquery.StructSaver {
+func (bq *BigQueryClient) processMessage(messageType string, message BigQueryEvent, batch []*bigquery.StructSaver, inserter *bigquery.Inserter) []*bigquery.StructSaver {
 	ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
 	batch = append(batch, ss)
 	if len(batch) == bq.messagesBatchSize {
-		bq.sendMultiple(batch, inserter)
+		bq.sendMultiple(messageType, batch, inserter)
 		batch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
 	}
 	return batch
 }
 
-func (bq *BigQueryClient) sendMultiple(ss []*bigquery.StructSaver, inserter *bigquery.Inserter) {
+func (bq *BigQueryClient) sendMultiple(messageType string, ss []*bigquery.StructSaver, inserter *bigquery.Inserter) {
 	if inserter == nil {
 		return
 	}
 	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
 	defer cancel()
 	if err := inserter.Put(ctx, ss); err != nil {
-		logger.Log.Printf("BigQuery Multi Inserter error: %v", err)
+		logger.Log.Printf("BigQuery Multi Inserter error: %s: %v", messageType, err)
 	}
 }
 
