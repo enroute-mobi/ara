@@ -62,7 +62,7 @@ definitions:
           - build.sh golang::dev::dependencies
           - build.sh bitbucket::database
           - make test_migrations
-          - make tests
+          - make memory_tests
           - build.sh codacy::report
         services:
           - postgres

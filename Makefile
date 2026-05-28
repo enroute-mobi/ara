@@ -22,11 +22,13 @@ rollback_migrations:
 populate:
 	psql -U ara -d ara -a -f model/populate.sql
 
-tests:
+memory_tests:
 	go test -coverprofile=coverage.out -p 1 -count 1  ./...
 
 redis_tests:
 	ARA_REDIS_ADDR=127.0.0.1:6379 go test -coverprofile=coverage.out -p 1 -count 1  ./...
+
+tests: memory_tests redis_tests
 
 cucumber:
 	go build && bundle exec cucumber -t 'not @wip'
