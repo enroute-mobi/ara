@@ -406,7 +406,7 @@ func (bq *BigQueryClient) sendMultiple(messageType string, ss []*bigquery.Struct
 	if err := inserter.Put(ctx, ss); err != nil {
 		var sizeMB float64
 		jsonBytes, err1 := json.Marshal(ss)
-		if err1 != nil {
+		if err1 == nil {
 			sizeMB = float64(len(jsonBytes)) / (1024 * 1024)
 		}
 		logger.Log.Printf("BigQuery Multi Inserter error: %s, requestSize %.2fMb , error %v", messageType, sizeMB, err)
