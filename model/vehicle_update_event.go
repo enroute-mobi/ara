@@ -3,13 +3,13 @@ package model
 import (
 	"time"
 
-	"bitbucket.org/enroute-mobi/ara/siri/siri_attributes"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 )
 
 type VehicleUpdateEvent struct {
-	SiriXML            *sxml.XMLVehicleActivity
+	// attributes is a fallback for non-SIRI builders; when SiriXML is set, RawAttributes() delegates to the XML cache.
 	attributes         RawAttributes
+	SiriXML            *sxml.XMLVehicleActivity
 	ValidUntilTime     time.Time
 	RecordedAt         time.Time
 	Code               Code
@@ -35,16 +35,11 @@ func (ue *VehicleUpdateEvent) EventKind() EventKind {
 }
 
 func (ue *VehicleUpdateEvent) RawAttributes() RawAttributes {
-	if ue.attributes != nil {
-		return ue.attributes
+	if ue.SiriXML != nil {
+		return RawAttributes(ue.SiriXML.RawAttributes())
 	}
-	ue.attributes = NewRawAttributes()
-
-	if ue.SiriXML == nil {
-		return ue.attributes
+	if ue.attributes == nil {
+		ue.attributes = NewRawAttributes()
 	}
-
-	ue.attributes.Set(siri_attributes.VehicleActivityNote, ue.SiriXML.VehicleActivityNote())
-
 	return ue.attributes
 }
