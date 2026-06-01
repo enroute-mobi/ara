@@ -1,6 +1,7 @@
 package audit
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -15,6 +16,115 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 )
+
+// fakeWriteStream is a writeStream whose AppendRows returns immediately and
+// whose GetResult blocks until unblockCh is closed.
+type fakeWriteStream struct {
+	unblockCh chan struct{}
+}
+
+func (s *fakeWriteStream) AppendRows(_ context.Context, _ [][]byte) (appendResult, error) {
+	return &fakeAppendResult{unblockCh: s.unblockCh}, nil
+}
+
+func (s *fakeWriteStream) Close() error { return nil }
+
+type fakeAppendResult struct {
+	unblockCh chan struct{}
+}
+
+func (r *fakeAppendResult) GetResult(ctx context.Context) error {
+	select {
+	case <-r.unblockCh:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+func newTestStorageWriter(semSize int, stream writeStream) *storageWriter {
+	return &storageWriter{
+		stream: stream,
+		done:   make(chan struct{}),
+		sem:    make(chan struct{}, semSize),
+	}
+}
+
+// TestStorageWriterSemaphoreBlocksAtCapacity verifies that send() blocks when
+// all semaphore slots are taken and unblocks once a slot is freed.
+func TestStorageWriterSemaphoreBlocksAtCapacity(t *testing.T) {
+	unblock := make(chan struct{})
+	w := newTestStorageWriter(1, &fakeWriteStream{unblockCh: unblock})
+
+	require.NoError(t, w.send(context.Background(), []byte("msg1")))
+	assert.Len(t, w.sem, 1, "semaphore slot should be taken")
+
+	errCh := make(chan error, 1)
+	go func() { errCh <- w.send(context.Background(), []byte("msg2")) }()
+
+	select {
+	case <-errCh:
+		t.Fatal("second send should be blocked on the full semaphore")
+	case <-time.After(20 * time.Millisecond):
+	}
+
+	close(unblock) // unblocks GetResult → slot freed → second send proceeds
+
+	select {
+	case err := <-errCh:
+		assert.NoError(t, err)
+	case <-time.After(time.Second):
+		t.Fatal("second send did not unblock after slot was freed")
+	}
+
+	w.wg.Wait()
+}
+
+// TestStorageWriterSemaphoreContextCancellation verifies that send() returns
+// context.Canceled when the context is cancelled while waiting for a slot.
+func TestStorageWriterSemaphoreContextCancellation(t *testing.T) {
+	w := newTestStorageWriter(1, &fakeWriteStream{unblockCh: make(chan struct{})})
+	w.sem <- struct{}{} // fill the semaphore directly, no goroutine needed
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	errCh := make(chan error, 1)
+	go func() { errCh <- w.send(ctx, []byte("msg")) }()
+
+	time.Sleep(20 * time.Millisecond)
+	cancel()
+
+	select {
+	case err := <-errCh:
+		assert.ErrorIs(t, err, context.Canceled)
+	case <-time.After(time.Second):
+		t.Fatal("send did not return after context cancellation")
+	}
+
+	assert.Len(t, w.sem, 1, "semaphore slot should not have been consumed")
+}
+
+// TestStorageWriterSemaphoreWriterClosing verifies that send() returns an
+// error when the writer is shut down while waiting for a semaphore slot.
+func TestStorageWriterSemaphoreWriterClosing(t *testing.T) {
+	w := newTestStorageWriter(1, &fakeWriteStream{unblockCh: make(chan struct{})})
+	w.sem <- struct{}{} // fill the semaphore directly
+
+	errCh := make(chan error, 1)
+	go func() { errCh <- w.send(context.Background(), []byte("msg")) }()
+
+	time.Sleep(20 * time.Millisecond)
+	close(w.done)
+
+	select {
+	case err := <-errCh:
+		assert.EqualError(t, err, "send: writer is closing")
+	case <-time.After(time.Second):
+		t.Fatal("send did not return after writer shutdown")
+	}
+
+	assert.Len(t, w.sem, 1, "semaphore slot should not have been consumed")
+}
 
 func unmarshalExchange(t *testing.T, msg *BigQueryMessage) *exchangepb.BigQueryMessage {
 	t.Helper()

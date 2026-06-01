@@ -19,11 +19,46 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+const maxConcurrentWrites = 256
+
+type appendResult interface {
+	GetResult(ctx context.Context) error
+}
+
+type writeStream interface {
+	AppendRows(ctx context.Context, data [][]byte) (appendResult, error)
+	Close() error
+}
+
+type managedStreamAdapter struct {
+	s *managedwriter.ManagedStream
+}
+
+func (a *managedStreamAdapter) AppendRows(ctx context.Context, data [][]byte) (appendResult, error) {
+	r, err := a.s.AppendRows(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+	return &managedAppendResult{r: r}, nil
+}
+
+func (a *managedStreamAdapter) Close() error { return a.s.Close() }
+
+type managedAppendResult struct {
+	r *managedwriter.AppendResult
+}
+
+func (a *managedAppendResult) GetResult(ctx context.Context) error {
+	_, err := a.r.GetResult(ctx)
+	return err
+}
+
 type storageWriter struct {
 	client *managedwriter.Client
-	stream *managedwriter.ManagedStream
+	stream writeStream
 	wg     sync.WaitGroup
 	done   chan struct{}
+	sem    chan struct{}
 }
 
 func newStorageWriter(ctx context.Context, projectID, dataset, table string, protoMsg proto.Message) (*storageWriter, error) {
@@ -48,7 +83,7 @@ func newStorageWriter(ctx context.Context, projectID, dataset, table string, pro
 		return nil, fmt.Errorf("NewManagedStream: %w", err)
 	}
 
-	return &storageWriter{client: client, stream: stream, done: make(chan struct{})}, nil
+	return &storageWriter{client: client, stream: &managedStreamAdapter{s: stream}, done: make(chan struct{}), sem: make(chan struct{}, maxConcurrentWrites)}, nil
 }
 
 func (w *storageWriter) close() {
@@ -64,13 +99,24 @@ func (w *storageWriter) send(ctx context.Context, data []byte) error {
 		return fmt.Errorf("AppendRows: %w", err)
 	}
 
+	// Acquire a semaphore slot before spawning the goroutine, providing back-pressure
+	// when too many writes are already in-flight.
+	select {
+	case w.sem <- struct{}{}:
+	case <-ctx.Done():
+		return fmt.Errorf("send: %w", ctx.Err())
+	case <-w.done:
+		return fmt.Errorf("send: writer is closing")
+	}
+
 	// GetResult blocks until the row is confirmed by BigQuery. Running it in a
 	// goroutine keeps send() non-blocking so the caller's critical path is not
 	// stalled while waiting for the write acknowledgement.
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
-		if _, err := result.GetResult(context.Background()); err != nil {
+		defer func() { <-w.sem }()
+		if err := result.GetResult(context.Background()); err != nil {
 			select {
 			case <-w.done:
 			default:
