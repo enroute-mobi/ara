@@ -181,23 +181,23 @@ func (smb *SMBroadcaster) addDeliveryToNotification(d *siri.SIRINotifyStopMonito
 func (smb *SMBroadcaster) getNotification(sub *Subscription) *siri.SIRINotifyStopMonitoring {
 	if smb.multipleDeliveries {
 		if smb.notification == nil {
+			// ResponseMessageIdentifier is set per send in sendNotification.
 			smb.notification = &siri.SIRINotifyStopMonitoring{
-				Address:                   smb.connector.Partner().Address(),
-				ProducerRef:               smb.connector.Partner().ProducerRef(),
-				ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
-				ResponseTimestamp:         smb.connector.Clock().Now(),
+				Address:           smb.connector.Partner().Address(),
+				ProducerRef:       smb.connector.Partner().ProducerRef(),
+				ResponseTimestamp: smb.connector.Clock().Now(),
 			}
 		}
 
 		return smb.notification
 	}
 
+	// ResponseMessageIdentifier is set per send in sendNotification.
 	return &siri.SIRINotifyStopMonitoring{
-		Address:                   smb.connector.Partner().Address(),
-		ProducerRef:               smb.connector.Partner().ProducerRef(),
-		RequestMessageRef:         sub.SubscriptionOption("MessageIdentifier"),
-		ResponseMessageIdentifier: smb.connector.Partner().NewResponseMessageIdentifier(),
-		ResponseTimestamp:         smb.connector.Clock().Now(),
+		Address:           smb.connector.Partner().Address(),
+		ProducerRef:       smb.connector.Partner().ProducerRef(),
+		RequestMessageRef: sub.SubscriptionOption("MessageIdentifier"),
+		ResponseTimestamp: smb.connector.Clock().Now(),
 	}
 }
 
@@ -268,6 +268,11 @@ func (smb *SMBroadcaster) sendNotification(notify *siri.SIRINotifyStopMonitoring
 	if notify == nil {
 		return
 	}
+
+	// Each sent notification must have its own ResponseMessageIdentifier: with
+	// maximum_resources_per_delivery the same notification object is reused to
+	// send several messages, so the identifier has to be refreshed per send.
+	notify.ResponseMessageIdentifier = smb.connector.Partner().NewResponseMessageIdentifier()
 
 	message := smb.newBQEvent()
 

@@ -531,5 +531,13 @@ func Test_StopMonitoringBroadcaster_Receive_Two_Notifications_With_MaxPerDeliver
 	time.Sleep(10 * time.Millisecond) // Wait for the Broadcaster and Connector to finish their work
 	connector.(*SIRIStopMonitoringSubscriptionBroadcaster).stopMonitoringBroadcaster.Start()
 
-	assert.Len(f.Messages(), 2, "2 messages should be sent to BigQuery")
+	messages := f.Messages()
+	assert.Len(messages, 2, "2 messages should be sent to BigQuery")
+
+	// ARA-1830: each notification produced by the maximum_resources_per_delivery
+	// batch must have its own ResponseMessageIdentifier.
+	assert.NotEmpty(messages[0].ResponseIdentifier)
+	assert.NotEmpty(messages[1].ResponseIdentifier)
+	assert.NotEqual(messages[0].ResponseIdentifier, messages[1].ResponseIdentifier,
+		"each batched NotifyStopMonitoring must have a distinct ResponseMessageIdentifier")
 }
