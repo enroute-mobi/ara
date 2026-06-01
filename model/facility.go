@@ -75,6 +75,8 @@ type Facilities interface {
 	CodeHandler[*Facility]
 	Broadcaster[FacilityBroadcastEvent]
 	Loadable
+
+	CollectableFacilities(time.Time) []*Facility
 }
 
 func (facility *Facility) Save() bool {
@@ -136,6 +138,22 @@ func (manager *MemoryFacilities) FindAll() (facilitys []*Facility) {
 	}
 
 	manager.mutex.RUnlock()
+	return
+}
+
+// CollectableFacilities returns a copy of the facilities due for collection at
+// the given time. Only the due facilities are copied, avoiding a deep copy of
+// the whole collection on every guardian cycle.
+func (manager *MemoryFacilities) CollectableFacilities(now time.Time) (facilities []*Facility) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, facility := range manager.byIdentifier {
+		if !facility.nextCollectAt.Before(now) {
+			continue
+		}
+		facilities = append(facilities, facility.copy())
+	}
 	return
 }
 

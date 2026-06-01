@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sync"
+	"time"
 )
 
 var lineReferentExtractor = func(instance ModelInstance) string { return string((instance.(*Line)).ReferentId) }
@@ -24,6 +25,7 @@ type Lines interface {
 	FindFamily(LineId) []LineId
 	FindFamilyFromCode(Code) []LineId
 	FindCode(LineId, string) (Code, bool)
+	CollectableLines(time.Time) []*Line
 }
 
 func NewMemoryLines() Lines {
@@ -105,6 +107,22 @@ func (manager *memoryLines) FindAll() (lines []*Line) {
 	}
 
 	manager.mutex.RUnlock()
+	return
+}
+
+// CollectableLines returns a copy of the lines due for collection at the given
+// time. Only the due lines are copied, avoiding a deep copy of the whole
+// collection on every guardian cycle.
+func (manager *memoryLines) CollectableLines(now time.Time) (lines []*Line) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, line := range manager.byIdentifier {
+		if !line.nextCollectAt.Before(now) {
+			continue
+		}
+		lines = append(lines, line.copy())
+	}
 	return
 }
 

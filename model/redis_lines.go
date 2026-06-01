@@ -3,6 +3,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/model/redisclient"
 )
@@ -25,6 +26,19 @@ func NewRedisLines(client redisclient.Client) Lines {
 
 func (manager *redisLines) FindByReferentId(id LineId) (lines []*Line) {
 	return manager.FindAllBy(redisclient.ByReferentID, string(id))
+}
+
+// CollectableLines returns the lines due for collection at the given time.
+// TODO: query Redis for the due lines only instead of loading them all and
+// filtering in Ara (needs a numeric index on nextCollectAt).
+func (manager *redisLines) CollectableLines(now time.Time) (lines []*Line) {
+	for _, line := range manager.FindAll() {
+		if !line.nextCollectAt.Before(now) {
+			continue
+		}
+		lines = append(lines, line)
+	}
+	return
 }
 
 func (manager *redisLines) FindFamily(lineId LineId) (lineIds []LineId) {

@@ -93,36 +93,22 @@ func (guardian *ModelGuardian) refreshStopAreas(ctx context.Context) {
 	defer monitoring.HandlePanic()
 
 	now := guardian.Clock().Now()
+	refresh := guardian.referential.ModelRefreshTime()
 
-	sas := guardian.referential.Model().StopAreas().FindAll()
-	child.SetTag("stop_areas_count", len(sas))
+	sas := guardian.referential.Model().StopAreas().CollectableStopAreas(now)
+	child.SetTag("collectable_stop_areas_count", len(sas))
 	for i := range sas {
-		if sas[i].ParentId != "" {
-			parent, ok := sas[i].Parent()
-			if ok && !parent.CollectChildren {
-				continue
-			}
-		}
-		if !sas[i].CollectedAlways && !sas[i].CollectedUntil.After(now) {
-			continue
-		}
-
-		if !sas[i].NextCollectAt().Before(now) {
-			continue
-		}
-
-		stopArea, _ := guardian.referential.Model().StopAreas().Find(sas[i].Id())
-		stopArea.NextCollect(now.Add(guardian.randDuration()))
-		stopArea.Save()
+		sas[i].NextCollect(now.Add(guardian.randDuration(refresh)))
+		sas[i].Save()
 
 		stopAreaUpdateRequest := &StopAreaUpdateRequest{
-			stopAreaId: stopArea.Id(),
+			stopAreaId: sas[i].Id(),
 			createdAt:  now,
 		}
 		guardian.referential.CollectManager().UpdateStopArea(stopAreaUpdateRequest)
 
 		if sas[i].CollectSituations {
-			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(stopArea.Id()))
+			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_STOP_AREA, string(sas[i].Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 	}
@@ -135,21 +121,16 @@ func (guardian *ModelGuardian) refreshFacilities(ctx context.Context) {
 	defer monitoring.HandlePanic()
 
 	now := guardian.Clock().Now()
+	refresh := guardian.referential.ModelRefreshTime()
 
-	facilities := guardian.referential.Model().Facilities().FindAll()
-	child.SetTag("facilities_count", len(facilities))
+	facilities := guardian.referential.Model().Facilities().CollectableFacilities(now)
+	child.SetTag("collectable_facilities_count", len(facilities))
 
 	for i := range facilities {
-		if !facilities[i].NextCollectAt().Before(now) {
-			continue
-		}
+		facilities[i].NextCollect(now.Add(guardian.randDuration(refresh)))
+		facilities[i].Save()
 
-		facility, _ := guardian.referential.Model().Facilities().Find(facilities[i].Id())
-
-		facility.NextCollect(now.Add(guardian.randDuration()))
-		facility.Save()
-
-		facilityUpdateRequest := NewFacilityUpdateRequest(facility.Id())
+		facilityUpdateRequest := NewFacilityUpdateRequest(facilities[i].Id())
 		guardian.referential.CollectManager().UpdateFacility(childContext, facilityUpdateRequest)
 	}
 }
@@ -161,34 +142,29 @@ func (guardian *ModelGuardian) refreshLines(ctx context.Context) {
 	defer monitoring.HandlePanic()
 
 	now := guardian.Clock().Now()
+	refresh := guardian.referential.ModelRefreshTime()
 
-	lines := guardian.referential.Model().Lines().FindAll()
-	child.SetTag("lines_count", len(lines))
+	lines := guardian.referential.Model().Lines().CollectableLines(now)
+	child.SetTag("collectable_lines_count", len(lines))
 	for i := range lines {
-		if !lines[i].NextCollectAt().Before(now) {
-			continue
-		}
-
-		line, _ := guardian.referential.Model().Lines().Find(lines[i].Id())
-
-		line.NextCollect(now.Add(guardian.randDuration()))
-		line.Save()
+		lines[i].NextCollect(now.Add(guardian.randDuration(refresh)))
+		lines[i].Save()
 
 		if lines[i].CollectSituations {
-			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(line.Id()))
+			situationUpdateRequest := NewSituationUpdateRequest(SITUATION_UPDATE_REQUEST_LINE, string(lines[i].Id()))
 			guardian.referential.CollectManager().UpdateSituation(situationUpdateRequest)
 		}
 
-		lineUpdateRequest := NewLineUpdateRequest(line.Id())
+		lineUpdateRequest := NewLineUpdateRequest(lines[i].Id())
 		guardian.referential.CollectManager().UpdateLine(childContext, lineUpdateRequest)
 
-		vehicleUpdateRequest := NewVehicleUpdateRequest(line.Id())
+		vehicleUpdateRequest := NewVehicleUpdateRequest(lines[i].Id())
 		guardian.referential.CollectManager().UpdateVehicle(childContext, vehicleUpdateRequest)
 	}
 }
 
-func (guardian *ModelGuardian) randDuration() time.Duration {
-	return time.Duration(rand.Intn(20)-10)*time.Second + guardian.referential.ModelRefreshTime()
+func (guardian *ModelGuardian) randDuration(refresh time.Duration) time.Duration {
+	return time.Duration(rand.Intn(20)-10)*time.Second + refresh
 }
 
 func (guardian *ModelGuardian) requestSituations(ctx context.Context) {
