@@ -16,6 +16,24 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// ARA-1823: a Notify can be handled before Start() (e.g. right after a
+// connector refresh), so deletedSubscriptions must be usable from construction
+// and never nil — otherwise AlreadySend panics on a nil pointer.
+func Test_SIRIStopMonitoringSubscriptionCollector_DeletedSubscriptionsReadyBeforeStart(t *testing.T) {
+	assert := assert.New(t)
+	_, referential := newTestReferential(t, true)
+
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+
+	connector := NewSIRIStopMonitoringSubscriptionCollector(partner)
+
+	assert.NotNil(connector.deletedSubscriptions, "deletedSubscriptions should be initialized at construction, before Start()")
+	assert.NotPanics(func() {
+		connector.deletedSubscriptions.AlreadySend("RATPCapIDF:Subscription::unknown:LOC")
+	}, "AlreadySend must not panic when called before Start()")
+}
+
 func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t *testing.T) {
 	_, referential := newTestReferential(t, true)
 	referential.Model().StopAreas().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())

@@ -43,6 +43,7 @@ func NewSIRIGeneralMessageSubscriptionCollector(partner *Partner) *SIRIGeneralMe
 	connector := &SIRIGeneralMessageSubscriptionCollector{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.generalMessageSubscriber = NewSIRIGeneralMessageSubscriber(connector)
@@ -55,7 +56,7 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRIGeneralMessageSubscriptionCollector) Start() {
-	connector.deletedSubscriptions = NewDeletedSubscriptions()
+	connector.deletedSubscriptions.Reset()
 	connector.generalMessageSubscriber.Start()
 }
 

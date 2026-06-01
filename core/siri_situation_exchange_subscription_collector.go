@@ -43,6 +43,7 @@ func NewSIRISituationExchangeSubscriptionCollector(partner *Partner) *SIRISituat
 	connector := &SIRISituationExchangeSubscriptionCollector{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.situationExchangeSubscriber = NewSIRISituationExchangeSubscriber(connector)
@@ -55,7 +56,7 @@ func (connector *SIRISituationExchangeSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRISituationExchangeSubscriptionCollector) Start() {
-	connector.deletedSubscriptions = NewDeletedSubscriptions()
+	connector.deletedSubscriptions.Reset()
 	connector.situationExchangeSubscriber.Start()
 }
 

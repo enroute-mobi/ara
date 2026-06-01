@@ -42,6 +42,7 @@ func NewSIRIVehicleMonitoringSubscriptionCollector(partner *Partner) *SIRIVehicl
 	connector := &SIRIVehicleMonitoringSubscriptionCollector{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.vehicleMonitoringSubscriber = NewSIRIVehicleMonitoringSubscriber(connector)
@@ -54,7 +55,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRIVehicleMonitoringSubscriptionCollector) Start() {
-	connector.deletedSubscriptions = NewDeletedSubscriptions()
+	connector.deletedSubscriptions.Reset()
 	connector.vehicleMonitoringSubscriber.Start()
 }
 

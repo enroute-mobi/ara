@@ -42,6 +42,7 @@ func NewSIRIEstimatedTimetableSubscriptionCollector(partner *Partner) *SIRIEstim
 	connector := &SIRIEstimatedTimetableSubscriptionCollector{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.estimatedTimetableSubscriber = NewSIRIEstimatedTimetableSubscriber(connector)
@@ -54,7 +55,7 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRIEstimatedTimetableSubscriptionCollector) Start() {
-	connector.deletedSubscriptions = NewDeletedSubscriptions()
+	connector.deletedSubscriptions.Reset()
 	connector.estimatedTimetableSubscriber.Start()
 }
 
