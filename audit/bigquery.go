@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"bitbucket.org/enroute-mobi/ara/clock"
@@ -210,11 +211,11 @@ type BigQueryClient struct {
 	longTermStopVisitEvents           chan *BigQueryLongTermStopVisitEvent
 	controlEvents                     chan *BigQueryControlEvent
 	stop                              chan struct{}
-	lostMessagesCount                 int
-	lostPartnerEventsCount            int
-	lostVehicleEventsCount            int
-	lostLongTermStopVisitsEventsCount int
-	lostControlEventsCount            int
+	lostMessagesCount                 atomic.Int64
+	lostPartnerEventsCount            atomic.Int64
+	lostVehicleEventsCount            atomic.Int64
+	lostLongTermStopVisitsEventsCount atomic.Int64
+	lostControlEventsCount            atomic.Int64
 	messagesBatchSize                 int
 }
 
@@ -284,12 +285,11 @@ func (bq *BigQueryClient) WriteEvent(e BigQueryEvent) error {
 func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 	select {
 	case bq.messages <- message:
-		if bq.lostMessagesCount > 0 {
-			logger.Log.Printf("BigQuery message queue was full: %d lost messages", bq.lostMessagesCount)
-			bq.lostMessagesCount = 0
+		if n := bq.lostMessagesCount.Swap(0); n > 0 {
+			logger.Log.Printf("BigQuery message queue was full: %d lost messages", n)
 		}
 	default:
-		bq.lostMessagesCount += 1
+		bq.lostMessagesCount.Add(1)
 	}
 	return nil
 }
@@ -297,13 +297,11 @@ func (bq *BigQueryClient) writeMessage(message *BigQueryMessage) error {
 func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) error {
 	select {
 	case bq.partnerEvents <- partnerEvent:
-		if bq.lostPartnerEventsCount > 0 {
-			logger.Log.Printf("BigQuery partnerEvent queue was full: %d lost messages", bq.lostPartnerEventsCount)
-			bq.lostPartnerEventsCount = 0
+		if n := bq.lostPartnerEventsCount.Swap(0); n > 0 {
+			logger.Log.Printf("BigQuery partnerEvent queue was full: %d lost messages", n)
 		}
-
 	default:
-		bq.lostPartnerEventsCount += 1
+		bq.lostPartnerEventsCount.Add(1)
 	}
 	return nil
 }
@@ -311,12 +309,11 @@ func (bq *BigQueryClient) writePartnerEvent(partnerEvent *BigQueryPartnerEvent) 
 func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) error {
 	select {
 	case bq.vehicleEvents <- vehicleEvent:
-		if bq.lostVehicleEventsCount > 0 {
-			logger.Log.Printf("BigQuery vehicleEvent queue was full: %d lost messages", bq.lostVehicleEventsCount)
-			bq.lostVehicleEventsCount = 0
+		if n := bq.lostVehicleEventsCount.Swap(0); n > 0 {
+			logger.Log.Printf("BigQuery vehicleEvent queue was full: %d lost messages", n)
 		}
 	default:
-		bq.lostVehicleEventsCount += 1
+		bq.lostVehicleEventsCount.Add(1)
 	}
 	return nil
 }
@@ -324,12 +321,11 @@ func (bq *BigQueryClient) writeVehicleEvent(vehicleEvent *BigQueryVehicleEvent) 
 func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *BigQueryLongTermStopVisitEvent) error {
 	select {
 	case bq.longTermStopVisitEvents <- longTermStopVisitEvent:
-		if bq.lostLongTermStopVisitsEventsCount > 0 {
-			logger.Log.Printf("BigQuery longTermStopVisitEvent queue was full: %d lost messages", bq.lostLongTermStopVisitsEventsCount)
-			bq.lostLongTermStopVisitsEventsCount = 0
+		if n := bq.lostLongTermStopVisitsEventsCount.Swap(0); n > 0 {
+			logger.Log.Printf("BigQuery longTermStopVisitEvent queue was full: %d lost messages", n)
 		}
 	default:
-		bq.lostLongTermStopVisitsEventsCount += 1
+		bq.lostLongTermStopVisitsEventsCount.Add(1)
 	}
 	return nil
 }
@@ -337,12 +333,11 @@ func (bq *BigQueryClient) writeLongTermStopVisitEvent(longTermStopVisitEvent *Bi
 func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) error {
 	select {
 	case bq.controlEvents <- controlEvent:
-		if bq.lostControlEventsCount > 0 {
-			logger.Log.Printf("BigQuery controleEvent queue was full: %d lost messages", bq.lostControlEventsCount)
-			bq.lostControlEventsCount = 0
+		if n := bq.lostControlEventsCount.Swap(0); n > 0 {
+			logger.Log.Printf("BigQuery controleEvent queue was full: %d lost messages", n)
 		}
 	default:
-		bq.lostControlEventsCount += 1
+		bq.lostControlEventsCount.Add(1)
 	}
 	return nil
 }
