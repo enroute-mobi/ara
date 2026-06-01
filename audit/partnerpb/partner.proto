@@ -1,0 +1,14 @@
+syntax = "proto2";
+package partnerpb;
+option go_package = "bitbucket.org/enroute-mobi/ara/audit/partnerpb";
+
+message BigQueryPartnerEvent {
+  optional string uuid = 1;
+  optional int64  timestamp = 2;
+  optional string slug = 3;
+  optional string partner_uuid = 4;
+  optional string previous_status = 5;
+  optional string previous_service_started_at = 6;
+  optional string new_status = 7;
+  optional string new_service_started_at = 8;
+}

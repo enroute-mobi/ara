@@ -34,6 +34,14 @@ cucumber:
 redis_cucumber:
 	go build && ARA_REDIS_ADDR=127.0.0.1:6379 bundle exec cucumber -t 'not @wip'
 
+gen_proto_bindings:
+	protoc --go_out=. --go_opt=paths=source_relative \
+		audit/exchangepb/exchange.proto \
+		audit/partnerpb/partner.proto \
+		audit/vehiclepb/vehicle.proto \
+		audit/controlpb/control.proto \
+		audit/longtermsvpb/longtermsv.proto
+
 gen_gtfsrt_bindings:
 	wget https://raw.githubusercontent.com/google/transit/refs/heads/master/gtfs-realtime/proto/gtfs-realtime.proto
 	protoc --go_out=. --go_opt=Mgtfs-realtime.proto=gtfs/ gtfs-realtime.proto

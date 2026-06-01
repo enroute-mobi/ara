@@ -9,11 +9,13 @@ require (
 	github.com/DataDog/dd-trace-go/v2 v2.8.2
 	github.com/everystreet/go-proj/v6 v6.0.0
 	github.com/getsentry/sentry-go v0.46.2
+	github.com/google/uuid v1.6.0
 	github.com/graph-gophers/graphql-go v1.10.1
 	github.com/jbowtie/gokogiri v0.0.0-20250107075044-de0f9d4877a5
 	github.com/jonboulle/clockwork v0.5.0
 	github.com/lib/pq v1.12.3
 	github.com/pkg/errors v0.9.1
+	github.com/redis/go-redis/v9 v9.18.0
 	github.com/rubenv/sql-migrate v1.8.1
 	github.com/satori/uuid v1.2.0
 	github.com/stretchr/testify v1.11.1
@@ -74,7 +76,6 @@ require (
 	github.com/google/flatbuffers v25.12.19+incompatible // indirect
 	github.com/google/pprof v0.0.0-20260507013755-92041b743c96 // indirect
 	github.com/google/s2a-go v0.1.9 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.15 // indirect
 	github.com/googleapis/gax-go/v2 v2.22.0 // indirect
 	github.com/hashicorp/go-version v1.9.0 // indirect
@@ -95,7 +96,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/puzpuzpuz/xsync/v3 v3.5.1 // indirect
-	github.com/redis/go-redis/v9 v9.18.0 // indirect
 	github.com/richardartoul/molecule v1.0.1-0.20240531184615-7ca0df43c0b3 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.11.0 // indirect
 	github.com/shirou/gopsutil/v4 v4.26.4 // indirect
@@ -107,6 +107,7 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
+	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/collector/component v1.58.0 // indirect
 	go.opentelemetry.io/collector/featuregate v1.58.0 // indirect

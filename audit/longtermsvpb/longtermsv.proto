@@ -1,0 +1,42 @@
+syntax = "proto2";
+package longtermsvpb;
+option go_package = "bitbucket.org/enroute-mobi/ara/audit/longtermsvpb";
+
+message Code {
+  optional string code_space = 1;
+  optional string value = 2;
+}
+
+message BigQueryLongTermStopVisitEvent {
+  optional string uuid = 1;
+  optional int64  timestamp = 2;
+
+  optional string stop_visit_uuid = 3;
+  optional string passage_order = 4;
+
+  optional int64 aimed_departure_time = 5;
+  optional int64 aimed_arrival_time = 6;
+  optional int64 expected_departure_time = 7;
+  optional int64 expected_arrival_time = 8;
+  optional int64 actual_departure_time = 9;
+  optional int64 actual_arrival_time = 10;
+
+  optional string departure_status = 11;
+  optional string arrival_status = 12;
+
+  optional string stop_area_name = 13;
+  repeated Code   stop_area_codes = 14;
+  optional string stop_area_coordinates = 15;
+
+  optional string line_name = 16;
+  optional string line_number = 17;
+  optional string transport_mode = 18;
+  repeated Code   line_codes = 19;
+
+  optional string vehicle_journey_direction_type = 20;
+  optional string vehicle_journey_origin_name = 21;
+  optional string vehicle_journey_destination_name = 22;
+  repeated Code   vehicle_journey_codes = 23;
+  optional string vehicle_driver_ref = 24;
+  optional string vehicle_occupancy = 25;
+}

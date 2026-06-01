@@ -1,0 +1,15 @@
+syntax = "proto2";
+package vehiclepb;
+option go_package = "bitbucket.org/enroute-mobi/ara/audit/vehiclepb";
+
+message BigQueryVehicleEvent {
+  optional string uuid = 1;
+  optional int64  timestamp = 2;
+  optional string id = 3;
+  repeated string codes = 4;
+  optional double longitude = 5;
+  optional double latitude = 6;
+  optional double bearing = 7;
+  optional string recorded_at_time = 8;
+  optional string occupancy = 9;
+}
