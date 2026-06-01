@@ -35,8 +35,13 @@ func (guardian *PartnersGuardian) Stop() {
 	}
 }
 
+type partnerWork struct {
+	partner *Partner
+	now     time.Time
+}
+
 func (guardian *PartnersGuardian) Run() {
-	partnerChannel := make(chan *Partner)
+	partnerChannel := make(chan partnerWork)
 	guardian.listen(partnerChannel)
 	for {
 		select {
@@ -46,27 +51,28 @@ func (guardian *PartnersGuardian) Run() {
 			return
 		case <-guardian.Clock().After(30 * time.Second):
 			logger.Log.Debugf("Check partners status")
+			now := guardian.Clock().Now()
 			for _, partner := range guardian.referential.Partners().FindAll() {
-				partnerChannel <- partner
+				partnerChannel <- partnerWork{partner: partner, now: now}
 			}
 		}
 	}
 }
 
-func (guardian *PartnersGuardian) listen(partnerChannel <-chan *Partner) {
+func (guardian *PartnersGuardian) listen(partnerChannel <-chan partnerWork) {
 	go func() {
-		for p := range partnerChannel {
-			guardian.routineWork(p)
+		for pw := range partnerChannel {
+			guardian.routineWork(pw.partner, pw.now)
 		}
 	}()
 }
 
-func (guardian *PartnersGuardian) routineWork(partner *Partner) {
+func (guardian *PartnersGuardian) routineWork(partner *Partner, now time.Time) {
 	defer monitoring.HandlePanic()
 
 	s := guardian.checkPartnerStatus(partner)
 	if s {
-		guardian.checkSubscriptionsTerminatedTime(partner)
+		guardian.checkSubscriptionsTerminatedTime(partner, now)
 	}
 
 	guardian.checkPartnerDiscovery(partner)
@@ -143,18 +149,18 @@ func (guardian *PartnersGuardian) checkPartnerStatus(partner *Partner) bool {
 	return true
 }
 
-func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Partner) {
+func (guardian *PartnersGuardian) checkSubscriptionsTerminatedTime(partner *Partner, now time.Time) {
 	if partner.Subscriptions() == nil {
 		return
 	}
 
 	for _, sub := range partner.Subscriptions().FindAll() {
 		for key, value := range sub.ResourcesByCodeCopy() {
-			if !value.SubscribedUntil.Before(guardian.Clock().Now()) || value.SubscribedAt().IsZero() {
+			if !value.SubscribedUntil.Before(now) || value.SubscribedAt().IsZero() {
 				continue
 			}
 			sub.DeleteResource(key)
-			logger.Log.Printf("%v from %v: Deleting ressource %v from subscription with id %v. SubscribedUntil %v before Clock.Now %v ", partner.Slug(), partner.Referential().Slug(), key, sub.Id(), value.SubscribedUntil, guardian.Clock().Now())
+			logger.Log.Printf("%v from %v: Deleting ressource %v from subscription with id %v. SubscribedUntil %v before Clock.Now %v ", partner.Slug(), partner.Referential().Slug(), key, sub.Id(), value.SubscribedUntil, now)
 		}
 		if sub.ResourcesLen() == 0 {
 			sub.Delete()

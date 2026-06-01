@@ -131,6 +131,8 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) HandleNotifyEstima
 			continue
 		}
 
+		subscription.RefreshSubscribedUntil(connector.Clock().Now().Add(2 * time.Minute))
+
 		builder := NewEstimatedTimetableUpdateEventBuilder(connector.partner)
 		builder.SetUpdateEvents(delivery.EstimatedJourneyVersionFrames())
 		updateEvents = builder.UpdateEvents()

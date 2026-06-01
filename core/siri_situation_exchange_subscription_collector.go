@@ -128,6 +128,8 @@ func (connector *SIRISituationExchangeSubscriptionCollector) HandleNotifySituati
 			continue
 		}
 
+		subscription.RefreshSubscribedUntil(connector.Clock().Now().Add(2 * time.Minute))
+
 		builder.SetSituationExchangeDeliveryUpdateEvents(updateEvents, delivery, notify.ProducerRef())
 
 		maps.Copy(collectedRefs.LineRefs, builder.LineRefs)

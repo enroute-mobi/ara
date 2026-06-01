@@ -130,6 +130,8 @@ func (connector *SIRIFacilityMonitoringSubscriptionCollector) HandleNotifyFacili
 			continue
 		}
 
+		subscription.RefreshSubscribedUntil(connector.Clock().Now().Add(2 * time.Minute))
+
 		builder := NewFacilityMonitoringUpdateEventBuilder(connector.partner)
 		builder.SetUpdateEvents(delivery.FacilityConditions())
 
