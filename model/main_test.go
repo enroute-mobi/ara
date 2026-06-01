@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 }
 
 // Default will create with 2 codespace values: internal and external
-func newTestModel(t *testing.T) Model {
+func newTestModel(t testing.TB) Model {
 	if config.Config.RedisAddr != "" {
 		c, err := redisclient.New("referential", config.Config.CodeSpaces)
 		if err != nil {
