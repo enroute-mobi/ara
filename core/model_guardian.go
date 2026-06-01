@@ -195,12 +195,13 @@ func (guardian *ModelGuardian) cleanOrUpdateStopVisits(ctx context.Context) {
 
 	svs := m.StopVisits().UnsafeFindAll()
 	persistence := guardian.referential.ModelPersistenceDuration()
+	deleteBefore := guardian.Clock().Now().Add(persistence)
 	vjs := make(map[model.VehicleJourneyId]struct{})
 	stopVisitstoDelete := []*model.StopVisit{}
 
 	child.SetTag("stop_visits_count", len(svs))
 	for i := range svs {
-		if svs[i].ReferenceTime().Before(guardian.Clock().Now().Add(persistence)) {
+		if svs[i].ReferenceTime().Before(deleteBefore) {
 			vjs[svs[i].VehicleJourneyId] = struct{}{}
 			stopVisitstoDelete = append(stopVisitstoDelete, svs[i])
 			continue
@@ -258,7 +259,7 @@ func (simulator *ActualAttributesSimulator) ArrivalTime() time.Time {
 }
 
 func (simulator *ActualAttributesSimulator) AfterArrivalTime() bool {
-	return simulator.Clock().Now().After(simulator.ArrivalTime())
+	return simulator.Now().After(simulator.ArrivalTime())
 }
 
 func (simulator *ActualAttributesSimulator) DepartureTime() time.Time {
@@ -266,7 +267,7 @@ func (simulator *ActualAttributesSimulator) DepartureTime() time.Time {
 }
 
 func (simulator *ActualAttributesSimulator) AfterDepartureTime() bool {
-	return simulator.Clock().Now().After(simulator.DepartureTime())
+	return simulator.Now().After(simulator.DepartureTime())
 }
 
 func (simulator *ActualAttributesSimulator) Simulate() bool {
