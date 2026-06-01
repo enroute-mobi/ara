@@ -11,13 +11,13 @@ import (
 type XMLSubscriptionResponse struct {
 	XMLStructure
 
-	address                   string
-	requestMessageRef         string
-	responderRef              string
-	responseMessageIdentifier string
+	address                   *string
+	requestMessageRef         *string
+	responderRef              *string
+	responseMessageIdentifier *string
 
-	responseTimestamp  time.Time
-	serviceStartedTime time.Time
+	responseTimestamp  *time.Time
+	serviceStartedTime *time.Time
 
 	responseStatus []*XMLResponseStatus
 }
@@ -25,7 +25,7 @@ type XMLSubscriptionResponse struct {
 type XMLResponseStatus struct {
 	SubscriptionDeliveryXMLStructure
 
-	validUntil time.Time
+	validUntil *time.Time
 }
 
 func NewXMLSubscriptionResponse(node xml.Node) *XMLSubscriptionResponse {
@@ -59,50 +59,57 @@ func (response *XMLSubscriptionResponse) ResponseStatus() []*XMLResponseStatus {
 }
 
 func (response *XMLSubscriptionResponse) Address() string {
-	if response.address == "" {
-		response.address = response.findStringChildContent(siri_attributes.Address)
+	if response.address == nil {
+		s := response.findStringChildContent(siri_attributes.Address)
+		response.address = &s
 	}
-	return response.address
+	return *response.address
 }
 
 func (response *XMLSubscriptionResponse) ResponderRef() string {
-	if response.responderRef == "" {
-		response.responderRef = response.findStringChildContent(siri_attributes.ResponderRef)
+	if response.responderRef == nil {
+		s := response.findStringChildContent(siri_attributes.ResponderRef)
+		response.responderRef = &s
 	}
-	return response.responderRef
+	return *response.responderRef
 }
 
 func (response *XMLSubscriptionResponse) RequestMessageRef() string {
-	if response.requestMessageRef == "" {
-		response.requestMessageRef = response.findStringChildContent(siri_attributes.RequestMessageRef)
+	if response.requestMessageRef == nil {
+		s := response.findStringChildContent(siri_attributes.RequestMessageRef)
+		response.requestMessageRef = &s
 	}
-	return response.requestMessageRef
+	return *response.requestMessageRef
 }
 
 func (response *XMLSubscriptionResponse) ServiceStartedTime() time.Time {
-	if response.serviceStartedTime.IsZero() {
-		response.serviceStartedTime = response.findTimeChildContent(siri_attributes.ServiceStartedTime)
+	if response.serviceStartedTime == nil {
+		t := response.findTimeChildContent(siri_attributes.ServiceStartedTime)
+		response.serviceStartedTime = &t
 	}
-	return response.serviceStartedTime
+	return *response.serviceStartedTime
 }
 
 func (response *XMLSubscriptionResponse) ResponseTimestamp() time.Time {
-	if response.responseTimestamp.IsZero() {
-		response.responseTimestamp = response.findTimeChildContent(siri_attributes.ResponseTimestamp)
+	if response.responseTimestamp == nil {
+		t := response.findTimeChildContent(siri_attributes.ResponseTimestamp)
+		response.responseTimestamp = &t
 	}
-	return response.responseTimestamp
+	return *response.responseTimestamp
 }
 
 func (response *XMLSubscriptionResponse) ResponseMessageIdentifier() string {
-	if response.responseMessageIdentifier == "" {
-		response.responseMessageIdentifier = response.findStringChildContent(siri_attributes.ResponseMessageIdentifier)
+	if response.responseMessageIdentifier == nil {
+		s := response.findStringChildContent(siri_attributes.ResponseMessageIdentifier)
+		response.responseMessageIdentifier = &s
 	}
-	return response.responseMessageIdentifier
+	return *response.responseMessageIdentifier
 }
 
 func (response *XMLResponseStatus) ValidUntil() time.Time {
-	if response.validUntil.IsZero() {
-		response.validUntil = response.findTimeChildContent(siri_attributes.ValidUntil)
+	if response.validUntil == nil {
+		t := response.findTimeChildContent(siri_attributes.ValidUntil)
+		response.validUntil = &t
 	}
-	return response.validUntil
+	return *response.validUntil
 }

@@ -11,7 +11,7 @@ type XMLProductionTimetableRequest struct {
 	LightRequestXMLStructure
 
 	previewInterval time.Duration
-	startTime       time.Time
+	startTime       *time.Time
 
 	lines []string
 }
@@ -34,8 +34,9 @@ func (request *XMLProductionTimetableRequest) PreviewInterval() time.Duration {
 }
 
 func (request *XMLProductionTimetableRequest) StartTime() time.Time {
-	if request.startTime.IsZero() {
-		request.startTime = request.findTimeChildContent(siri_attributes.StartTime)
+	if request.startTime == nil {
+		t := request.findTimeChildContent(siri_attributes.StartTime)
+		request.startTime = &t
 	}
-	return request.startTime
+	return *request.startTime
 }

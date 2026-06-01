@@ -18,8 +18,8 @@ type XMLStopPointsDiscoveryResponse struct {
 type XMLAnnotatedStopPointRef struct {
 	XMLStructure
 
-	stopPointRef string
-	stopName     string
+	stopPointRef *string
+	stopName     *string
 
 	lineRefs []string
 
@@ -71,17 +71,19 @@ func (response *XMLStopPointsDiscoveryResponse) AnnotatedStopPointRefs() []*XMLA
 }
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) StopPointRef() string {
-	if annotatedStopPoint.stopPointRef == "" {
-		annotatedStopPoint.stopPointRef = annotatedStopPoint.findStringChildContent(siri_attributes.StopPointRef)
+	if annotatedStopPoint.stopPointRef == nil {
+		s := annotatedStopPoint.findStringChildContent(siri_attributes.StopPointRef)
+		annotatedStopPoint.stopPointRef = &s
 	}
-	return annotatedStopPoint.stopPointRef
+	return *annotatedStopPoint.stopPointRef
 }
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) StopName() string {
-	if annotatedStopPoint.stopName == "" {
-		annotatedStopPoint.stopName = annotatedStopPoint.findStringChildContent(siri_attributes.StopName)
+	if annotatedStopPoint.stopName == nil {
+		s := annotatedStopPoint.findStringChildContent(siri_attributes.StopName)
+		annotatedStopPoint.stopName = &s
 	}
-	return annotatedStopPoint.stopName
+	return *annotatedStopPoint.stopName
 }
 
 func (annotatedStopPoint *XMLAnnotatedStopPointRef) LineRefs() []string {

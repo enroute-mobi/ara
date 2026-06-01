@@ -9,10 +9,10 @@ import (
 type XMLSubscriptionRequest struct {
 	RequestXMLStructure
 
-	consumerAddress string
+	consumerAddress *string
 
-	changeBeforeUpdates string
-	incrementalUpdates  string
+	changeBeforeUpdates *string
+	incrementalUpdates  *string
 
 	smEntries  []*XMLStopMonitoringSubscriptionRequestEntry
 	gmEntries  []*XMLGeneralMessageSubscriptionRequestEntry
@@ -116,22 +116,25 @@ func (request *XMLSubscriptionRequest) XMLSubscriptionSXEntries() []*XMLSituatio
 }
 
 func (request *XMLSubscriptionRequest) ConsumerAddress() string {
-	if request.consumerAddress == "" {
-		request.consumerAddress = request.findStringChildContent(siri_attributes.ConsumerAddress)
+	if request.consumerAddress == nil {
+		s := request.findStringChildContent(siri_attributes.ConsumerAddress)
+		request.consumerAddress = &s
 	}
-	return request.consumerAddress
+	return *request.consumerAddress
 }
 
 func (request *XMLSubscriptionRequest) ChangeBeforeUpdates() string {
-	if request.changeBeforeUpdates == "" {
-		request.changeBeforeUpdates = request.findStringChildContent(siri_attributes.ChangeBeforeUpdates)
+	if request.changeBeforeUpdates == nil {
+		s := request.findStringChildContent(siri_attributes.ChangeBeforeUpdates)
+		request.changeBeforeUpdates = &s
 	}
-	return request.changeBeforeUpdates
+	return *request.changeBeforeUpdates
 }
 
 func (request *XMLSubscriptionRequest) IncrementalUpdates() string {
-	if request.incrementalUpdates == "" {
-		request.incrementalUpdates = request.findStringChildContent(siri_attributes.IncrementalUpdates)
+	if request.incrementalUpdates == nil {
+		s := request.findStringChildContent(siri_attributes.IncrementalUpdates)
+		request.incrementalUpdates = &s
 	}
-	return request.incrementalUpdates
+	return *request.incrementalUpdates
 }

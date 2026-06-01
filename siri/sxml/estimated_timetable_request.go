@@ -12,14 +12,14 @@ import (
 type XMLGetEstimatedTimetable struct {
 	XMLEstimatedTimetableRequest
 
-	requestorRef string
+	requestorRef *string
 }
 
 type XMLEstimatedTimetableRequest struct {
 	LightRequestXMLStructure
 
 	previewInterval time.Duration
-	startTime       time.Time
+	startTime       *time.Time
 
 	lines []string
 }
@@ -50,10 +50,11 @@ func (request *XMLEstimatedTimetableRequest) Lines() []string {
 }
 
 func (request *XMLGetEstimatedTimetable) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }
 
 func (request *XMLEstimatedTimetableRequest) PreviewInterval() time.Duration {
@@ -64,8 +65,9 @@ func (request *XMLEstimatedTimetableRequest) PreviewInterval() time.Duration {
 }
 
 func (request *XMLEstimatedTimetableRequest) StartTime() time.Time {
-	if request.startTime.IsZero() {
-		request.startTime = request.findTimeChildContent(siri_attributes.StartTime)
+	if request.startTime == nil {
+		t := request.findTimeChildContent(siri_attributes.StartTime)
+		request.startTime = &t
 	}
-	return request.startTime
+	return *request.startTime
 }

@@ -10,9 +10,9 @@ import (
 type XMLSituationExchangeSubscriptionRequestEntry struct {
 	XMLSituationExchangeRequest
 
-	subscriberRef          string
-	subscriptionIdentifier string
-	initialTerminationTime time.Time
+	subscriberRef          *string
+	subscriptionIdentifier *string
+	initialTerminationTime *time.Time
 }
 
 func NewXMLSituationExchangeSubscriptionRequestEntry(node XMLNode) *XMLSituationExchangeSubscriptionRequestEntry {
@@ -22,24 +22,27 @@ func NewXMLSituationExchangeSubscriptionRequestEntry(node XMLNode) *XMLSituation
 }
 
 func (request *XMLSituationExchangeSubscriptionRequestEntry) SubscriberRef() string {
-	if request.subscriberRef == "" {
-		request.subscriberRef = request.findStringChildContent(siri_attributes.SubscriberRef)
+	if request.subscriberRef == nil {
+		s := request.findStringChildContent(siri_attributes.SubscriberRef)
+		request.subscriberRef = &s
 	}
-	return request.subscriberRef
+	return *request.subscriberRef
 }
 
 func (request *XMLSituationExchangeSubscriptionRequestEntry) SubscriptionIdentifier() string {
-	if request.subscriptionIdentifier == "" {
-		request.subscriptionIdentifier = request.findStringChildContent(siri_attributes.SubscriptionIdentifier)
+	if request.subscriptionIdentifier == nil {
+		s := request.findStringChildContent(siri_attributes.SubscriptionIdentifier)
+		request.subscriptionIdentifier = &s
 	}
-	return request.subscriptionIdentifier
+	return *request.subscriptionIdentifier
 }
 
 func (request *XMLSituationExchangeSubscriptionRequestEntry) InitialTerminationTime() time.Time {
-	if request.initialTerminationTime.IsZero() {
-		request.initialTerminationTime = request.findTimeChildContent(siri_attributes.InitialTerminationTime)
+	if request.initialTerminationTime == nil {
+		t := request.findTimeChildContent(siri_attributes.InitialTerminationTime)
+		request.initialTerminationTime = &t
 	}
-	return request.initialTerminationTime
+	return *request.initialTerminationTime
 }
 
 func (request *XMLSituationExchangeSubscriptionRequestEntry) LineRefs() []string {

@@ -10,9 +10,9 @@ import (
 type XMLFacilityMonitoringSubscriptionRequestEntry struct {
 	XMLFacilityMonitoringRequest
 
-	subscriberRef          string
-	subscriptionRef        string
-	initialTerminationTime time.Time
+	subscriberRef          *string
+	subscriptionRef        *string
+	initialTerminationTime *time.Time
 
 	facilities []string
 }
@@ -24,17 +24,19 @@ func NewXMLFacilityMonitoringSubscriptionRequestEntry(node XMLNode) *XMLFacility
 }
 
 func (request *XMLFacilityMonitoringSubscriptionRequestEntry) SubscriberRef() string {
-	if request.subscriberRef == "" {
-		request.subscriberRef = request.findStringChildContent(siri_attributes.SubscriberRef)
+	if request.subscriberRef == nil {
+		s := request.findStringChildContent(siri_attributes.SubscriberRef)
+		request.subscriberRef = &s
 	}
-	return request.subscriberRef
+	return *request.subscriberRef
 }
 
 func (request *XMLFacilityMonitoringSubscriptionRequestEntry) SubscriptionIdentifier() string {
-	if request.subscriptionRef == "" {
-		request.subscriptionRef = request.findStringChildContent(siri_attributes.SubscriptionIdentifier)
+	if request.subscriptionRef == nil {
+		s := request.findStringChildContent(siri_attributes.SubscriptionIdentifier)
+		request.subscriptionRef = &s
 	}
-	return request.subscriptionRef
+	return *request.subscriptionRef
 }
 
 func (request *XMLFacilityMonitoringSubscriptionRequestEntry) FacilityRefs() []string {
@@ -48,8 +50,9 @@ func (request *XMLFacilityMonitoringSubscriptionRequestEntry) FacilityRefs() []s
 }
 
 func (request *XMLFacilityMonitoringSubscriptionRequestEntry) InitialTerminationTime() time.Time {
-	if request.initialTerminationTime.IsZero() {
-		request.initialTerminationTime = request.findTimeChildContent(siri_attributes.InitialTerminationTime)
+	if request.initialTerminationTime == nil {
+		t := request.findTimeChildContent(siri_attributes.InitialTerminationTime)
+		request.initialTerminationTime = &t
 	}
-	return request.initialTerminationTime
+	return *request.initialTerminationTime
 }

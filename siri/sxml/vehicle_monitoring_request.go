@@ -11,15 +11,15 @@ import (
 type XMLGetVehicleMonitoring struct {
 	XMLVehicleMonitoringRequest
 
-	requestorRef string
+	requestorRef *string
 }
 
 type XMLVehicleMonitoringRequest struct {
 	LightRequestXMLStructure
 
-	lineRef           string
-	vehicleRef        string
-	messageIdentifier string
+	lineRef           *string
+	vehicleRef        *string
+	messageIdentifier *string
 
 	lines []string
 }
@@ -50,29 +50,33 @@ func (request *XMLVehicleMonitoringRequest) Lines() []string {
 }
 
 func (request *XMLGetVehicleMonitoring) LineRef() string {
-	if request.lineRef == "" {
-		request.lineRef = request.findStringChildContent(siri_attributes.LineRef)
+	if request.lineRef == nil {
+		s := request.findStringChildContent(siri_attributes.LineRef)
+		request.lineRef = &s
 	}
-	return request.lineRef
+	return *request.lineRef
 }
 
 func (request *XMLGetVehicleMonitoring) VehicleRef() string {
-	if request.vehicleRef == "" {
-		request.vehicleRef = request.findStringChildContent(siri_attributes.VehicleRef)
+	if request.vehicleRef == nil {
+		s := request.findStringChildContent(siri_attributes.VehicleRef)
+		request.vehicleRef = &s
 	}
-	return request.vehicleRef
+	return *request.vehicleRef
 }
 
 func (request *XMLGetVehicleMonitoring) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent(siri_attributes.MessageIdentifier)
+	if request.messageIdentifier == nil {
+		s := request.findStringChildContent(siri_attributes.MessageIdentifier)
+		request.messageIdentifier = &s
 	}
-	return request.messageIdentifier
+	return *request.messageIdentifier
 }
 
 func (request *XMLGetVehicleMonitoring) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }

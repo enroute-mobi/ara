@@ -25,22 +25,22 @@ type XMLSituationExchangeDelivery struct {
 type XMLPtSituationElement struct {
 	XMLStructure
 
-	situationNumber string
+	situationNumber *string
 
 	version Int
 
 	keywords           []string
-	reportType         string
-	alertCause         string
-	recordedAtTime     time.Time
-	versionedAtTime    time.Time
+	reportType         *string
+	alertCause         *string
+	recordedAtTime     *time.Time
+	versionedAtTime    *time.Time
 	validityPeriods    []*XMLPeriod
 	publicationWindows []*XMLPeriod
 
-	progress       string
-	severity       string
-	reality        string
-	participantRef string
+	progress       *string
+	severity       *string
+	reality        *string
+	participantRef *string
 	summaries      map[string]string
 	descriptions   map[string]string
 
@@ -55,18 +55,18 @@ type XMLPtSituationElement struct {
 type XMLActionData struct {
 	XMLStructure
 
-	name       string
-	actionType string
-	value      string
+	name       *string
+	actionType *string
+	value      *string
 	prompt     map[string]string
-	scopeType  string
+	scopeType  *string
 	affects    []*XMLAffect
 }
 
 type XMLCommonPublishingAction struct {
 	XMLActionData
 
-	actionStatus       string
+	actionStatus       *string
 	descriptions       map[string]string
 	publicationWindows []*XMLPeriod
 }
@@ -96,10 +96,10 @@ type XMLPublishToDisplayAction struct {
 type XMLInfoLink struct {
 	XMLStructure
 
-	uri         string
-	label       string
-	imageRef    string
-	linkContent string
+	uri         *string
+	label       *string
+	imageRef    *string
+	linkContent *string
 }
 
 func NewXMLInfoLink(node XMLNode) *XMLInfoLink {
@@ -135,8 +135,8 @@ func NewXMLPublishToDisplayAction(node XMLNode) *XMLPublishToDisplayAction {
 type XMLPeriod struct {
 	XMLStructure
 
-	startTime time.Time
-	endTime   time.Time
+	startTime *time.Time
+	endTime   *time.Time
 }
 
 type XMLAffect struct {
@@ -149,7 +149,7 @@ type XMLAffect struct {
 type XMLAffectedRoute struct {
 	XMLStructure
 
-	routeRef           string
+	routeRef           *string
 	affectedStopPoints []*XMLAffectedStopPoint
 }
 
@@ -178,7 +178,7 @@ func NewXMLAffectedNetwork(node XMLNode) *XMLAffectedNetwork {
 type XMLAffectedStopPoint struct {
 	XMLStructure
 
-	stopPointRef string
+	stopPointRef *string
 	lineRefs     []string
 }
 
@@ -191,16 +191,16 @@ func NewXMLAffectedStopPoint(node XMLNode) *XMLAffectedStopPoint {
 type XMLAffectedSection struct {
 	XMLStructure
 
-	firstStop string
-	lastStop  string
+	firstStop *string
+	lastStop  *string
 }
 
 type XMLConsequence struct {
 	XMLStructure
 
 	periods        []*XMLPeriod
-	condition      string
-	severity       string
+	condition      *string
+	severity       *string
 	affects        []*XMLAffect
 	hasBlocking    bool
 	journeyPlanner Bool
@@ -311,10 +311,11 @@ func (s *XMLPtSituationElement) Descriptions() map[string]string {
 }
 
 func (s *XMLPtSituationElement) AlertCause() string {
-	if s.alertCause == "" {
-		s.alertCause = s.findStringChildContent(siri_attributes.AlertCause)
+	if s.alertCause == nil {
+		str := s.findStringChildContent(siri_attributes.AlertCause)
+		s.alertCause = &str
 	}
-	return s.alertCause
+	return *s.alertCause
 }
 
 func (response *XMLSituationExchangeResponse) ErrorString() string {
@@ -329,27 +330,30 @@ func (response *XMLSituationExchangeResponse) errorType() string {
 }
 
 func (visit *XMLPtSituationElement) RecordedAtTime() time.Time {
-	if visit.recordedAtTime.IsZero() {
-		visit.recordedAtTime = visit.VersionedAtTime()
-		if visit.recordedAtTime.IsZero() {
-			visit.recordedAtTime = visit.findTimeChildContent(siri_attributes.CreationTime)
+	if visit.recordedAtTime == nil {
+		t := visit.VersionedAtTime()
+		if t.IsZero() {
+			t = visit.findTimeChildContent(siri_attributes.CreationTime)
 		}
+		visit.recordedAtTime = &t
 	}
-	return visit.recordedAtTime
+	return *visit.recordedAtTime
 }
 
 func (visit *XMLPtSituationElement) VersionedAtTime() time.Time {
-	if visit.versionedAtTime.IsZero() {
-		visit.versionedAtTime = visit.findTimeChildContent(siri_attributes.VersionedAtTime)
+	if visit.versionedAtTime == nil {
+		t := visit.findTimeChildContent(siri_attributes.VersionedAtTime)
+		visit.versionedAtTime = &t
 	}
-	return visit.versionedAtTime
+	return *visit.versionedAtTime
 }
 
 func (visit *XMLPtSituationElement) SituationNumber() string {
-	if visit.situationNumber == "" {
-		visit.situationNumber = visit.findStringChildContent(siri_attributes.SituationNumber)
+	if visit.situationNumber == nil {
+		s := visit.findStringChildContent(siri_attributes.SituationNumber)
+		visit.situationNumber = &s
 	}
-	return visit.situationNumber
+	return *visit.situationNumber
 }
 
 func (visit *XMLPtSituationElement) Version() int {
@@ -369,10 +373,11 @@ func (visit *XMLPtSituationElement) Keywords() []string {
 }
 
 func (visit *XMLPtSituationElement) ReportType() string {
-	if visit.reportType == "" {
-		visit.reportType = visit.findStringChildContent(siri_attributes.ReportType)
+	if visit.reportType == nil {
+		s := visit.findStringChildContent(siri_attributes.ReportType)
+		visit.reportType = &s
 	}
-	return visit.reportType
+	return *visit.reportType
 }
 
 func (visit *XMLPtSituationElement) PublicationWindows() []*XMLPeriod {
@@ -400,45 +405,51 @@ func (visit *XMLPtSituationElement) ValidityPeriods() []*XMLPeriod {
 }
 
 func (v *XMLPeriod) StartTime() time.Time {
-	if v.startTime.IsZero() {
-		v.startTime = v.findTimeChildContent(siri_attributes.StartTime)
+	if v.startTime == nil {
+		t := v.findTimeChildContent(siri_attributes.StartTime)
+		v.startTime = &t
 	}
-	return v.startTime
+	return *v.startTime
 }
 
 func (v *XMLPeriod) EndTime() time.Time {
-	if v.endTime.IsZero() {
-		v.endTime = v.findTimeChildContent(siri_attributes.EndTime)
+	if v.endTime == nil {
+		t := v.findTimeChildContent(siri_attributes.EndTime)
+		v.endTime = &t
 	}
-	return v.endTime
+	return *v.endTime
 }
 
 func (visit *XMLPtSituationElement) Severity() string {
-	if visit.severity == "" {
-		visit.severity = visit.findStringChildContent(siri_attributes.Severity)
+	if visit.severity == nil {
+		s := visit.findStringChildContent(siri_attributes.Severity)
+		visit.severity = &s
 	}
-	return visit.severity
+	return *visit.severity
 }
 
 func (visit *XMLPtSituationElement) Reality() string {
-	if visit.reality == "" {
-		visit.reality = visit.findStringChildContent(siri_attributes.Reality)
+	if visit.reality == nil {
+		s := visit.findStringChildContent(siri_attributes.Reality)
+		visit.reality = &s
 	}
-	return visit.reality
+	return *visit.reality
 }
 
 func (visit *XMLPtSituationElement) Progress() string {
-	if visit.progress == "" {
-		visit.progress = visit.findStringChildContent(siri_attributes.Progress)
+	if visit.progress == nil {
+		s := visit.findStringChildContent(siri_attributes.Progress)
+		visit.progress = &s
 	}
-	return visit.progress
+	return *visit.progress
 }
 
 func (visit *XMLPtSituationElement) ParticipantRef() string {
-	if visit.participantRef == "" {
-		visit.participantRef = visit.findStringChildContent(siri_attributes.ParticipantRef)
+	if visit.participantRef == nil {
+		s := visit.findStringChildContent(siri_attributes.ParticipantRef)
+		visit.participantRef = &s
 	}
-	return visit.participantRef
+	return *visit.participantRef
 }
 
 func (visit *XMLPtSituationElement) Consequences() []*XMLConsequence {
@@ -466,17 +477,19 @@ func (consequence *XMLConsequence) Periods() []*XMLPeriod {
 }
 
 func (consequence *XMLConsequence) Condition() string {
-	if consequence.condition == "" {
-		consequence.condition = consequence.findStringChildContent(siri_attributes.Condition)
+	if consequence.condition == nil {
+		s := consequence.findStringChildContent(siri_attributes.Condition)
+		consequence.condition = &s
 	}
-	return consequence.condition
+	return *consequence.condition
 }
 
 func (consequence *XMLConsequence) Severity() string {
-	if consequence.severity == "" {
-		consequence.severity = consequence.findStringChildContent(siri_attributes.Severity)
+	if consequence.severity == nil {
+		s := consequence.findStringChildContent(siri_attributes.Severity)
+		consequence.severity = &s
 	}
-	return consequence.severity
+	return *consequence.severity
 }
 
 func (c *XMLConsequence) Affects() []*XMLAffect {
@@ -573,10 +586,11 @@ func (an *XMLAffectedNetwork) AffectedRoutes() []*XMLAffectedRoute {
 }
 
 func (ar *XMLAffectedRoute) RouteRef() string {
-	if ar.routeRef == "" {
-		ar.routeRef = ar.findStringChildContent(siri_attributes.RouteRef)
+	if ar.routeRef == nil {
+		s := ar.findStringChildContent(siri_attributes.RouteRef)
+		ar.routeRef = &s
 	}
-	return ar.routeRef
+	return *ar.routeRef
 }
 func (ar *XMLAffectedRoute) AffectedStopPoints() []*XMLAffectedStopPoint {
 	if len(ar.affectedStopPoints) == 0 {
@@ -604,17 +618,19 @@ func (an *XMLAffectedNetwork) AffectedSections() []*XMLAffectedSection {
 }
 
 func (s *XMLAffectedSection) FirstStop() string {
-	if s.firstStop == "" {
-		s.firstStop = s.findStringChildContent(siri_attributes.FirstStopPointRef)
+	if s.firstStop == nil {
+		str := s.findStringChildContent(siri_attributes.FirstStopPointRef)
+		s.firstStop = &str
 	}
-	return s.firstStop
+	return *s.firstStop
 }
 
 func (s *XMLAffectedSection) LastStop() string {
-	if s.lastStop == "" {
-		s.lastStop = s.findStringChildContent(siri_attributes.LastStopPointRef)
+	if s.lastStop == nil {
+		str := s.findStringChildContent(siri_attributes.LastStopPointRef)
+		s.lastStop = &str
 	}
-	return s.lastStop
+	return *s.lastStop
 }
 
 func (an *XMLAffectedNetwork) AffectedDestinations() []string {
@@ -643,10 +659,11 @@ func (a *XMLAffect) AffectedStopPoints() []*XMLAffectedStopPoint {
 }
 
 func (asp *XMLAffectedStopPoint) StopPointRef() string {
-	if asp.stopPointRef == "" {
-		asp.stopPointRef = asp.findStringChildContent(siri_attributes.StopPointRef)
+	if asp.stopPointRef == nil {
+		s := asp.findStringChildContent(siri_attributes.StopPointRef)
+		asp.stopPointRef = &s
 	}
-	return asp.stopPointRef
+	return *asp.stopPointRef
 }
 
 func (asp *XMLAffectedStopPoint) LineRefs() []string {
@@ -670,27 +687,27 @@ func (visit *XMLPtSituationElement) PublishToWebActions() []*XMLPublishToWebActi
 }
 
 func (c *XMLActionData) Name() string {
-	if c.name == "" {
-		name := c.findStringChildContent("Name")
-		c.name = name
+	if c.name == nil {
+		s := c.findStringChildContent("Name")
+		c.name = &s
 	}
-	return c.name
+	return *c.name
 }
 
 func (c *XMLActionData) Type() string {
-	if c.actionType == "" {
-		actionType := c.findStringChildContent("Type")
-		c.actionType = actionType
+	if c.actionType == nil {
+		s := c.findStringChildContent("Type")
+		c.actionType = &s
 	}
-	return c.actionType
+	return *c.actionType
 }
 
 func (c *XMLActionData) Value() string {
-	if c.value == "" {
-		value := c.findStringChildContent("Value")
-		c.value = value
+	if c.value == nil {
+		s := c.findStringChildContent("Value")
+		c.value = &s
 	}
-	return c.value
+	return *c.value
 }
 
 func (c *XMLActionData) Prompt() map[string]string {
@@ -834,11 +851,11 @@ func (da *XMLPublishToDisplayAction) OnBoard() *bool {
 }
 
 func (ad *XMLActionData) ScopeType() string {
-	if ad.scopeType == "" {
-		scopeType := ad.findStringChildContent("ScopeType")
-		ad.scopeType = scopeType
+	if ad.scopeType == nil {
+		s := ad.findStringChildContent("ScopeType")
+		ad.scopeType = &s
 	}
-	return ad.scopeType
+	return *ad.scopeType
 }
 
 func (ad *XMLActionData) Affects() []*XMLAffect {
@@ -854,11 +871,11 @@ func (ad *XMLActionData) Affects() []*XMLAffect {
 }
 
 func (c *XMLCommonPublishingAction) ActionStatus() string {
-	if c.actionStatus == "" {
-		actionStatus := c.findStringChildContent("ActionStatus")
-		c.actionStatus = actionStatus
+	if c.actionStatus == nil {
+		s := c.findStringChildContent("ActionStatus")
+		c.actionStatus = &s
 	}
-	return c.actionStatus
+	return *c.actionStatus
 }
 
 func (c *XMLCommonPublishingAction) Descriptions() map[string]string {
@@ -894,33 +911,33 @@ func (visit *XMLPtSituationElement) InfoLinks() []*XMLInfoLink {
 }
 
 func (i *XMLInfoLink) Uri() string {
-	if i.uri == "" {
-		uri := i.findStringChildContent("Uri")
-		i.uri = uri
+	if i.uri == nil {
+		s := i.findStringChildContent("Uri")
+		i.uri = &s
 	}
-	return i.uri
+	return *i.uri
 }
 
 func (i *XMLInfoLink) Label() string {
-	if i.label == "" {
-		label := i.findStringChildContent("Label")
-		i.label = label
+	if i.label == nil {
+		s := i.findStringChildContent("Label")
+		i.label = &s
 	}
-	return i.label
+	return *i.label
 }
 
 func (i *XMLInfoLink) ImageRef() string {
-	if i.imageRef == "" {
-		imageRef := i.findStringChildContent("ImageRef")
-		i.imageRef = imageRef
+	if i.imageRef == nil {
+		s := i.findStringChildContent("ImageRef")
+		i.imageRef = &s
 	}
-	return i.imageRef
+	return *i.imageRef
 }
 
 func (i *XMLInfoLink) LinkContent() string {
-	if i.linkContent == "" {
-		linkContent := i.findStringChildContent("LinkContent")
-		i.linkContent = linkContent
+	if i.linkContent == nil {
+		s := i.findStringChildContent("LinkContent")
+		i.linkContent = &s
 	}
-	return i.linkContent
+	return *i.linkContent
 }

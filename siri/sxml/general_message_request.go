@@ -11,7 +11,7 @@ import (
 type XMLGetGeneralMessage struct {
 	XMLGeneralMessageRequest
 
-	requestorRef string
+	requestorRef *string
 }
 
 type XMLGeneralMessageRequest struct {
@@ -41,10 +41,11 @@ func NewXMLGetGeneralMessageFromContent(content []byte) (*XMLGetGeneralMessage, 
 }
 
 func (request *XMLGetGeneralMessage) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }
 
 func (request *XMLGeneralMessageRequest) InfoChannelRef() []string {
