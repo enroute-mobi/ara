@@ -3,8 +3,11 @@ package audit
 import (
 	"context"
 	"io"
+	"os"
+	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"bitbucket.org/enroute-mobi/ara/audit/controlpb"
 	"bitbucket.org/enroute-mobi/ara/audit/exchangepb"
@@ -235,7 +238,7 @@ func TestExchangeEncodeEmptyMessage(t *testing.T) {
 }
 
 func TestExchangeEncodeLargeRawMessage(t *testing.T) {
-	large := make([]byte, 11*1024*1024) // 11 MB
+	large := make([]byte, 11*1024*1024) // 11 MB — exceeds maxRawMessageBytes
 	for i := range large {
 		large[i] = 'x'
 	}
@@ -247,8 +250,45 @@ func TestExchangeEncodeLargeRawMessage(t *testing.T) {
 
 	decoded := unmarshalExchange(t, msg)
 
-	assert.Len(t, decoded.GetRequestRawMessage(), len(large))
-	assert.Len(t, decoded.GetResponseRawMessage(), len(large))
+	assert.LessOrEqual(t, len(decoded.GetRequestRawMessage()), maxRawMessageBytes+len("...[truncated]"))
+	assert.LessOrEqual(t, len(decoded.GetResponseRawMessage()), maxRawMessageBytes+len("...[truncated]"))
+	assert.True(t, strings.HasSuffix(decoded.GetRequestRawMessage(), "...[truncated]"))
+	assert.True(t, strings.HasSuffix(decoded.GetResponseRawMessage(), "...[truncated]"))
+}
+
+// TestExchangeEncodeLargeNotifyStopMonitoring uses a realistic large
+// NotifyStopMonitoring XML (> 1 MiB) to verify that encodeExchange truncates
+// the raw message, preserves the original size in request_size, and that the
+// truncated prefix is still valid UTF-8.
+func TestExchangeEncodeLargeNotifyStopMonitoring(t *testing.T) {
+	xmlBytes, err := os.ReadFile("../core/testdata/notify-stop-monitoring-large.xml")
+	require.NoError(t, err)
+	require.Greater(t, len(xmlBytes), maxRawMessageBytes, "test file must exceed the cap to be useful")
+
+	originalSize := int64(len(xmlBytes))
+	msg := &BigQueryMessage{
+		UUID:             "large-notify-sm",
+		Type:             NOTIFY_STOP_MONITORING,
+		Direction:        "received",
+		RequestRawMessage: string(xmlBytes),
+		RequestSize:      originalSize,
+	}
+
+	decoded := unmarshalExchange(t, msg)
+
+	// Raw message was truncated.
+	assert.LessOrEqual(t, len(decoded.GetRequestRawMessage()), maxRawMessageBytes+len("...[truncated]"))
+	assert.True(t, strings.HasSuffix(decoded.GetRequestRawMessage(), "...[truncated]"), "truncated suffix must be present")
+
+	// The truncated prefix must be valid UTF-8.
+	prefix := strings.TrimSuffix(decoded.GetRequestRawMessage(), "...[truncated]")
+	assert.True(t, utf8.ValidString(prefix), "truncated prefix must be valid UTF-8")
+
+	// The XML prefix is preserved — the original opening tag is intact.
+	assert.True(t, strings.HasPrefix(decoded.GetRequestRawMessage(), "<ns1:NotifyStopMonitoring"), "XML prefix must be preserved")
+
+	// request_size still holds the original full size, not the truncated length.
+	assert.Equal(t, originalSize, decoded.GetRequestSize(), "request_size must reflect the original untruncated size")
 }
 
 func TestVehicleEncode(t *testing.T) {
