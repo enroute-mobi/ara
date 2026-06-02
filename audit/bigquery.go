@@ -4,12 +4,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+	"unicode/utf8"
 
 	"bitbucket.org/enroute-mobi/ara/audit/controlpb"
 	"bitbucket.org/enroute-mobi/ara/audit/exchangepb"
@@ -346,7 +348,10 @@ func (bq *BigQueryClient) run() {
 			bq.client.Close()
 			return
 		case message := <-bq.messages:
-			bq.sendWithWriter(EXCHANGE_TABLE, bq.exchangeWriter, func() ([]byte, error) { return encodeExchange(message) })
+			bq.sendWithWriter(EXCHANGE_TABLE, bq.exchangeWriter,
+				func() ([]byte, error) { return encodeExchange(message) },
+				exchangeLabel(message),
+			)
 		case partnerMessage := <-bq.partnerEvents:
 			bq.sendWithWriter(PARTNER_TABLE, bq.partnerWriter, func() ([]byte, error) { return encodePartner(partnerMessage) })
 		case vehicleMessage := <-bq.vehicleEvents:
@@ -371,7 +376,32 @@ func (bq *BigQueryClient) closeWriters() {
 	}
 }
 
-func (bq *BigQueryClient) sendWithWriter(table string, w *storageWriter, encode func() ([]byte, error)) {
+func exchangeLabel(m *BigQueryMessage) string {
+	var invalidUTF8 []string
+	for _, f := range []struct {
+		name  string
+		value string
+	}{
+		{"request_raw_message", m.RequestRawMessage},
+		{"response_raw_message", m.ResponseRawMessage},
+	} {
+		if !utf8.ValidString(f.value) {
+			invalidUTF8 = append(invalidUTF8, f.name)
+		}
+	}
+
+	label := fmt.Sprintf("uuid=%s type=%s partner=%s direction=%s size=%d/%d req_raw_len=%d resp_raw_len=%d",
+		m.UUID, m.Type, m.Partner, m.Direction,
+		m.RequestSize, m.ResponseSize,
+		len(m.RequestRawMessage), len(m.ResponseRawMessage),
+	)
+	if len(invalidUTF8) > 0 {
+		label += fmt.Sprintf(" utf8_invalid=%s", strings.Join(invalidUTF8, ","))
+	}
+	return label
+}
+
+func (bq *BigQueryClient) sendWithWriter(table string, w *storageWriter, encode func() ([]byte, error), label ...string) {
 	if w == nil {
 		return
 	}
@@ -380,8 +410,12 @@ func (bq *BigQueryClient) sendWithWriter(table string, w *storageWriter, encode 
 		logger.Log.Printf("BigQuery encode error (%s): %v", table, err)
 		return
 	}
-	if err := w.send(bq.ctx, data); err != nil {
-		logger.Log.Printf("BigQuery storage writer error (%s): %v", table, err)
+	rowLabel := ""
+	if len(label) > 0 {
+		rowLabel = " " + label[0]
+	}
+	if err := w.send(bq.ctx, data, rowLabel); err != nil {
+		logger.Log.Printf("BigQuery storage writer error (%s%s): %v", table, rowLabel, err)
 	}
 }
 

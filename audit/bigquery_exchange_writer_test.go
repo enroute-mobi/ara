@@ -2,6 +2,7 @@ package audit
 
 import (
 	"context"
+	"io"
 	"testing"
 	"time"
 
@@ -11,6 +12,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/audit/partnerpb"
 	"bitbucket.org/enroute-mobi/ara/audit/vehiclepb"
 	"cloud.google.com/go/bigquery"
+	"cloud.google.com/go/bigquery/storage/managedwriter"
 	"cloud.google.com/go/civil"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -56,11 +58,11 @@ func TestStorageWriterSemaphoreBlocksAtCapacity(t *testing.T) {
 	unblock := make(chan struct{})
 	w := newTestStorageWriter(1, &fakeWriteStream{unblockCh: unblock})
 
-	require.NoError(t, w.send(context.Background(), []byte("msg1")))
+	require.NoError(t, w.send(context.Background(), []byte("msg1"), ""))
 	assert.Len(t, w.sem, 1, "semaphore slot should be taken")
 
 	errCh := make(chan error, 1)
-	go func() { errCh <- w.send(context.Background(), []byte("msg2")) }()
+	go func() { errCh <- w.send(context.Background(), []byte("msg2"), "") }()
 
 	select {
 	case <-errCh:
@@ -89,7 +91,7 @@ func TestStorageWriterSemaphoreContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	errCh := make(chan error, 1)
-	go func() { errCh <- w.send(ctx, []byte("msg")) }()
+	go func() { errCh <- w.send(ctx, []byte("msg"), "") }()
 
 	time.Sleep(20 * time.Millisecond)
 	cancel()
@@ -111,7 +113,7 @@ func TestStorageWriterSemaphoreWriterClosing(t *testing.T) {
 	w.sem <- struct{}{} // fill the semaphore directly
 
 	errCh := make(chan error, 1)
-	go func() { errCh <- w.send(context.Background(), []byte("msg")) }()
+	go func() { errCh <- w.send(context.Background(), []byte("msg"), "") }()
 
 	time.Sleep(20 * time.Millisecond)
 	close(w.done)
@@ -124,6 +126,43 @@ func TestStorageWriterSemaphoreWriterClosing(t *testing.T) {
 	}
 
 	assert.Len(t, w.sem, 1, "semaphore slot should not have been consumed")
+}
+
+// eofThenOkStream returns io.EOF on the first AppendRows, then succeeds.
+type eofThenOkStream struct {
+	callCount int
+	unblockCh chan struct{}
+}
+
+func (s *eofThenOkStream) AppendRows(_ context.Context, _ [][]byte) (appendResult, error) {
+	s.callCount++
+	if s.callCount == 1 {
+		return nil, io.EOF
+	}
+	return &fakeAppendResult{unblockCh: s.unblockCh}, nil
+}
+
+func (s *eofThenOkStream) Close() error { return nil }
+
+// TestStorageWriterReconnectsOnEOF verifies that send() reconnects and retries
+// when AppendRows returns io.EOF, and that the message is eventually delivered.
+func TestStorageWriterReconnectsOnEOF(t *testing.T) {
+	unblock := make(chan struct{})
+	stream := &eofThenOkStream{unblockCh: unblock}
+
+	w := newTestStorageWriter(1, stream)
+	// Inject a reconnect factory that replaces w.stream with the same stream
+	// (which will succeed on the retry since callCount is now > 1).
+	w.newStreamFn = func(_ context.Context, _ *managedwriter.Client, _ string, _ proto.Message) (writeStream, error) {
+		return stream, nil
+	}
+
+	err := w.send(context.Background(), []byte("msg"), "")
+	assert.NoError(t, err, "send should succeed after transparent reconnect")
+	assert.Equal(t, 2, stream.callCount, "AppendRows should be called twice: EOF then retry")
+
+	close(unblock)
+	w.wg.Wait()
 }
 
 func unmarshalExchange(t *testing.T, msg *BigQueryMessage) *exchangepb.BigQueryMessage {

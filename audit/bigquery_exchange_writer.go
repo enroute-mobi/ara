@@ -2,7 +2,9 @@ package audit
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"sync"
 
@@ -54,36 +56,66 @@ func (a *managedAppendResult) GetResult(ctx context.Context) error {
 }
 
 type storageWriter struct {
-	client *managedwriter.Client
-	stream writeStream
-	wg     sync.WaitGroup
-	done   chan struct{}
-	sem    chan struct{}
+	client      *managedwriter.Client
+	stream      writeStream
+	tableRef    string
+	protoMsg    proto.Message
+	newStreamFn func(ctx context.Context, client *managedwriter.Client, tableRef string, protoMsg proto.Message) (writeStream, error)
+	wg          sync.WaitGroup
+	done        chan struct{}
+	sem         chan struct{}
 }
 
 func newStorageWriter(ctx context.Context, projectID, dataset, table string, protoMsg proto.Message) (*storageWriter, error) {
-	dp, err := adapt.NormalizeDescriptor(protoMsg.ProtoReflect().Descriptor())
-	if err != nil {
-		return nil, fmt.Errorf("NormalizeDescriptor: %w", err)
-	}
-
 	client, err := managedwriter.NewClient(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("managedwriter.NewClient: %w", err)
 	}
 
 	tableRef := fmt.Sprintf("projects/%s/datasets/%s/tables/%s", projectID, dataset, table)
+	stream, err := newManagedStream(ctx, client, tableRef, protoMsg)
+	if err != nil {
+		client.Close()
+		return nil, err
+	}
+
+	return &storageWriter{
+		client:      client,
+		stream:      stream,
+		tableRef:    tableRef,
+		protoMsg:    protoMsg,
+		newStreamFn: newManagedStream,
+		done:        make(chan struct{}),
+		sem:         make(chan struct{}, maxConcurrentWrites),
+	}, nil
+}
+
+func newManagedStream(ctx context.Context, client *managedwriter.Client, tableRef string, protoMsg proto.Message) (writeStream, error) {
+	dp, err := adapt.NormalizeDescriptor(protoMsg.ProtoReflect().Descriptor())
+	if err != nil {
+		return nil, fmt.Errorf("NormalizeDescriptor: %w", err)
+	}
+
 	stream, err := client.NewManagedStream(ctx,
 		managedwriter.WithDestinationTable(tableRef),
 		managedwriter.WithType(managedwriter.DefaultStream),
 		managedwriter.WithSchemaDescriptor(dp),
 	)
 	if err != nil {
-		client.Close()
 		return nil, fmt.Errorf("NewManagedStream: %w", err)
 	}
 
-	return &storageWriter{client: client, stream: &managedStreamAdapter{s: stream}, done: make(chan struct{}), sem: make(chan struct{}, maxConcurrentWrites)}, nil
+	return &managedStreamAdapter{s: stream}, nil
+}
+
+func (w *storageWriter) reconnect(ctx context.Context) error {
+	w.stream.Close()
+	stream, err := w.newStreamFn(ctx, w.client, w.tableRef, w.protoMsg)
+	if err != nil {
+		return err
+	}
+	w.stream = stream
+	return nil
 }
 
 func (w *storageWriter) close() {
@@ -93,10 +125,21 @@ func (w *storageWriter) close() {
 	w.client.Close()
 }
 
-func (w *storageWriter) send(ctx context.Context, data []byte) error {
+func (w *storageWriter) send(ctx context.Context, data []byte, label string) error {
 	result, err := w.stream.AppendRows(ctx, [][]byte{data})
 	if err != nil {
-		return fmt.Errorf("AppendRows: %w", err)
+		if errors.Is(err, io.EOF) {
+			logger.Log.Printf("BigQuery storage stream closed (%s), reconnecting", w.tableRef)
+			if reconnErr := w.reconnect(ctx); reconnErr != nil {
+				return fmt.Errorf("AppendRows: %w; reconnect failed: %v", err, reconnErr)
+			}
+			result, err = w.stream.AppendRows(ctx, [][]byte{data})
+			if err != nil {
+				return fmt.Errorf("AppendRows after reconnect: %w", err)
+			}
+		} else {
+			return fmt.Errorf("AppendRows: %w", err)
+		}
 	}
 
 	// Acquire a semaphore slot before spawning the goroutine, providing back-pressure
@@ -112,6 +155,7 @@ func (w *storageWriter) send(ctx context.Context, data []byte) error {
 	// GetResult blocks until the row is confirmed by BigQuery. Running it in a
 	// goroutine keeps send() non-blocking so the caller's critical path is not
 	// stalled while waiting for the write acknowledgement.
+	rowSize := len(data)
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
@@ -120,7 +164,7 @@ func (w *storageWriter) send(ctx context.Context, data []byte) error {
 			select {
 			case <-w.done:
 			default:
-				logger.Log.Printf("BigQuery storage write error: %v", err)
+				logger.Log.Printf("BigQuery storage write error (table: %s, %d bytes%s): %v", w.tableRef, rowSize, label, err)
 			}
 		}
 	}()
