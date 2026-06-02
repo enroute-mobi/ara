@@ -171,6 +171,24 @@ func (w *storageWriter) send(ctx context.Context, data []byte, label string) err
 	return nil
 }
 
+// maxRawMessageBytes caps request_raw_message and response_raw_message before
+// encoding. The BigQuery Storage Write API rejects rows larger than 10 MB;
+// keeping each raw field below 1 MiB leaves ample headroom for the rest of
+// the row even when both fields are populated.
+const maxRawMessageBytes = 1 << 20 // 1 MiB
+
+func truncateRawMessage(s string) string {
+	if len(s) <= maxRawMessageBytes {
+		return s
+	}
+	// Walk back to the last valid UTF-8 boundary before cutting.
+	b := s[:maxRawMessageBytes]
+	for len(b) > 0 && b[len(b)-1]&0xC0 == 0x80 {
+		b = b[:len(b)-1]
+	}
+	return b + "...[truncated]"
+}
+
 func encodeExchange(msg *BigQueryMessage) ([]byte, error) {
 	pbMsg := &exchangepb.BigQueryMessage{
 		Uuid:                    proto.String(msg.UUID),
@@ -182,8 +200,8 @@ func encodeExchange(msg *BigQueryMessage) ([]byte, error) {
 		Partner:                 proto.String(msg.Partner),
 		Status:                  proto.String(msg.Status),
 		ErrorDetails:            proto.String(msg.ErrorDetails),
-		RequestRawMessage:       proto.String(msg.RequestRawMessage),
-		ResponseRawMessage:      proto.String(msg.ResponseRawMessage),
+		RequestRawMessage:       proto.String(truncateRawMessage(msg.RequestRawMessage)),
+		ResponseRawMessage:      proto.String(truncateRawMessage(msg.ResponseRawMessage)),
 		RequestIdentifier:       proto.String(msg.RequestIdentifier),
 		ResponseIdentifier:      proto.String(msg.ResponseIdentifier),
 		RequestSize:             proto.Int64(msg.RequestSize),
