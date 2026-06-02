@@ -535,6 +535,39 @@ func Test_MemoryReferentials_SaveToDatabase_SavePartner(t *testing.T) {
 	}
 }
 
+func Test_MemoryReferentials_SaveToDatabase_PreservesCodeSpaces(t *testing.T) {
+	assert := assert.New(t)
+
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	referentials := NewMemoryReferentials()
+	ref := referentials.New("slug")
+	ref.Save()
+
+	status, refErr := referentials.SaveToDatabase()
+	assert.Equal(200, status, refErr)
+
+	_, err := model.Database.Exec(
+		"INSERT INTO code_spaces (id, referential_id, name, short_name, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'internal', 'int', now(), now())",
+		string(ref.Id()),
+	)
+	assert.NoError(err)
+
+	status, refErr = referentials.SaveToDatabase()
+	assert.Equal(200, status, refErr)
+
+	var count int
+	err = model.Database.Db.QueryRow("SELECT COUNT(*) FROM code_spaces").Scan(&count)
+	assert.NoError(err)
+	assert.Equal(1, count, "code_space should be preserved after SaveToDatabase")
+
+	var referentialId string
+	err = model.Database.Db.QueryRow("SELECT referential_id FROM code_spaces").Scan(&referentialId)
+	assert.NoError(err)
+	assert.Equal(string(ref.Id()), referentialId, "code_space referential_id should remain unchanged after SaveToDatabase")
+}
+
 func Test_APIreferential_UnmarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 	var TestCases = []struct {

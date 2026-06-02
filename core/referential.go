@@ -477,7 +477,7 @@ func (manager *MemoryReferentials) SaveToDatabase() (int, error) {
 	}
 
 	// Truncate Table
-	_, err = tx.Exec("truncate referentials;")
+	_, err = tx.Exec("delete from referentials;")
 	if err != nil {
 		tx.Rollback()
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
