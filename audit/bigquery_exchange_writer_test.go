@@ -58,11 +58,11 @@ func TestStorageWriterSemaphoreBlocksAtCapacity(t *testing.T) {
 	unblock := make(chan struct{})
 	w := newTestStorageWriter(1, &fakeWriteStream{unblockCh: unblock})
 
-	require.NoError(t, w.send(context.Background(), []byte("msg1")))
+	require.NoError(t, w.send(context.Background(), []byte("msg1"), ""))
 	assert.Len(t, w.sem, 1, "semaphore slot should be taken")
 
 	errCh := make(chan error, 1)
-	go func() { errCh <- w.send(context.Background(), []byte("msg2")) }()
+	go func() { errCh <- w.send(context.Background(), []byte("msg2"), "") }()
 
 	select {
 	case <-errCh:
@@ -91,7 +91,7 @@ func TestStorageWriterSemaphoreContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	errCh := make(chan error, 1)
-	go func() { errCh <- w.send(ctx, []byte("msg")) }()
+	go func() { errCh <- w.send(ctx, []byte("msg"), "") }()
 
 	time.Sleep(20 * time.Millisecond)
 	cancel()
@@ -113,7 +113,7 @@ func TestStorageWriterSemaphoreWriterClosing(t *testing.T) {
 	w.sem <- struct{}{} // fill the semaphore directly
 
 	errCh := make(chan error, 1)
-	go func() { errCh <- w.send(context.Background(), []byte("msg")) }()
+	go func() { errCh <- w.send(context.Background(), []byte("msg"), "") }()
 
 	time.Sleep(20 * time.Millisecond)
 	close(w.done)
@@ -157,7 +157,7 @@ func TestStorageWriterReconnectsOnEOF(t *testing.T) {
 		return stream, nil
 	}
 
-	err := w.send(context.Background(), []byte("msg"))
+	err := w.send(context.Background(), []byte("msg"), "")
 	assert.NoError(t, err, "send should succeed after transparent reconnect")
 	assert.Equal(t, 2, stream.callCount, "AppendRows should be called twice: EOF then retry")
 

@@ -125,7 +125,7 @@ func (w *storageWriter) close() {
 	w.client.Close()
 }
 
-func (w *storageWriter) send(ctx context.Context, data []byte) error {
+func (w *storageWriter) send(ctx context.Context, data []byte, label string) error {
 	result, err := w.stream.AppendRows(ctx, [][]byte{data})
 	if err != nil {
 		if errors.Is(err, io.EOF) {
@@ -155,6 +155,7 @@ func (w *storageWriter) send(ctx context.Context, data []byte) error {
 	// GetResult blocks until the row is confirmed by BigQuery. Running it in a
 	// goroutine keeps send() non-blocking so the caller's critical path is not
 	// stalled while waiting for the write acknowledgement.
+	rowSize := len(data)
 	w.wg.Add(1)
 	go func() {
 		defer w.wg.Done()
@@ -163,7 +164,7 @@ func (w *storageWriter) send(ctx context.Context, data []byte) error {
 			select {
 			case <-w.done:
 			default:
-				logger.Log.Printf("BigQuery storage write error: %v", err)
+				logger.Log.Printf("BigQuery storage write error (table: %s, %d bytes%s): %v", w.tableRef, rowSize, label, err)
 			}
 		}
 	}()
