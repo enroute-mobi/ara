@@ -225,7 +225,7 @@ func (connector *SIRIVehicleMonitoringSubscriptionBroadcaster) checkEvent(vId mo
 		return
 	}
 
-	lineObj, ok := line.Code(connector.remoteCodeSpace)
+	lineObj, ok := line.ReferentOrSelfCode(connector.remoteCodeSpace)
 	if !ok {
 		return
 	}
