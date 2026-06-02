@@ -1281,34 +1281,33 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | remote_url            | http://localhost:8090 |
       | remote_credential     | Ara                   |
       | local_credential      | Subscriber            |
-      | remote_code_space     | hastus_agrege         |
+      | remote_code_space     | internal              |
       | sort_payload_for_test | true                  |
     And a Line exists with the following attributes:
-      | Codes[hastus_agrege] | 4606            |
-      | Name                 | Line Referent   |
-    # 6ba7b814-9dad-11d1-2-00c04fd430c8 - Referent line, has hastus_agrege code
+      | Codes[internal] | 4606            |
+      | Name            | Line Referent   |
+    # 6ba7b814-9dad-11d1-2-00c04fd430c8 - Referent line, has internal code
     And a Line exists with the following attributes:
       | Codes[external] | rdsaclay:4606                     |
       | Name            | Ligne 4606                        |
       | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
-    # 6ba7b814-9dad-11d1-3-00c04fd430c8 - Particulier with NO hastus_agrege code
+    # 6ba7b814-9dad-11d1-3-00c04fd430c8 - Particulier with NO internal code
     And a VehicleJourney exists with the following attributes:
-      | Codes[hastus_agrege] | VJ:4606:001                       |
-      | LineId               | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | Monitored            | true                              |
+      | Codes[internal] | VJ:4606:001                       |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored       | true                              |
     # 6ba7b814-9dad-11d1-4-00c04fd430c8
     And a Vehicle exists with the following attributes:
-      | Codes[internal]      | Test:Vehicle:4606:001             |
-      | Codes[hastus_agrege] | Vehicle:4606:001                  |
-      | LineId               | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
-      | VehicleJourneyId     | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
-      | Occupancy            | seatsAvailable                    |
+      | Codes[internal] | Test:Vehicle:4606:001             |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId| 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Occupancy       | seatsAvailable                    |
     # 6ba7b814-9dad-11d1-5-00c04fd430c8
     And a Subscription exist with the following attributes:
-      | Kind              | VehicleMonitoringBroadcast      |
-      | SubscriberRef     | Subscriber                      |
-      | ExternalId        | subscription-1                  |
-      | ReferenceArray[0] | Line, "hastus_agrege": "4606"   |
+      | Kind              | VehicleMonitoringBroadcast |
+      | SubscriberRef     | Subscriber                 |
+      | ExternalId        | subscription-1             |
+      | ReferenceArray[0] | Line, "internal": "4606"   |
     # 6ba7b814-9dad-11d1-6-00c04fd430c8
     When the Vehicle "internal:Test:Vehicle:4606:001" is edited with the following attributes:
       | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
@@ -1359,7 +1358,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                 <siri:VehicleActivity>
                   <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
                   <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
-                  <siri:VehicleMonitoringRef>Vehicle:4606:001</siri:VehicleMonitoringRef>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:4606:001</siri:VehicleMonitoringRef>
                   <siri:MonitoredVehicleJourney>
                     <siri:LineRef>4606</siri:LineRef>
                     <siri:FramedVehicleJourneyRef>
@@ -1404,7 +1403,7 @@ Feature: Support SIRI VehicleMonitoring by subscription
                 <siri:VehicleActivity>
                   <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
                   <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
-                  <siri:VehicleMonitoringRef>Vehicle:4606:001</siri:VehicleMonitoringRef>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:4606:001</siri:VehicleMonitoringRef>
                   <siri:MonitoredVehicleJourney>
                     <siri:LineRef>4606</siri:LineRef>
                     <siri:FramedVehicleJourneyRef>
@@ -1429,12 +1428,12 @@ Feature: Support SIRI VehicleMonitoring by subscription
       </S:Envelope>
       """
     Then an audit event should exist with these attributes:
-      | Type                    | NotifyVehicleMonitoring |
-      | Direction               | sent                    |
-      | Protocol                | siri                    |
-      | Partner                 | test                    |
-      | Status                  | OK                      |
-      | SubscriptionIdentifiers | ["subscription-1"]      |
-      | Lines                   | ["4606"]                |
-      | Vehicles                | ["Vehicle:4606:001"]    |
-      | VehicleJourneys         | ["VJ:4606:001"]         |
+      | Type                    | NotifyVehicleMonitoring   |
+      | Direction               | sent                      |
+      | Protocol                | siri                      |
+      | Partner                 | test                      |
+      | Status                  | OK                        |
+      | SubscriptionIdentifiers | ["subscription-1"]        |
+      | Lines                   | ["4606"]                  |
+      | Vehicles                | ["Test:Vehicle:4606:001"] |
+      | VehicleJourneys         | ["VJ:4606:001"]           |
