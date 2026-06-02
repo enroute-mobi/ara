@@ -1382,6 +1382,16 @@ Feature: Support SIRI VehicleMonitoring by subscription
         </S:Body>
       </S:Envelope>
       """
+    Then an audit event should exist with these attributes:
+      | Type              | VehicleMonitoringRequest  |
+      | Direction         | received                  |
+      | Protocol          | siri                      |
+      | Partner           | test                      |
+      | Status            | OK                        |
+      | RequestIdentifier | Test:1234::LOC            |
+      | Lines             | ["4606"]                  |
+      | Vehicles          | ["Test:Vehicle:4606:001"] |
+      | VehicleJourneys   | ["VJ:4606:001"]           |
     And 10 seconds have passed
     Then the SIRI server should receive this response
       """
