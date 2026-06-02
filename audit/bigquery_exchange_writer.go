@@ -2,7 +2,9 @@ package audit
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"sync"
 
@@ -54,36 +56,66 @@ func (a *managedAppendResult) GetResult(ctx context.Context) error {
 }
 
 type storageWriter struct {
-	client *managedwriter.Client
-	stream writeStream
-	wg     sync.WaitGroup
-	done   chan struct{}
-	sem    chan struct{}
+	client      *managedwriter.Client
+	stream      writeStream
+	tableRef    string
+	protoMsg    proto.Message
+	newStreamFn func(ctx context.Context, client *managedwriter.Client, tableRef string, protoMsg proto.Message) (writeStream, error)
+	wg          sync.WaitGroup
+	done        chan struct{}
+	sem         chan struct{}
 }
 
 func newStorageWriter(ctx context.Context, projectID, dataset, table string, protoMsg proto.Message) (*storageWriter, error) {
-	dp, err := adapt.NormalizeDescriptor(protoMsg.ProtoReflect().Descriptor())
-	if err != nil {
-		return nil, fmt.Errorf("NormalizeDescriptor: %w", err)
-	}
-
 	client, err := managedwriter.NewClient(ctx, projectID)
 	if err != nil {
 		return nil, fmt.Errorf("managedwriter.NewClient: %w", err)
 	}
 
 	tableRef := fmt.Sprintf("projects/%s/datasets/%s/tables/%s", projectID, dataset, table)
+	stream, err := newManagedStream(ctx, client, tableRef, protoMsg)
+	if err != nil {
+		client.Close()
+		return nil, err
+	}
+
+	return &storageWriter{
+		client:      client,
+		stream:      stream,
+		tableRef:    tableRef,
+		protoMsg:    protoMsg,
+		newStreamFn: newManagedStream,
+		done:        make(chan struct{}),
+		sem:         make(chan struct{}, maxConcurrentWrites),
+	}, nil
+}
+
+func newManagedStream(ctx context.Context, client *managedwriter.Client, tableRef string, protoMsg proto.Message) (writeStream, error) {
+	dp, err := adapt.NormalizeDescriptor(protoMsg.ProtoReflect().Descriptor())
+	if err != nil {
+		return nil, fmt.Errorf("NormalizeDescriptor: %w", err)
+	}
+
 	stream, err := client.NewManagedStream(ctx,
 		managedwriter.WithDestinationTable(tableRef),
 		managedwriter.WithType(managedwriter.DefaultStream),
 		managedwriter.WithSchemaDescriptor(dp),
 	)
 	if err != nil {
-		client.Close()
 		return nil, fmt.Errorf("NewManagedStream: %w", err)
 	}
 
-	return &storageWriter{client: client, stream: &managedStreamAdapter{s: stream}, done: make(chan struct{}), sem: make(chan struct{}, maxConcurrentWrites)}, nil
+	return &managedStreamAdapter{s: stream}, nil
+}
+
+func (w *storageWriter) reconnect(ctx context.Context) error {
+	w.stream.Close()
+	stream, err := w.newStreamFn(ctx, w.client, w.tableRef, w.protoMsg)
+	if err != nil {
+		return err
+	}
+	w.stream = stream
+	return nil
 }
 
 func (w *storageWriter) close() {
@@ -96,7 +128,18 @@ func (w *storageWriter) close() {
 func (w *storageWriter) send(ctx context.Context, data []byte) error {
 	result, err := w.stream.AppendRows(ctx, [][]byte{data})
 	if err != nil {
-		return fmt.Errorf("AppendRows: %w", err)
+		if errors.Is(err, io.EOF) {
+			logger.Log.Printf("BigQuery storage stream closed (%s), reconnecting", w.tableRef)
+			if reconnErr := w.reconnect(ctx); reconnErr != nil {
+				return fmt.Errorf("AppendRows: %w; reconnect failed: %v", err, reconnErr)
+			}
+			result, err = w.stream.AppendRows(ctx, [][]byte{data})
+			if err != nil {
+				return fmt.Errorf("AppendRows after reconnect: %w", err)
+			}
+		} else {
+			return fmt.Errorf("AppendRows: %w", err)
+		}
 	}
 
 	// Acquire a semaphore slot before spawning the goroutine, providing back-pressure
