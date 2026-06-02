@@ -6,12 +6,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/audit/controlpb"
+	"bitbucket.org/enroute-mobi/ara/audit/exchangepb"
+	"bitbucket.org/enroute-mobi/ara/audit/longtermsvpb"
+	"bitbucket.org/enroute-mobi/ara/audit/partnerpb"
+	"bitbucket.org/enroute-mobi/ara/audit/vehiclepb"
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/config"
 	"bitbucket.org/enroute-mobi/ara/logger"
@@ -19,6 +23,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/uuid"
 	"cloud.google.com/go/bigquery"
 	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/proto"
 )
 
 const (
@@ -27,7 +32,6 @@ const (
 	VEHICLE_TABLE              = "vehicles"
 	LONG_TERM_STOP_VISIT_TABLE = "long_term_stop_visits"
 	CONTROL_TABLE              = "control_messages"
-	DEFAULT_BATCH_SIZE         = 100
 )
 
 var tablesSchemas = map[string]bigquery.Schema{
@@ -200,11 +204,11 @@ type BigQueryClient struct {
 	dataset                           string
 	ctx                               context.Context
 	client                            *bigquery.Client
-	inserter                          *bigquery.Inserter
-	vehicleInserter                   *bigquery.Inserter
-	partnerInserter                   *bigquery.Inserter
-	longTermStopVisitInserter         *bigquery.Inserter
-	controlInserter                   *bigquery.Inserter
+	exchangeWriter                    *storageWriter
+	vehicleWriter                     *storageWriter
+	longTermStopVisitWriter           *storageWriter
+	controlWriter                     *storageWriter
+	partnerWriter                     *storageWriter
 	messages                          chan *BigQueryMessage
 	partnerEvents                     chan *BigQueryPartnerEvent
 	vehicleEvents                     chan *BigQueryVehicleEvent
@@ -216,7 +220,6 @@ type BigQueryClient struct {
 	lostVehicleEventsCount            atomic.Int64
 	lostLongTermStopVisitsEventsCount atomic.Int64
 	lostControlEventsCount            atomic.Int64
-	messagesBatchSize                 int
 }
 
 func NewBigQuery(dataset string) BigQuery {
@@ -229,7 +232,7 @@ func NewBigQuery(dataset string) BigQuery {
 }
 
 func NewBigQueryClient(dataset string) *BigQueryClient {
-	client := &BigQueryClient{
+	return &BigQueryClient{
 		dataset:                 dataset,
 		projectID:               config.Config.BigQueryProjectID,
 		messages:                make(chan *BigQueryMessage, 500),
@@ -237,15 +240,7 @@ func NewBigQueryClient(dataset string) *BigQueryClient {
 		vehicleEvents:           make(chan *BigQueryVehicleEvent, 500),
 		longTermStopVisitEvents: make(chan *BigQueryLongTermStopVisitEvent, 500),
 		controlEvents:           make(chan *BigQueryControlEvent, 500),
-		messagesBatchSize:       DEFAULT_BATCH_SIZE,
 	}
-
-	batchSize, err := strconv.Atoi(os.Getenv("BIGQUERY_MESSAGES_BATCH_SIZE"))
-	if err != nil && batchSize != 0 {
-		client.messagesBatchSize = batchSize
-	}
-
-	return client
 }
 
 func formatDatasetName(dataset string) string {
@@ -344,79 +339,49 @@ func (bq *BigQueryClient) writeControlEvent(controlEvent *BigQueryControlEvent) 
 
 func (bq *BigQueryClient) run() {
 	bq.connect()
-	var messageBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
-	var vehicleBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
-	var longTermSvBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
-	var controlBatch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
 	for {
 		select {
 		case <-bq.stop:
-			// flushing remaining messages
-			if len(messageBatch) > 0 {
-				bq.sendMultiple(EXCHANGE_TABLE, messageBatch, bq.inserter)
-			}
-			if len(vehicleBatch) > 0 {
-				bq.sendMultiple(VEHICLE_TABLE, vehicleBatch, bq.vehicleInserter)
-			}
-			if len(longTermSvBatch) > 0 {
-				bq.sendMultiple(LONG_TERM_STOP_VISIT_TABLE, longTermSvBatch, bq.longTermStopVisitInserter)
-			}
-			if len(controlBatch) > 0 {
-				bq.sendMultiple(CONTROL_TABLE, controlBatch, bq.controlInserter)
-			}
+			bq.closeWriters()
 			bq.client.Close()
 			return
 		case message := <-bq.messages:
-			messageBatch = bq.processMessage(EXCHANGE_TABLE, message, messageBatch, bq.inserter)
+			bq.sendWithWriter(EXCHANGE_TABLE, bq.exchangeWriter, func() ([]byte, error) { return encodeExchange(message) })
 		case partnerMessage := <-bq.partnerEvents:
-			bq.send(partnerMessage, bq.partnerInserter)
+			bq.sendWithWriter(PARTNER_TABLE, bq.partnerWriter, func() ([]byte, error) { return encodePartner(partnerMessage) })
 		case vehicleMessage := <-bq.vehicleEvents:
-			vehicleBatch = bq.processMessage(VEHICLE_TABLE, vehicleMessage, vehicleBatch, bq.vehicleInserter)
+			bq.sendWithWriter(VEHICLE_TABLE, bq.vehicleWriter, func() ([]byte, error) { return encodeVehicle(vehicleMessage) })
 		case longTermStopVisitMessage := <-bq.longTermStopVisitEvents:
 			if os.Getenv("ENABLE_BIGQUERY_LTS") != "false" {
-				longTermSvBatch = bq.processMessage(LONG_TERM_STOP_VISIT_TABLE, longTermStopVisitMessage, longTermSvBatch, bq.longTermStopVisitInserter)
+				bq.sendWithWriter(LONG_TERM_STOP_VISIT_TABLE, bq.longTermStopVisitWriter, func() ([]byte, error) {
+					return encodeLongTermStopVisit(longTermStopVisitMessage)
+				})
 			}
 		case controlMessage := <-bq.controlEvents:
-			controlBatch = bq.processMessage(CONTROL_TABLE, controlMessage, controlBatch, bq.controlInserter)
+			bq.sendWithWriter(CONTROL_TABLE, bq.controlWriter, func() ([]byte, error) { return encodeControl(controlMessage) })
 		}
 	}
 }
 
-func (bq *BigQueryClient) processMessage(messageType string, message BigQueryEvent, batch []*bigquery.StructSaver, inserter *bigquery.Inserter) []*bigquery.StructSaver {
-	ss := &bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
-	batch = append(batch, ss)
-	if len(batch) == bq.messagesBatchSize {
-		bq.sendMultiple(messageType, batch, inserter)
-		batch = make([]*bigquery.StructSaver, 0, bq.messagesBatchSize)
-	}
-	return batch
-}
-
-func (bq *BigQueryClient) sendMultiple(messageType string, ss []*bigquery.StructSaver, inserter *bigquery.Inserter) {
-	if inserter == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
-	defer cancel()
-	if err := inserter.Put(ctx, ss); err != nil {
-		var sizeMB float64
-		jsonBytes, err1 := json.Marshal(ss)
-		if err1 == nil {
-			sizeMB = float64(len(jsonBytes)) / (1024 * 1024)
+func (bq *BigQueryClient) closeWriters() {
+	for _, w := range []*storageWriter{bq.exchangeWriter, bq.partnerWriter, bq.vehicleWriter, bq.longTermStopVisitWriter, bq.controlWriter} {
+		if w != nil {
+			w.close()
 		}
-		logger.Log.Printf("BigQuery Multi Inserter error: %s, requestSize %.2fMb , error %v", messageType, sizeMB, err)
 	}
 }
 
-func (bq *BigQueryClient) send(message any, inserter *bigquery.Inserter) {
-	if inserter == nil {
+func (bq *BigQueryClient) sendWithWriter(table string, w *storageWriter, encode func() ([]byte, error)) {
+	if w == nil {
 		return
 	}
-	ss := bigquery.StructSaver{Struct: message, InsertID: bq.NewUUID()}
-	ctx, cancel := context.WithTimeout(bq.ctx, 5*time.Second)
-	defer cancel()
-	if err := inserter.Put(ctx, &ss); err != nil {
-		logger.Log.Printf("BigQuery inserter error: %v", err)
+	data, err := encode()
+	if err != nil {
+		logger.Log.Printf("BigQuery encode error (%s): %v", table, err)
+		return
+	}
+	if err := w.send(bq.ctx, data); err != nil {
+		logger.Log.Printf("BigQuery storage writer error (%s): %v", table, err)
 	}
 }
 
@@ -430,32 +395,44 @@ func (bq *BigQueryClient) connect() {
 		return
 	}
 
-	dataset, err := bq.findOrCreateDatasetAndTables()
-	if err != nil {
+	if err := bq.findOrCreateDatasetAndTables(); err != nil {
 		logger.Log.Printf("error while finding or creating the dataset: %v", err)
 		return
 	}
-	bq.inserter = dataset.Table(EXCHANGE_TABLE).Inserter()
-	bq.partnerInserter = dataset.Table(PARTNER_TABLE).Inserter()
-	bq.vehicleInserter = dataset.Table(VEHICLE_TABLE).Inserter()
-	bq.longTermStopVisitInserter = dataset.Table(LONG_TERM_STOP_VISIT_TABLE).Inserter()
-	bq.controlInserter = dataset.Table(CONTROL_TABLE).Inserter()
+	writers := []struct {
+		field **storageWriter
+		table string
+		proto proto.Message
+	}{
+		{&bq.exchangeWriter, EXCHANGE_TABLE, &exchangepb.BigQueryMessage{}},
+		{&bq.partnerWriter, PARTNER_TABLE, &partnerpb.BigQueryPartnerEvent{}},
+		{&bq.vehicleWriter, VEHICLE_TABLE, &vehiclepb.BigQueryVehicleEvent{}},
+		{&bq.longTermStopVisitWriter, LONG_TERM_STOP_VISIT_TABLE, &longtermsvpb.BigQueryLongTermStopVisitEvent{}},
+		{&bq.controlWriter, CONTROL_TABLE, &controlpb.BigQueryControlEvent{}},
+	}
+	for _, w := range writers {
+		writer, err := newStorageWriter(bq.ctx, bq.projectID, bq.dataset, w.table, w.proto)
+		if err != nil {
+			logger.Log.Printf("error creating storage writer for %s: %v", w.table, err)
+			continue
+		}
+		*w.field = writer
+	}
 }
 
-func (bq *BigQueryClient) findOrCreateDatasetAndTables() (*bigquery.Dataset, error) {
+func (bq *BigQueryClient) findOrCreateDatasetAndTables() error {
 	dataset, err := bq.findOrCreateDataset()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	for t, s := range tablesSchemas {
-		err = bq.findOrCreateTable(dataset, t, s)
-		if err != nil {
-			return nil, err
+		if err = bq.findOrCreateTable(dataset, t, s); err != nil {
+			return err
 		}
 	}
 
-	return dataset, nil
+	return nil
 }
 
 func (bq *BigQueryClient) findOrCreateDataset() (*bigquery.Dataset, error) {

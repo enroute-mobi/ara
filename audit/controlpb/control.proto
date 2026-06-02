@@ -1,0 +1,15 @@
+syntax = "proto2";
+package controlpb;
+option go_package = "bitbucket.org/enroute-mobi/ara/audit/controlpb";
+
+message BigQueryControlEvent {
+  optional string uuid = 1;
+  optional int64  timestamp = 2;
+  optional string criticity = 3;
+  optional string control_type = 4;
+  optional string internal_code = 5;
+  optional string target_model_class = 6;
+  optional string target_model_uuid = 7;
+  optional string translation_info_message_key = 8;
+  optional string translation_info_message_attributes = 9;
+}

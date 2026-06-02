@@ -1,0 +1,28 @@
+syntax = "proto2";
+package exchangepb;
+option go_package = "bitbucket.org/enroute-mobi/ara/audit/exchangepb";
+
+message BigQueryMessage {
+  optional string uuid = 1;
+  optional int64  timestamp = 2;
+  optional string ip_address = 3;
+  optional string protocol = 4;
+  optional string type = 5;
+  optional string direction = 6;
+  optional string partner = 7;
+  optional string status = 8;
+  optional string error_details = 9;
+  optional string request_raw_message = 10;
+  optional string response_raw_message = 11;
+  optional string request_identifier = 12;
+  optional string response_identifier = 13;
+  optional int64  request_size = 14;
+  optional int64  response_size = 15;
+  optional double processing_time = 16;
+  repeated string subscription_identifiers = 17;
+  repeated string lines = 18;
+  repeated string stop_areas = 19;
+  repeated string vehicles = 20;
+  repeated string vehicle_journeys = 21;
+  repeated string facilities = 22;
+}
