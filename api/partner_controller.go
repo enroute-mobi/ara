@@ -96,10 +96,17 @@ func (controller *PartnerController) findPartner(identifier string) *core.Partne
 	return controller.referential.Partners().Find(partners.Id(identifier))
 }
 
-func (controller *PartnerController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *PartnerController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Partners Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Partners().FindAll())
+	allPartners := controller.referential.Partners().FindAll()
+	paginatedPartners, err := paginate(allPartners, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedPartners)
 	response.Write(jsonBytes)
 }
 
