@@ -116,7 +116,7 @@ When(/^I wait that a Subscription has been created (?:in Referential "([^"]+)" )
     step "10 seconds have passed"
 
     subs = partner.subscriptions.all.reject do |sub|
-      (sub.resources || []).all? { |r| r[:subscribed_at] == "0001-01-01T00:00:00Z" }
+      (sub.resources || []).all? { |r| r["SubscribedAt"] == "0001-01-01T00:00:00Z" }
     end
   end
 
