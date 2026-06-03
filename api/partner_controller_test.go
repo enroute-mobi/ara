@@ -327,7 +327,7 @@ func Test_PartnerController_Index(t *testing.T) {
 	checkPartnerResponseStatus(responseRecorder, t)
 
 	//Test Results
-	expected := `[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"first_partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}]`
+	expected := `{"Models":[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"first_partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}],"Pagination":{"CurrentPage":1,"PerPage":1,"TotalCount":1,"TotalPages":1}}`
 	assert.JSONEq(expected, responseRecorder.Body.String())
 }
 
