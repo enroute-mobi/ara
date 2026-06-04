@@ -1273,3 +1273,177 @@ Feature: Support SIRI VehicleMonitoring by subscription
       | Lines                   | ["Test:Line:3:LOC"]             |
       | Vehicles                | ["Test:Vehicle:201123:LOC"]     |
       | VehicleJourneys         | ["Test:VehicleJourney:201:LOC"] |
+
+  @ARA-1937
+  Scenario: Send a VehicleMonitoring notification when a vehicle changes and the subscribed line is a particulier
+    Given a SIRI server on "http://localhost:8090"
+    And a SIRI Partner "test" exists with connectors [siri-check-status-client, siri-vehicle-monitoring-request-broadcaster, siri-vehicle-monitoring-subscription-broadcaster] and the following settings:
+      | remote_url            | http://localhost:8090 |
+      | remote_credential     | Ara                   |
+      | local_credential      | Subscriber            |
+      | remote_code_space     | internal              |
+      | sort_payload_for_test | true                  |
+    And a Line exists with the following attributes:
+      | Codes[internal] | 4606            |
+      | Name            | Line Referent   |
+    # 6ba7b814-9dad-11d1-2-00c04fd430c8 - Referent line, has internal code
+    And a Line exists with the following attributes:
+      | Codes[external] | rdsaclay:4606                     |
+      | Name            | Ligne 4606                        |
+      | ReferentId      | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+    # 6ba7b814-9dad-11d1-3-00c04fd430c8 - Particulier with NO internal code
+    And a VehicleJourney exists with the following attributes:
+      | Codes[internal] | VJ:4606:001                       |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | Monitored       | true                              |
+    # 6ba7b814-9dad-11d1-4-00c04fd430c8
+    And a Vehicle exists with the following attributes:
+      | Codes[internal] | Test:Vehicle:4606:001             |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId| 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Occupancy       | seatsAvailable                    |
+    # 6ba7b814-9dad-11d1-5-00c04fd430c8
+    And a Subscription exist with the following attributes:
+      | Kind              | VehicleMonitoringBroadcast |
+      | SubscriberRef     | Subscriber                 |
+      | ExternalId        | subscription-1             |
+      | ReferenceArray[0] | Line, "internal": "4606"   |
+    # 6ba7b814-9dad-11d1-6-00c04fd430c8
+    When the Vehicle "internal:Test:Vehicle:4606:001" is edited with the following attributes:
+      | LineId           | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+      | VehicleJourneyId | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | Longitude        | 1.234                             |
+      | Latitude         | 5.678                             |
+      | Bearing          | 234                               |
+      | RecordedAtTime   | 2017-01-01T13:00:00.000Z          |
+      | ValidUntilTime   | 2017-01-01T14:00:00.000Z          |
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+          <sw:GetVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceRequestInfo>
+              <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>Subscriber</siri:RequestorRef>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+            </ServiceRequestInfo>
+            <Request version="2.0:FR-IDF-2.4">
+              <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+              <siri:MessageIdentifier>Test:1234::LOC</siri:MessageIdentifier>
+              <siri:LineRef>4606</siri:LineRef>
+            </Request>
+            <RequestExtension />
+          </sw:GetVehicleMonitoring>
+        </soap:Body>
+      </soap:Envelope>
+      """
+    Then I should receive this SIRI response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:GetVehicleMonitoringResponse xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-7-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+              <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+            </ServiceDeliveryInfo>
+            <Answer>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:00.000Z</siri:ResponseTimestamp>
+                <siri:RequestMessageRef>Test:1234::LOC</siri:RequestMessageRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:4606:001</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>4606</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>VJ:4606:001</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Line Referent</siri:PublishedLineName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>234</siri:Bearing>
+                    <siri:Occupancy>seatsAvailable</siri:Occupancy>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+              </siri:VehicleMonitoringDelivery>
+            </Answer>
+            <AnswerExtension/>
+          </sw:GetVehicleMonitoringResponse>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type              | VehicleMonitoringRequest  |
+      | Direction         | received                  |
+      | Protocol          | siri                      |
+      | Partner           | test                      |
+      | Status            | OK                        |
+      | RequestIdentifier | Test:1234::LOC            |
+      | Lines             | ["4606"]                  |
+      | Vehicles          | ["Test:Vehicle:4606:001"] |
+      | VehicleJourneys   | ["VJ:4606:001"]           |
+    And 10 seconds have passed
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <S:Envelope xmlns:S='http://schemas.xmlsoap.org/soap/envelope/'>
+        <S:Body>
+          <sw:NotifyVehicleMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+            <ServiceDeliveryInfo>
+              <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+              <siri:ProducerRef>Ara</siri:ProducerRef>
+              <siri:ResponseMessageIdentifier>RATPDev:ResponseMessage::6ba7b814-9dad-11d1-8-00c04fd430c8:LOC</siri:ResponseMessageIdentifier>
+            </ServiceDeliveryInfo>
+            <Notification>
+              <siri:VehicleMonitoringDelivery version="2.0:FR-IDF-2.4">
+                <siri:ResponseTimestamp>2017-01-01T12:00:10.000Z</siri:ResponseTimestamp>
+                <siri:SubscriberRef>Subscriber</siri:SubscriberRef>
+                <siri:SubscriptionRef>subscription-1</siri:SubscriptionRef>
+                <siri:Status>true</siri:Status>
+                <siri:VehicleActivity>
+                  <siri:RecordedAtTime>2017-01-01T13:00:00.000Z</siri:RecordedAtTime>
+                  <siri:ValidUntilTime>2017-01-01T14:00:00.000Z</siri:ValidUntilTime>
+                  <siri:VehicleMonitoringRef>Test:Vehicle:4606:001</siri:VehicleMonitoringRef>
+                  <siri:MonitoredVehicleJourney>
+                    <siri:LineRef>4606</siri:LineRef>
+                    <siri:FramedVehicleJourneyRef>
+                      <siri:DataFrameRef>RATPDev:DataFrame::2017-01-01:LOC</siri:DataFrameRef>
+                      <siri:DatedVehicleJourneyRef>VJ:4606:001</siri:DatedVehicleJourneyRef>
+                    </siri:FramedVehicleJourneyRef>
+                    <siri:PublishedLineName>Ligne 4606</siri:PublishedLineName>
+                    <siri:Monitored>true</siri:Monitored>
+                    <siri:VehicleLocation>
+                      <siri:Longitude>1.234</siri:Longitude>
+                      <siri:Latitude>5.678</siri:Latitude>
+                    </siri:VehicleLocation>
+                    <siri:Bearing>234</siri:Bearing>
+                    <siri:Occupancy>seatsAvailable</siri:Occupancy>
+                  </siri:MonitoredVehicleJourney>
+                </siri:VehicleActivity>
+              </siri:VehicleMonitoringDelivery>
+            </Notification>
+            <SiriExtension />
+          </sw:NotifyVehicleMonitoring>
+        </S:Body>
+      </S:Envelope>
+      """
+    Then an audit event should exist with these attributes:
+      | Type                    | NotifyVehicleMonitoring   |
+      | Direction               | sent                      |
+      | Protocol                | siri                      |
+      | Partner                 | test                      |
+      | Status                  | OK                        |
+      | SubscriptionIdentifiers | ["subscription-1"]        |
+      | Lines                   | ["4606"]                  |
+      | Vehicles                | ["Test:Vehicle:4606:001"] |
+      | VehicleJourneys         | ["VJ:4606:001"]           |

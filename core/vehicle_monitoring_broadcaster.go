@@ -155,7 +155,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 			if !ok {
 				continue
 			}
-			lineCode, ok := line.Code(vm.connector.remoteCodeSpace)
+			lineCode, ok := line.ReferentOrSelfCode(vm.connector.remoteCodeSpace)
 			if !ok {
 				continue
 			}
