@@ -11,6 +11,7 @@ import (
 type StopVisitUpdateEvent struct {
 	RecordedAt         time.Time
 	Schedules          *schedules.StopVisitSchedules
+	// attributes is a fallback for non-SIRI builders; when SiriXML is set, RawAttributes() delegates to the XML cache.
 	attributes         RawAttributes
 	SiriXML            *sxml.XMLMonitoredStopVisit
 	references         *References
@@ -38,28 +39,12 @@ func (ue *StopVisitUpdateEvent) EventKind() EventKind {
 }
 
 func (ue *StopVisitUpdateEvent) RawAttributes() RawAttributes {
-	if ue.attributes != nil {
-		return ue.attributes
+	if ue.SiriXML != nil {
+		return RawAttributes(ue.SiriXML.RawAttributes())
 	}
-	ue.attributes = NewRawAttributes()
-
-	if ue.SiriXML == nil {
-		return ue.attributes
+	if ue.attributes == nil {
+		ue.attributes = NewRawAttributes()
 	}
-
-	ue.attributes.Set(siri_attributes.Delay, ue.SiriXML.Delay())
-	ue.attributes.Set(siri_attributes.ActualQuayName, ue.SiriXML.ActualQuayName())
-	ue.attributes.Set(siri_attributes.AimedHeadwayInterval, ue.SiriXML.AimedHeadwayInterval())
-	ue.attributes.Set(siri_attributes.ArrivalPlatformName, ue.SiriXML.ArrivalPlatformName())
-	ue.attributes.Set(siri_attributes.ArrivalProximityText, ue.SiriXML.ArrivalProximityText())
-	ue.attributes.Set(siri_attributes.DepartureBoardingActivity, ue.SiriXML.DepartureBoardingActivity())
-	ue.attributes.Set(siri_attributes.DeparturePlatformName, ue.SiriXML.DeparturePlatformName())
-	ue.attributes.Set(siri_attributes.DestinationDisplay, ue.SiriXML.DestinationDisplay())
-	ue.attributes.Set(siri_attributes.DistanceFromStop, ue.SiriXML.DistanceFromStop())
-	ue.attributes.Set(siri_attributes.ExpectedHeadwayInterval, ue.SiriXML.ExpectedHeadwayInterval())
-	ue.attributes.Set(siri_attributes.NumberOfStopsAway, ue.SiriXML.NumberOfStopsAway())
-	ue.attributes.Set(siri_attributes.PlatformTraversal, ue.SiriXML.PlatformTraversal())
-
 	return ue.attributes
 }
 

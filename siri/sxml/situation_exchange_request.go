@@ -12,7 +12,7 @@ import (
 type XMLGetSituationExchange struct {
 	XMLSituationExchangeRequest
 
-	requestorRef string
+	requestorRef *string
 }
 
 type XMLSituationExchangeRequest struct {
@@ -21,7 +21,7 @@ type XMLSituationExchangeRequest struct {
 	lineRefs        []string
 	stopPointRefs   []string
 	previewInterval time.Duration
-	startTime       time.Time
+	startTime       *time.Time
 }
 
 func NewXMLGetSituationExchange(node xml.Node) *XMLGetSituationExchange {
@@ -40,10 +40,11 @@ func NewXMLGetSituationExchangeFromContent(content []byte) (*XMLGetSituationExch
 }
 
 func (request *XMLGetSituationExchange) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }
 
 func (request *XMLSituationExchangeRequest) LineRef() []string {
@@ -64,8 +65,9 @@ func (request *XMLSituationExchangeRequest) PreviewInterval() time.Duration {
 }
 
 func (request *XMLSituationExchangeRequest) StartTime() time.Time {
-	if request.startTime.IsZero() {
-		request.startTime = request.findTimeChildContent(siri_attributes.StartTime)
+	if request.startTime == nil {
+		t := request.findTimeChildContent(siri_attributes.StartTime)
+		request.startTime = &t
 	}
-	return request.startTime
+	return *request.startTime
 }

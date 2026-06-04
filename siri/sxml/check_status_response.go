@@ -12,7 +12,7 @@ import (
 type XMLCheckStatusResponse struct {
 	ResponseXMLStructureWithStatus
 
-	serviceStartedTime time.Time
+	serviceStartedTime *time.Time
 }
 
 func NewXMLCheckStatusResponse(node xml.Node) *XMLCheckStatusResponse {
@@ -42,8 +42,9 @@ func (response *XMLCheckStatusResponse) errorType() string {
 }
 
 func (response *XMLCheckStatusResponse) ServiceStartedTime() time.Time {
-	if response.serviceStartedTime.IsZero() {
-		response.serviceStartedTime = response.findTimeChildContent(siri_attributes.ServiceStartedTime)
+	if response.serviceStartedTime == nil {
+		t := response.findTimeChildContent(siri_attributes.ServiceStartedTime)
+		response.serviceStartedTime = &t
 	}
-	return response.serviceStartedTime
+	return *response.serviceStartedTime
 }

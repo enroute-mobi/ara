@@ -11,10 +11,10 @@ import (
 type XMLDeleteSubscriptionResponse struct {
 	XMLStructure
 
-	responderRef      string
-	requestMessageRef string
+	responderRef      *string
+	requestMessageRef *string
 
-	responseTimestamp time.Time
+	responseTimestamp *time.Time
 
 	responseStatus []*XMLTerminationResponseStatus
 }
@@ -45,24 +45,27 @@ func NewXMLTerminationResponseStatus(node XMLNode) *XMLTerminationResponseStatus
 }
 
 func (response *XMLDeleteSubscriptionResponse) ResponderRef() string {
-	if response.responderRef == "" {
-		response.responderRef = response.findStringChildContent(siri_attributes.ResponderRef)
+	if response.responderRef == nil {
+		s := response.findStringChildContent(siri_attributes.ResponderRef)
+		response.responderRef = &s
 	}
-	return response.responderRef
+	return *response.responderRef
 }
 
 func (response *XMLDeleteSubscriptionResponse) RequestMessageRef() string {
-	if response.requestMessageRef == "" {
-		response.requestMessageRef = response.findStringChildContent(siri_attributes.RequestMessageRef)
+	if response.requestMessageRef == nil {
+		s := response.findStringChildContent(siri_attributes.RequestMessageRef)
+		response.requestMessageRef = &s
 	}
-	return response.requestMessageRef
+	return *response.requestMessageRef
 }
 
 func (response *XMLDeleteSubscriptionResponse) ResponseTimestamp() time.Time {
-	if response.responseTimestamp.IsZero() {
-		response.responseTimestamp = response.findTimeChildContent(siri_attributes.ResponseTimestamp)
+	if response.responseTimestamp == nil {
+		t := response.findTimeChildContent(siri_attributes.ResponseTimestamp)
+		response.responseTimestamp = &t
 	}
-	return response.responseTimestamp
+	return *response.responseTimestamp
 }
 
 func (response *XMLDeleteSubscriptionResponse) ResponseStatus() []*XMLTerminationResponseStatus {

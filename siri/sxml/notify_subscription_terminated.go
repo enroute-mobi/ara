@@ -9,8 +9,8 @@ import (
 type XMLNotifySubscriptionTerminated struct {
 	ResponseXMLStructure
 
-	subscriptionRef string
-	subscriberRef   string
+	subscriptionRef *string
+	subscriberRef   *string
 }
 
 func NewXMLNotifySubscriptionTerminated(node xml.Node) *XMLNotifySubscriptionTerminated {
@@ -29,15 +29,17 @@ func NewXMLNotifySubscriptionTerminatedFromContent(content []byte) (*XMLNotifySu
 }
 
 func (delivery *XMLNotifySubscriptionTerminated) SubscriberRef() string {
-	if delivery.subscriberRef == "" {
-		delivery.subscriberRef = delivery.findStringChildContent(siri_attributes.SubscriberRef)
+	if delivery.subscriberRef == nil {
+		s := delivery.findStringChildContent(siri_attributes.SubscriberRef)
+		delivery.subscriberRef = &s
 	}
-	return delivery.subscriberRef
+	return *delivery.subscriberRef
 }
 
 func (delivery *XMLNotifySubscriptionTerminated) SubscriptionRef() string {
-	if delivery.subscriptionRef == "" {
-		delivery.subscriptionRef = delivery.findStringChildContent(siri_attributes.SubscriptionRef)
+	if delivery.subscriptionRef == nil {
+		s := delivery.findStringChildContent(siri_attributes.SubscriptionRef)
+		delivery.subscriptionRef = &s
 	}
-	return delivery.subscriptionRef
+	return *delivery.subscriptionRef
 }

@@ -9,33 +9,36 @@ import (
 type RequestXMLStructure struct {
 	LightRequestXMLStructure
 
-	requestorRef string
+	requestorRef *string
 }
 
 type LightRequestXMLStructure struct {
 	XMLStructure
 
-	messageIdentifier string
-	requestTimestamp  time.Time
+	messageIdentifier *string
+	requestTimestamp  *time.Time
 }
 
 func (request *RequestXMLStructure) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }
 
 func (request *LightRequestXMLStructure) MessageIdentifier() string {
-	if request.messageIdentifier == "" {
-		request.messageIdentifier = request.findStringChildContent(siri_attributes.MessageIdentifier)
+	if request.messageIdentifier == nil {
+		s := request.findStringChildContent(siri_attributes.MessageIdentifier)
+		request.messageIdentifier = &s
 	}
-	return request.messageIdentifier
+	return *request.messageIdentifier
 }
 
 func (request *LightRequestXMLStructure) RequestTimestamp() time.Time {
-	if request.requestTimestamp.IsZero() {
-		request.requestTimestamp = request.findTimeChildContent(siri_attributes.RequestTimestamp)
+	if request.requestTimestamp == nil {
+		t := request.findTimeChildContent(siri_attributes.RequestTimestamp)
+		request.requestTimestamp = &t
 	}
-	return request.requestTimestamp
+	return *request.requestTimestamp
 }

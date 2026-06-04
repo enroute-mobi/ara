@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 }
 
 // Default will create with 2 codespace values: internal and external
-func newTestReferential(t *testing.T, tokens ...string) (*core.MemoryReferentials, *core.Referential) {
+func newTestReferential(t testing.TB, tokens ...string) (*core.MemoryReferentials, *core.Referential) {
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	referential := referentials.New("referential")
@@ -44,7 +44,7 @@ func newTestReferential(t *testing.T, tokens ...string) (*core.MemoryReferential
 	return referentials, referential
 }
 
-func newTestServer(t *testing.T, g ...uuid.UUIDGenerator) (*Server, *core.Referential) {
+func newTestServer(t testing.TB, g ...uuid.UUIDGenerator) (*Server, *core.Referential) {
 	referentials := core.NewMemoryReferentials()
 	if len(g) == 1 {
 		referentials.SetUUIDGenerator(g[0])

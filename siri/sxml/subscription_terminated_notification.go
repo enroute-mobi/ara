@@ -9,7 +9,7 @@ import (
 type XMLSubscriptionTerminatedNotification struct {
 	SubscriptionDeliveryXMLStructure
 
-	producerRef string
+	producerRef *string
 }
 
 func NewXMLSubscriptionTerminatedNotification(node xml.Node) *XMLSubscriptionTerminatedNotification {
@@ -28,8 +28,9 @@ func NewXMLSubscriptionTerminatedNotificationFromContent(content []byte) (*XMLSu
 }
 
 func (response *XMLSubscriptionTerminatedNotification) ProducerRef() string {
-	if response.producerRef == "" {
-		response.producerRef = response.findStringChildContent(siri_attributes.ProducerRef)
+	if response.producerRef == nil {
+		s := response.findStringChildContent(siri_attributes.ProducerRef)
+		response.producerRef = &s
 	}
-	return response.producerRef
+	return *response.producerRef
 }

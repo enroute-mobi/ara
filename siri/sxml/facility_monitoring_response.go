@@ -21,8 +21,8 @@ type XMLFacilityMonitoringDelivery struct {
 type XMLFacilityCondition struct {
 	XMLStructure
 
-	facilityRef    string
-	facilityStatus string
+	facilityRef    *string
+	facilityStatus *string
 }
 
 func NewXMLFacilityMonitoringResponse(node xml.Node) *XMLFacilityMonitoringResponse {
@@ -77,15 +77,17 @@ func (delivery *XMLFacilityMonitoringDelivery) FacilityConditions() []*XMLFacili
 }
 
 func (delivery *XMLFacilityCondition) FacilityRef() string {
-	if delivery.facilityRef == "" {
-		delivery.facilityRef = delivery.findStringChildContent(siri_attributes.FacilityRef)
+	if delivery.facilityRef == nil {
+		s := delivery.findStringChildContent(siri_attributes.FacilityRef)
+		delivery.facilityRef = &s
 	}
-	return delivery.facilityRef
+	return *delivery.facilityRef
 }
 
 func (delivery *XMLFacilityCondition) FacilityStatus() string {
-	if delivery.facilityStatus == "" {
-		delivery.facilityStatus = delivery.findStringChildContent(siri_attributes.FacilityStatus)
+	if delivery.facilityStatus == nil {
+		s := delivery.findStringChildContent(siri_attributes.FacilityStatus)
+		delivery.facilityStatus = &s
 	}
-	return delivery.facilityStatus
+	return *delivery.facilityStatus
 }

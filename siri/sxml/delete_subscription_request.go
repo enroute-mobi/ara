@@ -10,7 +10,7 @@ type XMLDeleteSubscriptionRequest struct {
 	RequestXMLStructure
 
 	cancelAll       Bool
-	subscriptionRef string
+	subscriptionRef *string
 }
 
 func NewXMLDeleteSubscriptionRequest(node xml.Node) *XMLDeleteSubscriptionRequest {
@@ -29,10 +29,11 @@ func NewXMLDeleteSubscriptionRequestFromContent(content []byte) (*XMLDeleteSubsc
 }
 
 func (request *XMLDeleteSubscriptionRequest) SubscriptionRef() string {
-	if request.subscriptionRef == "" {
-		request.subscriptionRef = request.findStringChildContent(siri_attributes.SubscriptionRef)
+	if request.subscriptionRef == nil {
+		s := request.findStringChildContent(siri_attributes.SubscriptionRef)
+		request.subscriptionRef = &s
 	}
-	return request.subscriptionRef
+	return *request.subscriptionRef
 }
 
 func (request *XMLDeleteSubscriptionRequest) CancelAll() bool {

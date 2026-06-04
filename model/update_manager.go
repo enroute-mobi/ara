@@ -366,12 +366,11 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	// Update StopArea Lines
-	l := vj.Line()
-	if l != nil {
-		sa.LineIds.Add(l.Id())
+	if vj.LineId != "" {
+		sa.LineIds.Add(vj.LineId)
 		referent, ok := manager.model.StopAreas().Find(sa.ReferentId)
 		if ok {
-			referent.LineIds.Add(l.Id())
+			referent.LineIds.Add(vj.LineId)
 			manager.model.StopAreas().Save(referent)
 		}
 		manager.model.StopAreas().Save(sa)
@@ -455,8 +454,6 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 
 	}
 
-	line := vj.Line()
-
 	vehicle, found := manager.model.Vehicles().FindByCode(event.Code)
 	if !found {
 		vehicle = manager.model.Vehicles().New()
@@ -500,9 +497,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 		vehicle.Occupancy = event.Occupancy
 	}
 
-	if line != nil {
-		vehicle.LineId = line.Id()
-	}
+	vehicle.LineId = vj.LineId
 
 	// Default is AfterCreate
 	var h hooks.Type

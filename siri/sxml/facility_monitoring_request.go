@@ -9,13 +9,13 @@ import (
 type XMLGetFacilityMonitoring struct {
 	XMLFacilityMonitoringRequest
 
-	requestorRef string
+	requestorRef *string
 }
 
 type XMLFacilityMonitoringRequest struct {
 	LightRequestXMLStructure
 
-	facilityRef string
+	facilityRef *string
 }
 
 func NewXMLGetFacilityMonitoring(node xml.Node) *XMLGetFacilityMonitoring {
@@ -34,15 +34,17 @@ func NewXMLGetFacilityMonitoringFromContent(content []byte) (*XMLGetFacilityMoni
 }
 
 func (request *XMLGetFacilityMonitoring) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }
 
 func (request *XMLFacilityMonitoringRequest) FacilityRef() string {
-	if request.facilityRef == "" {
-		request.facilityRef = request.findStringChildContent(siri_attributes.FacilityRef)
+	if request.facilityRef == nil {
+		s := request.findStringChildContent(siri_attributes.FacilityRef)
+		request.facilityRef = &s
 	}
-	return request.facilityRef
+	return *request.facilityRef
 }

@@ -25,7 +25,7 @@ func TestMain(m *testing.M) {
 	os.Exit(c)
 }
 
-func newTestReferential(t *testing.T) (*core.MemoryReferentials, *core.Referential) {
+func newTestReferential(t testing.TB) (*core.MemoryReferentials, *core.Referential) {
 	referentials := core.NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	referential := referentials.New("referential")

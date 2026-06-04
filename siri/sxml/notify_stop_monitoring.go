@@ -17,7 +17,7 @@ type XMLNotifyStopMonitoring struct {
 type XMLNotifyStopMonitoringDelivery struct {
 	SubscriptionDeliveryXMLStructure
 
-	monitoringRef string
+	monitoringRef *string
 
 	monitoredStopVisits             []*XMLMonitoredStopVisit
 	monitoredStopVisitCancellations []*XMLMonitoredStopVisitCancellation
@@ -42,10 +42,11 @@ func (notify *XMLNotifyStopMonitoring) StopMonitoringDeliveries() []*XMLNotifySt
 }
 
 func (delivery *XMLNotifyStopMonitoringDelivery) MonitoringRef() string {
-	if delivery.monitoringRef == "" {
-		delivery.monitoringRef = delivery.findStringChildContent(siri_attributes.MonitoringRef)
+	if delivery.monitoringRef == nil {
+		s := delivery.findStringChildContent(siri_attributes.MonitoringRef)
+		delivery.monitoringRef = &s
 	}
-	return delivery.monitoringRef
+	return *delivery.monitoringRef
 }
 
 func (delivery *XMLNotifyStopMonitoringDelivery) XMLMonitoredStopVisits() []*XMLMonitoredStopVisit {

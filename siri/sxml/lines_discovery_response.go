@@ -17,8 +17,8 @@ type XMLLinesDiscoveryResponse struct {
 type XMLAnnotatedLineRef struct {
 	XMLStructure
 
-	lineRef  string
-	lineName string
+	lineRef  *string
+	lineName *string
 
 	monitored Bool
 }
@@ -68,17 +68,19 @@ func (response *XMLLinesDiscoveryResponse) AnnotatedLineRefs() []*XMLAnnotatedLi
 }
 
 func (annotatedLine *XMLAnnotatedLineRef) LineRef() string {
-	if annotatedLine.lineRef == "" {
-		annotatedLine.lineRef = annotatedLine.findStringChildContent(siri_attributes.LineRef)
+	if annotatedLine.lineRef == nil {
+		s := annotatedLine.findStringChildContent(siri_attributes.LineRef)
+		annotatedLine.lineRef = &s
 	}
-	return annotatedLine.lineRef
+	return *annotatedLine.lineRef
 }
 
 func (annotatedLine *XMLAnnotatedLineRef) LineName() string {
-	if annotatedLine.lineName == "" {
-		annotatedLine.lineName = annotatedLine.findStringChildContent(siri_attributes.LineName)
+	if annotatedLine.lineName == nil {
+		s := annotatedLine.findStringChildContent(siri_attributes.LineName)
+		annotatedLine.lineName = &s
 	}
-	return annotatedLine.lineName
+	return *annotatedLine.lineName
 }
 
 func (annotatedLine *XMLAnnotatedLineRef) Monitored() bool {

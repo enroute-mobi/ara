@@ -26,7 +26,7 @@ func TestMain(m *testing.M) {
 }
 
 // Default will create with 2 codespace values: internal and external
-func newTestReferential(t *testing.T, testCollectManager ...bool) (*MemoryReferentials, *Referential) {
+func newTestReferential(t testing.TB, testCollectManager ...bool) (*MemoryReferentials, *Referential) {
 	referentials := NewMemoryReferentials()
 	referentials.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
 	referential := referentials.New("referential")
@@ -43,7 +43,7 @@ func newTestReferential(t *testing.T, testCollectManager ...bool) (*MemoryRefere
 	return referentials, referential
 }
 
-func newTestPartnerManager(t *testing.T) *PartnerManager {
+func newTestPartnerManager(t testing.TB) *PartnerManager {
 	_, r := newTestReferential(t)
 	return r.Partners().(*PartnerManager)
 }

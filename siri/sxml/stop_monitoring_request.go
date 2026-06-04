@@ -11,22 +11,22 @@ import (
 type XMLGetStopMonitoring struct {
 	XMLStopMonitoringRequest
 
-	requestorRef string
+	requestorRef *string
 }
 
 type XMLStopMonitoringRequest struct {
 	LightXMLStopMonitoringRequest
 
 	previewInterval time.Duration
-	startTime       time.Time
+	startTime       *time.Time
 }
 
 type LightXMLStopMonitoringRequest struct {
 	LightRequestXMLStructure
 
-	monitoringRef     string
-	stopVisitTypes    string
-	lineRef           string
+	monitoringRef     *string
+	stopVisitTypes    *string
+	lineRef           *string
 	maximumStopVisits Int
 }
 
@@ -46,31 +46,35 @@ func NewXMLGetStopMonitoringFromContent(content []byte) (*XMLGetStopMonitoring, 
 }
 
 func (request *XMLGetStopMonitoring) RequestorRef() string {
-	if request.requestorRef == "" {
-		request.requestorRef = request.findStringChildContent(siri_attributes.RequestorRef)
+	if request.requestorRef == nil {
+		s := request.findStringChildContent(siri_attributes.RequestorRef)
+		request.requestorRef = &s
 	}
-	return request.requestorRef
+	return *request.requestorRef
 }
 
 func (request *LightXMLStopMonitoringRequest) MonitoringRef() string {
-	if request.monitoringRef == "" {
-		request.monitoringRef = request.findStringChildContent(siri_attributes.MonitoringRef)
+	if request.monitoringRef == nil {
+		s := request.findStringChildContent(siri_attributes.MonitoringRef)
+		request.monitoringRef = &s
 	}
-	return request.monitoringRef
+	return *request.monitoringRef
 }
 
 func (request *LightXMLStopMonitoringRequest) StopVisitTypes() string {
-	if request.stopVisitTypes == "" {
-		request.stopVisitTypes = request.findStringChildContent(siri_attributes.StopVisitTypes)
+	if request.stopVisitTypes == nil {
+		s := request.findStringChildContent(siri_attributes.StopVisitTypes)
+		request.stopVisitTypes = &s
 	}
-	return request.stopVisitTypes
+	return *request.stopVisitTypes
 }
 
 func (request *LightXMLStopMonitoringRequest) LineRef() string {
-	if request.lineRef == "" {
-		request.lineRef = request.findStringChildContent(siri_attributes.LineRef)
+	if request.lineRef == nil {
+		s := request.findStringChildContent(siri_attributes.LineRef)
+		request.lineRef = &s
 	}
-	return request.lineRef
+	return *request.lineRef
 }
 
 func (request *LightXMLStopMonitoringRequest) MaximumStopVisits() int {
@@ -88,8 +92,9 @@ func (request *XMLStopMonitoringRequest) PreviewInterval() time.Duration {
 }
 
 func (request *XMLStopMonitoringRequest) StartTime() time.Time {
-	if request.startTime.IsZero() {
-		request.startTime = request.findTimeChildContent(siri_attributes.StartTime)
+	if request.startTime == nil {
+		t := request.findTimeChildContent(siri_attributes.StartTime)
+		request.startTime = &t
 	}
-	return request.startTime
+	return *request.startTime
 }

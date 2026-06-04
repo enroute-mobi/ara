@@ -19,22 +19,22 @@ type XMLGeneralMessageResponse struct {
 type XMLGeneralMessageCancellation struct {
 	XMLStructure
 
-	infoMessageIdentifier string
-	recordedAtTime        time.Time
+	infoMessageIdentifier *string
+	recordedAtTime        *time.Time
 }
 
 type XMLGeneralMessage struct {
 	XMLStructure
 
-	itemIdentifier        string
-	infoMessageIdentifier string
-	infoChannelRef        string
-	formatRef             string
+	itemIdentifier        *string
+	infoMessageIdentifier *string
+	infoChannelRef        *string
+	formatRef             *string
 
 	infoMessageVersion Int
 
-	recordedAtTime time.Time
-	validUntilTime time.Time
+	recordedAtTime *time.Time
+	validUntilTime *time.Time
 
 	content any
 }
@@ -55,15 +55,15 @@ type XMLMessage struct {
 	XMLStructure
 
 	messageTexts map[string]string
-	messageType  string
+	messageType  *string
 }
 
 type IDFLineSectionStructure struct {
 	XMLStructure
 
-	firstStop string
-	lastStop  string
-	lineRef   string
+	firstStop *string
+	lastStop  *string
+	lineRef   *string
 }
 
 func NewXMLGeneralMessageResponseFromContent(content []byte) (*XMLGeneralMessageResponse, error) {
@@ -130,45 +130,51 @@ func (response *XMLGeneralMessageResponse) XMLGeneralMessages() []*XMLGeneralMes
 }
 
 func (visit *XMLGeneralMessageCancellation) InfoMessageIdentifier() string {
-	if visit.infoMessageIdentifier == "" {
-		visit.infoMessageIdentifier = visit.findStringChildContent(siri_attributes.InfoMessageIdentifier)
+	if visit.infoMessageIdentifier == nil {
+		s := visit.findStringChildContent(siri_attributes.InfoMessageIdentifier)
+		visit.infoMessageIdentifier = &s
 	}
-	return visit.infoMessageIdentifier
+	return *visit.infoMessageIdentifier
 }
 
 func (visit *XMLGeneralMessageCancellation) RecordedAtTime() time.Time {
-	if visit.recordedAtTime.IsZero() {
-		visit.recordedAtTime = visit.findTimeChildContent("RecordedAtTime")
+	if visit.recordedAtTime == nil {
+		t := visit.findTimeChildContent("RecordedAtTime")
+		visit.recordedAtTime = &t
 	}
-	return visit.recordedAtTime
+	return *visit.recordedAtTime
 }
 
 func (visit *XMLGeneralMessage) RecordedAtTime() time.Time {
-	if visit.recordedAtTime.IsZero() {
-		visit.recordedAtTime = visit.findTimeChildContent(siri_attributes.RecordedAtTime)
+	if visit.recordedAtTime == nil {
+		t := visit.findTimeChildContent(siri_attributes.RecordedAtTime)
+		visit.recordedAtTime = &t
 	}
-	return visit.recordedAtTime
+	return *visit.recordedAtTime
 }
 
 func (visit *XMLGeneralMessage) ValidUntilTime() time.Time {
-	if visit.validUntilTime.IsZero() {
-		visit.validUntilTime = visit.findTimeChildContent(siri_attributes.ValidUntilTime)
+	if visit.validUntilTime == nil {
+		t := visit.findTimeChildContent(siri_attributes.ValidUntilTime)
+		visit.validUntilTime = &t
 	}
-	return visit.validUntilTime
+	return *visit.validUntilTime
 }
 
 func (visit *XMLGeneralMessage) ItemIdentifier() string {
-	if visit.itemIdentifier == "" {
-		visit.itemIdentifier = visit.findStringChildContent(siri_attributes.ItemIdentifier)
+	if visit.itemIdentifier == nil {
+		s := visit.findStringChildContent(siri_attributes.ItemIdentifier)
+		visit.itemIdentifier = &s
 	}
-	return visit.itemIdentifier
+	return *visit.itemIdentifier
 }
 
 func (visit *XMLGeneralMessage) InfoMessageIdentifier() string {
-	if visit.infoMessageIdentifier == "" {
-		visit.infoMessageIdentifier = visit.findStringChildContent(siri_attributes.InfoMessageIdentifier)
+	if visit.infoMessageIdentifier == nil {
+		s := visit.findStringChildContent(siri_attributes.InfoMessageIdentifier)
+		visit.infoMessageIdentifier = &s
 	}
-	return visit.infoMessageIdentifier
+	return *visit.infoMessageIdentifier
 }
 
 func (visit *XMLGeneralMessage) InfoMessageVersion() int {
@@ -179,17 +185,19 @@ func (visit *XMLGeneralMessage) InfoMessageVersion() int {
 }
 
 func (visit *XMLGeneralMessage) InfoChannelRef() string {
-	if visit.infoChannelRef == "" {
-		visit.infoChannelRef = visit.findStringChildContent(siri_attributes.InfoChannelRef)
+	if visit.infoChannelRef == nil {
+		s := visit.findStringChildContent(siri_attributes.InfoChannelRef)
+		visit.infoChannelRef = &s
 	}
-	return visit.infoChannelRef
+	return *visit.infoChannelRef
 }
 
 func (visit *XMLGeneralMessage) FormatRef() string {
-	if visit.formatRef == "" {
-		visit.formatRef = visit.node.NativeNode().Attr("formatRef")
+	if visit.formatRef == nil {
+		s := visit.node.NativeNode().Attr("formatRef")
+		visit.formatRef = &s
 	}
-	return visit.formatRef
+	return *visit.formatRef
 }
 
 func (visit *XMLGeneralMessage) createNewContent() IDFGeneralMessageStructure {
@@ -273,24 +281,27 @@ func (visit *IDFGeneralMessageStructure) Messages() []*XMLMessage {
 }
 
 func (visit *IDFLineSectionStructure) FirstStop() string {
-	if visit.firstStop == "" {
-		visit.firstStop = visit.findStringChildContent(siri_attributes.FirstStop)
+	if visit.firstStop == nil {
+		s := visit.findStringChildContent(siri_attributes.FirstStop)
+		visit.firstStop = &s
 	}
-	return visit.firstStop
+	return *visit.firstStop
 }
 
 func (visit *IDFLineSectionStructure) LastStop() string {
-	if visit.lastStop == "" {
-		visit.lastStop = visit.findStringChildContent(siri_attributes.LastStop)
+	if visit.lastStop == nil {
+		s := visit.findStringChildContent(siri_attributes.LastStop)
+		visit.lastStop = &s
 	}
-	return visit.lastStop
+	return *visit.lastStop
 }
 
 func (visit *IDFLineSectionStructure) LineRef() string {
-	if visit.lineRef == "" {
-		visit.lineRef = visit.findStringChildContent(siri_attributes.LineRef)
+	if visit.lineRef == nil {
+		s := visit.findStringChildContent(siri_attributes.LineRef)
+		visit.lineRef = &s
 	}
-	return visit.lineRef
+	return *visit.lineRef
 }
 
 func (message *XMLMessage) MessageTexts() map[string]string {
@@ -304,8 +315,9 @@ func (message *XMLMessage) MessageTexts() map[string]string {
 }
 
 func (message *XMLMessage) MessageType() string {
-	if message.messageType == "" {
-		message.messageType = message.findStringChildContent(siri_attributes.MessageType)
+	if message.messageType == nil {
+		s := message.findStringChildContent(siri_attributes.MessageType)
+		message.messageType = &s
 	}
-	return message.messageType
+	return *message.messageType
 }
