@@ -119,6 +119,19 @@ func (subscription *Subscription) ResourcesByCodeCopy() map[string]*SubscribedRe
 	return m
 }
 
+// RefreshSubscribedUntil extends the SubscribedUntil of every already subscribed
+// resource. Collectors call this when a Notify is received: an active data flow
+// proves the subscription is still alive on the remote side, so it must not be
+// terminated by the PartnersGuardian between two ModelGuardian refreshes.
+func (subscription *Subscription) RefreshSubscribedUntil(until time.Time) {
+	for _, resource := range subscription.ResourcesByCodeCopy() {
+		if resource.SubscribedAt().IsZero() {
+			continue
+		}
+		resource.SubscribedUntil = until
+	}
+}
+
 func (subscription *Subscription) MarshalJSON() ([]byte, error) {
 	resources := make([]*SubscribedResource, 0)
 
@@ -172,7 +185,7 @@ func (subscription *Subscription) UniqueResource() (r *SubscribedResource) {
 func (subscription *Subscription) Resources(now time.Time) (ressources []*SubscribedResource) {
 	subscription.RLock()
 	for _, ressource := range subscription.resourcesByCode {
-		if ressource.SubscribedUntil.After(subscription.Clock().Now()) {
+		if ressource.SubscribedUntil.After(now) {
 			ressources = append(ressources, ressource)
 		}
 	}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"testing"
+	"time"
 
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/stretchr/testify/assert"
@@ -151,4 +152,37 @@ func Test_Subscriptions_byKindAndResourceId(t *testing.T) {
 
 	subs = subscriptions.FindByResourceId(obj.String(), "kind")
 	assert.Len(subs, 0)
+}
+
+func Test_Subscription_RefreshSubscribedUntil(t *testing.T) {
+	assert := assert.New(t)
+
+	subscriptions := NewMemorySubscriptions(NewPartner())
+	subscription := subscriptions.New("kind")
+
+	code := model.NewCode("internal", "value")
+	ref := model.Reference{Code: &code}
+	resource := subscription.CreateAndAddNewResource(ref)
+	resource.Subscribed(time.Now())
+
+	until := time.Now().Add(5 * time.Minute)
+	subscription.RefreshSubscribedUntil(until)
+
+	assert.Equal(until, resource.SubscribedUntil)
+}
+
+func Test_Subscription_RefreshSubscribedUntil_SkipsUnsubscribedResources(t *testing.T) {
+	assert := assert.New(t)
+
+	subscriptions := NewMemorySubscriptions(NewPartner())
+	subscription := subscriptions.New("kind")
+
+	code := model.NewCode("internal", "value")
+	ref := model.Reference{Code: &code}
+	resource := subscription.CreateAndAddNewResource(ref) // subscribedAt is zero
+	originalUntil := resource.SubscribedUntil
+
+	subscription.RefreshSubscribedUntil(time.Now().Add(5 * time.Minute))
+
+	assert.Equal(originalUntil, resource.SubscribedUntil)
 }

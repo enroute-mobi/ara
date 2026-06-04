@@ -2,8 +2,8 @@ package model
 
 import (
 	"encoding/json"
-
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -233,4 +233,23 @@ func Test_FacilityStatus_FromString_Wrong(t *testing.T) {
 	status, err := FacilityStatusFromString("WRONG")
 	assert.Nil(status)
 	assert.EqualError(err, "invalid Facility status WRONG")
+}
+
+func Test_MemoryFacilities_CollectableFacilities_DueOnly(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	facilities := NewMemoryFacilities()
+
+	due := facilities.New()
+	due.NextCollect(now.Add(-1 * time.Second))
+	facilities.Save(due)
+
+	notYetDue := facilities.New()
+	notYetDue.NextCollect(now.Add(1 * time.Minute))
+	facilities.Save(notYetDue)
+
+	collectable := facilities.CollectableFacilities(now)
+	assert.Len(collectable, 1)
+	assert.Equal(due.Id(), collectable[0].Id())
 }

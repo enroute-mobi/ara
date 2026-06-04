@@ -246,6 +246,7 @@ type StopAreas interface {
 	FindByReferentId(StopAreaId) []*StopArea
 	FindAscendants(StopAreaId) []*StopArea
 	FindAscendantsWithCodeSpace(StopAreaId, string) []Code
+	CollectableStopAreas(time.Time) []*StopArea
 }
 
 func NewMemoryStopAreas() StopAreas {
@@ -372,6 +373,30 @@ func (manager *memoryStopAreas) FindAll() (stopAreas []*StopArea) {
 	}
 
 	manager.mutex.RUnlock()
+	return
+}
+
+// CollectableStopAreas returns a copy of the stop areas due for collection at the
+// given time. The filtering is done under the read lock so the whole collection
+// isn't deep-copied on every guardian cycle: only the due stop areas are copied.
+func (manager *memoryStopAreas) CollectableStopAreas(now time.Time) (stopAreas []*StopArea) {
+	manager.mutex.RLock()
+	defer manager.mutex.RUnlock()
+
+	for _, stopArea := range manager.byIdentifier {
+		if stopArea.ParentId != "" {
+			if parent, ok := manager.byIdentifier[stopArea.ParentId]; ok && !parent.CollectChildren {
+				continue
+			}
+		}
+		if !stopArea.CollectedAlways && !stopArea.CollectedUntil.After(now) {
+			continue
+		}
+		if !stopArea.nextCollectAt.Before(now) {
+			continue
+		}
+		stopAreas = append(stopAreas, stopArea.copy())
+	}
 	return
 }
 

@@ -127,6 +127,9 @@ func (connector *SIRIGeneralMessageSubscriptionCollector) HandleNotifyGeneralMes
 			subscriptionErrors[subscriptionId] = "Subscription of id %s is not a subscription of kind StopMonitoringCollect"
 			continue
 		}
+
+		subscription.RefreshSubscribedUntil(connector.Clock().Now().Add(2 * time.Minute))
+
 		connector.cancelGeneralMessage(delivery)
 
 		builder.SetGeneralMessageDeliveryUpdateEvents(updateEvents, delivery, notify.ProducerRef())

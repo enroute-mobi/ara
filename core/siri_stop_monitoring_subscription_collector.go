@@ -130,6 +130,8 @@ func (connector *SIRIStopMonitoringSubscriptionCollector) HandleNotifyStopMonito
 			continue
 		}
 
+		subscription.RefreshSubscribedUntil(connector.Clock().Now().Add(2 * time.Minute))
+
 		originStopAreaCode := model.Code{}
 		resource := subscription.UniqueResource()
 		if resource != nil {

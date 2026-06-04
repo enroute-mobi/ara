@@ -54,7 +54,7 @@ func Test_ModelGuardian_RandDuration_Without_Refresh_setting(t *testing.T) {
 	referential := referentials.New(ReferentialSlug("referential"))
 	referentials.Save(referential)
 
-	randDuration := referential.ModelGuardian().randDuration()
+	randDuration := referential.ModelGuardian().randDuration(referential.ModelRefreshTime())
 	assert.InDeltaf(time.Duration(s.DEFAULT_MODEL_REFRESH_TIME).Seconds(), randDuration.Seconds(),
 		10.0,
 		"should be between -10s/+10s range from the Default model.refresh_time of 50s")
@@ -66,7 +66,7 @@ func Test_ModelGuardian_RandDuration_With_Refresh_setting(t *testing.T) {
 	referential.SetSetting("model.refresh_time", "45s")
 	referentials.Save(referential)
 
-	randDuration := referential.ModelGuardian().randDuration()
+	randDuration := referential.ModelGuardian().randDuration(referential.ModelRefreshTime())
 	assert.InDeltaf(45.0, randDuration.Seconds(),
 		10.0,
 		"should be between -10s/+10s range from the model.refresh_time")

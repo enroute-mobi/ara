@@ -179,6 +179,25 @@ func Test_MemoryLines_FindAll(t *testing.T) {
 	}
 }
 
+func Test_MemoryLines_CollectableLines_DueOnly(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	lines := NewMemoryLines()
+
+	due := lines.New()
+	due.NextCollect(now.Add(-1 * time.Second))
+	lines.Save(due)
+
+	notYetDue := lines.New()
+	notYetDue.NextCollect(now.Add(1 * time.Minute))
+	lines.Save(notYetDue)
+
+	collectable := lines.CollectableLines(now)
+	assert.Len(collectable, 1)
+	assert.Equal(due.Id(), collectable[0].Id())
+}
+
 func Test_MemoryLines_Delete(t *testing.T) {
 	lines := NewMemoryLines()
 	existingLine := lines.New()

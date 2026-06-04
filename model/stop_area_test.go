@@ -290,6 +290,97 @@ func Test_MemoryStopAreas_FindAll(t *testing.T) {
 	}
 }
 
+func Test_MemoryStopAreas_CollectableStopAreas_DueOnly(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	stopAreas := NewMemoryStopAreas()
+
+	due := stopAreas.New()
+	due.NextCollect(now.Add(-1 * time.Second))
+	stopAreas.Save(due)
+
+	notYetDue := stopAreas.New()
+	notYetDue.NextCollect(now.Add(1 * time.Minute))
+	stopAreas.Save(notYetDue)
+
+	collectable := stopAreas.CollectableStopAreas(now)
+	assert.Len(collectable, 1)
+	assert.Equal(due.Id(), collectable[0].Id())
+}
+
+func Test_MemoryStopAreas_CollectableStopAreas_CollectedUntilExpired(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	stopAreas := NewMemoryStopAreas()
+
+	sa := stopAreas.New()
+	sa.CollectedAlways = false
+	sa.CollectedUntil = now.Add(-1 * time.Second)
+	sa.NextCollect(now.Add(-10 * time.Second))
+	stopAreas.Save(sa)
+
+	collectable := stopAreas.CollectableStopAreas(now)
+	assert.Empty(collectable)
+}
+
+func Test_MemoryStopAreas_CollectableStopAreas_CollectedAlwaysOverridesExpiredUntil(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	stopAreas := NewMemoryStopAreas()
+
+	sa := stopAreas.New() // CollectedAlways=true by default
+	sa.CollectedUntil = now.Add(-1 * time.Second)
+	sa.NextCollect(now.Add(-10 * time.Second))
+	stopAreas.Save(sa)
+
+	collectable := stopAreas.CollectableStopAreas(now)
+	assert.Len(collectable, 1)
+}
+
+func Test_MemoryStopAreas_CollectableStopAreas_ParentWithoutCollectChildren(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	stopAreas := NewMemoryStopAreas()
+
+	parent := stopAreas.New()
+	parent.CollectChildren = false
+	parent.NextCollect(now.Add(1 * time.Minute))
+	stopAreas.Save(parent)
+
+	child := stopAreas.New()
+	child.ParentId = parent.Id()
+	child.NextCollect(now.Add(-10 * time.Second))
+	stopAreas.Save(child)
+
+	collectable := stopAreas.CollectableStopAreas(now)
+	assert.Empty(collectable)
+}
+
+func Test_MemoryStopAreas_CollectableStopAreas_ParentWithCollectChildren(t *testing.T) {
+	assert := assert.New(t)
+	now := time.Now()
+
+	stopAreas := NewMemoryStopAreas()
+
+	parent := stopAreas.New()
+	parent.CollectChildren = true
+	parent.NextCollect(now.Add(1 * time.Minute))
+	stopAreas.Save(parent)
+
+	child := stopAreas.New()
+	child.ParentId = parent.Id()
+	child.NextCollect(now.Add(-10 * time.Second))
+	stopAreas.Save(child)
+
+	collectable := stopAreas.CollectableStopAreas(now)
+	assert.Len(collectable, 1)
+	assert.Equal(child.Id(), collectable[0].Id())
+}
+
 func Test_MemoryStopAreas_Delete(t *testing.T) {
 	stopAreas := NewMemoryStopAreas()
 	existingStopArea := stopAreas.New()

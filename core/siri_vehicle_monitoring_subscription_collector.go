@@ -130,6 +130,8 @@ func (connector *SIRIVehicleMonitoringSubscriptionCollector) HandleNotifyVehicle
 			continue
 		}
 
+		subscription.RefreshSubscribedUntil(connector.Clock().Now().Add(2 * time.Minute))
+
 		builder := NewVehicleMonitoringUpdateEventBuilder(connector.partner)
 		builder.SetUpdateEvents(delivery.VehicleActivities())
 
