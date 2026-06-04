@@ -43,13 +43,15 @@ Then(/^one Partner(?: in Referential "([^"]+)")? has the following attributes:$/
 end
 
 Then(/^the Partner "([^"]+)" in the Referential "([^"]+)" has the operational status (up|down|unknown)/) do |slug, referential_slug, status|
-  partner = find_referential(referential_slug).partners.find(slug)
-  expect(partner.status).to eq(status)
+  partner = find_referential(referential_slug).partners.all.find { |p| p.slug == slug }
+  expect(partner.partner_status["OperationnalStatus"]).to eq(status)
 end
 
 When(/^a Subscription exist (?:in Referential "([^"]+)" )?with the following attributes:$/) do |referential_slug, attributes|
   partner = find_referential(referential_slug).partners.all.first
-  sub_attrs = model_attributes(attributes).transform_keys { |key| key.to_s.underscore.to_sym }
+  raw_attrs = model_attributes(attributes)
+  raw_attrs["Kind"] = raw_attrs.delete("CodeSpace") if raw_attrs.key?("CodeSpace")
+  sub_attrs = raw_attrs.transform_keys { |key| key.to_s.underscore.to_sym }
   sub = partner.subscriptions.create(sub_attrs)
   sub.save
 end
@@ -70,7 +72,7 @@ Then(/^one Subscription exists with the following attributes:$/) do |attributes|
 
   if (subscribed_at = attrs.delete("Resources[0]/SubscribedAt"))
     subscribed_at = (a_value > $1) if %r{^> (.*)$} =~ subscribed_at
-    attrs["Resources"] = a_collection_including(a_hash_including(subscribed_at: subscribed_at))
+    attrs["Resources"] = a_collection_including(a_hash_including("SubscribedAt" => subscribed_at))
   end
 
   parsed_attributes = attrs.transform_keys { |key| key.to_s.underscore.to_sym }
@@ -83,9 +85,9 @@ Then(/^Subscriptions exist with the following resources:$/) do |attributes|
   subs = partner.subscriptions.all
 
   subscription_codes = subs.flat_map(&:resources)
-                           .map { |r| r[:reference]["Code"] }
+                           .map { |r| r["Reference"]["Code"] }
 
-  attributes.to_hash.map { |v| { v[0] => v[1] } }.each do |expected_subscription|
+  attributes.raw.map { |v| { v[0] => v[1] } }.each do |expected_subscription|
     expect(subscription_codes).to include(expected_subscription)
   end
 end
@@ -94,9 +96,9 @@ Then(/^No Subscriptions exist with the following resources:$/) do |attributes|
   partner = find_referential('test').partners.all.first
   subs = partner.subscriptions.all
 
-  first_sub_resources = (subs.first&.resources || []).map { |r| r[:reference]["Code"] }
+  first_sub_resources = (subs.first&.resources || []).map { |r| r["Reference"]["Code"] }
 
-  attributes.to_hash.map { |v| { v[0] => v[1] } }.each do |expected_subscription|
+  attributes.raw.map { |v| { v[0] => v[1] } }.each do |expected_subscription|
     expect(first_sub_resources).not_to include(expected_subscription)
   end
 end

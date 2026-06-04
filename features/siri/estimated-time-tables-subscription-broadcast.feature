@@ -55,7 +55,7 @@ Feature: Support SIRI EstimatedTimetable by subscription
       </SubscriptionResponse>
       </Siri>
       """
-    Then a Subscription exist with the following attributes:
+    Then Subscriptions exist with the following resources:
       | internal | NINOXE:Line:3:LOC |
       | internal | NINOXE:Line:A:BUS |
 
