@@ -568,6 +568,50 @@ func Test_MemoryReferentials_SaveToDatabase_PreservesCodeSpaces(t *testing.T) {
 	assert.Equal(string(ref.Id()), referentialId, "code_space referential_id should remain unchanged after SaveToDatabase")
 }
 
+func Test_MemoryReferentials_SaveToDatabase_CleansCodeSpacesOnDelete(t *testing.T) {
+	assert := assert.New(t)
+
+	model.InitTestDb(t)
+	defer model.CleanTestDb(t)
+
+	referentials := NewMemoryReferentials()
+	kept := referentials.New("kept")
+	kept.Save()
+	deleted := referentials.New("deleted")
+	deleted.Save()
+
+	status, refErr := referentials.SaveToDatabase()
+	assert.Equal(200, status, refErr)
+
+	for _, ref := range []*Referential{kept, deleted} {
+		_, err := model.Database.Exec(
+			"INSERT INTO code_spaces (id, referential_id, name, short_name, created_at, updated_at) VALUES (gen_random_uuid(), $1, 'internal', 'int', now(), now())",
+			string(ref.Id()),
+		)
+		assert.NoError(err)
+	}
+
+	referentials.Delete(deleted)
+
+	status, refErr = referentials.SaveToDatabase()
+	assert.Equal(200, status, refErr)
+
+	var refCount int
+	err := model.Database.Db.QueryRow("SELECT COUNT(*) FROM referentials").Scan(&refCount)
+	assert.NoError(err)
+	assert.Equal(1, refCount, "only the kept referential should remain in the database")
+
+	var csCount int
+	err = model.Database.Db.QueryRow("SELECT COUNT(*) FROM code_spaces").Scan(&csCount)
+	assert.NoError(err)
+	assert.Equal(1, csCount, "only the code_space of the kept referential should remain")
+
+	var csReferentialId string
+	err = model.Database.Db.QueryRow("SELECT referential_id FROM code_spaces").Scan(&csReferentialId)
+	assert.NoError(err)
+	assert.Equal(string(kept.Id()), csReferentialId, "surviving code_space must belong to the kept referential")
+}
+
 func Test_APIreferential_UnmarshalJSON(t *testing.T) {
 	assert := assert.New(t)
 	var TestCases = []struct {
