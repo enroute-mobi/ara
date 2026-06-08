@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 	"time"
-	"unicode/utf8"
 
 	"bitbucket.org/enroute-mobi/ara/audit/controlpb"
 	"bitbucket.org/enroute-mobi/ara/audit/exchangepb"
@@ -237,58 +236,68 @@ func TestExchangeEncodeEmptyMessage(t *testing.T) {
 	assert.Empty(t, decoded.GetSubscriptionIdentifiers())
 }
 
-func TestExchangeEncodeLargeRawMessage(t *testing.T) {
-	large := make([]byte, 11*1024*1024) // 11 MB — exceeds maxRawMessageBytes
-	for i := range large {
-		large[i] = 'x'
-	}
+// TestExchangeEncodeBothRawMessagesTooLarge — when both raw fields individually
+// exceed the row budget, neither is stored, but the sizes are still recorded.
+func TestExchangeEncodeBothRawMessagesTooLarge(t *testing.T) {
+	large := strings.Repeat("x", 11*1024*1024) // 11 MiB each — each exceeds the row budget
 	msg := &BigQueryMessage{
 		UUID:               "large-uuid",
-		RequestRawMessage:  string(large),
-		ResponseRawMessage: string(large),
+		RequestRawMessage:  large,
+		ResponseRawMessage: large,
+		RequestSize:        int64(len(large)),
+		ResponseSize:       int64(len(large)),
 	}
 
 	decoded := unmarshalExchange(t, msg)
 
-	assert.LessOrEqual(t, len(decoded.GetRequestRawMessage()), maxRawMessageBytes+len("...[truncated]"))
-	assert.LessOrEqual(t, len(decoded.GetResponseRawMessage()), maxRawMessageBytes+len("...[truncated]"))
-	assert.True(t, strings.HasSuffix(decoded.GetRequestRawMessage(), "...[truncated]"))
-	assert.True(t, strings.HasSuffix(decoded.GetResponseRawMessage(), "...[truncated]"))
+	assert.Empty(t, decoded.GetRequestRawMessage(), "oversized request must be dropped")
+	assert.Empty(t, decoded.GetResponseRawMessage(), "oversized response must be dropped")
+	// Sizes still reflect the true payload sizes.
+	assert.Equal(t, int64(len(large)), decoded.GetRequestSize())
+	assert.Equal(t, int64(len(large)), decoded.GetResponseSize())
+}
+
+// TestExchangeEncodeKeepsSmallerRawMessage — when the combined raw payload
+// exceeds the budget but the smaller field fits on its own, the larger field
+// is dropped and the smaller one is kept in full.
+func TestExchangeEncodeKeepsSmallerRawMessage(t *testing.T) {
+	big := strings.Repeat("b", 9*1024*1024)   // 9 MiB
+	small := strings.Repeat("a", 1*1024*1024) // 1 MiB; combined exceeds the 9 MiB budget
+	msg := &BigQueryMessage{
+		UUID:               "mixed-uuid",
+		RequestRawMessage:  big,
+		ResponseRawMessage: small,
+	}
+
+	decoded := unmarshalExchange(t, msg)
+
+	assert.Empty(t, decoded.GetRequestRawMessage(), "larger request must be dropped")
+	assert.Equal(t, small, decoded.GetResponseRawMessage(), "smaller response must be kept in full")
 }
 
 // TestExchangeEncodeLargeNotifyStopMonitoring uses a realistic large
-// NotifyStopMonitoring XML (> 1 MiB) to verify that encodeExchange truncates
-// the raw message, preserves the original size in request_size, and that the
-// truncated prefix is still valid UTF-8.
+// NotifyStopMonitoring XML that still fits within the row budget, and verifies
+// that encodeExchange stores it untouched (no truncation) and preserves the
+// recorded request_size.
 func TestExchangeEncodeLargeNotifyStopMonitoring(t *testing.T) {
 	xmlBytes, err := os.ReadFile("../core/testdata/notify-stop-monitoring-large.xml")
 	require.NoError(t, err)
-	require.Greater(t, len(xmlBytes), maxRawMessageBytes, "test file must exceed the cap to be useful")
+	require.LessOrEqual(t, len(xmlBytes), maxRowRawBytes, "test file must fit within the row budget to be stored in full")
 
 	originalSize := int64(len(xmlBytes))
 	msg := &BigQueryMessage{
-		UUID:             "large-notify-sm",
-		Type:             NOTIFY_STOP_MONITORING,
-		Direction:        "received",
+		UUID:              "large-notify-sm",
+		Type:              NOTIFY_STOP_MONITORING,
+		Direction:         "received",
 		RequestRawMessage: string(xmlBytes),
-		RequestSize:      originalSize,
+		RequestSize:       originalSize,
 	}
 
 	decoded := unmarshalExchange(t, msg)
 
-	// Raw message was truncated.
-	assert.LessOrEqual(t, len(decoded.GetRequestRawMessage()), maxRawMessageBytes+len("...[truncated]"))
-	assert.True(t, strings.HasSuffix(decoded.GetRequestRawMessage(), "...[truncated]"), "truncated suffix must be present")
-
-	// The truncated prefix must be valid UTF-8.
-	prefix := strings.TrimSuffix(decoded.GetRequestRawMessage(), "...[truncated]")
-	assert.True(t, utf8.ValidString(prefix), "truncated prefix must be valid UTF-8")
-
-	// The XML prefix is preserved — the original opening tag is intact.
-	assert.True(t, strings.HasPrefix(decoded.GetRequestRawMessage(), "<ns1:NotifyStopMonitoring"), "XML prefix must be preserved")
-
-	// request_size still holds the original full size, not the truncated length.
-	assert.Equal(t, originalSize, decoded.GetRequestSize(), "request_size must reflect the original untruncated size")
+	// The payload fits within the budget, so it is stored in full and unchanged.
+	assert.Equal(t, string(xmlBytes), decoded.GetRequestRawMessage(), "payload within budget must be stored unchanged")
+	assert.Equal(t, originalSize, decoded.GetRequestSize(), "request_size must reflect the original size")
 }
 
 func TestVehicleEncode(t *testing.T) {

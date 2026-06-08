@@ -171,25 +171,42 @@ func (w *storageWriter) send(ctx context.Context, data []byte, label string) err
 	return nil
 }
 
-// maxRawMessageBytes caps request_raw_message and response_raw_message before
-// encoding. The BigQuery Storage Write API rejects rows larger than 10 MB;
-// keeping each raw field below 1 MiB leaves ample headroom for the rest of
-// the row even when both fields are populated.
-const maxRawMessageBytes = 1 << 20 // 1 MiB
+// maxRowRawBytes bounds the combined size of request_raw_message and
+// response_raw_message stored in a single row. The BigQuery Storage Write API
+// rejects rows larger than 10 MB; capping the combined raw payload at 9 MiB
+// leaves headroom for the row's other fields. The check itself only ever
+// measures these two raw fields.
+const maxRowRawBytes = 9 << 20 // 9 MiB
 
-func truncateRawMessage(s string) string {
-	if len(s) <= maxRawMessageBytes {
-		return s
+// limitRawMessages enforces the per-row payload budget. Fields are kept or
+// dropped whole — never truncated:
+//   - combined request + response within budget -> keep both
+//   - combined over budget -> keep only the smaller, drop the larger
+//   - the smaller field alone over budget -> drop both
+//
+// A dropped field is replaced with an empty string. The full payload size is
+// still recorded in request_size / response_size, so a reviewer can tell a
+// dropped field from a genuinely empty one.
+func limitRawMessages(request, response string) (string, string) {
+	if len(request)+len(response) <= maxRowRawBytes {
+		return request, response
 	}
-	// Walk back to the last valid UTF-8 boundary before cutting.
-	b := s[:maxRawMessageBytes]
-	for len(b) > 0 && b[len(b)-1]&0xC0 == 0x80 {
-		b = b[:len(b)-1]
+	// Combined payload is over budget: keep only the smaller field, and only
+	// when it fits on its own. The larger field is dropped.
+	if len(request) <= len(response) {
+		if len(request) <= maxRowRawBytes {
+			return request, ""
+		}
+		return "", ""
 	}
-	return b + "...[truncated]"
+	if len(response) <= maxRowRawBytes {
+		return "", response
+	}
+	return "", ""
 }
 
 func encodeExchange(msg *BigQueryMessage) ([]byte, error) {
+	requestRaw, responseRaw := limitRawMessages(msg.RequestRawMessage, msg.ResponseRawMessage)
 	pbMsg := &exchangepb.BigQueryMessage{
 		Uuid:                    proto.String(msg.UUID),
 		Timestamp:               proto.Int64(msg.Timestamp.UnixMicro()),
@@ -200,8 +217,8 @@ func encodeExchange(msg *BigQueryMessage) ([]byte, error) {
 		Partner:                 proto.String(msg.Partner),
 		Status:                  proto.String(msg.Status),
 		ErrorDetails:            proto.String(msg.ErrorDetails),
-		RequestRawMessage:       proto.String(truncateRawMessage(msg.RequestRawMessage)),
-		ResponseRawMessage:      proto.String(truncateRawMessage(msg.ResponseRawMessage)),
+		RequestRawMessage:       proto.String(requestRaw),
+		ResponseRawMessage:      proto.String(responseRaw),
 		RequestIdentifier:       proto.String(msg.RequestIdentifier),
 		ResponseIdentifier:      proto.String(msg.ResponseIdentifier),
 		RequestSize:             proto.Int64(msg.RequestSize),
