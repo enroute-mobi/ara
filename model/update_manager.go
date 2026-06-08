@@ -472,6 +472,7 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 		controls[i].Control(sv)
 	}
 
+	// Complex controls for other model types can be wired the same way in their respective update methods.
 	complexControls := manager.model.Controls().GetComplexControls(model_types.StopVisit)
 	for h, cs := range complexControls {
 		switch h {
