@@ -16,8 +16,8 @@ const (
 	*/
 	AfterAllStopVisitSave
 
-	Total               = 3
-	TotalSimpleControls = 2
+	Total            = 3
+	TotalSimpleHooks = 2
 )
 
 var Hook = map[string]Type{

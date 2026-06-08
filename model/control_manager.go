@@ -61,7 +61,7 @@ func (mm *ControlManager) setControl(h hooks.Type, t ModelType, m Control) {
 
 // If we ask for AfterCreate, we'll also get AfterSave Controls
 func (mm ControlManager) GetSimpleControls(h hooks.Type, t model_types.Model) (m []Control) {
-	for i := h; i < hooks.TotalSimpleControls; i++ {
+	for i := h; i < hooks.TotalSimpleHooks; i++ {
 		m = append(m, mm.controls[i][t]...)
 	}
 	return
@@ -69,7 +69,7 @@ func (mm ControlManager) GetSimpleControls(h hooks.Type, t model_types.Model) (m
 
 func (mm ControlManager) GetComplexControls(t model_types.Model) (m map[hooks.Type][]Control) {
 	m = make(map[hooks.Type][]Control)
-	for i := hooks.TotalSimpleControls; i < hooks.Total; i++ {
+	for i := hooks.TotalSimpleHooks; i < hooks.Total; i++ {
 		m[hooks.Type(i)] = append(m[hooks.Type(i)], mm.controls[hooks.Type(i)][t]...)
 	}
 	return
