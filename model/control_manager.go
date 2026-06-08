@@ -110,6 +110,7 @@ func (b *controlBuilder) buildContext(c *controlContextBuilder) []error {
 	e := []error{}
 
 	m := NewControl()
+	m.Id = c.control.Id
 	e = append(e, b.handleContexes(c, m)...)
 	b.manager.controls[h][mt] = append(b.manager.controls[h][mt], *m)
 
@@ -125,6 +126,7 @@ func (b *controlBuilder) buildController(sm *SelectControl) []error {
 	e := []error{}
 
 	m := NewControl()
+	m.Id = sm.Id
 	updater, err := NewControllerFromDatabase(sm)
 	if err != nil {
 		e = append(e, err)

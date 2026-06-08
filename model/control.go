@@ -27,8 +27,7 @@ type Control struct {
 	ctx         Context
 	controllers []controller
 
-	Criticity    string
-	InternalCode string
+	Id string
 }
 
 func NewControl() *Control {

@@ -4,13 +4,32 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"sync"
 	"testing"
 	"time"
 
+	"bitbucket.org/enroute-mobi/ara/model/hooks"
+	"bitbucket.org/enroute-mobi/ara/model/model_types"
 	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"github.com/stretchr/testify/assert"
 )
+
+// fakeControls implements Controls with injected complex controls for testing.
+type fakeControls struct {
+	complex map[model_types.Model]map[hooks.Type][]Control
+}
+
+func (f *fakeControls) Load(_ string) error { return nil }
+func (f *fakeControls) GetSimpleControls(_ hooks.Type, _ model_types.Model) []Control {
+	return nil
+}
+func (f *fakeControls) GetComplexControls(t model_types.Model) map[hooks.Type][]Control {
+	if m, ok := f.complex[t]; ok {
+		return m
+	}
+	return nil
+}
 
 func Test_UpdateManager_UpdateVehicle_WithNextStopVisitOrderExisting(t *testing.T) {
 	assert := assert.New(t)
@@ -675,4 +694,123 @@ func checkSituation(situation Situation, code Code, testTime time.Time) bool {
 	testSituation.SetCode(NewCode("_default", code.HashValue()))
 
 	return reflect.DeepEqual(situation, testSituation)
+}
+
+// Blocker 3: newUpdateManager (test constructor) initializes toControl so complex controls don't panic
+func Test_UpdateManager_newUpdateManager_InitializesToControl(t *testing.T) {
+	manager := newUpdateManager(NewTestMemoryModel())
+	if manager.toControl == nil {
+		t.Error("newUpdateManager should initialize toControl")
+	}
+}
+
+// Blocker 1: concurrent Update calls on the same manager don't data-race
+func Test_UpdateManager_Update_ConcurrentSafe(t *testing.T) {
+	manager := newUpdateManager(newTestModel(t))
+
+	var wg sync.WaitGroup
+	for i := 0; i < 20; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			manager.Update([]UpdateEvent{})
+		}()
+	}
+	wg.Wait()
+}
+
+// Blocker 2: the same complex control (same Id) is deduplicated and runs exactly once
+// even when two StopVisit events for the same VehicleJourney arrive in the same batch.
+func Test_UpdateManager_ComplexControl_DeduplicatedById(t *testing.T) {
+	assert := assert.New(t)
+
+	m := NewTestMemoryModel()
+	mm := m.(*memoryModel)
+
+	code := NewCode("internal", "value")
+	code2 := NewCode("internal", "value2")
+
+	sa := m.StopAreas().New()
+	sa.SetCode(code)
+	sa.Save()
+
+	l := m.Lines().New()
+	l.SetCode(code)
+	l.Save()
+
+	vj := m.VehicleJourneys().New()
+	vj.SetCode(code)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	callCount := 0
+	control := Control{Id: "control-1"}
+	control.AddController(func(ModelInstance) error {
+		callCount++
+		return nil
+	})
+
+	mm.controls = &fakeControls{
+		complex: map[model_types.Model]map[hooks.Type][]Control{
+			model_types.StopVisit: {
+				hooks.AfterAllStopVisitSave: {control},
+			},
+		},
+	}
+
+	manager := newUpdateManager(m)
+	manager.Update([]UpdateEvent{
+		&StopVisitUpdateEvent{Code: code, StopAreaCode: code, VehicleJourneyCode: code, Schedules: schedules.NewStopVisitSchedules()},
+		&StopVisitUpdateEvent{Code: code2, StopAreaCode: code, VehicleJourneyCode: code, Schedules: schedules.NewStopVisitSchedules()},
+	})
+
+	assert.Equal(1, callCount, "same complex control should run only once per VehicleJourney per batch")
+}
+
+// Blocker 2: two distinct complex controls (different Id) on the same VehicleJourney both run
+func Test_UpdateManager_ComplexControl_DistinctControlsBothRun(t *testing.T) {
+	assert := assert.New(t)
+
+	m := NewTestMemoryModel()
+	mm := m.(*memoryModel)
+
+	code := NewCode("internal", "value")
+
+	sa := m.StopAreas().New()
+	sa.SetCode(code)
+	sa.Save()
+
+	l := m.Lines().New()
+	l.SetCode(code)
+	l.Save()
+
+	vj := m.VehicleJourneys().New()
+	vj.SetCode(code)
+	vj.LineId = l.Id()
+	vj.Save()
+
+	callCount := 0
+	makeControl := func(id string) Control {
+		c := Control{Id: id}
+		c.AddController(func(ModelInstance) error {
+			callCount++
+			return nil
+		})
+		return c
+	}
+
+	mm.controls = &fakeControls{
+		complex: map[model_types.Model]map[hooks.Type][]Control{
+			model_types.StopVisit: {
+				hooks.AfterAllStopVisitSave: {makeControl("control-1"), makeControl("control-2")},
+			},
+		},
+	}
+
+	manager := newUpdateManager(m)
+	manager.Update([]UpdateEvent{
+		&StopVisitUpdateEvent{Code: code, StopAreaCode: code, VehicleJourneyCode: code, Schedules: schedules.NewStopVisitSchedules()},
+	})
+
+	assert.Equal(2, callCount, "two distinct complex controls should both run")
 }

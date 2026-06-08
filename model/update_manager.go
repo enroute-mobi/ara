@@ -1,6 +1,8 @@
 package model
 
 import (
+	"sync"
+
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model/hooks"
@@ -15,19 +17,20 @@ type UpdateManager struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
+	mutex     sync.Mutex
 	model     Model
 	toControl map[model_types.Model]map[string]map[string]Control
 }
 
 func NewUpdateManager(model Model) func([]UpdateEvent) {
-	manager := newUpdateManager(model)
-	manager.resetToControl()
-	return manager.Update
+	return newUpdateManager(model).Update
 }
 
 // Test method
 func newUpdateManager(model Model) *UpdateManager {
-	return &UpdateManager{model: model}
+	manager := &UpdateManager{model: model}
+	manager.resetToControl()
+	return manager
 }
 
 func (manager *UpdateManager) resetToControl() {
@@ -37,24 +40,27 @@ func (manager *UpdateManager) resetToControl() {
 func (manager *UpdateManager) addToControl(t model_types.Model, id string, c Control) {
 	_, found := manager.toControl[t]
 	if !found {
-		manager.toControl[t] = map[string]map[string]Control{id: {c.InternalCode: c}}
+		manager.toControl[t] = map[string]map[string]Control{id: {c.Id: c}}
 		return
 	}
 
 	_, found = manager.toControl[t][id]
 	if !found {
-		manager.toControl[t][id] = map[string]Control{c.InternalCode: c}
+		manager.toControl[t][id] = map[string]Control{c.Id: c}
 		return
 	}
 
-	_, found = manager.toControl[t][id][c.InternalCode]
+	_, found = manager.toControl[t][id][c.Id]
 	if !found {
-		manager.toControl[t][id][c.InternalCode] = c
+		manager.toControl[t][id][c.Id] = c
 	}
 
 }
 
 func (manager *UpdateManager) Update(events []UpdateEvent) {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
 	for i := range events {
 		manager.update(events[i])
 	}
