@@ -61,14 +61,18 @@ func (manager *UpdateManager) Update(events []UpdateEvent) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
+	// Complex controls config is static — compute once per batch rather than per event.
+	// Other update methods can hoist their own GetComplexControls call here when needed.
+	stopVisitComplexControls := manager.model.Controls().GetComplexControls(model_types.StopVisit)
+
 	for i := range events {
-		manager.update(events[i])
+		manager.update(events[i], stopVisitComplexControls)
 	}
 
 	manager.handleToControl()
 }
 
-func (manager *UpdateManager) update(event UpdateEvent) {
+func (manager *UpdateManager) update(event UpdateEvent, stopVisitComplexControls map[hooks.Type][]Control) {
 	switch event.EventKind() {
 	case STOP_AREA_EVENT:
 		manager.updateStopArea(event.(*StopAreaUpdateEvent))
@@ -77,7 +81,7 @@ func (manager *UpdateManager) update(event UpdateEvent) {
 	case VEHICLE_JOURNEY_EVENT:
 		manager.updateVehicleJourney(event.(*VehicleJourneyUpdateEvent))
 	case STOP_VISIT_EVENT:
-		manager.updateStopVisit(event.(*StopVisitUpdateEvent))
+		manager.updateStopVisit(event.(*StopVisitUpdateEvent), stopVisitComplexControls)
 	case VEHICLE_EVENT:
 		manager.updateVehicle(event.(*VehicleUpdateEvent))
 	case STATUS_EVENT:
@@ -350,7 +354,7 @@ func (manager *UpdateManager) updateVehicleJourneyFromVehicleMonitoring(event *V
 	}
 }
 
-func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
+func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent, complexControls map[hooks.Type][]Control) {
 	if event.Code.Value() == "" { // Avoid creating a StopVisit with an empty code
 		return
 	}
@@ -473,7 +477,6 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	}
 
 	// Complex controls for other model types can be wired the same way in their respective update methods.
-	complexControls := manager.model.Controls().GetComplexControls(model_types.StopVisit)
 	for h, cs := range complexControls {
 		switch h {
 		case hooks.AfterAllStopVisitSave:
