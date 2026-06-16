@@ -154,6 +154,57 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 	assert.Equal(stopVisit1.Id(), vehicleB.NextStopVisitId)
 }
 
+// When a vehicle advances to a new next stop, the previous byNextStopVisitId key
+// must be evicted so the index can't accumulate stale entries. We inspect the
+// index map directly because FindByNextStopVisitId lazily self-heals on lookup,
+// which would mask a missing eviction.
+func Test_MemoryVehicles_Save_EvictsPreviousNextStopVisitId(t *testing.T) {
+	assert := assert.New(t)
+
+	model := newTestModel(t)
+	sv1 := model.StopVisits().New()
+	sv1.Save()
+	sv2 := model.StopVisits().New()
+	sv2.Save()
+
+	vehicle := model.Vehicles().New()
+	vehicle.NextStopVisitId = sv1.Id()
+	assert.True(vehicle.Save())
+
+	mv := model.Vehicles().(*memoryVehicles)
+	_, present := mv.byNextStopVisitId[sv1.Id()]
+	assert.True(present, "index should hold sv1 -> vehicle after first Save")
+
+	// Advance the vehicle to a new next stop the way the update path does:
+	// fetch a copy, mutate it, Save it (so the stored object differs).
+	updated, ok := model.Vehicles().Find(vehicle.Id())
+	assert.True(ok)
+	updated.NextStopVisitId = sv2.Id()
+	assert.True(updated.Save())
+
+	_, present = mv.byNextStopVisitId[sv2.Id()]
+	assert.True(present, "index should hold sv2 -> vehicle after the update")
+	_, present = mv.byNextStopVisitId[sv1.Id()]
+	assert.False(present, "stale sv1 index entry should be evicted on Save")
+}
+
+func Test_MemoryVehicles_Delete_CleansNextStopVisitIdIndex(t *testing.T) {
+	assert := assert.New(t)
+
+	vehicles := NewMemoryVehicles().(*memoryVehicles)
+	vehicle := vehicles.New()
+	vehicle.NextStopVisitId = StopVisitId("sv-1")
+	vehicles.Save(vehicle)
+
+	_, present := vehicles.byNextStopVisitId[StopVisitId("sv-1")]
+	assert.True(present, "index should hold the entry after Save")
+
+	vehicles.Delete(vehicle)
+
+	_, present = vehicles.byNextStopVisitId[StopVisitId("sv-1")]
+	assert.False(present, "Delete should remove the byNextStopVisitId entry")
+}
+
 func Test_Vehicle_Code(t *testing.T) {
 	vehicle := Vehicle{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",

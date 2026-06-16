@@ -226,7 +226,9 @@ func (manager *memoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*V
 
 	id, ok := manager.FindOneBy(ByVehicleJourney, string(vjId))
 	if ok {
-		return manager.byIdentifier[VehicleId(id)].copy(), true
+		if vehicle, found := manager.byIdentifier[VehicleId(id)]; found {
+			return vehicle.copy(), true
+		}
 	}
 	return &Vehicle{}, false
 }
@@ -267,10 +269,12 @@ func (manager *memoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 
+	var previousNextStopVisitId StopVisitId
 	if vehicle.id == "" {
 		vehicle.id = VehicleId(manager.NewUUID())
 		manager.sendBQMessage(vehicle)
 	} else if v, ok := manager.byIdentifier[vehicle.Id()]; ok {
+		previousNextStopVisitId = v.NextStopVisitId
 		r, err := Equal(v, vehicle)
 		if err != nil {
 			logger.Log.Debugf("Error while comparing two vehicles: %v", err)
@@ -283,6 +287,14 @@ func (manager *memoryVehicles) Save(vehicle *Vehicle) bool {
 	manager.byIdentifier[vehicle.Id()] = vehicle
 	manager.Index(vehicle)
 
+	// Keep byNextStopVisitId consistent: drop the previous key if it changed and
+	// still pointed at this vehicle, then (re)index the current one. Without this
+	// the index accumulates stale keys every time a vehicle advances its next stop.
+	if previousNextStopVisitId != StopVisitId("") && previousNextStopVisitId != vehicle.NextStopVisitId {
+		if id, ok := manager.byNextStopVisitId[previousNextStopVisitId]; ok && id == vehicle.Id() {
+			delete(manager.byNextStopVisitId, previousNextStopVisitId)
+		}
+	}
 	if vehicle.NextStopVisitId != StopVisitId("") {
 		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle.Id()
 	}
@@ -322,6 +334,12 @@ func (manager *memoryVehicles) Delete(vehicle *Vehicle) bool {
 	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
 	manager.Deindex(string(vehicle.id))
+
+	if vehicle.NextStopVisitId != StopVisitId("") {
+		if id, ok := manager.byNextStopVisitId[vehicle.NextStopVisitId]; ok && id == vehicle.Id() {
+			delete(manager.byNextStopVisitId, vehicle.NextStopVisitId)
+		}
+	}
 
 	return true
 }
