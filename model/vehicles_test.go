@@ -211,10 +211,9 @@ func Test_MemoryVehicles_FindByNextStopVisitId_MismatchReturnsFalse(t *testing.T
 	assert.True(ok, "the matching next stop should resolve")
 }
 
-// When a vehicle is reassigned to another journey, the ByVehicleJourney index
-// keeps a stale key for the old journey. FindByVehicleJourneyId must not return
-// the vehicle for that old journey (otherwise the guardian cascade could delete
-// a vehicle that is actually live on its new journey).
+// After a vehicle is reassigned to another journey, FindByVehicleJourneyId must
+// no longer return it for the old journey: Index evicts the old key on Save, and
+// the match check backs that up.
 func Test_MemoryVehicles_FindByVehicleJourneyId_StaleAfterReassignmentReturnsFalse(t *testing.T) {
 	assert := assert.New(t)
 
@@ -235,7 +234,7 @@ func Test_MemoryVehicles_FindByVehicleJourneyId_StaleAfterReassignmentReturnsFal
 	_, ok = model.Vehicles().FindByVehicleJourneyId(VehicleJourneyId("vj-B"))
 	assert.True(ok, "vehicle should resolve for its new journey")
 	_, ok = model.Vehicles().FindByVehicleJourneyId(VehicleJourneyId("vj-A"))
-	assert.False(ok, "vehicle must not resolve for the journey it left (stale index key)")
+	assert.False(ok, "vehicle must not resolve for the journey it left")
 }
 
 func Test_MemoryVehicles_Delete_CleansNextStopVisitIdIndex(t *testing.T) {

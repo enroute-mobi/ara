@@ -226,8 +226,8 @@ func (manager *memoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*V
 
 	id, ok := manager.FindOneBy(ByVehicleJourney, string(vjId))
 	if ok {
-		// The ByVehicleJourney index keeps stale keys when a vehicle is reassigned
-		// to another journey (Index only sets the new key), so verify the match.
+		// Save/Delete keep this index in sync with byIdentifier; the guard is belt-
+		// and-suspenders so a stale id yields a miss, not a nil-deref or wrong vehicle.
 		if vehicle, found := manager.byIdentifier[VehicleId(id)]; found && vehicle.VehicleJourneyId == vjId {
 			return vehicle.copy(), true
 		}

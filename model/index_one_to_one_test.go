@@ -6,56 +6,70 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// The OneToOne index is used only by Vehicles (ByVehicleJourney), so the tests
+// exercise it with the production *Vehicle extractor.
 func createTestOneToOneIndex() *indexOneToOne {
-	extractor := func(instance ModelInstance) string {
-		return string((instance.(*StopVisit)).VehicleJourneyId)
-	}
-	return NewSimpleIndex(extractor)
+	return NewSimpleIndex(vehicleVjExtractor)
 }
 
 func Test_IndexOneToOne_FindOne(t *testing.T) {
 	assert := assert.New(t)
 	index := createTestOneToOneIndex()
 
-	index.Index(&StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"})
+	index.Index(&Vehicle{id: "v1", VehicleJourneyId: "vj-a"})
 
-	id, ok := index.FindOne("dummy")
+	id, ok := index.FindOne("vj-a")
 	assert.True(ok, "should find the model after indexing")
-	assert.Equal("stopVisitId", id)
+	assert.Equal("v1", id)
 }
 
-// Delete is keyed by modelId, while the map is keyed by the indexable value.
-// This guards the fix that makes Delete remove the entry whose value is the
-// modelId (the previous implementation deleted by the wrong key, so the entry
-// was never removed).
+// Delete is given a modelId, while the map is keyed by the indexable value.
+// This guards the fix that makes Delete remove the entry for that model (the
+// previous implementation deleted by the wrong key, so the entry was never
+// removed).
 func Test_IndexOneToOne_Delete(t *testing.T) {
 	assert := assert.New(t)
 	index := createTestOneToOneIndex()
 
-	index.Index(&StopVisit{id: "stopVisitId", VehicleJourneyId: "dummy"})
-	index.Delete("stopVisitId")
+	index.Index(&Vehicle{id: "v1", VehicleJourneyId: "vj-a"})
+	index.Delete("v1")
 
-	_, ok := index.FindOne("dummy")
+	_, ok := index.FindOne("vj-a")
 	assert.False(ok, "entry should be gone after Delete(modelId)")
 }
 
-// If the indexable changes without a prior Delete, the OneToOne index can hold
-// several keys pointing at the same modelId. Delete must remove all of them.
-func Test_IndexOneToOne_Delete_RemovesAllStaleKeys(t *testing.T) {
+// Re-indexing a model whose indexable changed must evict the previous key, so
+// the index does not accumulate stale entries on reassignment.
+func Test_IndexOneToOne_Index_EvictsPreviousKeyOnChange(t *testing.T) {
 	assert := assert.New(t)
 	index := createTestOneToOneIndex()
 
-	sv := &StopVisit{id: "stopVisitId", VehicleJourneyId: "vj-a"}
-	index.Index(sv)
-	sv.VehicleJourneyId = "vj-b"
-	index.Index(sv) // leaves the "vj-a" -> stopVisitId entry behind
-
-	index.Delete("stopVisitId")
+	v := &Vehicle{id: "v1", VehicleJourneyId: "vj-a"}
+	index.Index(v)
+	v.VehicleJourneyId = "vj-b"
+	index.Index(v)
 
 	_, ok := index.FindOne("vj-a")
-	assert.False(ok, "stale key vj-a should be removed by Delete")
-	_, ok = index.FindOne("vj-b")
-	assert.False(ok, "current key vj-b should be removed by Delete")
+	assert.False(ok, "stale key vj-a should be evicted when the model is re-indexed")
+	id, ok := index.FindOne("vj-b")
+	assert.True(ok, "current key vj-b should resolve")
+	assert.Equal("v1", id)
+}
+
+// A model that shares an indexable value with another must not have its entry
+// dropped when the other is deleted.
+func Test_IndexOneToOne_Delete_KeepsSharedIndexableOfOtherModel(t *testing.T) {
+	assert := assert.New(t)
+	index := createTestOneToOneIndex()
+
+	index.Index(&Vehicle{id: "v1", VehicleJourneyId: "vj-shared"})
+	index.Index(&Vehicle{id: "v2", VehicleJourneyId: "vj-shared"}) // overwrites the value to v2
+
+	index.Delete("v1")
+
+	id, ok := index.FindOne("vj-shared")
+	assert.True(ok, "the entry taken over by v2 must survive deleting v1")
+	assert.Equal("v2", id)
 }
 
 // Deleting one model must not drop another model's entry that happens to share
@@ -64,14 +78,14 @@ func Test_IndexOneToOne_Delete_KeepsOtherEntries(t *testing.T) {
 	assert := assert.New(t)
 	index := createTestOneToOneIndex()
 
-	index.Index(&StopVisit{id: "sv1", VehicleJourneyId: "vj-1"})
-	index.Index(&StopVisit{id: "sv2", VehicleJourneyId: "vj-2"})
+	index.Index(&Vehicle{id: "v1", VehicleJourneyId: "vj-1"})
+	index.Index(&Vehicle{id: "v2", VehicleJourneyId: "vj-2"})
 
-	index.Delete("sv1")
+	index.Delete("v1")
 
 	_, ok := index.FindOne("vj-1")
 	assert.False(ok, "deleted model's entry should be gone")
 	id, ok := index.FindOne("vj-2")
 	assert.True(ok, "other model's entry should remain")
-	assert.Equal("sv2", id)
+	assert.Equal("v2", id)
 }
