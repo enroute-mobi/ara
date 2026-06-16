@@ -247,20 +247,15 @@ func (manager *memoryVehicles) FindAll() (vehicles []*Vehicle) {
 func (manager *memoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
+
 	vehicleId, ok := manager.byNextStopVisitId[stopVisitId]
-	if ok {
-		vehicle, ok := manager.byIdentifier[vehicleId]
-		if ok {
-			if vehicle.NextStopVisitId == stopVisitId {
-				return vehicle.copy(), true
-			}
-		}
-		// clean the index
-		manager.mutex.RUnlock()
-		manager.mutex.Lock()
-		delete(manager.byNextStopVisitId, stopVisitId)
-		manager.mutex.Unlock()
-		manager.mutex.RLock()
+	if !ok {
+		return &Vehicle{}, false
+	}
+	// Save/Delete keep byNextStopVisitId consistent, so a pure read under the
+	// read lock is enough; the match check stays as a defensive guard.
+	if vehicle, ok := manager.byIdentifier[vehicleId]; ok && vehicle.NextStopVisitId == stopVisitId {
+		return vehicle.copy(), true
 	}
 	return &Vehicle{}, false
 }

@@ -188,6 +188,29 @@ func Test_MemoryVehicles_Save_EvictsPreviousNextStopVisitId(t *testing.T) {
 	assert.False(present, "stale sv1 index entry should be evicted on Save")
 }
 
+// FindByNextStopVisitId returns false (without mutating under the read lock) when
+// the index entry no longer matches the vehicle's current NextStopVisitId.
+func Test_MemoryVehicles_FindByNextStopVisitId_MismatchReturnsFalse(t *testing.T) {
+	assert := assert.New(t)
+
+	vehicles := NewMemoryVehicles().(*memoryVehicles)
+	vehicle := vehicles.New()
+	vehicle.NextStopVisitId = StopVisitId("sv-1")
+	vehicles.Save(vehicle)
+
+	// Force an inconsistent state: index still points at sv-1, but the stored
+	// vehicle has moved on. FindByNextStopVisitId must report sv-1 as not found.
+	vehicles.byIdentifier[vehicle.Id()].NextStopVisitId = StopVisitId("sv-2")
+
+	_, ok := vehicles.FindByNextStopVisitId(StopVisitId("sv-1"))
+	assert.False(ok, "a stale byNextStopVisitId entry must not resolve")
+
+	// The current, consistent next stop still resolves.
+	vehicles.byNextStopVisitId[StopVisitId("sv-2")] = vehicle.Id()
+	_, ok = vehicles.FindByNextStopVisitId(StopVisitId("sv-2"))
+	assert.True(ok, "the matching next stop should resolve")
+}
+
 func Test_MemoryVehicles_Delete_CleansNextStopVisitIdIndex(t *testing.T) {
 	assert := assert.New(t)
 
