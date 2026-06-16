@@ -30,7 +30,14 @@ func (index *indexOneToOne) Find(indexable string) ([]string, bool) {
 }
 
 func (index *indexOneToOne) Delete(modelId string) {
-	delete(index.byIndexable, modelId)
+	// byIndexable is keyed by the indexable value, not the modelId, so we must
+	// remove the entries whose value is this modelId (there may be more than one
+	// if the indexable changed without a prior Delete).
+	for indexable, id := range index.byIndexable {
+		if id == modelId {
+			delete(index.byIndexable, indexable)
+		}
+	}
 }
 
 func (index *indexOneToOne) IndexableLength(indexable string) int {
