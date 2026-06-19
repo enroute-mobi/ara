@@ -195,7 +195,11 @@ func (manager *memoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 
 	id, ok := manager.ByCode().Find(code)
 	if ok {
-		return manager.byIdentifier[VehicleId(id)].copy(), true
+		// Guard against a stale index entry so a missing id yields a miss, not a
+		// nil-deref.
+		if vehicle, found := manager.byIdentifier[VehicleId(id)]; found {
+			return vehicle.copy(), true
+		}
 	}
 	return &Vehicle{}, false
 }
@@ -214,8 +218,10 @@ func (manager *memoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	ids, _ := manager.FindBy(ByLine, string(id))
 
 	for _, id := range ids {
-		v := manager.byIdentifier[VehicleId(id)]
-		vehicles = append(vehicles, v.copy())
+		// Skip a stale index entry rather than nil-deref on .copy().
+		if v, found := manager.byIdentifier[VehicleId(id)]; found {
+			vehicles = append(vehicles, v.copy())
+		}
 	}
 
 	manager.mutex.RUnlock()
