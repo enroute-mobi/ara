@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// The OneToOne index is used only by Vehicles (ByVehicleJourney), so the tests
-// exercise it with the production *Vehicle extractor.
+// The OneToOne index is used only by Vehicles (ByVehicleJourney and
+// ByNextStopVisit), so the tests exercise it with the production *Vehicle extractor.
 func createTestOneToOneIndex() *indexOneToOne {
 	return NewSimpleIndex(vehicleVjExtractor)
 }

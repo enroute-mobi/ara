@@ -154,10 +154,10 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 	assert.Equal(stopVisit1.Id(), vehicleB.NextStopVisitId)
 }
 
-// When a vehicle advances to a new next stop, the previous byNextStopVisitId key
-// must be evicted so the index can't accumulate stale entries. We inspect the
-// index map directly because FindByNextStopVisitId lazily self-heals on lookup,
-// which would mask a missing eviction.
+// When a vehicle advances to a new next stop, the previous ByNextStopVisit key
+// must be evicted so the index can't accumulate stale entries. We assert through
+// the index (FindOneBy) rather than FindByNextStopVisitId, whose match guard
+// would return false anyway and mask a missing eviction.
 func Test_MemoryVehicles_Save_EvictsPreviousNextStopVisitId(t *testing.T) {
 	assert := assert.New(t)
 
@@ -172,7 +172,7 @@ func Test_MemoryVehicles_Save_EvictsPreviousNextStopVisitId(t *testing.T) {
 	assert.True(vehicle.Save())
 
 	mv := model.Vehicles().(*memoryVehicles)
-	_, present := mv.byNextStopVisitId[sv1.Id()]
+	_, present := mv.FindOneBy(ByNextStopVisit, string(sv1.Id()))
 	assert.True(present, "index should hold sv1 -> vehicle after first Save")
 
 	// Advance the vehicle to a new next stop the way the update path does:
@@ -182,14 +182,14 @@ func Test_MemoryVehicles_Save_EvictsPreviousNextStopVisitId(t *testing.T) {
 	updated.NextStopVisitId = sv2.Id()
 	assert.True(updated.Save())
 
-	_, present = mv.byNextStopVisitId[sv2.Id()]
+	_, present = mv.FindOneBy(ByNextStopVisit, string(sv2.Id()))
 	assert.True(present, "index should hold sv2 -> vehicle after the update")
-	_, present = mv.byNextStopVisitId[sv1.Id()]
+	_, present = mv.FindOneBy(ByNextStopVisit, string(sv1.Id()))
 	assert.False(present, "stale sv1 index entry should be evicted on Save")
 }
 
-// FindByNextStopVisitId returns false (without mutating under the read lock) when
-// the index entry no longer matches the vehicle's current NextStopVisitId.
+// FindByNextStopVisitId returns false when the index entry no longer matches the
+// vehicle's current NextStopVisitId.
 func Test_MemoryVehicles_FindByNextStopVisitId_MismatchReturnsFalse(t *testing.T) {
 	assert := assert.New(t)
 
@@ -203,10 +203,10 @@ func Test_MemoryVehicles_FindByNextStopVisitId_MismatchReturnsFalse(t *testing.T
 	vehicles.byIdentifier[vehicle.Id()].NextStopVisitId = StopVisitId("sv-2")
 
 	_, ok := vehicles.FindByNextStopVisitId(StopVisitId("sv-1"))
-	assert.False(ok, "a stale byNextStopVisitId entry must not resolve")
+	assert.False(ok, "a stale ByNextStopVisit entry must not resolve")
 
-	// The current, consistent next stop still resolves.
-	vehicles.byNextStopVisitId[StopVisitId("sv-2")] = vehicle.Id()
+	// Re-index the vehicle on its new next stop; it then resolves.
+	vehicles.Index(vehicles.byIdentifier[vehicle.Id()])
 	_, ok = vehicles.FindByNextStopVisitId(StopVisitId("sv-2"))
 	assert.True(ok, "the matching next stop should resolve")
 }
@@ -245,13 +245,13 @@ func Test_MemoryVehicles_Delete_CleansNextStopVisitIdIndex(t *testing.T) {
 	vehicle.NextStopVisitId = StopVisitId("sv-1")
 	vehicles.Save(vehicle)
 
-	_, present := vehicles.byNextStopVisitId[StopVisitId("sv-1")]
+	_, present := vehicles.FindOneBy(ByNextStopVisit, "sv-1")
 	assert.True(present, "index should hold the entry after Save")
 
 	vehicles.Delete(vehicle)
 
-	_, present = vehicles.byNextStopVisitId[StopVisitId("sv-1")]
-	assert.False(present, "Delete should remove the byNextStopVisitId entry")
+	_, present = vehicles.FindOneBy(ByNextStopVisit, "sv-1")
+	assert.False(present, "Delete should remove the ByNextStopVisit index entry")
 }
 
 func Test_Vehicle_Code(t *testing.T) {

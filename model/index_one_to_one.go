@@ -28,7 +28,11 @@ func (index *indexOneToOne) Index(model ModelInstance) {
 		}
 	}
 
-	index.byIndexable[indexable] = modelId
+	// An empty indexable means "not indexed" (e.g. a Vehicle with no next stop):
+	// skip it rather than collapsing every such model onto byIndexable[""].
+	if indexable != "" {
+		index.byIndexable[indexable] = modelId
+	}
 	index.byModelId[modelId] = indexable
 }
 
