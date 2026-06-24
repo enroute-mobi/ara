@@ -2,6 +2,55 @@ Feature: Collect realtime data via GTFS-RT feeds
   Background:
     Given a Referential "test" is created
 
+  @ARA-1975
+  Scenario: Collect GTFS TripUpdate ignoring stop_time_update already past the persistence window
+    Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
+      """
+      header {
+        gtfs_realtime_version: "2.0"
+        incrementality: FULL_DATASET
+        timestamp: 1630318853
+      }
+      entity {
+        id: "trip:ORLEANS:VehicleJourney:20_R_67_13_2067_1_152701"
+        trip_update {
+          trip {
+            trip_id: "Trip:A"
+            route_id: "Line:1"
+          }
+          stop_time_update {
+            stop_sequence: 0
+            stop_id: "StopArea:A"
+            arrival {
+              time: 1483272000
+            }
+            departure {
+              time: 1483272000
+            }
+          }
+          stop_time_update {
+            stop_sequence: 1
+            stop_id: "StopArea:B"
+            arrival {
+              time: 315532800
+            }
+            departure {
+              time: 315532800
+            }
+          }
+        }
+      }
+      """
+    And a Partner "gtfs" exists with connectors [gtfs-rt-request-collector] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_code_space | internal              |
+    When a minute has passed
+    # The first stop is in the future and is collected; the second stop's time is
+    # already older than the persistence window, so it must not be created (it
+    # would otherwise be deleted by the guardian on its next routine, every cycle).
+    Then a StopVisit "internal":"Trip:A-1" should exist
+    And a StopVisit "internal":"Trip:A-2" should not exist
+
   @ARA-1218
   Scenario: Collect GTFS TripUpdate (with stop_id) with stop_time_update having SKIPPED schedule_relationship
     Given a GTFS-RT server waits request on "http://localhost:8090" to respond with
