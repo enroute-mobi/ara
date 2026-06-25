@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/model"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"bitbucket.org/enroute-mobi/ara/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreas(t *testing.T) {
@@ -199,4 +200,74 @@ func Test_SIRIStopPointDiscoveryRequestBroadcaster_StopAreasWithParent(t *testin
 	if response.AnnotatedStopPoints[1].StopPointRef != fourthCode.Value() {
 		t.Errorf("AnnotatedStopPoints StopPointRef 1 is wrong:\n got: %v\n want: %v", response.AnnotatedStopPoints[0].StopPointRef, firstCode.Value())
 	}
+}
+
+// A stop filtered out of the response by ignore_stop_without_line (no lines)
+// must not leak into the audit event (message.StopAreas), otherwise it shows up
+// in the exchanges search while never being broadcast.
+func Test_SIRIStopPointDiscoveryRequestBroadcaster_AuditMatchesResponse(t *testing.T) {
+	assert := assert.New(t)
+
+	_, referential := newTestReferential(t)
+	partner := referential.Partners().New("partner")
+	partner.SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	settings := map[string]string{
+		"remote_code_space":             "internal",
+		"generators.message_identifier": "Ara:Message::%{uuid}:LOC",
+		// ignore_stop_without_line left unset -> defaults to true
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	connector := NewSIRIStopDiscoveryRequestBroadcaster(partner)
+	connector.SetClock(clock.NewFakeClock())
+	connector.Start()
+
+	line := referential.Model().Lines().New()
+	line.SetCode(model.NewCode("internal", "1234"))
+	line.Save()
+
+	// Broadcast stop: has a line.
+	withLine := referential.Model().StopAreas().New()
+	withLineCode := model.NewCode("internal", "NINOXE:StopPoint:SP:1:LOC")
+	withLine.SetCode(withLineCode)
+	withLine.Name = "With Line"
+	withLine.CollectedAlways = true
+	withLine.LineIds = []model.LineId{line.Id()}
+	withLine.Save()
+
+	// Filtered stop: no line.
+	withoutLine := referential.Model().StopAreas().New()
+	withoutLineCode := model.NewCode("internal", "NINOXE:StopPoint:SP:2:LOC")
+	withoutLine.SetCode(withoutLineCode)
+	withoutLine.Name = "Without Line"
+	withoutLine.CollectedAlways = true
+	withoutLine.ParentId = model.StopAreaId("19a687d2-076c-44ba-85a3-f50ec29351ee") // does not exist
+	withoutLine.Save()
+
+	file, err := os.Open("testdata/stoppointdiscovery-request-soap.xml")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer file.Close()
+	content, err := io.ReadAll(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request, err := sxml.NewXMLStopPointsDiscoveryRequestFromContent(content)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	message := &audit.BigQueryMessage{}
+	response, err := connector.StopAreas(request, message)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Only the stop with a line is broadcast.
+	assert.Len(response.AnnotatedStopPoints, 1)
+	assert.Equal(withLineCode.Value(), response.AnnotatedStopPoints[0].StopPointRef)
+
+	// The audit event must list exactly what was broadcast, not the filtered stop.
+	assert.ElementsMatch([]string{withLineCode.Value()}, message.StopAreas)
+	assert.NotContains(message.StopAreas, withoutLineCode.Value())
 }
