@@ -11,6 +11,7 @@ import (
 	"bitbucket.org/enroute-mobi/ara/clock"
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"bitbucket.org/enroute-mobi/ara/model/schedules"
 	"bitbucket.org/enroute-mobi/ara/siri/sxml"
 	"github.com/stretchr/testify/assert"
 )
@@ -112,6 +113,100 @@ func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithReferent(t 
 	if len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast) != 1 {
 		t.Error("1 events should have been generated got: ", len(connector.(*SIRIStopMonitoringSubscriptionBroadcaster).toBroadcast))
 	}
+}
+
+// ARA-1947: the subscription-init dump must not send a partner its own collected StopVisits.
+func Test_StopMonitoringSubscriptionBroadcaster_addStopAreaStopVisits_DoesNotLoopbackOwnOrigin(t *testing.T) {
+	clock.SetDefaultClock(clock.NewFakeClock())
+
+	_, referential := newTestReferential(t)
+	referential.Save()
+
+	partner := referential.Partners().New("partner")
+	settings := map[string]string{
+		"remote_code_space": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	stopArea := referential.Model().StopAreas().New()
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
+	stopArea.Save()
+
+	reference := model.Reference{
+		Code: &code,
+		Type: "StopArea",
+	}
+
+	subs := partner.Subscriptions().New("StopMonitoringBroadcast")
+	resource := subs.CreateAndAddNewResource(reference)
+	subs.SetExternalId("externalId")
+	subs.Save()
+
+	// StopVisit collected by this very partner (Origin == partner slug), with a future
+	// schedule so it qualifies as "following".
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.Origin = string(partner.Slug())
+	stopVisit.Schedules.SetArrivalTime(schedules.Aimed, referential.Clock().Now().Add(10*time.Minute))
+	stopVisit.Save()
+
+	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	smsb := connector.(*SIRIStopMonitoringSubscriptionBroadcaster)
+
+	smsb.addStopAreaStopVisits(stopArea, subs, resource)
+
+	assert.Equal(t, 0, len(smsb.toBroadcast),
+		"a StopVisit collected by the partner itself must not be broadcast back to it")
+}
+
+// ARA-1947: the dump must still broadcast StopVisits collected by a different partner.
+func Test_StopMonitoringSubscriptionBroadcaster_addStopAreaStopVisits_BroadcastsForeignOrigin(t *testing.T) {
+	clock.SetDefaultClock(clock.NewFakeClock())
+
+	_, referential := newTestReferential(t)
+	referential.Save()
+
+	partner := referential.Partners().New("partner")
+	settings := map[string]string{
+		"remote_code_space": "internal",
+	}
+	partner.PartnerSettings = s.NewPartnerSettings(partner.UUIDGenerator, settings)
+	partner.ConnectorTypes = []string{SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER}
+	partner.RefreshConnectors()
+	referential.Partners().Save(partner)
+
+	stopArea := referential.Model().StopAreas().New()
+	code := model.NewCode("internal", string(stopArea.Id()))
+	stopArea.SetCode(code)
+	stopArea.Save()
+
+	reference := model.Reference{
+		Code: &code,
+		Type: "StopArea",
+	}
+
+	subs := partner.Subscriptions().New("StopMonitoringBroadcast")
+	resource := subs.CreateAndAddNewResource(reference)
+	subs.SetExternalId("externalId")
+	subs.Save()
+
+	stopVisit := referential.Model().StopVisits().New()
+	stopVisit.StopAreaId = stopArea.Id()
+	stopVisit.Origin = "anotherPartner"
+	stopVisit.Schedules.SetArrivalTime(schedules.Aimed, referential.Clock().Now().Add(10*time.Minute))
+	stopVisit.Save()
+
+	connector, _ := partner.Connector(SIRI_STOP_MONITORING_SUBSCRIPTION_BROADCASTER)
+	smsb := connector.(*SIRIStopMonitoringSubscriptionBroadcaster)
+
+	smsb.addStopAreaStopVisits(stopArea, subs, resource)
+
+	assert.Equal(t, 1, len(smsb.toBroadcast),
+		"a StopVisit collected by a different partner must still be broadcast")
 }
 
 func Test_StopMonitoringBroadcaster_HandleStopMonitoringBroadcastWithLineRefFilter(t *testing.T) {
