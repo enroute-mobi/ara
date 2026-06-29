@@ -1,13 +1,12 @@
 module bitbucket.org/enroute-mobi/ara
 
-go 1.25.8
+go 1.26
 
 require (
 	bitbucket.org/enroute-mobi/ara-external-models v0.0.9
 	cloud.google.com/go v0.123.0
 	cloud.google.com/go/bigquery v1.77.0
 	github.com/DataDog/dd-trace-go/v2 v2.9.0
-	github.com/everystreet/go-proj/v6 v6.0.0
 	github.com/getsentry/sentry-go v0.47.0
 	github.com/google/uuid v1.6.0
 	github.com/graph-gophers/graphql-go v1.10.2
@@ -20,7 +19,7 @@ require (
 	github.com/satori/uuid v1.2.0
 	github.com/stretchr/testify v1.11.1
 	github.com/sym01/htmlsanitizer v1.1.1
-	github.com/wroge/wgs84 v1.1.7
+	github.com/wroge/wgs84/v2 v2.0.0-alpha.14.0.20260614075515-80ed90380836
 	golang.org/x/exp v0.0.0-20260611194520-c48552f49976
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/text v0.38.0
@@ -65,7 +64,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/goccy/go-json v0.10.6 // indirect
-	github.com/golang/geo v0.0.0-20260612074446-f1a45663b0f3 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/flatbuffers v25.12.19+incompatible // indirect
 	github.com/google/pprof v0.0.0-20260604005048-7023385849c0 // indirect
