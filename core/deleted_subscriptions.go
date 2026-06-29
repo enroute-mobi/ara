@@ -12,7 +12,7 @@ const (
 )
 
 type DeletedSubscriptions struct {
-	sync.RWMutex
+	sync.Mutex
 
 	s map[string]time.Time
 }
@@ -34,15 +34,14 @@ func (ds *DeletedSubscriptions) Reset() {
 // Returns true if we send a DeleteSubscription request in the last 5 minutes
 // Otherwise register it
 func (ds *DeletedSubscriptions) AlreadySend(subID string) bool {
-	ds.RLock()
+	ds.Lock()
+	defer ds.Unlock()
+
 	t, ok := ds.s[subID]
-	ds.RUnlock()
 	if ok && clock.DefaultClock().Now().Before(t.Add(DELETED_SUBSCRIPTION_TIMER)) {
 		return true
 	}
 
-	ds.Lock()
 	ds.s[subID] = clock.DefaultClock().Now()
-	ds.Unlock()
 	return false
 }
