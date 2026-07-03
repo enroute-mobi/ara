@@ -70,8 +70,6 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 			continue
 		}
 
-		annotedStopPointMap[code.Value()] = struct{}{}
-
 		annotedStopPoint := &siri.SIRIAnnotatedStopPoint{
 			StopName:     sas[i].Name,
 			StopPointRef: code.Value(),
@@ -109,6 +107,8 @@ func (connector *SIRIStopPointsDiscoveryRequestBroadcaster) StopAreas(request *s
 		}
 
 		slices.Sort(annotedStopPoint.Lines)
+
+		annotedStopPointMap[code.Value()] = struct{}{}
 
 		response.AnnotatedStopPoints = append(response.AnnotatedStopPoints, annotedStopPoint)
 
