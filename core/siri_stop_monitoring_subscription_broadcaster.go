@@ -256,6 +256,14 @@ func (connector *SIRIStopMonitoringSubscriptionBroadcaster) addStopAreaStopVisit
 	for _, saId := range connector.partner.Model().StopAreas().FindFamily(sa.Id()) {
 		svs := connector.partner.Model().StopVisits().FindFollowingByStopAreaId(saId)
 		for i := range svs {
+			// Don't broadcast a StopVisit back to the partner that collected it.
+			// checkEvent guards the steady-state event path; this guards the
+			// subscription-initialization dump, which a partner with both a collect
+			// and broadcast subscription would otherwise loop its own data through.
+			if svs[i].Origin == string(connector.partner.Slug()) {
+				continue
+			}
+
 			if _, ok := res.LastState(string(svs[i].Id())); ok {
 				continue
 			}

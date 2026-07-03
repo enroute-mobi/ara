@@ -2987,3 +2987,133 @@ Feature: Support SIRI StopMonitoring by subscription
     And 90 seconds have passed
     Then Subscriptions exist with the following resources:
       | internal | NINOXE:StopPoint:SP:24:LOC |
+
+  @ARA-1947
+  Scenario: A StopVisit collected from a partner must not be broadcast back to it on a fresh subscription
+    Given a SIRI server on "http://localhost:8090"
+    And a Partner "test" exists with connectors [siri-check-status-client, siri-check-status-server, siri-stop-monitoring-subscription-broadcaster] and the following settings:
+      | remote_url        | http://localhost:8090 |
+      | remote_credential | test                  |
+      | local_credential  | NINOXE:default        |
+      | remote_code_space | internal              |
+    And a StopArea exists with the following attributes:
+      | Name            | Test     |
+      | Codes[internal] | coicogn2 |
+    And a Line exists with the following attributes:
+      | Codes[internal] | NINOXE:Line:3:LOC |
+      | Name            | Ligne 3 Metro     |
+    And a VehicleJourney exists with the following attributes:
+      | Name            | Passage 32                        |
+      | Codes[internal] | NINOXE:VehicleJourney:201         |
+      | LineId          | 6ba7b814-9dad-11d1-3-00c04fd430c8 |
+    # StopVisit collected from the "test" partner itself (Origin == partner slug),
+    # e.g. an in-memory StopVisit re-collected right after a Model Reload. Must NOT be sent back.
+    And a StopVisit exists with the following attributes:
+      | Codes[internal]            | test:StopVisit:own:LOC            |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | PassageOrder               | 4                                 |
+      | Origin                     | test                              |
+      | Schedule[expected]#Arrival | 2017-01-01T15:00:00.000Z          |
+      | ArrivalStatus              | onTime                            |
+    # StopVisit collected from a different partner. MUST still be broadcast. Its presence turns
+    # the check positive: if the hardcoded StopAreaId/VehicleJourneyId ever drift, no delivery is
+    # produced and the assertion fails loudly instead of passing vacuously.
+    And a StopVisit exists with the following attributes:
+      | Codes[internal]            | other:StopVisit:foreign:LOC       |
+      | StopAreaId                 | 6ba7b814-9dad-11d1-2-00c04fd430c8 |
+      | VehicleJourneyId           | 6ba7b814-9dad-11d1-4-00c04fd430c8 |
+      | PassageOrder               | 5                                 |
+      | Origin                     | other                             |
+      | Schedule[expected]#Arrival | 2017-01-01T15:00:00.000Z          |
+      | ArrivalStatus              | onTime                            |
+    And a minute has passed
+    # The partner opens a fresh StopMonitoringBroadcast subscription on the same StopArea,
+    # triggering the subscription-initialization dump (addStopAreaStopVisits).
+    When I send this SIRI request
+      """
+      <?xml version='1.0' encoding='utf-8'?>
+      <SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+        <SOAP-ENV:Header />
+        <SOAP-ENV:Body>
+          <ws:Subscribe>
+            <SubscriptionRequestInfo>
+              <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+              <siri:RequestorRef>NINOXE:default</siri:RequestorRef>
+              <siri:MessageIdentifier>Ara:Message::6ba7b814-9dad-11d1-1-00c04fd430c8:LOC</siri:MessageIdentifier>
+              <siri:ConsumerAddress>http://localhost:8090</siri:ConsumerAddress>
+            </SubscriptionRequestInfo>
+            <Request>
+              <siri:StopMonitoringSubscriptionRequest>
+                <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+                <siri:SubscriptionIdentifier>loopback-sub</siri:SubscriptionIdentifier>
+                <siri:InitialTerminationTime>2018-01-01T23:00:00.000Z</siri:InitialTerminationTime>
+                <siri:StopMonitoringRequest>
+                  <siri:RequestTimestamp>2017-01-01T12:00:00.000Z</siri:RequestTimestamp>
+                  <siri:MessageIdentifier>28679112-9dad-11d1-2-00c04fd430c8</siri:MessageIdentifier>
+                  <siri:MonitoringRef>coicogn2</siri:MonitoringRef>
+                  <siri:StopVisitTypes>all</siri:StopVisitTypes>
+                </siri:StopMonitoringRequest>
+                <siri:IncrementalUpdates>true</siri:IncrementalUpdates>
+                <siri:ChangeBeforeUpdates>PT1M</siri:ChangeBeforeUpdates>
+              </siri:StopMonitoringSubscriptionRequest>
+            </Request>
+            <RequestExtension />
+          </ws:Subscribe>
+        </SOAP-ENV:Body>
+      </SOAP-ENV:Envelope>
+      """
+    And 10 seconds have passed
+    And one Subscription exists with the following attributes:
+      | Kind       | StopMonitoringBroadcast |
+      | ExternalId | loopback-sub            |
+    # The notification carries a single MonitoredStopVisit, the foreign one. The partner's own
+    # StopVisit (Origin == its slug) is filtered out of the subscription-initialization dump.
+    Then the SIRI server should receive this response
+      """
+      <?xml version='1.0' encoding='UTF-8'?>
+      <S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+      <S:Body>
+      <sw:NotifyStopMonitoring xmlns:sw="http://wsdl.siri.org.uk" xmlns:siri="http://www.siri.org.uk/siri">
+      <ServiceDeliveryInfo>
+      <siri:ResponseTimestamp>2017-01-01T12:01:10.000Z</siri:ResponseTimestamp>
+      <siri:ProducerRef>test</siri:ProducerRef>
+      <siri:ResponseMessageIdentifier>6ba7b814-9dad-11d1-9-00c04fd430c8</siri:ResponseMessageIdentifier>
+      </ServiceDeliveryInfo>
+      <Notification>
+      <siri:StopMonitoringDelivery version="2.0:FR-IDF-2.4">
+      <siri:ResponseTimestamp>2017-01-01T12:01:10.000Z</siri:ResponseTimestamp>
+      <siri:SubscriberRef>subscriber</siri:SubscriberRef>
+      <siri:SubscriptionRef>loopback-sub</siri:SubscriptionRef>
+      <siri:Status>true</siri:Status>
+      <siri:MonitoringRef>coicogn2</siri:MonitoringRef>
+      <siri:MonitoredStopVisit>
+        <siri:RecordedAtTime>0001-01-01T00:00:00.000Z</siri:RecordedAtTime>
+        <siri:ItemIdentifier>other:StopVisit:foreign:LOC</siri:ItemIdentifier>
+        <siri:MonitoringRef>coicogn2</siri:MonitoringRef>
+        <siri:MonitoredVehicleJourney>
+          <siri:LineRef>NINOXE:Line:3:LOC</siri:LineRef>
+          <siri:FramedVehicleJourneyRef>
+            <siri:DataFrameRef>2017-01-01</siri:DataFrameRef>
+            <siri:DatedVehicleJourneyRef>NINOXE:VehicleJourney:201</siri:DatedVehicleJourneyRef>
+          </siri:FramedVehicleJourneyRef>
+          <siri:PublishedLineName>Ligne 3 Metro</siri:PublishedLineName>
+          <siri:VehicleJourneyName>Passage 32</siri:VehicleJourneyName>
+          <siri:Monitored>false</siri:Monitored>
+          <siri:MonitoredCall>
+            <siri:StopPointRef>coicogn2</siri:StopPointRef>
+            <siri:Order>5</siri:Order>
+            <siri:StopPointName>Test</siri:StopPointName>
+            <siri:VehicleAtStop>false</siri:VehicleAtStop>
+            <siri:ExpectedArrivalTime>2017-01-01T15:00:00.000Z</siri:ExpectedArrivalTime>
+            <siri:ArrivalStatus>onTime</siri:ArrivalStatus>
+          </siri:MonitoredCall>
+        </siri:MonitoredVehicleJourney>
+      </siri:MonitoredStopVisit>
+      </siri:StopMonitoringDelivery>
+      </Notification>
+      <SiriExtension />
+      </sw:NotifyStopMonitoring>
+      </S:Body>
+      </S:Envelope>
+      """
