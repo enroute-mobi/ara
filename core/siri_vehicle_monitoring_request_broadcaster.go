@@ -26,6 +26,7 @@ type SIRIVehicleMonitoringRequestBroadcaster struct {
 
 	vjRemoteCodeSpaces      []string
 	vehicleRemoteCodeSpaces []string
+	ignoreNotes             bool
 }
 
 type SIRIVehicleMonitoringRequestBroadcasterFactory struct{}
@@ -41,6 +42,7 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) Start() {
 	connector.vjRemoteCodeSpaces = connector.partner.VehicleJourneyRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
 	connector.vehicleRemoteCodeSpaces = connector.partner.VehicleRemoteCodeSpaceWithFallback(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
 	connector.remoteCodeSpace = connector.partner.RemoteCodeSpace(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
+	connector.ignoreNotes = connector.partner.IgnoreNotes(SIRI_VEHICLE_MONITORING_REQUEST_BROADCASTER)
 }
 
 func (connector *SIRIVehicleMonitoringRequestBroadcaster) RequestVehicles(request *sxml.XMLGetVehicleMonitoring, message *audit.BigQueryMessage) (siriResponse *siri.SIRIVehicleMonitoringResponse) {
@@ -176,7 +178,9 @@ func (connector *SIRIVehicleMonitoringRequestBroadcaster) buildVehicleActivity(d
 		ValidUntilTime:       vehicle.ValidUntilTime,
 		VehicleMonitoringRef: vehicleId.Value(),
 		ProgressBetweenStops: connector.handleProgressBetweenStops(vehicle),
-		VehicleActivityNote:  vehicle.RawAttributes[siri_attributes.VehicleActivityNote],
+	}
+	if !connector.ignoreNotes {
+		activity.VehicleActivityNote = vehicle.RawAttributes[siri_attributes.VehicleActivityNote]
 	}
 
 	monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{

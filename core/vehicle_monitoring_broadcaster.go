@@ -174,7 +174,9 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 				ValidUntilTime:       vehicle.ValidUntilTime,
 				VehicleMonitoringRef: vehicleCode.Value(),
 				ProgressBetweenStops: vm.connector.handleProgressBetweenStops(vehicle),
-				VehicleActivityNote:  vehicle.RawAttributes[siri_attributes.VehicleActivityNote],
+			}
+			if !vm.connector.ignoreNotes {
+				activity.VehicleActivityNote = vehicle.RawAttributes[siri_attributes.VehicleActivityNote]
 			}
 
 			monitoredVehicleJourney := &siri.SIRIMonitoredVehicleJourney{
@@ -204,7 +206,7 @@ func (vm *VMBroadcaster) prepareSIRIVehicleMonitoring() {
 							StopPointRef:          stopAreaCode,
 							StopPointName:         stopArea.Name,
 							VehicleAtStop:         nextStopVisit.VehicleAtStop,
-							DestinationDisplay:    nextStopVisit.RawAttributes["DestinationDisplay"],
+							DestinationDisplay:    nextStopVisit.RawAttributes[siri_attributes.DestinationDisplay],
 							ExpectedArrivalTime:   nextStopVisit.Schedules.DepartureTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 							ExpectedDepartureTime: nextStopVisit.Schedules.ArrivalTimeFromKind([]schedules.StopVisitScheduleType{schedules.Expected}),
 							DepartureStatus:       string(nextStopVisit.DepartureStatus),
