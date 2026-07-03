@@ -476,8 +476,10 @@ func (manager *MemoryReferentials) SaveToDatabase() (int, error) {
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
 	}
 
-	// Truncate Table
-	_, err = tx.Exec("truncate referentials;")
+	// Clear the table. Use delete rather than truncate so the deferrable
+	// fk_code_spaces_referential_id constraint is checked at commit, after
+	// the referentials are re-inserted below.
+	_, err = tx.Exec("delete from referentials;")
 	if err != nil {
 		tx.Rollback()
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
@@ -499,6 +501,14 @@ func (manager *MemoryReferentials) SaveToDatabase() (int, error) {
 
 	// Delete partners
 	_, err = tx.Exec("delete from partners where referential_id not in (select referential_id from referentials);")
+	if err != nil {
+		tx.Rollback()
+		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
+	}
+
+	// Delete code_spaces orphaned by a removed referential, otherwise the
+	// deferred fk_code_spaces_referential_id constraint fails at commit.
+	_, err = tx.Exec("delete from code_spaces where referential_id not in (select referential_id from referentials);")
 	if err != nil {
 		tx.Rollback()
 		return http.StatusInternalServerError, fmt.Errorf("database error: %v", err)
