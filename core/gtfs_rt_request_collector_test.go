@@ -12,6 +12,7 @@ import (
 	s "bitbucket.org/enroute-mobi/ara/core/settings"
 	"bitbucket.org/enroute-mobi/ara/gtfs"
 	"bitbucket.org/enroute-mobi/ara/model"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -145,6 +146,146 @@ func Test_PartnerStatusDown(t *testing.T) {
 	}
 	if partner.alternativeStatusCheck.Status != p.OperationnalStatusDown {
 		t.Errorf("Partner alternative status status should be updated, got: %v", partner.alternativeStatusCheck.Status)
+	}
+}
+
+func Test_GtfsCollect_SkipExpiredStops(t *testing.T) {
+	assert := assert.New(t)
+
+	e := []*gtfs.FeedEntity{
+		tripUpdateWithExpiredStops(),
+	}
+	feed := newGtfsFeed(e)
+
+	_, partner := collectGtfs(t, feed, false)
+
+	// The trip has 4 stops:
+	// - 1 stop visit with both times after the persistence cutoff -> kept
+	// - 1 stop visit departure-only after the persistence cutoff -> kept
+	// - 1 stop visit with both times already older than the cutoff -> dropped
+	// - 1 stop visit departure-only already older than the cutoff -> dropped
+	// Only the two stops whose reference time survives persistence must produce a
+	// StopVisit; the expired ones must be dropped rather than created and then
+	// cleaned by the guardian on its next routine, every collect cycle.
+	deleteBefore := clock.FAKE_CLOCK_INITIAL_DATE.Add(-3 * time.Hour)
+
+	svs := partner.Referential().Model().StopVisits().FindAll()
+	assert.Len(svs, 2, "only stops after the persistence cutoff should be created")
+
+	for _, sv := range svs {
+		assert.Falsef(sv.ReferenceTime().Before(deleteBefore),
+			"created StopVisit reference time should survive persistence, got %v", sv.ReferenceTime())
+	}
+}
+
+func Test_GtfsCollect_SkipFullyExpiredTrip(t *testing.T) {
+	assert := assert.New(t)
+
+	e := []*gtfs.FeedEntity{
+		tripUpdateFullyExpired(),
+	}
+	feed := newGtfsFeed(e)
+
+	_, partner := collectGtfs(t, feed, false)
+
+	// Every stop of the trip is past the persistence window, so nothing is
+	// collected — and crucially no empty VehicleJourney is left behind, since the
+	// guardian only cleans VehicleJourneys whose StopVisits were deleted.
+	assert.Empty(partner.Referential().Model().StopVisits().FindAll(), "no StopVisit should be created")
+	assert.Empty(partner.Referential().Model().VehicleJourneys().FindAll(), "no empty VehicleJourney should be created")
+}
+
+func tripUpdateWithExpiredStops() *gtfs.FeedEntity {
+	id := "id"
+	tid := "tid"
+	rid := "rid"
+
+	// FAKE_CLOCK_INITIAL_DATE is 1984; persisted times are well after it,
+	// expired times well before it.
+	persisted := int64(1601875200)    // 2020, after the persistence cutoff
+	persistedDep := int64(1601875610) // 2020
+	expired := int64(315532800)       // 1980, before the persistence cutoff
+	expiredDep := int64(315533000)    // 1980
+
+	ss1 := uint32(1)
+	sid1 := "sid1"
+	ss2 := uint32(2)
+	sid2 := "sid2"
+	ss3 := uint32(3)
+	sid3 := "sid3"
+	ss4 := uint32(4)
+	sid4 := "sid4"
+
+	return &gtfs.FeedEntity{
+		Id: &id,
+		TripUpdate: &gtfs.TripUpdate{
+			Trip: &gtfs.TripDescriptor{
+				TripId:  &tid,
+				RouteId: &rid,
+			},
+			StopTimeUpdate: []*gtfs.TripUpdate_StopTimeUpdate{
+				{ // regular stop after the cutoff, kept
+					StopSequence: &ss1,
+					StopId:       &sid1,
+					Arrival:      &gtfs.TripUpdate_StopTimeEvent{Time: &persisted},
+					Departure:    &gtfs.TripUpdate_StopTimeEvent{Time: &persisted},
+				},
+				{ // regular stop already past the persistence window, dropped
+					StopSequence: &ss2,
+					StopId:       &sid2,
+					Arrival:      &gtfs.TripUpdate_StopTimeEvent{Time: &expired},
+					Departure:    &gtfs.TripUpdate_StopTimeEvent{Time: &expiredDep},
+				},
+				{ // departure-only stop after the cutoff, kept
+					StopSequence: &ss3,
+					StopId:       &sid3,
+					Departure:    &gtfs.TripUpdate_StopTimeEvent{Time: &persistedDep},
+				},
+				{ // departure-only stop already past the persistence window, dropped
+					StopSequence: &ss4,
+					StopId:       &sid4,
+					Departure:    &gtfs.TripUpdate_StopTimeEvent{Time: &expiredDep},
+				},
+			},
+		},
+	}
+}
+
+func tripUpdateFullyExpired() *gtfs.FeedEntity {
+	id := "id"
+	tid := "tid"
+	rid := "rid"
+
+	expired := int64(315532800)    // 1980, before the persistence cutoff
+	expiredDep := int64(315533000) // 1980
+
+	ss1 := uint32(1)
+	sid1 := "sid1"
+	ss2 := uint32(2)
+	sid2 := "sid2"
+
+	return &gtfs.FeedEntity{
+		Id: &id,
+		TripUpdate: &gtfs.TripUpdate{
+			Trip: &gtfs.TripDescriptor{
+				TripId:  &tid,
+				RouteId: &rid,
+			},
+			StopTimeUpdate: []*gtfs.TripUpdate_StopTimeUpdate{
+				{
+					StopSequence: &ss1,
+					StopId:       &sid1,
+					Arrival:      &gtfs.TripUpdate_StopTimeEvent{Time: &expired},
+					Departure:    &gtfs.TripUpdate_StopTimeEvent{Time: &expiredDep},
+				},
+				{
+					StopSequence: &ss2,
+					StopId:       &sid2,
+					Arrival:      &gtfs.TripUpdate_StopTimeEvent{Time: &expired},
+					Departure:    &gtfs.TripUpdate_StopTimeEvent{Time: &expiredDep},
+				},
+			},
+		},
 	}
 }
 

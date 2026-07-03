@@ -235,7 +235,20 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 	if trip == nil {
 		return
 	}
-	vjCode := connector.handleTrip(events, trip) // returns the vj code
+	vjCode := model.NewCode(connector.remoteCodeSpace, trip.GetTripId())
+
+	// Don't create a StopVisit whose reference time is already older than the
+	// model persistence window: the ModelGuardian deletes such StopVisits on its
+	// very next pass, and a realtime feed re-sends long-completed stops (and
+	// whole finished trips) on every cycle, so they would otherwise be
+	// re-created and re-deleted forever. Use the same cutoff the guardian does.
+	deleteBefore := connector.Clock().Now().Add(connector.Partner().Referential().ModelPersistenceDuration())
+
+	// The VehicleJourney (and Line) is created only once a stop survives the
+	// cutoff. A trip whose every stop is expired would otherwise leave behind an
+	// empty VehicleJourney the guardian never cleans, since it only deletes VJs
+	// whose StopVisits were deleted.
+	vjHandled := false
 
 	for _, stu := range t.GetStopTimeUpdate() {
 		sid := stu.GetStopId()
@@ -255,34 +268,52 @@ func (connector *GtfsRequestCollector) handleTripUpdate(events *CollectUpdateEve
 			}
 		}
 
-		_, ok := events.StopVisits[sid][svid]
-		if !ok {
-			stopVisitCode := model.NewCode(connector.remoteCodeSpace, svid)
-			svEvent := &model.StopVisitUpdateEvent{
-				Origin:             connector.origin,
-				Code:               stopVisitCode,
-				StopAreaCode:       stopAreaCode,
-				VehicleJourneyCode: vjCode,
-				PassageOrder:       connector.handleStopSequence(stu),
-				Monitored:          true,
-				RecordedAt:         connector.Clock().Now(),
-				Schedules:          schedules.NewStopVisitSchedules(),
-			}
-			svEvent.Schedules.SetSchedule(
-				schedules.Expected,
-				time.Unix(stu.GetDeparture().GetTime(), 0),
-				time.Unix(stu.GetArrival().GetTime(), 0))
-
-			if connector.hasSkippedScheduleRelationship(stu) {
-				svEvent.DepartureStatus = model.STOP_VISIT_DEPARTURE_CANCELLED
-				svEvent.ArrivalStatus = model.STOP_VISIT_ARRIVAL_CANCELLED
-			}
-
-			if events.StopVisits[sid] == nil {
-				events.StopVisits[sid] = make(map[string]*model.StopVisitUpdateEvent)
-			}
-			events.StopVisits[sid][svid] = svEvent
+		if _, ok := events.StopVisits[sid][svid]; ok {
+			continue
 		}
+
+		stopVisitCode := model.NewCode(connector.remoteCodeSpace, svid)
+		svEvent := &model.StopVisitUpdateEvent{
+			Origin:             connector.origin,
+			Code:               stopVisitCode,
+			StopAreaCode:       stopAreaCode,
+			VehicleJourneyCode: vjCode,
+			PassageOrder:       connector.handleStopSequence(stu),
+			Monitored:          true,
+			RecordedAt:         connector.Clock().Now(),
+			Schedules:          schedules.NewStopVisitSchedules(),
+		}
+		// Only set the times the feed actually provides: time.Unix(0, 0) is a
+		// non-zero (1970) reference time that would trip persistence cleaning
+		// even for a stop with a valid future departure or arrival.
+		if departureTime := stu.GetDeparture().GetTime(); departureTime != 0 {
+			svEvent.Schedules.SetDepartureTime(schedules.Expected, time.Unix(departureTime, 0))
+		}
+		if arrivalTime := stu.GetArrival().GetTime(); arrivalTime != 0 {
+			svEvent.Schedules.SetArrivalTime(schedules.Expected, time.Unix(arrivalTime, 0))
+		}
+
+		// ReferenceTime() is arrival if known, otherwise departure — the same
+		// value the guardian deletes by. A stop with no time at all has a zero
+		// reference time and is left untouched here (handled separately).
+		if referenceTime := svEvent.Schedules.ReferenceTime(); !referenceTime.IsZero() && referenceTime.Before(deleteBefore) {
+			continue
+		}
+
+		if connector.hasSkippedScheduleRelationship(stu) {
+			svEvent.DepartureStatus = model.STOP_VISIT_DEPARTURE_CANCELLED
+			svEvent.ArrivalStatus = model.STOP_VISIT_ARRIVAL_CANCELLED
+		}
+
+		if !vjHandled {
+			connector.handleTrip(events, trip)
+			vjHandled = true
+		}
+
+		if events.StopVisits[sid] == nil {
+			events.StopVisits[sid] = make(map[string]*model.StopVisitUpdateEvent)
+		}
+		events.StopVisits[sid][svid] = svEvent
 	}
 }
 
