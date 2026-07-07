@@ -901,3 +901,21 @@ func Test_BroadcastPeriod(t *testing.T) {
 	assert.Equal(parseTime("1999-06-05T01:30:06.000+02:00"), situation.BroadcastPeriod().StartTime)
 	assert.Equal(time.Time{}, situation.BroadcastPeriod().EndTime, "Should be the minimum period startTime")
 }
+
+func Test_BroadcastPeriod_NoPeriods(t *testing.T) {
+	assert := assert.New(t)
+
+	// A Situation without any validity period nor publication window
+	// (e.g. a GTFS-RT ServiceAlert with an empty active_period, see ARA-1928).
+	situation := &Situation{}
+
+	broadcastPeriod := situation.BroadcastPeriod()
+
+	// Must not panic and should be broadcast forever (empty TimeRange).
+	assert.Equal(time.Time{}, broadcastPeriod.StartTime)
+	assert.Equal(time.Time{}, broadcastPeriod.EndTime)
+
+	// "Forever" means it overlaps any request period.
+	request := &TimeRange{parseTime("2023-06-01T01:30:06.000+02:00"), parseTime("2023-06-10T01:30:06.000+02:00")}
+	assert.True(broadcastPeriod.Overlaps(request), "a situation without periods should always be broadcasted")
+}
