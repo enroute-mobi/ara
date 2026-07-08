@@ -90,6 +90,8 @@ definitions:
           name: us-east1-docker.pkg.dev/enroute-interne/enroute-interne/enroute-ruby:4.0-dev
           username: _json_key
           password: "$GCLOUD_API_KEYFILE"
+        condition:
+          state: CI_CHECKSECURITY_DISABLED != true
         script:
           - build.sh bundle::audit
 
