@@ -1,27 +1,18 @@
 package geographic
 
 import (
-	"github.com/everystreet/go-proj/v6/proj"
-	"github.com/wroge/wgs84"
+	"fmt"
+	"math"
+
+	"github.com/wroge/wgs84/v2"
 )
 
-func Transform(srsName int, x, y float64) (lat, lon float64, e error) {
-	if srsName == 27572 {
-		var xy proj.XY
-		xy.X = x
-		xy.Y = y
-		e = proj.CRSToCRS(
-			"EPSG:27572",
-			"+proj=latlong",
-			func(pj proj.Projection) {
-				proj.TransformForward(pj, &xy)
-			})
+func Transform(srsName int, x, y float64) (lon, lat float64, e error) {
+	lon, lat, _ = wgs84.Transform(wgs84.EPSG(srsName), wgs84.EPSG(4326))(x, y, 0)
 
-		return xy.X, xy.Y, e
+	if math.IsNaN(lon) || math.IsNaN(lat) {
+		return 0, 0, fmt.Errorf("unsupported coordinate reference system EPSG:%d", srsName)
 	}
 
-	epsg := wgs84.EPSG()
-	lon, lat, _, e = epsg.SafeTransform(srsName, 4326)(x, y, 0)
-
-	return lon, lat, e
+	return lon, lat, nil
 }
