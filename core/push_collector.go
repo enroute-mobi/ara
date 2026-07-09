@@ -16,7 +16,7 @@ type PushCollector struct {
 	connector
 
 	vjEvents        map[string]model.UpdateEvent
-	svEvents        []model.UpdateEvent
+	updateEvents    []model.UpdateEvent
 	vjOfIgnoredSv   map[string]struct{}
 	vjWithStopVisit map[string]struct{}
 	persistence     time.Duration
@@ -40,7 +40,7 @@ func NewPushCollector(partner *Partner) *PushCollector {
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.subscriber = manager.BroadcastUpdateEvent
+	connector.subscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -49,16 +49,16 @@ func (pc *PushCollector) SetSubscriber(subscriber UpdateSubscriber) {
 	pc.subscriber = subscriber
 }
 
-func (pc *PushCollector) broadcastUpdateEvent(event model.UpdateEvent) {
+func (pc *PushCollector) broadcastUpdateEvents() {
 	if pc.subscriber != nil {
-		pc.subscriber(event)
+		pc.subscriber(pc.updateEvents)
 	}
 }
 
 func (pc *PushCollector) refresh() {
 	pc.persistence = pc.partner.Referential().ModelPersistenceDuration()
 	pc.vjEvents = make(map[string]model.UpdateEvent)
-	pc.svEvents = []model.UpdateEvent{}
+	pc.updateEvents = []model.UpdateEvent{}
 	pc.vjOfIgnoredSv = make(map[string]struct{})
 	pc.vjWithStopVisit = make(map[string]struct{})
 }
@@ -77,6 +77,7 @@ func (pc *PushCollector) HandlePushNotification(model *em.ExternalCompleteModel,
 	pc.handleLines(model.GetLines())
 	pc.handleVehicleJourneysAndStopVisits(model.GetVehicleJourneys(), model.GetStopVisits())
 	pc.handleVehicles(model.GetVehicles())
+	pc.broadcastUpdateEvents()
 	processingTime := clock.DefaultClock().Since(t)
 
 	total := len(model.GetStopAreas()) + len(model.GetLines()) + len(model.GetVehicleJourneys()) + len(model.GetStopVisits())
@@ -105,7 +106,7 @@ func (pc *PushCollector) handleStopAreas(sas []*em.ExternalStopArea) (stopAreas 
 
 		stopAreas = append(stopAreas, sa.GetObjectid())
 
-		pc.broadcastUpdateEvent(event)
+		pc.updateEvents = append(pc.updateEvents, event)
 	}
 	return
 }
@@ -123,7 +124,7 @@ func (pc *PushCollector) handleLines(lines []*em.ExternalLine) (lineIds []string
 
 		lineIds = append(lineIds, l.GetObjectid())
 
-		pc.broadcastUpdateEvent(event)
+		pc.updateEvents = append(pc.updateEvents, event)
 	}
 	return
 }
@@ -141,10 +142,7 @@ func (pc *PushCollector) handleVehicleJourneysAndStopVisits(vjs []*em.ExternalVe
 	}
 
 	for k := range pc.vjEvents {
-		pc.broadcastUpdateEvent(pc.vjEvents[k])
-	}
-	for i := range pc.svEvents {
-		pc.broadcastUpdateEvent(pc.svEvents[i])
+		pc.updateEvents = append(pc.updateEvents, pc.vjEvents[k])
 	}
 }
 
@@ -191,7 +189,7 @@ func (pc *PushCollector) handleStopVisits(svs []*em.ExternalStopVisit) {
 		event.DepartureStatus = model.StopVisitDepartureStatus(sv.GetDepartureStatus())
 
 		pc.vjWithStopVisit[sv.GetVehicleJourneyRef()] = struct{}{} // Save vehicle journeys for which we did save at least 1 stop visit
-		pc.svEvents = append(pc.svEvents, event)
+		pc.updateEvents = append(pc.updateEvents, event)
 	}
 }
 
@@ -212,7 +210,7 @@ func (pc *PushCollector) handleVehicles(vs []*em.ExternalVehicle) (vehicles []st
 
 		vehicles = append(vehicles, v.GetObjectid())
 
-		pc.broadcastUpdateEvent(event)
+		pc.updateEvents = append(pc.updateEvents, event)
 	}
 	return
 }

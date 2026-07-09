@@ -20,7 +20,7 @@ func NewSIRIGeneralMessageRequestCollector(partner *Partner) *SIRIGeneralMessage
 	siriGeneralMessageRequestCollector := &SIRIGeneralMessageRequestCollector{}
 	siriGeneralMessageRequestCollector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriGeneralMessageRequestCollector.updateSubscriber = manager.BroadcastUpdateEvent
+	siriGeneralMessageRequestCollector.updateSubscriber = manager.BroadcastUpdateEvents
 
 	return siriGeneralMessageRequestCollector
 }
@@ -86,9 +86,7 @@ func (connector *SIRIGeneralMessageRequestCollector) broadcastSituationUpdateEve
 		return
 
 	}
-	for _, e := range event.Situations {
-		connector.updateSubscriber(e)
-	}
+	connector.updateSubscriber(event.SituationsUpdateEvents())
 }
 
 func (connector *SIRIGeneralMessageRequestCollector) newBQEvent() *audit.BigQueryMessage {

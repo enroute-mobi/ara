@@ -37,7 +37,7 @@ func NewSIRILinesDiscoveryRequestCollector(partner *Partner) *SIRILinesDiscovery
 	connector := &SIRILinesDiscoveryRequestCollector{}
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.lineUpdateSubscriber = manager.BroadcastUpdateEvent
+	connector.lineUpdateSubscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -50,9 +50,9 @@ func (connector *SIRILinesDiscoveryRequestCollector) SetSubscriber(subscriber Up
 	connector.lineUpdateSubscriber = subscriber
 }
 
-func (connector *SIRILinesDiscoveryRequestCollector) broadcastUpdateEvent(event model.UpdateEvent) {
+func (connector *SIRILinesDiscoveryRequestCollector) broadcastUpdateEvents(events []model.UpdateEvent) {
 	if connector.lineUpdateSubscriber != nil {
-		connector.lineUpdateSubscriber(event)
+		connector.lineUpdateSubscriber(events)
 	}
 }
 
@@ -89,6 +89,8 @@ func (connector *SIRILinesDiscoveryRequestCollector) RequestLines() {
 	lineRefs := []string{}
 	partner := string(connector.Partner().Slug())
 
+	evs := []model.UpdateEvent{}
+
 	for _, annotatedLine := range response.AnnotatedLineRefs() {
 		lineRefs = append(lineRefs, annotatedLine.LineRef())
 		event := model.NewLineUpdateEvent()
@@ -96,9 +98,10 @@ func (connector *SIRILinesDiscoveryRequestCollector) RequestLines() {
 		event.Origin = partner
 		event.Code = model.NewCode(connector.remoteCodeSpace, annotatedLine.LineRef())
 		event.Name = annotatedLine.LineName()
-
-		connector.broadcastUpdateEvent(event)
+		evs = append(evs, event)
 	}
+
+	connector.broadcastUpdateEvents(evs)
 
 	connector.partner.RegisterDiscoveredLines(lineRefs)
 	message.Lines = lineRefs

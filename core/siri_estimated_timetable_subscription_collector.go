@@ -44,7 +44,7 @@ func NewSIRIEstimatedTimetableSubscriptionCollector(partner *Partner) *SIRIEstim
 	connector.partner = partner
 	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 	connector.estimatedTimetableSubscriber = NewSIRIEstimatedTimetableSubscriber(connector)
 
 	return connector
@@ -156,18 +156,22 @@ func (connector *SIRIEstimatedTimetableSubscriptionCollector) broadcastUpdateEve
 	if connector.updateSubscriber == nil {
 		return
 	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, e := range events.StopAreas {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Lines {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.VehicleJourneys {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
 		for _, e := range es {
-			connector.updateSubscriber(e)
+			evs = append(evs, e)
 		}
 	}
+	connector.updateSubscriber(evs)
 }

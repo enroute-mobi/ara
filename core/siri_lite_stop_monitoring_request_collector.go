@@ -28,7 +28,7 @@ func NewSIRILiteStopMonitoringRequestCollector(partner *Partner) *SIRILiteStopMo
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -102,39 +102,45 @@ func (connector *SIRILiteStopMonitoringRequestCollector) RequestStopAreaUpdate(r
 }
 
 func (connector *SIRILiteStopMonitoringRequestCollector) broadcastUpdateEvents(events *CollectUpdateEvents) {
-
 	if connector.updateSubscriber == nil {
 		return
 	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, e := range events.StopAreas {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Lines {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.VehicleJourneys {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
 		for _, e := range es {
-			connector.updateSubscriber(e)
+			evs = append(evs, e)
 		}
 	}
-}
 
-func (connector *SIRILiteStopMonitoringRequestCollector) broadcastUpdateEvent(event model.UpdateEvent) {
-	if connector.updateSubscriber != nil {
-		connector.updateSubscriber(event)
-	}
+	connector.updateSubscriber(evs)
 }
 
 func (connector *SIRILiteStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitCodes []model.Code, t time.Time) {
+	if connector.updateSubscriber == nil {
+		return
+	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, stopVisitCode := range collectedStopVisitCodes {
 		if _, ok := events[stopVisitCode.Value()]; !ok {
 			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitCode)
-			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitCode, t))
+			evs = append(evs, model.NewNotCollectedUpdateEvent(stopVisitCode, t))
 		}
 	}
+
+	connector.updateSubscriber(evs)
 }
 
 func (connector *SIRILiteStopMonitoringRequestCollector) SetUpdateSubscriber(updateSubscriber UpdateSubscriber) {

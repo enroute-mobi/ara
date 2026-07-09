@@ -75,7 +75,7 @@ func Test_Macro_DefineSituationAffects(t *testing.T) {
 		Consequences:  []*Consequence{c1, c2},
 	}
 
-	updateManager.Update(event)
+	updateManager.Update([]UpdateEvent{event})
 
 	updatedSituation, ok := model.Situations().FindByCode(code)
 	assert.True(ok)

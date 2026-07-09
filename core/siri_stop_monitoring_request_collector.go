@@ -49,7 +49,7 @@ func NewSIRIStopMonitoringRequestCollector(partner *Partner) *SIRIStopMonitoring
 	connector := &SIRIStopMonitoringRequestCollector{}
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.updateSubscriber = manager.BroadcastUpdateEvent
+	connector.updateSubscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -143,35 +143,41 @@ func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvents(event
 	if connector.updateSubscriber == nil {
 		return
 	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, e := range events.StopAreas {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Lines {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.VehicleJourneys {
-		connector.updateSubscriber(e)
+		evs = append(evs, e)
 	}
 	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
 		for _, e := range es {
-			connector.updateSubscriber(e)
+			evs = append(evs, e)
 		}
 	}
-}
-
-func (connector *SIRIStopMonitoringRequestCollector) broadcastUpdateEvent(event model.UpdateEvent) {
-	if connector.updateSubscriber != nil {
-		connector.updateSubscriber(event)
-	}
+	connector.updateSubscriber(evs)
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) broadcastNotCollectedEvents(events map[string]*model.StopVisitUpdateEvent, collectedStopVisitCodes []model.Code, t time.Time) {
+	if connector.updateSubscriber == nil {
+		return
+	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, stopVisitCode := range collectedStopVisitCodes {
 		if _, ok := events[stopVisitCode.Value()]; !ok {
 			logger.Log.Debugf("Send StopVisitNotCollectedEvent for %v", stopVisitCode)
-			connector.broadcastUpdateEvent(model.NewNotCollectedUpdateEvent(stopVisitCode, t))
+			evs = append(evs, model.NewNotCollectedUpdateEvent(stopVisitCode, t))
 		}
 	}
+
+	connector.updateSubscriber(evs)
 }
 
 func (connector *SIRIStopMonitoringRequestCollector) SetUpdateSubscriber(updateSubscriber UpdateSubscriber) {

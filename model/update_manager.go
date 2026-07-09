@@ -1,6 +1,8 @@
 package model
 
 import (
+	"sync"
+
 	"bitbucket.org/enroute-mobi/ara/clock"
 	"bitbucket.org/enroute-mobi/ara/logger"
 	"bitbucket.org/enroute-mobi/ara/model/hooks"
@@ -15,20 +17,62 @@ type UpdateManager struct {
 	clock.ClockConsumer
 	uuid.UUIDConsumer
 
-	model Model
+	mutex     sync.Mutex
+	model     Model
+	toControl map[model_types.Model]map[string]map[string]Control
 }
 
-func NewUpdateManager(model Model) func(UpdateEvent) {
-	manager := newUpdateManager(model)
-	return manager.Update
+func NewUpdateManager(model Model) func([]UpdateEvent) {
+	return newUpdateManager(model).Update
 }
 
 // Test method
 func newUpdateManager(model Model) *UpdateManager {
-	return &UpdateManager{model: model}
+	manager := &UpdateManager{model: model}
+	manager.resetToControl()
+	return manager
 }
 
-func (manager *UpdateManager) Update(event UpdateEvent) {
+func (manager *UpdateManager) resetToControl() {
+	manager.toControl = make(map[model_types.Model]map[string]map[string]Control)
+}
+
+func (manager *UpdateManager) addToControl(t model_types.Model, id string, c Control) {
+	_, found := manager.toControl[t]
+	if !found {
+		manager.toControl[t] = map[string]map[string]Control{id: {c.Id: c}}
+		return
+	}
+
+	_, found = manager.toControl[t][id]
+	if !found {
+		manager.toControl[t][id] = map[string]Control{c.Id: c}
+		return
+	}
+
+	_, found = manager.toControl[t][id][c.Id]
+	if !found {
+		manager.toControl[t][id][c.Id] = c
+	}
+
+}
+
+func (manager *UpdateManager) Update(events []UpdateEvent) {
+	manager.mutex.Lock()
+	defer manager.mutex.Unlock()
+
+	// Complex controls config is static — compute once per batch rather than per event.
+	// Other update methods can hoist their own GetComplexControls call here when needed.
+	stopVisitComplexControls := manager.model.Controls().GetComplexControls(model_types.StopVisit)
+
+	for i := range events {
+		manager.update(events[i], stopVisitComplexControls)
+	}
+
+	manager.handleToControl()
+}
+
+func (manager *UpdateManager) update(event UpdateEvent, stopVisitComplexControls map[hooks.Type][]Control) {
 	switch event.EventKind() {
 	case STOP_AREA_EVENT:
 		manager.updateStopArea(event.(*StopAreaUpdateEvent))
@@ -37,7 +81,7 @@ func (manager *UpdateManager) Update(event UpdateEvent) {
 	case VEHICLE_JOURNEY_EVENT:
 		manager.updateVehicleJourney(event.(*VehicleJourneyUpdateEvent))
 	case STOP_VISIT_EVENT:
-		manager.updateStopVisit(event.(*StopVisitUpdateEvent))
+		manager.updateStopVisit(event.(*StopVisitUpdateEvent), stopVisitComplexControls)
 	case VEHICLE_EVENT:
 		manager.updateVehicle(event.(*VehicleUpdateEvent))
 	case STATUS_EVENT:
@@ -117,7 +161,7 @@ func (manager *UpdateManager) updateSituation(event *SituationUpdateEvent) {
 	for i := range macros {
 		macros[i].Update(situation)
 	}
-	controls := manager.model.Controls().GetControls(h, model_types.Situation)
+	controls := manager.model.Controls().GetSimpleControls(h, model_types.Situation)
 	for i := range controls {
 		controls[i].Control(situation)
 	}
@@ -159,7 +203,7 @@ func (manager *UpdateManager) updateStopArea(event *StopAreaUpdateEvent) {
 	for i := range macros {
 		macros[i].Update(stopArea)
 	}
-	controls := manager.model.Controls().GetControls(h, model_types.StopArea)
+	controls := manager.model.Controls().GetSimpleControls(h, model_types.StopArea)
 	for i := range controls {
 		controls[i].Control(stopArea)
 	}
@@ -212,7 +256,7 @@ func (manager *UpdateManager) updateLine(event *LineUpdateEvent) {
 	for i := range macros {
 		macros[i].Update(line)
 	}
-	controls := manager.model.Controls().GetControls(h, model_types.Line)
+	controls := manager.model.Controls().GetSimpleControls(h, model_types.Line)
 	for i := range controls {
 		controls[i].Control(line)
 	}
@@ -290,7 +334,7 @@ func (manager *UpdateManager) updateVehicleJourney(event *VehicleJourneyUpdateEv
 	for i := range macros {
 		macros[i].Update(vj)
 	}
-	controls := manager.model.Controls().GetControls(h, model_types.VehicleJourney)
+	controls := manager.model.Controls().GetSimpleControls(h, model_types.VehicleJourney)
 	for i := range controls {
 		controls[i].Control(vj)
 	}
@@ -310,7 +354,7 @@ func (manager *UpdateManager) updateVehicleJourneyFromVehicleMonitoring(event *V
 	}
 }
 
-func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
+func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent, complexControls map[hooks.Type][]Control) {
 	if event.Code.Value() == "" { // Avoid creating a StopVisit with an empty code
 		return
 	}
@@ -427,9 +471,19 @@ func (manager *UpdateManager) updateStopVisit(event *StopVisitUpdateEvent) {
 	for i := range macros {
 		macros[i].Update(sv)
 	}
-	controls := manager.model.Controls().GetControls(h, model_types.StopVisit)
+	controls := manager.model.Controls().GetSimpleControls(h, model_types.StopVisit)
 	for i := range controls {
 		controls[i].Control(sv)
+	}
+
+	// Complex controls for other model types can be wired the same way in their respective update methods.
+	for h, cs := range complexControls {
+		switch h {
+		case hooks.AfterAllStopVisitSave:
+			for i := range cs {
+				manager.addToControl(model_types.VehicleJourney, vj.ModelId(), cs[i])
+			}
+		}
 	}
 
 	manager.model.StopVisits().Save(sv)
@@ -508,7 +562,7 @@ func (manager *UpdateManager) updateVehicle(event *VehicleUpdateEvent) {
 	for i := range macros {
 		macros[i].Update(vehicle)
 	}
-	controls := manager.model.Controls().GetControls(h, model_types.Vehicle)
+	controls := manager.model.Controls().GetSimpleControls(h, model_types.Vehicle)
 	for i := range controls {
 		controls[i].Control(vehicle)
 	}
@@ -542,4 +596,69 @@ func (manager *UpdateManager) updateNotCollected(event *NotCollectedUpdateEvent)
 		sva.Archive()
 	}
 	logger.Log.Debugf("StopVisit not Collected: %s (%v)", stopVisit.Id(), event.Code)
+}
+
+func (manager *UpdateManager) handleToControl() {
+	for t := range manager.toControl {
+		for id := range manager.toControl[t] {
+			switch t {
+			case model_types.Situation:
+				mi, ok := manager.model.Situations().Find(SituationId(id))
+				if !ok {
+					logger.Log.Debugf("Something really unexpected happened while trying to control model %v", id)
+					continue
+				}
+				for _, c := range manager.toControl[t][id] {
+					c.Control(mi)
+				}
+			case model_types.StopArea:
+				mi, ok := manager.model.StopAreas().Find(StopAreaId(id))
+				if !ok {
+					logger.Log.Debugf("Something really unexpected happened while trying to control model %v", id)
+					continue
+				}
+				for _, c := range manager.toControl[t][id] {
+					c.Control(mi)
+				}
+			case model_types.Line:
+				mi, ok := manager.model.Lines().Find(LineId(id))
+				if !ok {
+					logger.Log.Debugf("Something really unexpected happened while trying to control model %v", id)
+					continue
+				}
+				for _, c := range manager.toControl[t][id] {
+					c.Control(mi)
+				}
+			case model_types.VehicleJourney:
+				mi, ok := manager.model.VehicleJourneys().Find(VehicleJourneyId(id))
+				if !ok {
+					logger.Log.Debugf("Something really unexpected happened while trying to control model %v", id)
+					continue
+				}
+				for _, c := range manager.toControl[t][id] {
+					c.Control(mi)
+				}
+			case model_types.StopVisit:
+				mi, ok := manager.model.StopVisits().Find(StopVisitId(id))
+				if !ok {
+					logger.Log.Debugf("Something really unexpected happened while trying to control model %v", id)
+					continue
+				}
+				for _, c := range manager.toControl[t][id] {
+					c.Control(mi)
+				}
+			case model_types.Vehicle:
+				mi, ok := manager.model.Vehicles().Find(VehicleId(id))
+				if !ok {
+					logger.Log.Debugf("Something really unexpected happened while trying to control model %v", id)
+					continue
+				}
+				for _, c := range manager.toControl[t][id] {
+					c.Control(mi)
+				}
+			}
+		}
+	}
+
+	manager.resetToControl()
 }

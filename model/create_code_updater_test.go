@@ -73,9 +73,7 @@ func Test_Macro_CreateCode_StopArea(t *testing.T) {
 		Name: "Test 3",
 	}
 
-	updateManager.Update(event1)
-	updateManager.Update(event2)
-	updateManager.Update(event3)
+	updateManager.Update([]UpdateEvent{event1, event2, event3})
 
 	updatedSA1, ok := model.StopAreas().FindByCode(code1)
 	assert.True(ok)
@@ -159,9 +157,7 @@ func Test_Macro_CreateCode_Line(t *testing.T) {
 		Name: "Test 3",
 	}
 
-	updateManager.Update(event1)
-	updateManager.Update(event2)
-	updateManager.Update(event3)
+	updateManager.Update([]UpdateEvent{event1, event2, event3})
 
 	updatedLine, ok := model.Lines().FindByCode(code1)
 	assert.True(ok)

@@ -38,7 +38,7 @@ func Test_CollectManager_StopVisitUpdate(t *testing.T) {
 		ArrivalStatus:      model.STOP_VISIT_ARRIVAL_ARRIVED,
 		Schedules:          schedules.NewStopVisitSchedules(),
 	}
-	referential.collectManager.BroadcastUpdateEvent(event)
+	referential.collectManager.BroadcastUpdateEvents([]model.UpdateEvent{event})
 
 	updatedStopVisit, _ := referential.Model().StopVisits().Find(stopVisit.Id())
 	if updatedStopVisit.ArrivalStatus != model.STOP_VISIT_ARRIVAL_ARRIVED {

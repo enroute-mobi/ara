@@ -1,6 +1,7 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
@@ -14,7 +15,8 @@ type controls [][][]Control
 type Controls interface {
 	Loadable
 
-	GetControls(hooks.Type, model_types.Model) []Control
+	GetSimpleControls(hooks.Type, model_types.Model) []Control
+	GetComplexControls(model_types.Model) map[hooks.Type][]Control
 }
 
 type ControlManager struct {
@@ -58,9 +60,17 @@ func (mm *ControlManager) setControl(h hooks.Type, t ModelType, m Control) {
 */
 
 // If we ask for AfterCreate, we'll also get AfterSave Controls
-func (mm ControlManager) GetControls(h hooks.Type, t model_types.Model) (m []Control) {
-	for i := h; i < hooks.Total; i++ {
+func (mm ControlManager) GetSimpleControls(h hooks.Type, t model_types.Model) (m []Control) {
+	for i := h; i < hooks.TotalSimpleHooks; i++ {
 		m = append(m, mm.controls[i][t]...)
+	}
+	return
+}
+
+func (mm ControlManager) GetComplexControls(t model_types.Model) (m map[hooks.Type][]Control) {
+	m = make(map[hooks.Type][]Control)
+	for i := hooks.TotalSimpleHooks; i < hooks.Total; i++ {
+		m[hooks.Type(i)] = append(m[hooks.Type(i)], mm.controls[hooks.Type(i)][t]...)
 	}
 	return
 }
@@ -100,6 +110,7 @@ func (b *controlBuilder) buildContext(c *controlContextBuilder) []error {
 	e := []error{}
 
 	m := NewControl()
+	m.Id = c.control.Id
 	e = append(e, b.handleContexes(c, m)...)
 	b.manager.controls[h][mt] = append(b.manager.controls[h][mt], *m)
 
@@ -115,6 +126,7 @@ func (b *controlBuilder) buildController(sm *SelectControl) []error {
 	e := []error{}
 
 	m := NewControl()
+	m.Id = sm.Id
 	updater, err := NewControllerFromDatabase(sm)
 	if err != nil {
 		e = append(e, err)
@@ -198,8 +210,9 @@ func (manager *ControlManager) Load(referentialSlug string) error {
 
 	errs := builder.buildControls()
 	if len(errs) != 0 {
-		logger.Log.Debugf("errors while loading Controls: %v", errs)
-		return fmt.Errorf("errors while loading Controls: %v", errs)
+		e := fmt.Sprintf("errors while loading Controls: %v", errs)
+		logger.Log.Debug(e)
+		return errors.New(e)
 	}
 	return nil
 }

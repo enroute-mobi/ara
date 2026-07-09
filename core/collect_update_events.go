@@ -16,6 +16,78 @@ type CollectUpdateEvents struct {
 	*CollectedRefs
 }
 
+func (es *CollectUpdateEvents) StopAreasUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.StopAreas {
+		evs = append(evs, es.StopAreas[i])
+	}
+
+	return evs
+}
+
+func (es *CollectUpdateEvents) LinesUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.Lines {
+		evs = append(evs, es.Lines[i])
+	}
+
+	return evs
+}
+
+func (es *CollectUpdateEvents) VehicleJourneysUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.VehicleJourneys {
+		evs = append(evs, es.VehicleJourneys[i])
+	}
+
+	return evs
+}
+
+func (es *CollectUpdateEvents) StopVisitsUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.StopVisits {
+		for j := range es.StopVisits[i] {
+			evs = append(evs, es.StopVisits[i][j])
+		}
+	}
+
+	return evs
+}
+
+func (es *CollectUpdateEvents) SituationsUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.Situations {
+		evs = append(evs, es.Situations[i])
+	}
+
+	return evs
+}
+
+func (es *CollectUpdateEvents) VehiclesUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.Vehicles {
+		evs = append(evs, es.Vehicles[i])
+	}
+
+	return evs
+}
+
+func (es *CollectUpdateEvents) FacilitiesUpdateEvents() []model.UpdateEvent {
+	evs := []model.UpdateEvent{}
+
+	for i := range es.Facilities {
+		evs = append(evs, es.Facilities[i])
+	}
+
+	return evs
+}
+
 type CollectedRefs struct {
 	MonitoringRefs     map[string]struct{}
 	LineRefs           map[string]struct{}

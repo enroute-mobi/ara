@@ -61,7 +61,7 @@ func (mm *MacroManager) setMacro(h hooks.Type, t ModelType, m Macro) {
 
 // If we ask for AfterCreate, we'll also get AfterSave Macros
 func (mm macroManager) GetMacros(h hooks.Type, t model_types.Model) (m []Macro) {
-	for i := h; i < hooks.Total; i++ {
+	for i := h; i < hooks.TotalSimpleHooks; i++ {
 		m = append(m, mm.macros[i][t]...)
 	}
 	return

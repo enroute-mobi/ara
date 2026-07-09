@@ -44,7 +44,7 @@ func NewGtfsRequestCollector(partner *Partner) *GtfsRequestCollector {
 	connector := &GtfsRequestCollector{}
 	connector.partner = partner
 	manager := partner.Referential().CollectManager()
-	connector.subscriber = manager.BroadcastUpdateEvent
+	connector.subscriber = manager.BroadcastUpdateEvents
 
 	return connector
 }
@@ -405,26 +405,31 @@ func (connector *GtfsRequestCollector) broadcastUpdateEvents(events *CollectUpda
 	if connector.subscriber == nil {
 		return
 	}
+
+	evs := []model.UpdateEvent{}
+
 	for _, e := range events.StopAreas {
-		connector.subscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Lines {
-		connector.subscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.VehicleJourneys {
-		connector.subscriber(e)
+		evs = append(evs, e)
 	}
 	for _, es := range events.StopVisits { // Stopvisits are map[MonitoringRef]map[ItemIdentifier]event
 		for _, e := range es {
-			connector.subscriber(e)
+			evs = append(evs, e)
 		}
 	}
 	for _, e := range events.Vehicles {
-		connector.subscriber(e)
+		evs = append(evs, e)
 	}
 	for _, e := range events.Situations {
-		connector.subscriber(e)
+		evs = append(evs, e)
 	}
+
+	connector.subscriber(evs)
 }
 
 func operationnalStatusFromError(err error) partners.OperationnalStatus {

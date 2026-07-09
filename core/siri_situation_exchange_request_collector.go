@@ -24,7 +24,7 @@ func NewSIRISituationExchangeRequestCollector(partner *Partner) *SIRISituationEx
 	siriSituationExchangeRequestCollector := &SIRISituationExchangeRequestCollector{}
 	siriSituationExchangeRequestCollector.partner = partner
 	manager := partner.Referential().CollectManager()
-	siriSituationExchangeRequestCollector.updateSubscriber = manager.BroadcastUpdateEvent
+	siriSituationExchangeRequestCollector.updateSubscriber = manager.BroadcastUpdateEvents
 
 	return siriSituationExchangeRequestCollector
 }
@@ -84,9 +84,7 @@ func (connector *SIRISituationExchangeRequestCollector) broadcastSituationUpdate
 		return
 
 	}
-	for _, e := range events.Situations {
-		connector.updateSubscriber(e)
-	}
+	connector.updateSubscriber(events.SituationsUpdateEvents())
 }
 
 func (connector *SIRISituationExchangeRequestCollector) newBQEvent() *audit.BigQueryMessage {
