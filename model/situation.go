@@ -233,6 +233,14 @@ func (s *Situation) BroadcastPeriod() *TimeRange {
 	}
 
 	broadcastPeriod := &TimeRange{}
+
+	// No validity period nor publication window: the situation is broadcast
+	// forever. An empty TimeRange (both bounds zero) makes Overlaps always
+	// true, and avoids slices.MinFunc panicking on an empty slice.
+	if len(possibleMin) == 0 {
+		return broadcastPeriod
+	}
+
 	broadcastPeriod.StartTime = slices.MinFunc(possibleMin, time.Time.Compare)
 
 	for i := range possibleMax {
