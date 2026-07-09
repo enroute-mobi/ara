@@ -154,6 +154,106 @@ func Test_Vehicle_NextStopVisitId_with_Updates(t *testing.T) {
 	assert.Equal(stopVisit1.Id(), vehicleB.NextStopVisitId)
 }
 
+// When a vehicle advances to a new next stop, the previous ByNextStopVisit key
+// must be evicted so the index can't accumulate stale entries. We assert through
+// the index (FindOneBy) rather than FindByNextStopVisitId, whose match guard
+// would return false anyway and mask a missing eviction.
+func Test_MemoryVehicles_Save_EvictsPreviousNextStopVisitId(t *testing.T) {
+	assert := assert.New(t)
+
+	model := newTestModel(t)
+	sv1 := model.StopVisits().New()
+	sv1.Save()
+	sv2 := model.StopVisits().New()
+	sv2.Save()
+
+	vehicle := model.Vehicles().New()
+	vehicle.NextStopVisitId = sv1.Id()
+	assert.True(vehicle.Save())
+
+	mv := model.Vehicles().(*memoryVehicles)
+	_, present := mv.FindOneBy(ByNextStopVisit, string(sv1.Id()))
+	assert.True(present, "index should hold sv1 -> vehicle after first Save")
+
+	// Advance the vehicle to a new next stop the way the update path does:
+	// fetch a copy, mutate it, Save it (so the stored object differs).
+	updated, ok := model.Vehicles().Find(vehicle.Id())
+	assert.True(ok)
+	updated.NextStopVisitId = sv2.Id()
+	assert.True(updated.Save())
+
+	_, present = mv.FindOneBy(ByNextStopVisit, string(sv2.Id()))
+	assert.True(present, "index should hold sv2 -> vehicle after the update")
+	_, present = mv.FindOneBy(ByNextStopVisit, string(sv1.Id()))
+	assert.False(present, "stale sv1 index entry should be evicted on Save")
+}
+
+// FindByNextStopVisitId returns false when the index entry no longer matches the
+// vehicle's current NextStopVisitId.
+func Test_MemoryVehicles_FindByNextStopVisitId_MismatchReturnsFalse(t *testing.T) {
+	assert := assert.New(t)
+
+	vehicles := NewMemoryVehicles().(*memoryVehicles)
+	vehicle := vehicles.New()
+	vehicle.NextStopVisitId = StopVisitId("sv-1")
+	vehicles.Save(vehicle)
+
+	// Force an inconsistent state: index still points at sv-1, but the stored
+	// vehicle has moved on. FindByNextStopVisitId must report sv-1 as not found.
+	vehicles.byIdentifier[vehicle.Id()].NextStopVisitId = StopVisitId("sv-2")
+
+	_, ok := vehicles.FindByNextStopVisitId(StopVisitId("sv-1"))
+	assert.False(ok, "a stale ByNextStopVisit entry must not resolve")
+
+	// Re-index the vehicle on its new next stop; it then resolves.
+	vehicles.Index(vehicles.byIdentifier[vehicle.Id()])
+	_, ok = vehicles.FindByNextStopVisitId(StopVisitId("sv-2"))
+	assert.True(ok, "the matching next stop should resolve")
+}
+
+// After a vehicle is reassigned to another journey, FindByVehicleJourneyId must
+// no longer return it for the old journey: Index evicts the old key on Save, and
+// the match check backs that up.
+func Test_MemoryVehicles_FindByVehicleJourneyId_StaleAfterReassignmentReturnsFalse(t *testing.T) {
+	assert := assert.New(t)
+
+	model := newTestModel(t)
+	vehicle := model.Vehicles().New()
+	vehicle.VehicleJourneyId = VehicleJourneyId("vj-A")
+	assert.True(vehicle.Save())
+
+	_, ok := model.Vehicles().FindByVehicleJourneyId(VehicleJourneyId("vj-A"))
+	assert.True(ok, "vehicle should resolve for its current journey")
+
+	// Reassign to vj-B (the way updateVehicle does): fetch a copy, mutate, Save.
+	updated, ok := model.Vehicles().Find(vehicle.Id())
+	assert.True(ok)
+	updated.VehicleJourneyId = VehicleJourneyId("vj-B")
+	assert.True(updated.Save())
+
+	_, ok = model.Vehicles().FindByVehicleJourneyId(VehicleJourneyId("vj-B"))
+	assert.True(ok, "vehicle should resolve for its new journey")
+	_, ok = model.Vehicles().FindByVehicleJourneyId(VehicleJourneyId("vj-A"))
+	assert.False(ok, "vehicle must not resolve for the journey it left")
+}
+
+func Test_MemoryVehicles_Delete_CleansNextStopVisitIdIndex(t *testing.T) {
+	assert := assert.New(t)
+
+	vehicles := NewMemoryVehicles().(*memoryVehicles)
+	vehicle := vehicles.New()
+	vehicle.NextStopVisitId = StopVisitId("sv-1")
+	vehicles.Save(vehicle)
+
+	_, present := vehicles.FindOneBy(ByNextStopVisit, "sv-1")
+	assert.True(present, "index should hold the entry after Save")
+
+	vehicles.Delete(vehicle)
+
+	_, present = vehicles.FindOneBy(ByNextStopVisit, "sv-1")
+	assert.False(present, "Delete should remove the ByNextStopVisit index entry")
+}
+
 func Test_Vehicle_Code(t *testing.T) {
 	vehicle := Vehicle{
 		id: "6ba7b814-9dad-11d1-0-00c04fd430c8",

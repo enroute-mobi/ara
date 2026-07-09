@@ -15,6 +15,9 @@ type VehicleId string
 
 var vehicleLineExtractor = func(instance ModelInstance) string { return string((instance.(*Vehicle)).LineId) }
 var vehicleVjExtractor = func(instance ModelInstance) string { return string((instance.(*Vehicle)).VehicleJourneyId) }
+var vehicleNextStopVisitExtractor = func(instance ModelInstance) string {
+	return string((instance.(*Vehicle)).NextStopVisitId)
+}
 
 type Vehicle struct {
 	RecordedAtTime time.Time
@@ -138,9 +141,8 @@ type memoryVehicles struct {
 	clock.ClockConsumer
 	IndexHandler
 
-	mutex             *sync.RWMutex
-	byIdentifier      map[VehicleId]*Vehicle
-	byNextStopVisitId map[StopVisitId]VehicleId
+	mutex        *sync.RWMutex
+	byIdentifier map[VehicleId]*Vehicle
 
 	broadcastEvent func(event VehicleBroadcastEvent)
 }
@@ -157,13 +159,13 @@ type Vehicles interface {
 
 func NewMemoryVehicles() Vehicles {
 	v := &memoryVehicles{
-		mutex:             &sync.RWMutex{},
-		byIdentifier:      make(map[VehicleId]*Vehicle),
-		byNextStopVisitId: make(map[StopVisitId]VehicleId),
+		mutex:        &sync.RWMutex{},
+		byIdentifier: make(map[VehicleId]*Vehicle),
 	}
 	v.InitIndexes()
 	v.AddIndex(ByLine, OneToMany, vehicleLineExtractor)
 	v.AddIndex(ByVehicleJourney, OneToOne, vehicleVjExtractor)
+	v.AddIndex(ByNextStopVisit, OneToOne, vehicleNextStopVisitExtractor)
 
 	return v
 }
@@ -193,7 +195,11 @@ func (manager *memoryVehicles) FindByCode(code Code) (*Vehicle, bool) {
 
 	id, ok := manager.ByCode().Find(code)
 	if ok {
-		return manager.byIdentifier[VehicleId(id)].copy(), true
+		// Guard against a stale index entry so a missing id yields a miss, not a
+		// nil-deref.
+		if vehicle, found := manager.byIdentifier[VehicleId(id)]; found {
+			return vehicle.copy(), true
+		}
 	}
 	return &Vehicle{}, false
 }
@@ -212,8 +218,10 @@ func (manager *memoryVehicles) FindByLineId(id LineId) (vehicles []*Vehicle) {
 	ids, _ := manager.FindBy(ByLine, string(id))
 
 	for _, id := range ids {
-		v := manager.byIdentifier[VehicleId(id)]
-		vehicles = append(vehicles, v.copy())
+		// Skip a stale index entry rather than nil-deref on .copy().
+		if v, found := manager.byIdentifier[VehicleId(id)]; found {
+			vehicles = append(vehicles, v.copy())
+		}
 	}
 
 	manager.mutex.RUnlock()
@@ -226,7 +234,11 @@ func (manager *memoryVehicles) FindByVehicleJourneyId(vjId VehicleJourneyId) (*V
 
 	id, ok := manager.FindOneBy(ByVehicleJourney, string(vjId))
 	if ok {
-		return manager.byIdentifier[VehicleId(id)].copy(), true
+		// The index is kept in sync by Index/Deindex; the guard is belt-and-
+		// suspenders so a stale id yields a miss, not a nil-deref or wrong vehicle.
+		if vehicle, found := manager.byIdentifier[VehicleId(id)]; found && vehicle.VehicleJourneyId == vjId {
+			return vehicle.copy(), true
+		}
 	}
 	return &Vehicle{}, false
 }
@@ -245,20 +257,14 @@ func (manager *memoryVehicles) FindAll() (vehicles []*Vehicle) {
 func (manager *memoryVehicles) FindByNextStopVisitId(stopVisitId StopVisitId) (*Vehicle, bool) {
 	manager.mutex.RLock()
 	defer manager.mutex.RUnlock()
-	vehicleId, ok := manager.byNextStopVisitId[stopVisitId]
+
+	id, ok := manager.FindOneBy(ByNextStopVisit, string(stopVisitId))
 	if ok {
-		vehicle, ok := manager.byIdentifier[vehicleId]
-		if ok {
-			if vehicle.NextStopVisitId == stopVisitId {
-				return vehicle.copy(), true
-			}
+		// The index is kept in sync by Index/Deindex; the guard is belt-and-
+		// suspenders so a stale id yields a miss, not a nil-deref or wrong vehicle.
+		if vehicle, found := manager.byIdentifier[VehicleId(id)]; found && vehicle.NextStopVisitId == stopVisitId {
+			return vehicle.copy(), true
 		}
-		// clean the index
-		manager.mutex.RUnlock()
-		manager.mutex.Lock()
-		delete(manager.byNextStopVisitId, stopVisitId)
-		manager.mutex.Unlock()
-		manager.mutex.RLock()
 	}
 	return &Vehicle{}, false
 }
@@ -281,11 +287,9 @@ func (manager *memoryVehicles) Save(vehicle *Vehicle) bool {
 
 	vehicle.model = manager.model
 	manager.byIdentifier[vehicle.Id()] = vehicle
+	// Index maintains ByLine, ByVehicleJourney and ByNextStopVisit, including
+	// evicting the previous key when a vehicle advances its next stop.
 	manager.Index(vehicle)
-
-	if vehicle.NextStopVisitId != StopVisitId("") {
-		manager.byNextStopVisitId[vehicle.NextStopVisitId] = vehicle.Id()
-	}
 
 	event := VehicleBroadcastEvent{
 		ModelId:   string(vehicle.id),
@@ -321,6 +325,7 @@ func (manager *memoryVehicles) Delete(vehicle *Vehicle) bool {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
 	delete(manager.byIdentifier, vehicle.Id())
+	// Deindex removes the vehicle from ByLine, ByVehicleJourney and ByNextStopVisit.
 	manager.Deindex(string(vehicle.id))
 
 	return true

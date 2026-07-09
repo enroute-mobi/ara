@@ -20,6 +20,7 @@ const (
 	ByStopVisit
 	ByParent
 	ByReferent
+	ByNextStopVisit
 )
 
 type IndexableExtractor func(ModelInstance) string
