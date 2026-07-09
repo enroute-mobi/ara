@@ -42,6 +42,7 @@ func NewSIRIFacilityMonitoringSubscriptionCollector(partner *Partner) *SIRIFacil
 	connector := &SIRIFacilityMonitoringSubscriptionCollector{}
 	connector.remoteCodeSpace = partner.RemoteCodeSpace()
 	connector.partner = partner
+	connector.deletedSubscriptions = NewDeletedSubscriptions()
 	manager := partner.Referential().CollectManager()
 	connector.updateSubscriber = manager.BroadcastUpdateEvent
 	connector.facilityMonitoringSubscriber = NewSIRIFacilityMonitoringSubscriber(connector)
@@ -54,7 +55,7 @@ func (connector *SIRIFacilityMonitoringSubscriptionCollector) Stop() {
 }
 
 func (connector *SIRIFacilityMonitoringSubscriptionCollector) Start() {
-	connector.deletedSubscriptions = NewDeletedSubscriptions()
+	connector.deletedSubscriptions.Reset()
 	connector.facilityMonitoringSubscriber.Start()
 }
 

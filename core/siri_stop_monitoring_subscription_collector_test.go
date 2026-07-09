@@ -16,6 +16,50 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// ARA-1823: a Notify can be handled before Start() (e.g. right after a
+// connector refresh), so deletedSubscriptions must be usable from construction
+// and never nil — otherwise AlreadySend panics on a nil pointer.
+func Test_SIRISubscriptionCollectors_DeletedSubscriptionsReadyBeforeStart(t *testing.T) {
+	_, referential := newTestReferential(t, true)
+	partners := NewPartnerManager(referential)
+	partner := partners.New("slug")
+
+	tests := []struct {
+		name  string
+		build func() *DeletedSubscriptions
+	}{
+		{"StopMonitoring", func() *DeletedSubscriptions {
+			return NewSIRIStopMonitoringSubscriptionCollector(partner).deletedSubscriptions
+		}},
+		{"EstimatedTimetable", func() *DeletedSubscriptions {
+			return NewSIRIEstimatedTimetableSubscriptionCollector(partner).deletedSubscriptions
+		}},
+		{"FacilityMonitoring", func() *DeletedSubscriptions {
+			return NewSIRIFacilityMonitoringSubscriptionCollector(partner).deletedSubscriptions
+		}},
+		{"GeneralMessage", func() *DeletedSubscriptions {
+			return NewSIRIGeneralMessageSubscriptionCollector(partner).deletedSubscriptions
+		}},
+		{"SituationExchange", func() *DeletedSubscriptions {
+			return NewSIRISituationExchangeSubscriptionCollector(partner).deletedSubscriptions
+		}},
+		{"VehicleMonitoring", func() *DeletedSubscriptions {
+			return NewSIRIVehicleMonitoringSubscriptionCollector(partner).deletedSubscriptions
+		}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert := assert.New(t)
+			ds := tt.build()
+			assert.NotNil(ds, "%s: deletedSubscriptions should be initialized at construction, before Start()", tt.name)
+			assert.NotPanics(func() {
+				ds.AlreadySend("RATPCapIDF:Subscription::unknown:LOC")
+			}, "%s: AlreadySend must not panic when called before Start()", tt.name)
+		})
+	}
+}
+
 func Test_SIRIStopmonitoringSubscriptionsCollector_HandleNotifyStopMonitoring(t *testing.T) {
 	_, referential := newTestReferential(t, true)
 	referential.Model().StopAreas().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
