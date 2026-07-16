@@ -1014,3 +1014,61 @@ func Test_Partner_RequestorRef(t *testing.T) {
 		t.Errorf("Wrong Partner RequestorRef:\n got: %s\n want: \"ara\"", partner.RequestorRef())
 	}
 }
+
+func Test_stopAreaResolverFromGroup_GracefulDegradation(t *testing.T) {
+	assert := assert.New(t)
+	_, referential := newTestReferential(t)
+	m := referential.Model()
+
+	// resolvable member: has the partner's remote code space
+	sa1 := m.StopAreas().New()
+	sa1.SetCode(model.NewCode("stif", "STIF:StopArea:1:"))
+	sa1.Save()
+
+	// unresolvable member: present in the model but has no "stif" code
+	sa2 := m.StopAreas().New()
+	sa2.SetCode(model.NewCode("external", "chouette:StopArea:2:"))
+	sa2.Save()
+
+	group := m.StopAreaGroups().New()
+	group.ShortName = "grp"
+	group.StopAreaIds = []model.StopAreaId{sa1.Id(), sa2.Id(), model.StopAreaId("00000000-missing")}
+	group.Save()
+
+	manager := NewPartnerManager(referential)
+	values, ok := manager.stopAreaResolverFromGroup("grp", "stif")
+
+	// ARA-1999: one bad member must no longer void the whole group —
+	// the resolvable member is kept, the no-code member and the missing id are skipped.
+	assert.True(ok, "group exists, so the resolver should succeed")
+	assert.Equal([]string{"STIF:StopArea:1:"}, values)
+
+	// an unknown group short name still returns false
+	_, ok = manager.stopAreaResolverFromGroup("unknown", "stif")
+	assert.False(ok, "unknown group short name should return false")
+}
+
+func Test_lineResolverFromGroup_GracefulDegradation(t *testing.T) {
+	assert := assert.New(t)
+	_, referential := newTestReferential(t)
+	m := referential.Model()
+
+	l1 := m.Lines().New()
+	l1.SetCode(model.NewCode("stif", "STIF:Line:1:"))
+	l1.Save()
+
+	l2 := m.Lines().New() // no "stif" code
+	l2.SetCode(model.NewCode("external", "chouette:Line:2:"))
+	l2.Save()
+
+	group := m.LineGroups().New()
+	group.ShortName = "grp"
+	group.LineIds = []model.LineId{l1.Id(), l2.Id(), model.LineId("00000000-missing")}
+	group.Save()
+
+	manager := NewPartnerManager(referential)
+	values, ok := manager.lineResolverFromGroup("grp", "stif")
+
+	assert.True(ok)
+	assert.Equal([]string{"STIF:Line:1:"}, values)
+}
