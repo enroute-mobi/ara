@@ -8,6 +8,7 @@ import (
 	"strings"
 	"unicode"
 
+	"bitbucket.org/enroute-mobi/ara/core"
 	"bitbucket.org/enroute-mobi/ara/model"
 	"github.com/google/uuid"
 	"golang.org/x/text/runes"
@@ -30,7 +31,8 @@ type ModelForCode[S SearchableByCode] interface {
 type SearchableByName interface {
 	model.StopArea |
 		model.VehicleJourney |
-		model.Line
+		model.Line |
+		core.Partner
 }
 
 type ModelForName[S SearchableByName] interface {

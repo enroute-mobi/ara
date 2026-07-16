@@ -100,7 +100,32 @@ func (controller *PartnerController) Index(response http.ResponseWriter, params 
 	logger.Log.Debugf("Partners Index")
 
 	allPartners := controller.referential.Partners().FindAll()
-	paginatedPartners, err := paginate(allPartners, params)
+
+	// Search
+	filteredPartners, err := searchByName(allPartners, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Sort
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(filteredPartners, func(i, j int) bool {
+			return filteredPartners[i].Name > filteredPartners[j].Name
+		})
+	case "asc", "":
+		sort.Slice(filteredPartners, func(i, j int) bool {
+			return filteredPartners[i].Name < filteredPartners[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	// Paginate
+	paginatedPartners, err := paginate(filteredPartners, params)
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return

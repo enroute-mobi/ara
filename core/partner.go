@@ -144,6 +144,10 @@ func (partner *Partner) Slug() partners.Slug {
 	return partner.slug
 }
 
+func (partner *Partner) GetName() string {
+	return partner.Name
+}
+
 func (partner *Partner) SetSlug(s partners.Slug) {
 	partner.slug = s
 }

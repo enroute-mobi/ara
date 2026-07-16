@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -329,6 +330,46 @@ func Test_PartnerController_Index(t *testing.T) {
 	//Test Results
 	expected := `{"Models":[{"Id":"6ba7b814-9dad-11d1-0-00c04fd430c8","Slug":"first_partner","PartnerStatus":{"OperationnalStatus":"unknown","RetryCount":0,"ServiceStartedAt":"0001-01-01T00:00:00Z"},"ConnectorTypes":[],"Settings":{}}],"Pagination":{"CurrentPage":1,"PerPage":1,"TotalCount":1,"TotalPages":1}}`
 	assert.JSONEq(expected, responseRecorder.Body.String())
+}
+
+func Test_PartnerController_Index_SearchByName(t *testing.T) {
+	assert := assert.New(t)
+
+	server, referential := newTestServer(t)
+	referential.Tokens = []string{"testToken"}
+
+	uuid.SetDefaultUUIDGenerator(uuid.NewFakeUUIDGenerator())
+	referential.Partners().SetUUIDGenerator(uuid.NewFakeUUIDGenerator())
+
+	alpha := referential.Partners().New("alpha_partner")
+	alpha.Name = "Alpha"
+	referential.Partners().Save(alpha)
+
+	beta := referential.Partners().New("beta_partner")
+	beta.Name = "Beta"
+	referential.Partners().Save(beta)
+
+	request, err := http.NewRequest("GET", "/default/partners?name=Alpha", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	request.Header.Set("Authorization", "Token token=testToken")
+	request.SetPathValue("referential_slug", string(referential.Slug()))
+	request.SetPathValue("model", "partners")
+
+	responseRecorder := httptest.NewRecorder()
+	server.handleReferentialModelIndex(responseRecorder, request)
+
+	checkPartnerResponseStatus(responseRecorder, t)
+
+	var paginated struct {
+		Models     []struct{ Name string }
+		Pagination struct{ TotalCount int }
+	}
+	assert.NoError(json.Unmarshal(responseRecorder.Body.Bytes(), &paginated))
+	assert.Equal(1, paginated.Pagination.TotalCount, "only the matching partner should be returned")
+	assert.Len(paginated.Models, 1)
+	assert.Equal("Alpha", paginated.Models[0].Name)
 }
 
 func Test_PartnerController_Save(t *testing.T) {
