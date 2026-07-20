@@ -527,6 +527,43 @@ func (situation *Situation) containsKeyword(str string) bool {
 	return slices.Contains(situation.Keywords, str)
 }
 
+// SearchableText returns every textual value (default and translations of the
+// Summary and Description) against which a text search can be matched.
+func (situation *Situation) SearchableText() (texts []string) {
+	for _, translatedString := range []*TranslatedString{situation.Summary, situation.Description} {
+		if translatedString == nil {
+			continue
+		}
+		if translatedString.DefaultValue != "" {
+			texts = append(texts, translatedString.DefaultValue)
+		}
+		for _, translation := range translatedString.Translations {
+			texts = append(texts, translation)
+		}
+	}
+	return texts
+}
+
+// GetAffectedLineIds returns the ids of the Lines directly affected by the Situation.
+func (situation *Situation) GetAffectedLineIds() (lineIds []LineId) {
+	for _, affect := range situation.Affects {
+		if affectedLine, ok := affect.(*AffectedLine); ok {
+			lineIds = append(lineIds, affectedLine.LineId)
+		}
+	}
+	return lineIds
+}
+
+// GetAffectedStopAreaIds returns the ids of the StopAreas directly affected by the Situation.
+func (situation *Situation) GetAffectedStopAreaIds() (stopAreaIds []StopAreaId) {
+	for _, affect := range situation.Affects {
+		if affectedStopArea, ok := affect.(*AffectedStopArea); ok {
+			stopAreaIds = append(stopAreaIds, affectedStopArea.StopAreaId)
+		}
+	}
+	return stopAreaIds
+}
+
 type APISituation struct {
 	Id     SituationId `json:",omitempty"`
 	Origin string      `json:",omitempty"`

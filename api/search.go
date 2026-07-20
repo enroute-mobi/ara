@@ -19,7 +19,8 @@ type SearchableByCode interface {
 	model.Line |
 		model.Vehicle |
 		model.VehicleJourney |
-		model.StopArea
+		model.StopArea |
+		model.Situation
 }
 
 type ModelForCode[S SearchableByCode] interface {
@@ -44,6 +45,33 @@ type SearchableByLineId interface {
 
 type ModelForLineIds[S SearchableByLineId] interface {
 	GetLineId() model.LineId
+	*S
+}
+
+type SearchableByText interface {
+	model.Situation
+}
+
+type ModelForText[S SearchableByText] interface {
+	SearchableText() []string
+	*S
+}
+
+type SearchableByAffectedLineIds interface {
+	model.Situation
+}
+
+type ModelForAffectedLineIds[S SearchableByAffectedLineIds] interface {
+	GetAffectedLineIds() []model.LineId
+	*S
+}
+
+type SearchableByAffectedStopAreaIds interface {
+	model.Situation
+}
+
+type ModelForAffectedStopAreaIds[S SearchableByAffectedStopAreaIds] interface {
+	GetAffectedStopAreaIds() []model.StopAreaId
 	*S
 }
 
@@ -149,6 +177,98 @@ func searchByLineIds[S SearchableByLineId, M ModelForLineIds[S]](s []M, params u
 	for i := range s {
 		if slices.Contains(lineIds, string(s[i].GetLineId())) {
 			possibleModels = append(possibleModels, s[i])
+		}
+	}
+	return possibleModels, nil
+}
+
+func searchByText[S SearchableByText, M ModelForText[S]](s []M, params url.Values) ([]M, error) {
+	searchText := params.Get("text")
+	if searchText == "" {
+		return s, nil
+	}
+	params.Del("text")
+
+	if len(searchText) < 3 {
+		return nil, fmt.Errorf("length of search text must be at least 3 characters, got: %s", searchText)
+	}
+
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	normalizedSearchText, _, err := transform.String(t, searchText)
+	if err != nil {
+		return nil, fmt.Errorf("query parameter \"text\" %s: cannot normalize:, %v", searchText, err.Error())
+	}
+
+	searchPattern, err := regexp.Compile("(?i)" + normalizedSearchText)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create search pattern: %v", err.Error())
+	}
+
+	possibleModels := []M{}
+	for i := range s {
+		for _, text := range s[i].SearchableText() {
+			normalizedText, _, err := transform.String(t, text)
+			if err != nil {
+				return nil, fmt.Errorf("cannot normalize text: %v", err.Error())
+			}
+			if searchPattern.MatchString(normalizedText) {
+				possibleModels = append(possibleModels, s[i])
+				break
+			}
+		}
+	}
+	return possibleModels, nil
+}
+
+func searchByAffectedLineIds[S SearchableByAffectedLineIds, M ModelForAffectedLineIds[S]](s []M, params url.Values) ([]M, error) {
+	lineIds := params["line_ids[]"]
+	if len(lineIds) == 0 {
+		return s, nil
+	}
+
+	params.Del("line_ids[]")
+
+	for i := range lineIds {
+		err := uuid.Validate(lineIds[i])
+		if err != nil {
+			return nil, fmt.Errorf("line id is not a valid UUID: %s", lineIds[i])
+		}
+	}
+
+	possibleModels := []M{}
+	for i := range s {
+		for _, lineId := range s[i].GetAffectedLineIds() {
+			if slices.Contains(lineIds, string(lineId)) {
+				possibleModels = append(possibleModels, s[i])
+				break
+			}
+		}
+	}
+	return possibleModels, nil
+}
+
+func searchByAffectedStopAreaIds[S SearchableByAffectedStopAreaIds, M ModelForAffectedStopAreaIds[S]](s []M, params url.Values) ([]M, error) {
+	stopAreaIds := params["stop_area_ids[]"]
+	if len(stopAreaIds) == 0 {
+		return s, nil
+	}
+
+	params.Del("stop_area_ids[]")
+
+	for i := range stopAreaIds {
+		err := uuid.Validate(stopAreaIds[i])
+		if err != nil {
+			return nil, fmt.Errorf("stop area id is not a valid UUID: %s", stopAreaIds[i])
+		}
+	}
+
+	possibleModels := []M{}
+	for i := range s {
+		for _, stopAreaId := range s[i].GetAffectedStopAreaIds() {
+			if slices.Contains(stopAreaIds, string(stopAreaId)) {
+				possibleModels = append(possibleModels, s[i])
+				break
+			}
 		}
 	}
 	return possibleModels, nil
