@@ -75,6 +75,36 @@ type ModelForAffectedStopAreaIds[S SearchableByAffectedStopAreaIds] interface {
 	*S
 }
 
+// newNormalizedMatcher validates a search string (at least 3 characters) and
+// returns a matcher reporting whether a candidate string contains it. Both the
+// search string and the candidates are compared accent-insensitively (combining
+// marks stripped) and case-insensitively. label names the searched field and is
+// only used to make the length error message explicit.
+func newNormalizedMatcher(label, value string) (func(string) (bool, error), error) {
+	if len(value) < 3 {
+		return nil, fmt.Errorf("length of search %s must be at least 3 characters, got: %s", label, value)
+	}
+
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	normalizedValue, _, err := transform.String(t, value)
+	if err != nil {
+		return nil, fmt.Errorf("query parameter %q %s: cannot normalize:, %v", label, value, err.Error())
+	}
+
+	searchPattern, err := regexp.Compile("(?i)" + normalizedValue)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create search pattern: %v", err.Error())
+	}
+
+	return func(candidate string) (bool, error) {
+		normalizedCandidate, _, err := transform.String(t, candidate)
+		if err != nil {
+			return false, fmt.Errorf("cannot normalize %q: %v", candidate, err.Error())
+		}
+		return searchPattern.MatchString(normalizedCandidate), nil
+	}, nil
+}
+
 func searchByName[S SearchableByName, M ModelForName[S]](s []M, params url.Values) ([]M, error) {
 	searchName := params.Get("name")
 	if searchName == "" {
@@ -82,29 +112,18 @@ func searchByName[S SearchableByName, M ModelForName[S]](s []M, params url.Value
 	}
 	params.Del("name")
 
+	matches, err := newNormalizedMatcher("name", searchName)
+	if err != nil {
+		return nil, err
+	}
+
 	possibleModels := []M{}
-
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	if len(searchName) < 3 {
-		return nil, fmt.Errorf("length of search name must be at least 3 characters, got: %s", searchName)
-	}
-
-	normalizedSearchPattern, _, err := transform.String(t, searchName)
-	if err != nil {
-		return nil, fmt.Errorf("query parameter \"name\" %s: cannot normalize:, %v", searchName, err.Error())
-	}
-
-	searchPattern, err := regexp.Compile("(?i)" + normalizedSearchPattern)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create search pattern: %v", err.Error())
-	}
-
 	for i := range s {
-		normalizedSaName, _, err := transform.String(t, s[i].GetName())
+		ok, err := matches(s[i].GetName())
 		if err != nil {
-			return nil, fmt.Errorf("cannot normalize stopArea name: %v", err.Error())
+			return nil, err
 		}
-		if searchPattern.MatchString(normalizedSaName) {
+		if ok {
 			possibleModels = append(possibleModels, s[i])
 		}
 	}
@@ -118,8 +137,6 @@ func searchByCode[S SearchableByCode, M ModelForCode[S]](s []M, params url.Value
 	}
 	params.Del("code")
 
-	possibleModels := []M{}
-
 	searchCodeSpace, searchValue, found := strings.Cut(searchCode, ":")
 	if !found {
 		return nil, fmt.Errorf("invalid request: query parameter \"code\" : %s", searchCode)
@@ -127,31 +144,23 @@ func searchByCode[S SearchableByCode, M ModelForCode[S]](s []M, params url.Value
 	if searchCodeSpace == "" || searchValue == "" {
 		return nil, fmt.Errorf("code space or value should not be empty")
 	}
-	if len(searchValue) < 3 {
-		return nil, fmt.Errorf("length of search value must be at least 3 characters, got: %s", searchValue)
-	}
 
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	normalizedSearchValue, _, err := transform.String(t, searchValue)
+	matches, err := newNormalizedMatcher("value", searchValue)
 	if err != nil {
-		return nil, fmt.Errorf("invalid request: query parameter \"code\" %s: cannot normalize value:, %v", searchValue, err.Error())
+		return nil, err
 	}
 
-	searchPattern, err := regexp.Compile("(?i)" + normalizedSearchValue)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create search pattern: %v", err.Error())
-	}
-
+	possibleModels := []M{}
 	for i := range s {
 		code, ok := s[i].Code(searchCodeSpace)
 		if !ok {
 			continue
 		}
-		normalisedCodeValue, _, err := transform.String(t, code.Value())
+		match, err := matches(code.Value())
 		if err != nil {
-			return nil, fmt.Errorf("cannot normalize code value: %v", err.Error())
+			return nil, err
 		}
-		if searchPattern.MatchString(normalisedCodeValue) {
+		if match {
 			possibleModels = append(possibleModels, s[i])
 		}
 	}
@@ -189,29 +198,19 @@ func searchByText[S SearchableByText, M ModelForText[S]](s []M, params url.Value
 	}
 	params.Del("text")
 
-	if len(searchText) < 3 {
-		return nil, fmt.Errorf("length of search text must be at least 3 characters, got: %s", searchText)
-	}
-
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	normalizedSearchText, _, err := transform.String(t, searchText)
+	matches, err := newNormalizedMatcher("text", searchText)
 	if err != nil {
-		return nil, fmt.Errorf("query parameter \"text\" %s: cannot normalize:, %v", searchText, err.Error())
-	}
-
-	searchPattern, err := regexp.Compile("(?i)" + normalizedSearchText)
-	if err != nil {
-		return nil, fmt.Errorf("cannot create search pattern: %v", err.Error())
+		return nil, err
 	}
 
 	possibleModels := []M{}
 	for i := range s {
 		for _, text := range s[i].SearchableText() {
-			normalizedText, _, err := transform.String(t, text)
+			ok, err := matches(text)
 			if err != nil {
-				return nil, fmt.Errorf("cannot normalize text: %v", err.Error())
+				return nil, err
 			}
-			if searchPattern.MatchString(normalizedText) {
+			if ok {
 				possibleModels = append(possibleModels, s[i])
 				break
 			}
