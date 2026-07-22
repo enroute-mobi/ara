@@ -8,7 +8,12 @@ import (
 )
 
 func Transform(srsName int, x, y float64) (lon, lat float64, e error) {
-	lon, lat, _ = wgs84.Transform(wgs84.EPSG(srsName), wgs84.EPSG(4326))(x, y, 0)
+	transform, err := wgs84.Transform(srsName, 4326)
+	if err != nil {
+		return 0, 0, fmt.Errorf("unsupported coordinate reference system EPSG:%d", srsName)
+	}
+
+	lon, lat, _, _ = transform(x, y, 0)
 
 	if math.IsNaN(lon) || math.IsNaN(lat) {
 		return 0, 0, fmt.Errorf("unsupported coordinate reference system EPSG:%d", srsName)
