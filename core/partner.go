@@ -1144,12 +1144,14 @@ func (manager *PartnerManager) stopAreaResolverFromGroup(shortName, codeSpace st
 	for _, id := range group.StopAreaIds {
 		sa, ok := manager.Referential().Model().StopAreas().Find(id)
 		if !ok {
-			return nil, false
+			logger.Log.Printf("StopAreaGroup %q: member %v not found in model, skipping it", shortName, id)
+			continue
 		}
 
 		code, ok := sa.Code(codeSpace)
 		if !ok {
-			return nil, false
+			logger.Log.Printf("StopAreaGroup %q: member %v has no %q code, skipping it", shortName, id, codeSpace)
+			continue
 		}
 
 		stopAreaValues = append(stopAreaValues, code.Value())
@@ -1166,14 +1168,16 @@ func (manager *PartnerManager) lineResolverFromGroup(shortName, codeSpace string
 
 	lineValues := []string{}
 	for _, id := range group.LineIds {
-		sa, ok := manager.Referential().Model().Lines().Find(id)
+		line, ok := manager.Referential().Model().Lines().Find(id)
 		if !ok {
-			return nil, false
+			logger.Log.Printf("LineGroup %q: member %v not found in model, skipping it", shortName, id)
+			continue
 		}
 
-		code, ok := sa.Code(codeSpace)
+		code, ok := line.Code(codeSpace)
 		if !ok {
-			return nil, false
+			logger.Log.Printf("LineGroup %q: member %v has no %q code, skipping it", shortName, id, codeSpace)
+			continue
 		}
 
 		lineValues = append(lineValues, code.Value())
