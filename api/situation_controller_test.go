@@ -167,6 +167,78 @@ func Test_SituationController_Index(t *testing.T) {
 	assert.JSONEq(string(expected), responseRecorder.Body.String())
 }
 
+func Test_SituationController_Index_Search(t *testing.T) {
+	assert := assert.New(t)
+
+	server, referential := newTestServer(t)
+	referential.Tokens = []string{"testToken"}
+
+	uuid.SetDefaultUUIDGenerator(uuid.NewRealUUIDGenerator())
+
+	lineId := "09fc2149-1182-4bcc-a0d4-382516c193a1"
+	stopAreaId := "3f2504e0-4f89-11d3-9a0c-0305e82c3301"
+
+	// Situation matched by text and code
+	textSituation := referential.Model().Situations().New()
+	textSituation.SetCode(model.NewCode("internal", "SEARCHABLE-CODE"))
+	textSituation.Summary = &model.TranslatedString{DefaultValue: "Travaux sur la ligne"}
+	referential.Model().Situations().Save(textSituation)
+
+	// Situation matched by affected line
+	lineSituation := referential.Model().Situations().New()
+	lineSituation.Description = &model.TranslatedString{DefaultValue: "Autre perturbation"}
+	lineSituation.Affects = model.Affects{&model.AffectedLine{LineId: model.LineId(lineId)}}
+	referential.Model().Situations().Save(lineSituation)
+
+	// Situation matched by affected stop area
+	stopAreaSituation := referential.Model().Situations().New()
+	stopAreaSituation.Affects = model.Affects{&model.AffectedStopArea{StopAreaId: model.StopAreaId(stopAreaId)}}
+	referential.Model().Situations().Save(stopAreaSituation)
+
+	assert.Len(referential.Model().Situations().FindAll(), 3)
+
+	search := func(params url.Values) []model.APISituation {
+		u, _ := URI("", path.Join("default", "situations"), params)
+		request, _ := http.NewRequest("GET", u.String(), nil)
+		request.Header.Set("Authorization", "Token token=testToken")
+		request.SetPathValue("referential_slug", string(referential.Slug()))
+		request.SetPathValue("model", "situations")
+
+		responseRecorder := httptest.NewRecorder()
+		server.handleReferentialModelIndex(responseRecorder, request)
+
+		res := responseRecorder.Result()
+		defer res.Body.Close()
+		data, err := io.ReadAll(res.Body)
+		assert.NoError(err)
+
+		var situations []model.APISituation
+		err = json.Unmarshal(data, &situations)
+		assert.NoError(err)
+		return situations
+	}
+
+	// Search by text (case-insensitive, partial, on summary or description)
+	byText := search(url.Values{"text": []string{"travaux"}})
+	assert.Len(byText, 1)
+	assert.Equal(textSituation.Id(), byText[0].Id)
+
+	// Search by code
+	byCode := search(url.Values{"code": []string{"internal:SEARCHABLE"}})
+	assert.Len(byCode, 1)
+	assert.Equal(textSituation.Id(), byCode[0].Id)
+
+	// Search by affected line
+	byLine := search(url.Values{"line_ids[]": []string{lineId}})
+	assert.Len(byLine, 1)
+	assert.Equal(lineSituation.Id(), byLine[0].Id)
+
+	// Search by affected stop area
+	byStopArea := search(url.Values{"stop_area_ids[]": []string{stopAreaId}})
+	assert.Len(byStopArea, 1)
+	assert.Equal(stopAreaSituation.Id(), byStopArea[0].Id)
+}
+
 func Test_SituationController_Index_Paginated(t *testing.T) {
 	assert := assert.New(t)
 
