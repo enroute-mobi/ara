@@ -1,6 +1,6 @@
 GIT
   remote: https://bitbucket.org/enroute-mobi/ara-ruby.git
-  revision: e2859219b19d877a3cced3cb3f4cc5d1a6793117
+  revision: a732e2e3e39971242ee43a9d78859c32f618b29b
   specs:
     ara (3.5.5)
       faraday
@@ -89,7 +89,7 @@ GEM
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     io-console (0.8.2)
-    json (2.19.9)
+    json (2.21.1)
     license_finder (7.2.1)
       bundler
       csv (~> 3.2)

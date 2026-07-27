@@ -96,10 +96,42 @@ func (controller *PartnerController) findPartner(identifier string) *core.Partne
 	return controller.referential.Partners().Find(partners.Id(identifier))
 }
 
-func (controller *PartnerController) Index(response http.ResponseWriter, _params url.Values) {
+func (controller *PartnerController) Index(response http.ResponseWriter, params url.Values) {
 	logger.Log.Debugf("Partners Index")
 
-	jsonBytes, _ := json.Marshal(controller.referential.Partners().FindAll())
+	allPartners := controller.referential.Partners().FindAll()
+
+	// Search
+	filteredPartners, err := searchByName(allPartners, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Sort
+	direction := params.Get("direction")
+	switch direction {
+	case "desc":
+		sort.Slice(filteredPartners, func(i, j int) bool {
+			return filteredPartners[i].Name > filteredPartners[j].Name
+		})
+	case "asc", "":
+		sort.Slice(filteredPartners, func(i, j int) bool {
+			return filteredPartners[i].Name < filteredPartners[j].Name
+		})
+	default:
+		http.Error(response, fmt.Sprintf("invalid request: query parameter \"direction\": %s", params.Get("direction")), http.StatusBadRequest)
+		return
+	}
+
+	// Paginate
+	paginatedPartners, err := paginate(filteredPartners, params)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonBytes, _ := json.Marshal(paginatedPartners)
 	response.Write(jsonBytes)
 }
 

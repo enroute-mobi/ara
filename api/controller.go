@@ -80,7 +80,8 @@ type Paginable interface {
 		model.StopArea |
 		model.Vehicle |
 		model.VehicleJourney |
-		model.Situation
+		model.Situation |
+		core.Partner
 }
 
 type PaginatedResource[p Paginable] struct {

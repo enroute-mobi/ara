@@ -488,6 +488,9 @@ func (server *Server) partnerSubscriptionsSetup(response http.ResponseWriter, re
 		return
 	}
 
+	response.Header().Set("Server", version.ApplicationName())
+	response.Header().Set("Content-Type", "application/json")
+
 	controller = NewPartnerController(foundReferential)
 	return
 }
