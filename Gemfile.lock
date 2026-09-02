@@ -89,7 +89,7 @@ GEM
     i18n (1.15.2)
       concurrent-ruby (~> 1.0)
     io-console (0.8.2)
-    json (2.21.1)
+    json (2.21.2)
     license_finder (7.2.1)
       bundler
       csv (~> 3.2)
